@@ -46,7 +46,7 @@ namespace SwarmRoboticsGUI
 
             //Add the interop host control to the grid control's collection of child controls
             this.grid1.Children.Add(host);
-
+            //this.Column1.Children.Add(host);
         }
     }
 }

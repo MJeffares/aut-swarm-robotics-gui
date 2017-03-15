@@ -5,12 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SwarmRoboticsGUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525" Loaded="Window_Loaded">
-    <Grid Name="grid1">
+        Title="Swarm Robotics Graphics User Interface" Height="350" Width="525" Loaded="Window_Loaded">
+    <Grid x:Name="grid1">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="27*"/>
-            <ColumnDefinition Width="20*"/>
+            <ColumnDefinition x:Name="Column1" Width="*"/>
+            <ColumnDefinition x:Name="Column2" Width="5"/>
+            <ColumnDefinition x:Name="Column3" Width="*"/>
         </Grid.ColumnDefinitions>
 
+        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
     </Grid>
 </Window>
