@@ -37,7 +37,6 @@ namespace SwarmRoboticsGUI
         {
             InitializeComponent();
             CvInvoke.UseOpenCL = false;
-            ImageBox imagebox1 = new ImageBox();
 
             try
             {

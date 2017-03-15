@@ -22,7 +22,7 @@
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
 
         <WindowsFormsHost Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Grid.Column="2" Margin="0,0,0,0" >
-            <em:ImageBox x:Name="captureImageBox" Height="320" Width="256"/>
+            <em:ImageBox x:Name="captureImageBox" Height="320" Width="256" SizeMode="StretchImage" FunctionalMode="Minimum"/>
         </WindowsFormsHost>
     </Grid>
 </Window>
