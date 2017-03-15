@@ -14,8 +14,14 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 using Emgu.CV;
+using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.UI;
+using Emgu.CV.Util;
+
+using System.Drawing;
+using System.Windows.Forms;
+
 
 namespace SwarmRoboticsGUI
 {
@@ -24,29 +30,37 @@ namespace SwarmRoboticsGUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        private VideoCapture _capture = null;
+        private Mat _frame;     
+
         public MainWindow()
         {
             InitializeComponent();
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            // Create the interop host control
-            System.Windows.Forms.Integration.WindowsFormsHost host = new System.Windows.Forms.Integration.WindowsFormsHost();
-
-            //Create imagebox Control
+            CvInvoke.UseOpenCL = false;
             ImageBox imagebox1 = new ImageBox();
 
-            string FileName = "g:\\lena.jpg";
-            Image<Bgr, byte> imgInput = new Image<Bgr, byte>(FileName);
-            imagebox1.Image = imgInput;
+            try
+            {
+                _capture = new VideoCapture();
+                _capture.ImageGrabbed += ProcessFrame;
+            }
+            catch(NullReferenceException excpt)
+            {
+                System.Windows.MessageBox.Show(excpt.Message);
+            }
 
-            //Assign ImageBox as the host controller
-            host.Child = imagebox1;
+            _frame = new Mat();
+            _capture.Start();
+        }
 
-            //Add the interop host control to the grid control's collection of child controls
-            this.grid1.Children.Add(host);
-            //this.Column1.Children.Add(host);
+        private void ProcessFrame(object sender, EventArgs arg)
+        {
+            if(_capture != null && _capture.Ptr != IntPtr.Zero)
+            {
+                _capture.Retrieve(_frame, 0);
+
+                captureImageBox.Image = _frame;
+            }  
         }
     }
 }

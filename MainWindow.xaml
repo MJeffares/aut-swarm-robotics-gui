@@ -4,9 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SwarmRoboticsGUI"
+        
+        
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+        xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
+        
         mc:Ignorable="d"
-        Title="Swarm Robotics Graphics User Interface" Height="350" Width="525" Loaded="Window_Loaded">
-    <Grid x:Name="grid1">
+        Title="Swarm Robotics Graphics User Interface" Height="350" Width="525" >
+    <Grid>
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="Column1" Width="*"/>
             <ColumnDefinition x:Name="Column2" Width="5"/>
@@ -14,5 +20,9 @@
         </Grid.ColumnDefinitions>
 
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
+
+        <WindowsFormsHost Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Grid.Column="2" Margin="0,0,0,0" >
+            <em:ImageBox x:Name="captureImageBox" Height="320" Width="256"/>
+        </WindowsFormsHost>
     </Grid>
 </Window>
