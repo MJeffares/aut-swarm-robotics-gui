@@ -1,10 +1,11 @@
 # README #
 
 ## To do List ##
--Camera Selection
--Placement Setup
--Custom Library
--Camera Visibility
+- Camera Selection
+- Placement Setup
+- Custom Library
+- Camera Visibility
+- This Readme
 
 (only show combobox, combobox shows "select a camera", update combo box on click/hover, show button on selection, once button clicked change visibility of buttons, fade with opacity?) 
 
