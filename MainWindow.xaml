@@ -19,6 +19,11 @@
             <ColumnDefinition x:Name="Column3" Width="*"/>
         </Grid.ColumnDefinitions>
 
+        <!--<WindowsFormsHost Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Grid.Column="0" Grid.ColumnSpan="1" Grid.RowSpan="3" Margin="0,0,0,0" Visibility="Hidden">
+            <em:ImageBox x:Name="captureImageBox" Height="320" Width="256" SizeMode="StretchImage" FunctionalMode="Minimum"/>
+        </WindowsFormsHost>-->
+
+
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
         <Grid Grid.Column="2">
 
@@ -35,14 +40,15 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Column="1" Grid.Row="1" Panel.ZIndex="1">
-                <Label Content="Avaliable Cameras" HorizontalAlignment="Center"/>
+                <Label Content="Select A Camera" HorizontalAlignment="Center"/>
                 <ComboBox x:Name="cbCameraList" Margin="10" AutomationProperties.Name="cbCameraList" SelectedIndex="0" HorizontalAlignment="Center" MouseEnter="cbCameraList_MouseEnter" SelectionChanged="cbCameraList_SelectionChanged"/>
-                <Button Margin="10" HorizontalAlignment="Center">Connect</Button>
+                <Button x:Name="butCameraConnect" Margin="10" HorizontalAlignment="Center" Visibility="Hidden" Click="butCameraConnect_Click" >Connect</Button>
              </StackPanel>
-            
-            <!--<WindowsFormsHost Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3" Margin="0,0,0,0">
+
+
+            <WindowsFormsHost Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3" Margin="0,0,0,0" Visibility="Hidden">
                 <em:ImageBox x:Name="captureImageBox" Height="320" Width="256" SizeMode="StretchImage" FunctionalMode="Minimum"/>
-            </WindowsFormsHost>-->
+            </WindowsFormsHost>
         </Grid>
     </Grid>
 </Window>
