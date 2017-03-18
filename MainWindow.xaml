@@ -12,43 +12,66 @@
         mc:Ignorable="d"
         Title="Swarm Robotics Graphics User Interface" Height="350" Width="525" >
     <Grid>
-        
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="Column1" Width="*"/>
             <ColumnDefinition x:Name="Column2" Width="5"/>
             <ColumnDefinition x:Name="Column3" Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!--<WindowsFormsHost Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Grid.Column="0" Grid.ColumnSpan="1" Grid.RowSpan="3" Margin="0,0,0,0" Visibility="Hidden">
-            <em:ImageBox x:Name="captureImageBox" Height="320" Width="256" SizeMode="StretchImage" FunctionalMode="Minimum"/>
-        </WindowsFormsHost>-->
-
 
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
-        <Grid Grid.Column="2">
-
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="3*"/>
-            </Grid.RowDefinitions>
-
-            <StackPanel Grid.Column="1" Grid.Row="1" Panel.ZIndex="1">
-                <Label Content="Select A Camera" HorizontalAlignment="Center"/>
-                <ComboBox x:Name="cbCameraList" Margin="10" AutomationProperties.Name="cbCameraList" SelectedIndex="0" HorizontalAlignment="Center" MouseEnter="cbCameraList_MouseEnter" SelectionChanged="cbCameraList_SelectionChanged"/>
-                <Button x:Name="butCameraConnect" Margin="10" HorizontalAlignment="Center" Visibility="Hidden" Click="butCameraConnect_Click" >Connect</Button>
-             </StackPanel>
 
 
-            <WindowsFormsHost Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3" Margin="0,0,0,0" Visibility="Hidden">
-                <em:ImageBox x:Name="captureImageBox" Height="320" Width="256" SizeMode="StretchImage" FunctionalMode="Minimum"/>
-            </WindowsFormsHost>
-        </Grid>
+        <DockPanel Grid.Column="2">
+            <!--
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_File">
+                    <MenuItem Header="_New" />
+                    <MenuItem Header="_Open" />
+                    <MenuItem Header="_Save" />
+                </MenuItem>
+                <MenuItem Header="Camera">
+                    <MenuItem x:Name="menuCameraList" Header="Connected Cameras"/>
+
+
+                </MenuItem>
+                <MenuItem Header="Filters">
+                    
+                </MenuItem>
+                <MenuItem Header="Overlays">
+                    
+                </MenuItem>
+                <MenuItem Header="Options"/>
+            </Menu>
+            -->
+            <Grid>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="3*"/>
+                </Grid.RowDefinitions>
+
+                <!--<Button x:Name="butCameraClose" Margin="3" HorizontalAlignment="Left" VerticalAlignment="Top" Background="Transparent" FontWeight="Bold" BorderBrush="Transparent" Foreground="Red" Panel.ZIndex="10" >X</Button>-->
+
+                <StackPanel Grid.Column="1" Grid.Row="1" Panel.ZIndex="1">
+                    <Label Content="Select A Camera" HorizontalAlignment="Center"/>
+                    <ComboBox x:Name="cbCameraList" Margin="10" AutomationProperties.Name="cbCameraList" SelectedIndex="0" HorizontalAlignment="Center" MouseEnter="cbCameraList_MouseEnter" SelectionChanged="cbCameraList_SelectionChanged"/>
+                    <Button x:Name="butCameraConnect" Margin="10" HorizontalAlignment="Center" Visibility="Hidden" Click="butCameraConnect_Click" >Connect</Button>
+                </StackPanel>
+
+
+                <WindowsFormsHost Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3" Margin="0,0,0,0" Visibility="Hidden" Panel.ZIndex="0">
+                    <em:ImageBox x:Name="captureImageBox" Height="320" Width="256" SizeMode="StretchImage" FunctionalMode="Minimum"/>
+                </WindowsFormsHost>
+            </Grid>
+        </DockPanel>
     </Grid>
 </Window>
