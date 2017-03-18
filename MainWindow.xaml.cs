@@ -60,26 +60,30 @@ struct Video_Device
     public string Device_Name;
     public int Device_ID;
     public Guid Identifier;
-    //public int Menu_Index;
 
     public Video_Device(int ID, string Name, Guid Identity = new Guid())
     {
         Device_ID = ID;
         Device_Name = Name;
         Identifier = Identity;
-        //Menu_Index = -1;
     }
 
     ///<summary>
     ///Represent the Device as a string
     /// </summary>
-    /// <returns>The string representation of this colour</returns>
+    /// <returns>The string representation of this Device</returns>
     public override string ToString()
     {
         return String.Format("[{0}]{1}", Device_ID, Device_Name);
     }
 }
 
+static class CaptureStatuses
+{
+    public const int PLAYING = 0;
+    public const int PAUSED = 1;
+    public const int STOPPED = 2;
+}
 
 
 namespace SwarmRoboticsGUI
@@ -94,7 +98,6 @@ namespace SwarmRoboticsGUI
     {
         //Camera Capture Variables
         public VideoCapture _capture = null;
-        public bool _captureInProgress = false;
         public int CameraDevice = 0;
         Video_Device[] WebCams;
         public Mat _frame;
@@ -102,7 +105,10 @@ namespace SwarmRoboticsGUI
         public int FPS_Count = 0;
         Timer FPS_Timer = new Timer();
 
-        Timer test_timer = new Timer();
+        //public bool _captureInProgress = false;
+        public int CaptureStatus = CaptureStatuses.STOPPED;
+        
+        
 
         public MainWindow()
         {
@@ -110,47 +116,27 @@ namespace SwarmRoboticsGUI
             CvInvoke.UseOpenCL = false;
             PopulateCameras();
            
-            //FPS_Timer.Elapsed += new ElapsedEventHandler(FPS_Timer_Tick);
-            //FPS_Timer.Interval = 1000;
             DispatcherTimer FPS_Timer = new DispatcherTimer();
             FPS_Timer.Tick += FPS_Timer_Tick;
             FPS_Timer.Interval = new TimeSpan(0, 0, 1);
-            FPS_Timer.Start();  //place where connect
-
-            /*
-            DispatcherTimer test_Timer = new DispatcherTimer();
-            test_Timer.Tick += test_Timer_Tick;
-            test_Timer.Interval = new TimeSpan(0, 0, 0, 5,0);
-            test_Timer.Start();  //place where connect  */
-            //System.Windows.Forms.Application.Idle += UpdateUI;
+            //FPS_Timer.Start();  //place where connect
         }
 
-        int number = 0;
+
+
         private void FPS_Timer_Tick(object sender, EventArgs arg)
         {
             cameraStatusFPS.Text = "FPS: " + FPS_Count.ToString();
             FPS_Count = 0;
-
-            if (_captureInProgress)
-            {
-                //_capture.SetCaptureProperty(CapProp.Autograb, number);
-                //number++;
-            }
         }
-        /*
-        private void test_Timer_Tick(object sender, EventArgs arg)
-        {
-            DispatcherTimer timesender = (DispatcherTimer)sender;
-            timesender.Interval = new TimeSpan(0, 0, 0, 0, 34);
-            _capture.QueryFrame();
-        }   */
+        
 
         //Find Connected Cameras by using Directshow.net dll library by carles iloret
         //As the project is build for x64, only cameras with x64 drivers will be found/displayed
         private void PopulateCameras()
         {
 
-            if (!_captureInProgress)
+            if (CaptureStatus == CaptureStatuses.STOPPED)
             {
                 DsDevice[] _SystemCameras = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);      //gets currently connected devices
                 WebCams = new Video_Device[_SystemCameras.Length];                                          //creates a new array of devices
@@ -187,7 +173,7 @@ namespace SwarmRoboticsGUI
         
 
 
-        private void SetupCapture()
+        private void StartCapture()
         {
             if (_capture != null)
             {
@@ -200,23 +186,75 @@ namespace SwarmRoboticsGUI
                 host1.Visibility = Visibility.Visible;
                 _capture = new VideoCapture(CameraDevice);
                 _capture.ImageGrabbed += ProcessFrame;
-
-                //_capture.
-                //.SetCaptureProperty(CapProp.Autograb)
-                //_capture.SetCaptureProperty(CapProp.Brightness, 11);
-                //_capture.SetCaptureProperty(CapProp.Settings, 1);
-                
                 _frame = new Mat();
-                _capture.Start();
-                menuCameraConnect.Header = "Stop Capture";
 
+                menuCameraConnect.Header = "Stop Capture";
+                menuCameraFreeze.IsEnabled = true;
+
+                _capture.Start();
+                FPS_Timer.Start();
+                CaptureStatus = CaptureStatuses.PLAYING;
             }
             catch (NullReferenceException excpt)
             {
-                System.Windows.MessageBox.Show(excpt.Message);
+                MessageBox.Show(excpt.Message);
             }
         }
 
+        private void StopCapture()
+        {
+            try
+            {
+                _capture.Stop();
+                FPS_Timer.Stop();
+                _capture.Dispose();
+                host1.Visibility = Visibility.Hidden;
+                //_captureInProgress = false;
+                CaptureStatus = CaptureStatuses.STOPPED;
+                menuCameraConnect.Header = "Start Capture";
+                menuCameraFreeze.Header = "Freeze";
+                menuCameraFreeze.IsChecked = false;
+                menuCameraFreeze.IsEnabled = false;
+            }
+            catch(Exception excpt)
+            {
+                MessageBox.Show(excpt.Message);
+            }
+        }
+
+        private void PauseCapture()
+        {
+            try
+            {
+                _capture.Pause();
+                FPS_Timer.Stop();
+                //_captureInProgress = false;
+                CaptureStatus = CaptureStatuses.PAUSED;
+                menuCameraFreeze.Header = "Un-Freeze";
+                menuCameraFreeze.IsChecked = true;
+            }
+            catch(Exception excpt)
+            {
+                MessageBox.Show(excpt.Message);
+            }
+        }
+
+        private void ResumeCapture()
+        {
+            try
+            {
+                _capture.Start();
+                FPS_Timer.Start();
+                //_captureInProgress = true;
+                CaptureStatus = CaptureStatuses.PLAYING;
+                menuCameraFreeze.Header = "Freeze";
+                menuCameraFreeze.IsChecked = false;
+            }
+            catch (Exception excpt)
+            {
+                MessageBox.Show(excpt.Message);
+            }
+        }
 
 
         private void ProcessFrame(object sender, EventArgs arg)
@@ -238,7 +276,7 @@ namespace SwarmRoboticsGUI
             MenuItem menusender = (MenuItem)sender;
             String menusenderstring = menusender.ToString();
 
-            if (!_captureInProgress && currentlyConnectedCamera != menusenderstring) //also check if the same menu option is clicked twice
+            if (CaptureStatus == CaptureStatuses.STOPPED && currentlyConnectedCamera != menusenderstring) //also check if the same menu option is clicked twice
             {
                 var allitems = menuCameraList.Items.Cast<System.Windows.Controls.MenuItem>().ToArray();
 
@@ -279,9 +317,33 @@ namespace SwarmRoboticsGUI
 
         private void menuCameraConnect_Click(object sender, RoutedEventArgs e)
         {
+            if(CaptureStatus == CaptureStatuses.PLAYING || CaptureStatus == CaptureStatuses.PAUSED)
+            {
+                StopCapture();
+
+                var allitems = menuCameraList.Items.Cast<MenuItem>().ToArray();
+
+                foreach (var item in allitems)
+                {
+                    item.IsEnabled = true;
+                }
+            }
+            else if(CaptureStatus == CaptureStatuses.STOPPED)
+            {
+                StartCapture();
+
+                var allitems = menuCameraList.Items.Cast<MenuItem>().ToArray();
+
+                foreach (var item in allitems)
+                {
+                    item.IsEnabled = false;
+                }
+            }
+
+            /*
             if (!_captureInProgress)
             {
-                SetupCapture();
+                StartCapture();
                 _captureInProgress = true;
                 menuCameraConnect.Header = "Stop Capture";
                 var allitems = menuCameraList.Items.Cast<System.Windows.Controls.MenuItem>().ToArray();
@@ -304,13 +366,32 @@ namespace SwarmRoboticsGUI
                     item.IsEnabled = true;
                 }
                 //menuCameraConnect.IsChecked = false;
-            }
+            }   */
         }
 
         private void menCameraOptions_Click(object sender, RoutedEventArgs e)
         {
             //need try/catch or checks 
-            _capture.SetCaptureProperty(CapProp.Settings, 1);
+            try
+            {
+                _capture.SetCaptureProperty(CapProp.Settings, 1);
+            }
+            catch(Exception excpt)
+            {
+                MessageBox.Show(excpt.Message);
+            }
+        }
+
+        private void menuCameraFreeze_Click(object sender, RoutedEventArgs e)
+        {
+            if(CaptureStatus == CaptureStatuses.PLAYING)
+            {
+                PauseCapture();
+            }
+            else if (CaptureStatus == CaptureStatuses.PAUSED)
+            {
+                ResumeCapture();
+            }
         }
     }
 }

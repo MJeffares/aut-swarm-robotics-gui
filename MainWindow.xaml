@@ -34,6 +34,7 @@
                 <MenuItem Header="Camera" MouseEnter="MenuItem_MouseEnter">
                     <MenuItem x:Name="menuCameraList" Header="Connected Cameras"/>
                     <MenuItem x:Name="menuCameraConnect" Header="Start Capture" IsEnabled="False" IsCheckable="True"  Click="menuCameraConnect_Click"/>
+                    <MenuItem x:Name="menuCameraFreeze" Header="Freeze Frame" IsEnabled="False" IsCheckable="True" Click="menuCameraFreeze_Click" />
                     <MenuItem x:Name="menCameraOptions" Header="Camera Options" Click="menCameraOptions_Click"/>
                 </MenuItem>
                 <MenuItem Header="Filters">
