@@ -366,7 +366,7 @@ namespace SwarmRoboticsGUI
 
 
 
-		private void menCameraOptions_Click(object sender, RoutedEventArgs e)
+		private void menuCameraOptions_Click(object sender, RoutedEventArgs e)
 		{
 			//need try/catch or checks 
 			try
