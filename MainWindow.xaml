@@ -7,14 +7,55 @@
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
         mc:Ignorable="d"
-        Title="Swarm Robotics Graphics User Interface" Height="350" Width="525" >
+        Title="Swarm Robotics Graphics User Interface" Height="900" Width="1600" >
     <Grid>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition x:Name="Column1" Width="*"/>
-            <ColumnDefinition x:Name="Column2" Width="5"/>
-            <ColumnDefinition x:Name="Column3" Width="*"/>
+            <ColumnDefinition x:Name="Column0" Width="*"/>
+            <ColumnDefinition x:Name="Column1" Width="5"/>
+            <ColumnDefinition x:Name="Column2" Width="*"/>
         </Grid.ColumnDefinitions>
+
+        <DockPanel Grid.Column="0">
+            <StatusBar DockPanel.Dock="Right" Background="Transparent">
+                <StatusBar.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                        </Grid>
+                    </ItemsPanelTemplate>
+                </StatusBar.ItemsPanel>
+
+
+                <StatusBarItem Grid.Row="1" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0">
+                    <Label Content="   >" Padding="0"/>
+                </StatusBarItem>
+
+                <StatusBarItem Grid.Row="2" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0">
+
+                    <Label Content="Camera" Padding="3">
+                        <Label.LayoutTransform>
+                            <RotateTransform Angle="270" />
+                        </Label.LayoutTransform>
+                    </Label>
+
+                </StatusBarItem>
+
+                <StatusBarItem Grid.Row="3" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0">
+                    <Label Content="   >" Padding="0"/>
+                </StatusBarItem>
+
+            </StatusBar>
+            <Grid>
+                <!--fills space in left space-->
+            </Grid>
+        </DockPanel>
 
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
 
@@ -26,7 +67,7 @@
                     <MenuItem Header="_Open" />
                     <MenuItem Header="_Save" />
                 </MenuItem>
-                
+
                 <MenuItem Header="Camera" MouseEnter="MenuItem_MouseEnter">
                     <MenuItem x:Name="menuCameraList" Header="Connected Cameras"/>
                     <MenuItem x:Name="menuCameraConnect" Header="Start Capture" IsEnabled="False" IsCheckable="True"  Click="menuCameraConnect_Click"/>
@@ -53,7 +94,16 @@
                         <MenuItem x:Name="menuOverlaySettings" Header="Settings" />
                     </MenuItem>
 
+                    <MenuItem x:Name="menuFilterFlipVertical" Header="Flip Vertical" Click="menuFilterFlipVertical_Click"/>
+                    <MenuItem x:Name="menuFilterFlipHorizontal" Header="Flip Horizontal" Click="menuFilterFlipHorizontal_Click"/>
                     <MenuItem x:Name="menuFilterSmooth" Header="Smooth" IsCheckable="True" Click="menuFilterSmooth_Click"/>
+                </MenuItem>
+
+                <MenuItem Header="Record">
+                    <MenuItem x:Name="menuRecordNew" Header="New Recording"/>
+                    <MenuItem x:Name="menuRecordPause" Header="Pause Recording" IsCheckable="True" IsEnabled="False"/>
+                    <Separator/>
+                    <MenuItem x:Name="menuRecordingSettings" Header="Settings" />
                 </MenuItem>
             </Menu>
 
@@ -62,45 +112,63 @@
                     <ItemsPanelTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="45"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                         </Grid>
                     </ItemsPanelTemplate>
                 </StatusBar.ItemsPanel>
-                
+
                 <StatusBarItem>
-                    <TextBlock Name="cameraStatusFPS" Text="FPS: "/>
+                    <TextBlock Name="cameraStatusFPS" Text="FPS: 00"/>
                 </StatusBarItem>
-                
+
                 <Separator Grid.Column="1"/>
-                
+
                 <StatusBarItem Grid.Column="2">
                     <TextBlock Name="cameraStatusName" Text="No Camera Selected"/>
                 </StatusBarItem>
-                
+
                 <Separator Grid.Column="3"/>
-                
+
                 <StatusBarItem Grid.Column="4">
-                    <TextBlock Name="cameraStatusRecording"/>
+                    <TextBlock Name="cameraStatusRecordingText" Text="Not Recording"/>
                 </StatusBarItem>
-                
-                <Separator Grid.Column="5"/>
-                
-                <StatusBarItem Grid.Column="6">
-                    <TextBlock Name="cameraStatusFilter"/>
+
+                <StatusBarItem Grid.Column="5">
+                    <PasswordBox Name="cameraStatusRecording" Password="1" Background="Transparent"  BorderBrush="Transparent" IsEnabled="False" SelectionBrush="{x:Null}"/>
                 </StatusBarItem>
+
+                <Separator Grid.Column="6"/>
+
+                <StatusBarItem Grid.Column="7">
+                    <TextBlock Name="cameraStatusFilter" Text="No Filter"/>
+                </StatusBarItem>
+
+                <Separator Grid.Column="8"/>
+
+                <StatusBarItem Grid.Column="9">
+                    <TextBlock Name="cameraStatusTime" Text="00:00:00:00"/>
+                </StatusBarItem>
+
             </StatusBar>
 
             <WindowsFormsHost Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,0,0,0" Visibility="Hidden">
                 <em:ImageBox x:Name="captureImageBox" Height="320" Width="256" SizeMode="StretchImage" FunctionalMode="Minimum"/>
             </WindowsFormsHost>
-            
+
         </DockPanel>
     </Grid>
 </Window>
+
+
+  

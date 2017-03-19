@@ -2,7 +2,8 @@
 *	File: MainWindow.xaml.cs
 *
 *	Developed By: Mansel Jeffares
-*	Date: 19 March 2017
+*	First Build: 7 March 2017
+*	Current Build:  19 March 2017
 *
 *	Description :
 *		Graphics User Interface for Swarm Robotics Project
@@ -450,7 +451,7 @@ namespace SwarmRoboticsGUI
 			{
 				StartCapture();
 
-				var allitems = menuCameraList.Items.Cast<MenuItem>().ToArray();
+				var allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
 
 				foreach (var item in allitems)
 				{
@@ -498,14 +499,15 @@ namespace SwarmRoboticsGUI
 			}
 			else
 			{
-				var allitems = menuFilterList.Items.Cast<MenuItem>().ToArray();
-				
+				var allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
+
 				foreach (var item in allitems)
 				{
 					item.IsChecked = false;
 				}
 				menuFilterNone.IsChecked = true;
 				filter = CaptureFilters.NO_FILTER;
+				cameraStatusFilter.Text = "No Filter";
 			}
 		}
 
@@ -519,7 +521,7 @@ namespace SwarmRoboticsGUI
 			}
 			else
 			{
-				var allitems = menuFilterList.Items.Cast<MenuItem>().ToArray();
+				var allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
 
 				foreach (var item in allitems)
 				{
@@ -527,6 +529,7 @@ namespace SwarmRoboticsGUI
 				}
 				menuFilterGrey.IsChecked = true;
 				filter = CaptureFilters.GREYSCALE;
+				cameraStatusFilter.Text = "Greyscale";
 			}
 		}
 
@@ -540,7 +543,7 @@ namespace SwarmRoboticsGUI
 			}
 			else
 			{
-				var allitems = menuFilterList.Items.Cast<MenuItem>().ToArray();
+				var allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
 
 				foreach (var item in allitems)
 				{
@@ -548,6 +551,7 @@ namespace SwarmRoboticsGUI
 				}
 				menuFilterCanny.IsChecked = true;
 				filter = CaptureFilters.CANNY_EDGES;
+				cameraStatusFilter.Text = "Canny Edges";
 			}
 		}
 
@@ -564,6 +568,26 @@ namespace SwarmRoboticsGUI
 			{
 				menuFilterSmooth.IsChecked = true;
 				smoothed = true;
+			}
+		}
+
+
+
+		private void menuFilterFlipVertical_Click(object sender, RoutedEventArgs e)
+		{
+			if (_capture != null)
+			{
+				_capture.FlipVertical = !_capture.FlipVertical;
+			}
+		}
+
+
+
+		private void menuFilterFlipHorizontal_Click(object sender, RoutedEventArgs e)
+		{
+			if (_capture != null)
+			{
+				_capture.FlipHorizontal = !_capture.FlipHorizontal;
 			}
 		}
 
