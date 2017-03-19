@@ -15,7 +15,7 @@
 *			CamelCase
 *			Variables start lower case, if another object goes by the same name, then also with an underscore
 *			Methods start upper case
-*			Constants, all upper case
+*			Constants, all upper case, unscores for seperation
 * 
 **********************************************************************************************************************************************/
 
@@ -68,6 +68,71 @@ struct Video_Device
 	}
 }
 
+/*
+struct Capture_Filter
+{
+	public int filter;
+	public bool smoothed;
+
+	public Capture_Filter(int fil, bool smooth)
+	{
+		filter = fil;
+		smoothed = smooth;
+	}
+
+	///<summary>
+	///Represent the Filter as a string
+	/// </summary>
+	/// <returns>The string representation of this Filter</returns>
+	public override string ToString()
+	{
+		if (smoothed)
+		{
+			switch(filter)
+			{
+				case CaptureFilters.NO_FILTER:
+					return String.Format("Smoothed");
+					break;
+
+				case CaptureFilters.GREYSCALE:
+					return String.Format("Smoothed GreyScale");
+					break;
+
+				case CaptureFilters.CANNY_EDGES:
+					return String.Format("Smoothed Canny Edges");
+					break;
+
+				//default:
+
+					//break;
+			}
+		}
+		else
+		{
+			switch (filter)
+			{
+				//case CaptureFilters.NO_FILTER:
+					//return String.Format("No Filter");
+					//break;
+
+				case CaptureFilters.GREYSCALE:
+					return String.Format("GreyScale");
+					break;
+
+				case CaptureFilters.CANNY_EDGES:
+					return String.Format("Canny Edges");
+					break;
+
+					//default:
+
+					//break;
+			}
+		}
+		return String.Format("No Filter");
+	}
+}
+*/
+
 
 
 static class CaptureStatuses
@@ -75,6 +140,13 @@ static class CaptureStatuses
 	public const int PLAYING = 0;
 	public const int PAUSED = 1;
 	public const int STOPPED = 2;
+}
+
+static class CaptureFilters
+{
+	public const int NO_FILTER = 0;
+	public const int GREYSCALE = 1;
+	public const int CANNY_EDGES = 2;
 }
 
 #endregion
@@ -93,6 +165,10 @@ namespace SwarmRoboticsGUI
 		private VideoCapture _capture = null;
 		private int cameradevice = 0;
 		private Video_Device[] webcams;
+
+		private int filter = CaptureFilters.NO_FILTER;
+		private bool smoothed = false;
+
 		private Mat _frame;
 		private string currentlyconnectedcamera = null;
 		private int _capturestatus = CaptureStatuses.STOPPED;
@@ -267,9 +343,28 @@ namespace SwarmRoboticsGUI
 			{
 				_capture.Retrieve(_frame, 0);
 
-				captureImageBox.Image = _frame;
+				switch (filter)
+				{
+					case CaptureFilters.GREYSCALE:
+						CvInvoke.CvtColor(_frame, _frame, ColorConversion.Bgr2Gray);
+						break;
+
+					case CaptureFilters.CANNY_EDGES:
+						CvInvoke.CvtColor(_frame, _frame, ColorConversion.Bgr2Gray);
+						CvInvoke.PyrDown(_frame, _frame);
+						CvInvoke.PyrUp(_frame, _frame);
+						CvInvoke.Canny(_frame, _frame, 80, 40);
+						break;
+				}
+
+				if (smoothed)
+				{
+					CvInvoke.PyrDown(_frame, _frame);
+					CvInvoke.PyrUp(_frame, _frame);
+				}
+
 				_fpscount++;
-				// _capture.SetCaptureProperty(CapProp.Brightness, FPS_Count);
+				captureImageBox.Image = _frame;
 			}
 		}
 
@@ -393,8 +488,88 @@ namespace SwarmRoboticsGUI
 			}
 		}
 
-		#endregion
 
+
+		private void menuFilterNone_Click(object sender, RoutedEventArgs e)
+		{
+			if(filter == CaptureFilters.NO_FILTER)
+			{
+
+			}
+			else
+			{
+				var allitems = menuFilterList.Items.Cast<MenuItem>().ToArray();
+				
+				foreach (var item in allitems)
+				{
+					item.IsChecked = false;
+				}
+				menuFilterNone.IsChecked = true;
+				filter = CaptureFilters.NO_FILTER;
+			}
+		}
+
+
+
+		private void menuFilterGrey_Click(object sender, RoutedEventArgs e)
+		{
+			if (filter == CaptureFilters.GREYSCALE)
+			{
+
+			}
+			else
+			{
+				var allitems = menuFilterList.Items.Cast<MenuItem>().ToArray();
+
+				foreach (var item in allitems)
+				{
+					item.IsChecked = false;
+				}
+				menuFilterGrey.IsChecked = true;
+				filter = CaptureFilters.GREYSCALE;
+			}
+		}
+
+
+
+		private void menuFilterCanny_Click(object sender, RoutedEventArgs e)
+		{
+			if (filter == CaptureFilters.CANNY_EDGES)
+			{
+
+			}
+			else
+			{
+				var allitems = menuFilterList.Items.Cast<MenuItem>().ToArray();
+
+				foreach (var item in allitems)
+				{
+					item.IsChecked = false;
+				}
+				menuFilterCanny.IsChecked = true;
+				filter = CaptureFilters.CANNY_EDGES;
+			}
+		}
+
+
+
+		private void menuFilterSmooth_Click(object sender, RoutedEventArgs e)
+		{
+			if (smoothed)
+			{
+				menuFilterSmooth.IsChecked = false;
+				smoothed = false;
+			}
+			else
+			{
+				menuFilterSmooth.IsChecked = true;
+				smoothed = true;
+			}
+		}
+
+
+
+		#endregion
 
 
 	}

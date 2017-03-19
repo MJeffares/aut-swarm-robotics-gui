@@ -31,13 +31,29 @@
                     <MenuItem x:Name="menuCameraList" Header="Connected Cameras"/>
                     <MenuItem x:Name="menuCameraConnect" Header="Start Capture" IsEnabled="False" IsCheckable="True"  Click="menuCameraConnect_Click"/>
                     <MenuItem x:Name="menuCameraFreeze" Header="Freeze Frame" IsEnabled="False" IsCheckable="True" Click="menuCameraFreeze_Click" />
+                    <Separator/>
                     <MenuItem x:Name="menuCameraOptions" Header="Camera Options" Click="menuCameraOptions_Click"/>
                 </MenuItem>
-                
-                <MenuItem Header="Filters">
-                </MenuItem>
-                
-                <MenuItem Header="Overlays">
+
+                <MenuItem Header="Display">
+
+                    <MenuItem x:Name="menuFilterList" Header="Filters">
+                        <MenuItem x:Name="menuFilterNone" Header="No Filter" IsCheckable="True" IsChecked="True" Click="menuFilterNone_Click"/>
+                        <MenuItem x:Name="menuFilterGrey" Header="Greyscale" IsCheckable="True" Click="menuFilterGrey_Click"/>
+                        <MenuItem x:Name="menuFilterCanny" Header="Canny Edges" IsCheckable="True" Click="menuFilterCanny_Click"/>
+                        <Separator/>
+                        <MenuItem x:Name="menuFilterSettings" Header="Settings" />
+                    </MenuItem>
+
+                    <MenuItem x:Name="menuOverlayList" Header="Overlays">
+                        <MenuItem x:Name="menuOverlayNone" Header="No Overlay" IsCheckable="True" IsChecked="True"/>
+                        <MenuItem x:Name="menuOverlayPlaceHolderOne" Header="PlaceHolder" IsCheckable="True"/>
+                        <MenuItem x:Name="menuFilterPlaceHolderTwo" Header="PlaceHolder" IsCheckable="True"/>
+                        <Separator/>
+                        <MenuItem x:Name="menuOverlaySettings" Header="Settings" />
+                    </MenuItem>
+
+                    <MenuItem x:Name="menuFilterSmooth" Header="Smooth" IsCheckable="True" Click="menuFilterSmooth_Click"/>
                 </MenuItem>
             </Menu>
 
