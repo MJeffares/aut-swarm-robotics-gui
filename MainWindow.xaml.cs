@@ -69,71 +69,6 @@ struct Video_Device
 	}
 }
 
-/*
-struct Capture_Filter
-{
-	public int filter;
-	public bool smoothed;
-
-	public Capture_Filter(int fil, bool smooth)
-	{
-		filter = fil;
-		smoothed = smooth;
-	}
-
-	///<summary>
-	///Represent the Filter as a string
-	/// </summary>
-	/// <returns>The string representation of this Filter</returns>
-	public override string ToString()
-	{
-		if (smoothed)
-		{
-			switch(filter)
-			{
-				case CaptureFilters.NO_FILTER:
-					return String.Format("Smoothed");
-					break;
-
-				case CaptureFilters.GREYSCALE:
-					return String.Format("Smoothed GreyScale");
-					break;
-
-				case CaptureFilters.CANNY_EDGES:
-					return String.Format("Smoothed Canny Edges");
-					break;
-
-				//default:
-
-					//break;
-			}
-		}
-		else
-		{
-			switch (filter)
-			{
-				//case CaptureFilters.NO_FILTER:
-					//return String.Format("No Filter");
-					//break;
-
-				case CaptureFilters.GREYSCALE:
-					return String.Format("GreyScale");
-					break;
-
-				case CaptureFilters.CANNY_EDGES:
-					return String.Format("Canny Edges");
-					break;
-
-					//default:
-
-					//break;
-			}
-		}
-		return String.Format("No Filter");
-	}
-}
-*/
-
 
 
 static class CaptureStatuses
@@ -143,11 +78,96 @@ static class CaptureStatuses
 	public const int STOPPED = 2;
 }
 
-static class CaptureFilters
+
+
+static public class CaptureFilters
 {
+	//static public Mat outputframe;
+
+	public const int NUM_FILTERS = 4;
+
 	public const int NO_FILTER = 0;
 	public const int GREYSCALE = 1;
 	public const int CANNY_EDGES = 2;
+	public const int BRAE_EDGES = 3;
+
+	// HSV ranges.
+	private const int LowerH = 0;
+	private const int UpperH = 255;
+	private const int LowerS = 0;
+	private const int UpperS = 255;
+	private const int LowerV = 0;
+	private const int UpperV = 255;
+	// Blur, Canny, and Threshold values.
+	private const int BlurC = 1;
+	private const int LowerC = 128;
+	private const int UpperC = 255;
+
+	///<summary>
+	///Calculates the output for the current filter
+	/// </summary>
+	/// <returns>The proccessed frame matrix</returns>
+	static public Mat Process(int filter, Mat inputframe, Mat outputframe)
+	{
+		
+		switch (filter)
+		{
+			case CaptureFilters.NO_FILTER:
+				return inputframe;
+				
+
+			case CaptureFilters.GREYSCALE:
+				CvInvoke.CvtColor(inputframe, outputframe, ColorConversion.Bgr2Gray);
+				return outputframe;
+
+			case CaptureFilters.CANNY_EDGES:
+				CvInvoke.CvtColor(inputframe, outputframe, ColorConversion.Bgr2Gray);
+				CvInvoke.PyrDown(outputframe, outputframe);
+				CvInvoke.PyrUp(outputframe, outputframe);
+				CvInvoke.Canny(outputframe, outputframe, 80, 40);
+				return outputframe;
+
+			case CaptureFilters.BRAE_EDGES:
+				CvInvoke.CvtColor(inputframe, outputframe, ColorConversion.Bgr2Gray);
+				CvInvoke.Threshold(outputframe, outputframe, LowerC, UpperC, ThresholdType.Binary);
+				CvInvoke.AdaptiveThreshold(outputframe, outputframe, UpperC, AdaptiveThresholdType.GaussianC, ThresholdType.Binary, 3, 0);
+
+				return outputframe;
+
+
+
+			default:
+				return inputframe;
+				
+		}
+	}
+
+
+	///<summary>
+	///Represent the Filter as a string
+	/// </summary>
+	/// <returns>The string representation of this Filter</returns>
+	static public string ToString(int filter)
+	{
+		switch (filter)
+		{
+			case CaptureFilters.NO_FILTER:
+				return String.Format("No Filter");
+
+			case CaptureFilters.GREYSCALE:
+				return String.Format("Greyscale");
+
+			case CaptureFilters.CANNY_EDGES:
+				return String.Format("Canny Edges");
+
+			case CaptureFilters.BRAE_EDGES:
+				return String.Format("Brae Edges");
+
+			default:
+				return String.Format("Filter Text Error");
+
+		}
+	}
 }
 
 #endregion
@@ -178,10 +198,17 @@ namespace SwarmRoboticsGUI
 		private int _fpscount = 0;
 		private DispatcherTimer FpsTimer = new DispatcherTimer();
 
+		bool captureblocked = false;
+		int captureblockedframes = 0;
+
+		public Mat outputframe = new Mat();
+
+
 		public MainWindow()
 		{
 			InitializeComponent();
 			CvInvoke.UseOpenCL = false;
+			PopulateFilters();
 			PopulateCameras();
 
 
@@ -277,7 +304,6 @@ namespace SwarmRoboticsGUI
 				cameraStatusFPS.Text = "FPS: ";
 				_capture.Dispose();
 				host1.Visibility = Visibility.Hidden;
-				//_captureInProgress = false;
 				_capturestatus = CaptureStatuses.STOPPED;
 				menuCameraConnect.Header = "Start Capture";
 				menuCameraFreeze.Header = "Freeze";
@@ -299,7 +325,6 @@ namespace SwarmRoboticsGUI
 				_capture.Pause();
 				FpsTimer.Stop();
 				cameraStatusFPS.Text = "FPS: ";
-				//_captureInProgress = false;
 				_capturestatus = CaptureStatuses.PAUSED;
 				menuCameraFreeze.Header = "Un-Freeze";
 				menuCameraFreeze.IsChecked = true;
@@ -329,6 +354,32 @@ namespace SwarmRoboticsGUI
 			}
 		}
 
+
+
+		private void PopulateFilters()
+		{
+
+			for(int i =0; i < CaptureFilters.NUM_FILTERS; i++)
+			{
+				MenuItem item = new MenuItem { Header = CaptureFilters.ToString(i) };
+				item.Click += new RoutedEventHandler(menuFilterListItem_Click);
+				item.IsCheckable = true;
+
+				if(i == 0)
+				{
+					item.IsChecked = true;
+				}
+
+				menuFilterList.Items.Add(item);
+			}
+
+			Separator sep = new Separator();
+			menuFilterList.Items.Add(sep);
+
+			MenuItem settingsmenuitem = new MenuItem { Header = "Settings" };
+			menuFilterList.Items.Add(settingsmenuitem);
+		}
+
 		#endregion
 
 
@@ -336,36 +387,40 @@ namespace SwarmRoboticsGUI
 		/**********************************************************************************************************************************************
 		* Repeated/Time Activated Methods
 		**********************************************************************************************************************************************/
-		#region
+			#region
 
-		private void ProcessFrame(object sender, EventArgs arg)
+			private void ProcessFrame(object sender, EventArgs arg)
 		{
 			if (_capture != null && _capture.Ptr != IntPtr.Zero)
 			{
 				_capture.Retrieve(_frame, 0);
 
-				switch (filter)
-				{
-					case CaptureFilters.GREYSCALE:
-						CvInvoke.CvtColor(_frame, _frame, ColorConversion.Bgr2Gray);
-						break;
-
-					case CaptureFilters.CANNY_EDGES:
-						CvInvoke.CvtColor(_frame, _frame, ColorConversion.Bgr2Gray);
-						CvInvoke.PyrDown(_frame, _frame);
-						CvInvoke.PyrUp(_frame, _frame);
-						CvInvoke.Canny(_frame, _frame, 80, 40);
-						break;
-				}
-
+				
+				/*
 				if (smoothed)
 				{
 					CvInvoke.PyrDown(_frame, _frame);
 					CvInvoke.PyrUp(_frame, _frame);
 				}
+				*/
+				
 
-				_fpscount++;
-				captureImageBox.Image = _frame;
+				if (!captureblocked)
+				{
+					_fpscount++;
+					//captureImageBox.Image = _frame;
+					captureImageBox.Image = CaptureFilters.Process(filter, _frame, outputframe);
+				}
+				else
+				{
+					captureblockedframes++;
+				}
+
+				if(captureblockedframes > 2)
+				{
+					captureblocked = false;
+					captureblockedframes = 0;
+				}
 			}
 		}
 
@@ -393,7 +448,8 @@ namespace SwarmRoboticsGUI
 
 			if (_capturestatus == CaptureStatuses.STOPPED && currentlyconnectedcamera != menusenderstring) //also check if the same menu option is clicked twice
 			{
-				var allitems = menuCameraList.Items.Cast<System.Windows.Controls.MenuItem>().ToArray();
+				//var allitems = menuCameraList.Items.Cast<System.Windows.Controls.MenuItem>().ToArray();
+				var allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
 
 				foreach (var item in allitems)
 				{
@@ -411,7 +467,8 @@ namespace SwarmRoboticsGUI
 			}
 			else if (currentlyconnectedcamera == menusenderstring)
 			{
-				var allitems = menuCameraList.Items.Cast<System.Windows.Controls.MenuItem>().ToArray();
+				//var allitems = menuCameraList.Items.Cast<System.Windows.Controls.MenuItem>().ToArray();
+				var allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
 
 				foreach (var item in allitems)
 				{
@@ -426,9 +483,45 @@ namespace SwarmRoboticsGUI
 		}
 
 
+		private void menuFilterListItem_Click(object sender, RoutedEventArgs e)
+		{
+			
+			MenuItem menusender = (MenuItem)sender;
+			String menusenderstring = menusender.ToString();
+
+			if(menusenderstring != CaptureFilters.ToString(filter))
+			{
+				var allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
+
+				foreach (var item in allitems)
+				{
+					item.IsChecked = false;
+				}
+
+				menusender.IsChecked = true;
+
+				filter = menuFilterList.Items.IndexOf(menusender);
+
+				//
+				cameraStatusFilter.Text = CaptureFilters.ToString(filter);
+			}
+			else if (menusenderstring == CaptureFilters.ToString(filter) && CaptureFilters.ToString(filter) != CaptureFilters.ToString(CaptureFilters.NO_FILTER))
+			{
+				var allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
+
+				foreach (var item in allitems)
+				{
+					item.IsChecked = false;
+					item.IsEnabled = true;
+				}
+			}
+		}
+
+
 
 		private void MenuItem_MouseEnter(object sender, MouseEventArgs e)
 		{
+			captureblocked = true;
 			PopulateCameras();
 		}
 
@@ -489,74 +582,7 @@ namespace SwarmRoboticsGUI
 			}
 		}
 
-
-
-		private void menuFilterNone_Click(object sender, RoutedEventArgs e)
-		{
-			if(filter == CaptureFilters.NO_FILTER)
-			{
-
-			}
-			else
-			{
-				var allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
-
-				foreach (var item in allitems)
-				{
-					item.IsChecked = false;
-				}
-				menuFilterNone.IsChecked = true;
-				filter = CaptureFilters.NO_FILTER;
-				cameraStatusFilter.Text = "No Filter";
-			}
-		}
-
-
-
-		private void menuFilterGrey_Click(object sender, RoutedEventArgs e)
-		{
-			if (filter == CaptureFilters.GREYSCALE)
-			{
-
-			}
-			else
-			{
-				var allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
-
-				foreach (var item in allitems)
-				{
-					item.IsChecked = false;
-				}
-				menuFilterGrey.IsChecked = true;
-				filter = CaptureFilters.GREYSCALE;
-				cameraStatusFilter.Text = "Greyscale";
-			}
-		}
-
-
-
-		private void menuFilterCanny_Click(object sender, RoutedEventArgs e)
-		{
-			if (filter == CaptureFilters.CANNY_EDGES)
-			{
-
-			}
-			else
-			{
-				var allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
-
-				foreach (var item in allitems)
-				{
-					item.IsChecked = false;
-				}
-				menuFilterCanny.IsChecked = true;
-				filter = CaptureFilters.CANNY_EDGES;
-				cameraStatusFilter.Text = "Canny Edges";
-			}
-		}
-
-
-
+		/*
 		private void menuFilterSmooth_Click(object sender, RoutedEventArgs e)
 		{
 			if (smoothed)
@@ -570,7 +596,7 @@ namespace SwarmRoboticsGUI
 				smoothed = true;
 			}
 		}
-
+		*/
 
 
 		private void menuFilterFlipVertical_Click(object sender, RoutedEventArgs e)
@@ -593,8 +619,12 @@ namespace SwarmRoboticsGUI
 
 
 
+		private void menu_hover(object sender, RoutedEventArgs e)
+		{
+			captureblocked = true;
+		}
+
+
 		#endregion
-
-
 	}
 }

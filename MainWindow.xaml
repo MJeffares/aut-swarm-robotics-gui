@@ -61,32 +61,28 @@
 
         <DockPanel Grid.Column="2">
 
-            <Menu DockPanel.Dock="Top">
-                <MenuItem Header="_File">
+            <Menu DockPanel.Dock="Top" MouseEnter="menu_hover">
+                <MenuItem Header="_File" MouseEnter="menu_hover">
                     <MenuItem Header="_New" />
                     <MenuItem Header="_Open" />
                     <MenuItem Header="_Save" />
                 </MenuItem>
 
                 <MenuItem Header="Camera" MouseEnter="MenuItem_MouseEnter">
-                    <MenuItem x:Name="menuCameraList" Header="Connected Cameras"/>
+                    <MenuItem x:Name="menuCameraList" Header="Connected Cameras" MouseEnter="menu_hover"/>
                     <MenuItem x:Name="menuCameraConnect" Header="Start Capture" IsEnabled="False" IsCheckable="True"  Click="menuCameraConnect_Click"/>
                     <MenuItem x:Name="menuCameraFreeze" Header="Freeze Frame" IsEnabled="False" IsCheckable="True" Click="menuCameraFreeze_Click" />
                     <Separator/>
                     <MenuItem x:Name="menuCameraOptions" Header="Camera Options" Click="menuCameraOptions_Click"/>
                 </MenuItem>
 
-                <MenuItem Header="Display">
+                <MenuItem Header="Display" MouseEnter="menu_hover">
 
-                    <MenuItem x:Name="menuFilterList" Header="Filters">
-                        <MenuItem x:Name="menuFilterNone" Header="No Filter" IsCheckable="True" IsChecked="True" Click="menuFilterNone_Click"/>
-                        <MenuItem x:Name="menuFilterGrey" Header="Greyscale" IsCheckable="True" Click="menuFilterGrey_Click"/>
-                        <MenuItem x:Name="menuFilterCanny" Header="Canny Edges" IsCheckable="True" Click="menuFilterCanny_Click"/>
-                        <Separator/>
-                        <MenuItem x:Name="menuFilterSettings" Header="Settings" />
+                    <MenuItem x:Name="menuFilterList" Header="Filters" MouseEnter="menu_hover">
+                   
                     </MenuItem>
 
-                    <MenuItem x:Name="menuOverlayList" Header="Overlays">
+                    <MenuItem x:Name="menuOverlayList" Header="Overlays" MouseEnter="menu_hover">
                         <MenuItem x:Name="menuOverlayNone" Header="No Overlay" IsCheckable="True" IsChecked="True"/>
                         <MenuItem x:Name="menuOverlayPlaceHolderOne" Header="PlaceHolder" IsCheckable="True"/>
                         <MenuItem x:Name="menuFilterPlaceHolderTwo" Header="PlaceHolder" IsCheckable="True"/>
@@ -96,10 +92,10 @@
 
                     <MenuItem x:Name="menuFilterFlipVertical" Header="Flip Vertical" Click="menuFilterFlipVertical_Click"/>
                     <MenuItem x:Name="menuFilterFlipHorizontal" Header="Flip Horizontal" Click="menuFilterFlipHorizontal_Click"/>
-                    <MenuItem x:Name="menuFilterSmooth" Header="Smooth" IsCheckable="True" Click="menuFilterSmooth_Click"/>
+                    <!--<MenuItem x:Name="menuFilterSmooth" Header="Smooth" IsCheckable="True" Click="menuFilterSmooth_Click"/> -->
                 </MenuItem>
 
-                <MenuItem Header="Record">
+                <MenuItem Header="Record" MouseEnter="menu_hover">
                     <MenuItem x:Name="menuRecordNew" Header="New Recording"/>
                     <MenuItem x:Name="menuRecordPause" Header="Pause Recording" IsCheckable="True" IsEnabled="False"/>
                     <Separator/>
@@ -112,7 +108,7 @@
                     <ItemsPanelTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="45"/>
+                                <ColumnDefinition Width="51"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
@@ -129,7 +125,7 @@
                 </StatusBar.ItemsPanel>
 
                 <StatusBarItem>
-                    <TextBlock Name="cameraStatusFPS" Text="FPS: 00"/>
+                    <TextBlock Name="cameraStatusFPS" Text="FPS: "/>
                 </StatusBarItem>
 
                 <Separator Grid.Column="1"/>
@@ -170,5 +166,3 @@
     </Grid>
 </Window>
 
-
-  
