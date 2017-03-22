@@ -61,14 +61,16 @@
 
         <DockPanel Grid.Column="2">
 
-            <Menu DockPanel.Dock="Top" MouseEnter="menu_hover">
+            <Menu DockPanel.Dock="Top" MouseEnter="menu_hover" >
+                <!--
                 <MenuItem Header="_File" MouseEnter="menu_hover">
                     <MenuItem Header="_New" />
                     <MenuItem Header="_Open" />
                     <MenuItem Header="_Save" />
                 </MenuItem>
+                -->
 
-                <MenuItem Header="Camera" MouseEnter="MenuItem_MouseEnter">
+                <MenuItem Header="Camera" MouseEnter="MenuItem_MouseEnter" Click="menu_hover">
                     <MenuItem x:Name="menuCameraList" Header="Connected Cameras" MouseEnter="menu_hover"/>
                     <MenuItem x:Name="menuCameraConnect" Header="Start Capture" IsEnabled="False" IsCheckable="True"  Click="menuCameraConnect_Click"/>
                     <MenuItem x:Name="menuCameraFreeze" Header="Freeze Frame" IsEnabled="False" IsCheckable="True" Click="menuCameraFreeze_Click" />
@@ -76,13 +78,13 @@
                     <MenuItem x:Name="menuCameraOptions" Header="Camera Options" Click="menuCameraOptions_Click"/>
                 </MenuItem>
 
-                <MenuItem Header="Display" MouseEnter="menu_hover">
+                <MenuItem Header="Display" MouseEnter="menu_hover" Click="menu_hover">
 
-                    <MenuItem x:Name="menuFilterList" Header="Filters" MouseEnter="menu_hover">
+                    <MenuItem x:Name="menuFilterList" Header="Filters" MouseEnter="menu_hover" Click="menu_hover">
                    
                     </MenuItem>
 
-                    <MenuItem x:Name="menuOverlayList" Header="Overlays" MouseEnter="menu_hover">
+                    <MenuItem x:Name="menuOverlayList" Header="Overlays" MouseEnter="menu_hover" Click="menu_hover">
                         <MenuItem x:Name="menuOverlayNone" Header="No Overlay" IsCheckable="True" IsChecked="True"/>
                         <MenuItem x:Name="menuOverlayPlaceHolderOne" Header="PlaceHolder" IsCheckable="True"/>
                         <MenuItem x:Name="menuFilterPlaceHolderTwo" Header="PlaceHolder" IsCheckable="True"/>
@@ -95,11 +97,19 @@
                     <!--<MenuItem x:Name="menuFilterSmooth" Header="Smooth" IsCheckable="True" Click="menuFilterSmooth_Click"/> -->
                 </MenuItem>
 
-                <MenuItem Header="Record" MouseEnter="menu_hover">
-                    <MenuItem x:Name="menuRecordNew" Header="New Recording"/>
+                <MenuItem Header="Record" MouseEnter="menu_hover" Click="menu_hover">
+                    <MenuItem x:Name="menuRecordNew" Header="New Recording" Click="menuRecordNew_Click"/>
                     <MenuItem x:Name="menuRecordPause" Header="Pause Recording" IsCheckable="True" IsEnabled="False"/>
+                    <MenuItem x:Name="menuRecordStop" Header="Stop Recording" Click="menuRecordStop_Click" />
                     <Separator/>
                     <MenuItem x:Name="menuRecordingSettings" Header="Settings" />
+                </MenuItem>
+
+                <MenuItem Header="Replay" MouseEnter="menu_hover" Click="menu_hover">
+                    <MenuItem x:Name="menuReplayOpen" Header="Open Replay" Click="menuReplayOpen_Click"/>
+                    <MenuItem x:Name="menuReplayPause" Header="Pause Replay" IsCheckable="True" IsEnabled="False"/>
+                    <Separator/>
+                    <MenuItem x:Name="menuReplaySettings" Header="Settings" />
                 </MenuItem>
             </Menu>
 

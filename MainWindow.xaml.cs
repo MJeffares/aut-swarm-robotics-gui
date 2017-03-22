@@ -30,8 +30,12 @@
 using DirectShowLib;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
+using Microsoft.Win32;
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -70,12 +74,15 @@ struct Video_Device
 }
 
 
-
+//cannot use precomplier defines therefore we use a static class
 static class CaptureStatuses
 {
 	public const int PLAYING = 0;
 	public const int PAUSED = 1;
 	public const int STOPPED = 2;
+	public const int REPLAY_ACTIVE = 3;
+	public const int REPLAY_PAUSED = 4;
+	public const int RECORD = 5;
 }
 
 
@@ -98,6 +105,7 @@ static public class CaptureFilters
 	private const int UpperS = 255;
 	private const int LowerV = 0;
 	private const int UpperV = 255;
+
 	// Blur, Canny, and Threshold values.
 	private const int BlurC = 1;
 	private const int LowerC = 128;
@@ -134,11 +142,8 @@ static public class CaptureFilters
 
 				return outputframe;
 
-
-
 			default:
 				return inputframe;
-				
 		}
 	}
 
@@ -182,27 +187,46 @@ namespace SwarmRoboticsGUI
 
 	public partial class MainWindow : Window
 	{
+		/**********************************************************************************************************************************************
+		* Variables
+		**********************************************************************************************************************************************/
+		#region
+
 		//camera capture variables
 		private VideoCapture _capture = null;
 		private int cameradevice = 0;
 		private Video_Device[] webcams;
-
-		private int filter = CaptureFilters.NO_FILTER;
-		private bool smoothed = false;
-
 		private Mat _frame;
 		private string currentlyconnectedcamera = null;
 		private int _capturestatus = CaptureStatuses.STOPPED;
+		private int filter = CaptureFilters.NO_FILTER;
+		private bool captureblocked = false;
+		private int captureblockedframes = 0;
+		private Mat outputframe = new Mat();
+		//private bool smoothed = false;
+
 
 		//fps timer variables
 		private int _fpscount = 0;
 		private DispatcherTimer FpsTimer = new DispatcherTimer();
 
-		bool captureblocked = false;
-		int captureblockedframes = 0;
+		// video record/replay variables
+		OpenFileDialog openvideodialog = new OpenFileDialog();
+		SaveFileDialog savevideodialog = new SaveFileDialog();
+		private double replayframerate = 0;
+		private double replaytotalframes = 0;
+		private int recordframewidth;
+		private int recordframeheight;
+		private double replayframecount;
+		private VideoWriter _videowriter;
+		private Stopwatch _stopwatch;
+		private double replayspeed = 1;
+		private int recordframerate = 0;
+		private System.Drawing.Size recordsize = new System.Drawing.Size();
 
-		public Mat outputframe = new Mat();
+		
 
+		#endregion
 
 		public MainWindow()
 		{
@@ -211,9 +235,11 @@ namespace SwarmRoboticsGUI
 			PopulateFilters();
 			PopulateCameras();
 
-
+			openvideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
+			savevideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
 			FpsTimer.Tick += FpsTimerTick;
 			FpsTimer.Interval = new TimeSpan(0, 0, 1);
+			FpsTimer.Start();
 		}
 
 
@@ -380,6 +406,29 @@ namespace SwarmRoboticsGUI
 			menuFilterList.Items.Add(settingsmenuitem);
 		}
 
+
+
+		//menu will not display correctly if image refreshed while menu is being rendered 
+		//blocking display for two frames if the menu has been clicked/hovered over
+		private void DisplayFrame()
+		{
+			if (!captureblocked)
+			{
+				_fpscount++;
+				captureImageBox.Image = CaptureFilters.Process(filter, _frame, outputframe);
+			}
+			else
+			{
+				captureblockedframes++;
+			}
+
+			if (captureblockedframes > 2)
+			{
+				captureblocked = false;
+				captureblockedframes = 0;
+			}
+		}
+
 		#endregion
 
 
@@ -389,37 +438,31 @@ namespace SwarmRoboticsGUI
 		**********************************************************************************************************************************************/
 			#region
 
-			private void ProcessFrame(object sender, EventArgs arg)
+		private void ProcessFrame(object sender, EventArgs arg)
 		{
 			if (_capture != null && _capture.Ptr != IntPtr.Zero)
 			{
 				_capture.Retrieve(_frame, 0);
 
-				
-				/*
-				if (smoothed)
+				if (_capturestatus == CaptureStatuses.PLAYING)
 				{
-					CvInvoke.PyrDown(_frame, _frame);
-					CvInvoke.PyrUp(_frame, _frame);
+					DisplayFrame();
 				}
-				*/
-				
-
-				if (!captureblocked)
+				else if(_capturestatus == CaptureStatuses.REPLAY_ACTIVE)
 				{
-					_fpscount++;
-					//captureImageBox.Image = _frame;
-					captureImageBox.Image = CaptureFilters.Process(filter, _frame, outputframe);
+					replayframecount = _capture.GetCaptureProperty(CapProp.PosFrames);
+					//display current frame/time
+					DisplayFrame();	
+					Thread.Sleep((int)(1000.0 / (replayframerate * replayspeed)));
 				}
-				else
+				else if(_capturestatus == CaptureStatuses.RECORD)
 				{
-					captureblockedframes++;
-				}
-
-				if(captureblockedframes > 2)
-				{
-					captureblocked = false;
-					captureblockedframes = 0;
+					DisplayFrame();
+					if (_videowriter.Ptr != IntPtr.Zero)
+					{
+						//_videowriter.Write(_frame);
+						_videowriter.Write(CaptureFilters.Process(filter, _frame, outputframe));
+					}
 				}
 			}
 		}
@@ -626,5 +669,106 @@ namespace SwarmRoboticsGUI
 
 
 		#endregion
+
+		private void menuReplayOpen_Click(object sender, RoutedEventArgs e)
+		{
+			if(_capturestatus ==  CaptureStatuses.STOPPED)
+			{
+				if(openvideodialog.ShowDialog() == true)
+				{
+					if(_capture != null)
+					{
+						_capture.Dispose();
+					}
+
+					try
+					{
+						cameraStatusRecordingText.Text = "Replaying Video: " + openvideodialog.FileName;
+
+						_capturestatus = CaptureStatuses.REPLAY_ACTIVE;
+						_capture = new VideoCapture(openvideodialog.FileName);
+						_capture.ImageGrabbed += ProcessFrame;
+						host1.Visibility = Visibility.Visible;
+
+
+						replayframerate = _capture.GetCaptureProperty(CapProp.Fps);
+						replaytotalframes = _capture.GetCaptureProperty(CapProp.FrameCount);
+
+						_frame = new Mat();
+						_capture.Start();
+						FpsTimer.Start();
+
+
+					}
+					catch (NullReferenceException excpt)
+					{
+						MessageBox.Show(excpt.Message);
+					}
+				}
+			}
+		}
+
+		private void menuRecordNew_Click(object sender, RoutedEventArgs e)
+		{
+			if(_capturestatus == CaptureStatuses.PLAYING)
+			{
+				if(savevideodialog.ShowDialog() == true)
+				{
+					//if(_capture != null)
+					//{
+						//_capture.Dispose();
+					//}
+
+					try
+					{
+						cameraStatusRecordingText.Text = "Recording Video: " + savevideodialog.FileName;
+						
+						//_capture = new VideoCapture(savevideodialog.FileName);
+						//_capture.ImageGrabbed += ProcessFrame;
+						//host1.Visibility = Visibility.Visible;
+
+						//recordframewidth = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
+						//recordframeheight = (int)_capture.GetCaptureProperty(CapProp.FrameHeight);
+
+						//recordsize.Width = recordframewidth;
+						//recordsize.Height = recordframeheight;
+
+						recordsize.Width = 640;
+						recordsize.Height = 480;
+
+						recordframerate = 15;
+
+						//Set up a video writer component
+						/*                                        ---USE----
+						/* VideoWriter(string fileName, int compressionCode, int fps, int width, int height, bool isColor)
+						 *
+						 * Compression code. 
+						 *      Usually computed using CvInvoke.CV_FOURCC. On windows use -1 to open a codec selection dialog. 
+						 *      On Linux, use CvInvoke.CV_FOURCC('I', 'Y', 'U', 'V') for default codec for the specific file name. 
+						 * 
+						 * Compression code. 
+						 *      -1: allows the user to choose the codec from a dialog at runtime 
+						 *       0: creates an uncompressed AVI file (the filename must have a .avi extension) 
+						 *
+						 * isColor.
+						 *      true if this is a color video, false otherwise
+						 */
+						_videowriter = new VideoWriter(savevideodialog.FileName, -1, recordframerate, recordsize, true);
+						_capturestatus = CaptureStatuses.RECORD;
+						//_capture.Start();
+					}
+					catch (NullReferenceException excpt)
+					{
+						MessageBox.Show(excpt.Message);
+					}
+				}
+			}
+		}
+
+		private void menuRecordStop_Click(object sender, RoutedEventArgs e)
+		{
+			_videowriter.Dispose();
+			_capturestatus = CaptureStatuses.PLAYING;
+		}
 	}
 }
