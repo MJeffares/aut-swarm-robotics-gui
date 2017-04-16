@@ -7,8 +7,7 @@
     xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
     xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
     mc:Ignorable="d"
-    Title="Swarm Robotics Graphics User Interface" Height="900" Width="1600" >
-
+    Title="Swarm Robotics Graphics User Interface" Height="900" Width="1600">
 
     <DockPanel x:Name="innerWin">
         <Menu DockPanel.Dock="Top" MouseEnter="menu_hover" Height="21">
@@ -47,9 +46,11 @@
             <MenuItem Header="Serial Comms" MouseEnter="MenuItem_MouseEnter" Click="menu_hover">
                 <MenuItem x:Name="menuCommunicationPortList" Header="Communication Port" MouseEnter="menu_hover"/>
                 <MenuItem x:Name="menuCommunicationBaudList" Header="Baud Rate" MouseEnter="menu_hover"/>
-                <MenuItem x:Name="menuCommunicationStopBitsList" Header="Stop Bits" MouseEnter="menu_hover"/>
                 <MenuItem x:Name="menuCommunicationParityList" Header="Parity" MouseEnter="menu_hover"/>
-                <MenuItem x:Name="menuCommunicationConnect" Header="Connect" IsEnabled="False" IsCheckable="True" Click="menuCommunicationConnect_Click"  />
+                <MenuItem x:Name="menuCommunicationDataList" Header="Data Bits" MouseEnter="menu_hover"/>
+                <MenuItem x:Name="menuCommunicationStopBitsList" Header="Stop Bits" MouseEnter="menu_hover"/>
+                <MenuItem x:Name="menuCommunicationHandshakeList" Header="Handshaking" MouseEnter="menu_hover"/>
+                <MenuItem x:Name="menuCommunicationConnect" Header="Connect" IsEnabled="False" IsCheckable="True" />
                 <Separator/>
                 <MenuItem x:Name="menuCommunicationoptions" Header="Options" Click="menuCameraOptions_Click"/>
             </MenuItem>
@@ -173,8 +174,22 @@
 
                 </StatusBar>
                 <Grid>
-                    <RichTextBox x:Name="rtbSerial" Visibility="Visible" Margin="100"/>
-                    <!--fills space in left space-->
+                    <StackPanel Orientation="Vertical">
+
+                        <TextBlock Text="Recieved Data" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10"/>
+                        <RichTextBox x:Name="rtbSerialReceived" Margin="10" IsReadOnly="True" Height="220"/>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Data to Send:" HorizontalAlignment="Left" Margin="10"/>
+                            <RichTextBox x:Name="rtbSendBuffer" Margin="10" HorizontalContentAlignment="Stretch" Width="500"/>
+                            <Button Content="Send" Margin="10" Click="Button_Click"/>
+                        </StackPanel>
+
+                        <TextBlock Text="Sent Data" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10"/>
+                        <RichTextBox x:Name="rtbSerialSent" Margin="10" IsReadOnly="True" Height="220"/>
+
+                        <!--fills space in left space-->
+                    </StackPanel>
                 </Grid>
             </DockPanel>
 

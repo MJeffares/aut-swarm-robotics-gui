@@ -1,22 +1,26 @@
 ﻿/**********************************************************************************************************************************************
-*	File: MJGuiSerialLib.cs
+*	File: SerialCommunication.cs
 *
 *	Developed By: Mansel Jeffares
 *	First Build: 29 March 2017
-*	Current Build:  29 March 2017
+*	Current Build:  16 April 2017
 *
 *	Description :
 *		Serial communication methods and functions for Swarm Robotics Project
 *		Built for x64, .NET 4.5.2
+*		
+*	Useage :
+*		
 *
 *	Limitations :
 *		Build for x64
+*		1.5 Stopbits doesn't work unless also using 5 databits
 *   
 *		Naming Conventions:
 *			
 *			Variables, camelCase, start lower case, subsequent words also upper case, if another object goes by the same name, then also with an underscore
 *			Methods, PascalCase, start upper case, subsequent words also upper case
-*			Constants, all upper case, unscores for seperation (camelCase ATM for this file)
+*			Constants, all upper case, unscores for seperation
 * 
 **********************************************************************************************************************************************/
 
@@ -31,10 +35,12 @@ using System;
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
-using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+
 #endregion
 
 
@@ -45,108 +51,238 @@ using System.Windows.Controls;
 #region
 
 
-namespace SwarmRoboticsGUI
+public class SerialUARTCommunication
 {
+	//supported serial port settings
+	private string[] baudRateOptions = new string[] { "4800", "9600", "19200", "38400", "57600", "115200", "230400", "460800", "921600" };
+	private string[] parityOptions = new string[] { "None", "Odd", "Even", "Mark", "Space" };
+	private string[] dataBitOptions = new string[] { "8", "7", "6", "5" };
+	private string[] stopBitOptions = new string[] { "None", "One", "One Point Five", "Two" };
+	private string[] handshakingOptions = new string[] { "None", "XOnXOff", "RequestToSend", "RequestToSendXOnXOff" };
 
-	//cannot use precomplier defines therefore we use a static class
-	static class SerialStatuses
+
+	//default serial port settings
+	private const string DEFAULT_BAUD_RATE = "9600";
+	private const string DEFAULT_PARITY = "None";
+	private const string DEFAULT_DATA_BITS = "8";
+	private const string DEFAULT_STOP_BITS = "One";
+	private const string DEFAULT_HANDSHAKING = "None";
+
+
+	//menu Items
+	MenuItem portList = null;
+	MenuItem baudList = null;
+	MenuItem parityList = null;
+	MenuItem dataBitsList = null;
+	MenuItem stopBitsList = null;
+	MenuItem handshakingList = null;
+	MenuItem connectButton = null;
+
+	public SerialPort _serialPort;
+	public Queue<byte> rxBuffer;
+
+	private string currentlyConnectedPort = null;
+
+	public SerialUARTCommunication()
 	{
-		public const int CLOSED = 0;
-		public const int OPEN = 1;
+		rxBuffer = new Queue<byte>();
 
+		_serialPort = new SerialPort();
+		//_serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+	}
+	public SerialUARTCommunication(MenuItem port, MenuItem baud, MenuItem parity, MenuItem data, MenuItem stop, MenuItem handshaking, MenuItem connect)
+	{
+		portList = port;
+		baudList = baud;
+		parityList = parity;
+		dataBitsList = data;
+		stopBitsList = stop;
+		handshakingList = handshaking;
+		connectButton = connect;
+
+		rxBuffer = new Queue<byte>();
+		_serialPort = new SerialPort();
+
+		PopulateSerialSettings();
+		PopulateSerialPorts();
+
+		portList.MouseEnter += new MouseEventHandler(PopulateSerialPorts);
+		connectButton.Click += new RoutedEventHandler(menuCommunicationConnect_Click);
+				
+		//_serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
 	}
 
 
+	public void sendByteArray(byte[] msg)
+	{
+		if (_serialPort.IsOpen)
+		{
+			_serialPort.Write(msg, 0, msg.Length);
+		}
+	}
 
-	public class SerialUARTCommunication
+	public void sendString(String msg)
+	{
+		if (_serialPort.IsOpen)
+		{
+			_serialPort.Write(msg);
+		}
+	}
+
+	private void PopulateSerialSettings()
+	{
+		MJLib.PopulateMenuItemList(baudList, baudRateOptions, DEFAULT_BAUD_RATE, MJLib.menuMutuallyExclusiveMenuItem_Click);
+		MJLib.PopulateMenuItemList(parityList, parityOptions, DEFAULT_PARITY, MJLib.menuMutuallyExclusiveMenuItem_Click);
+		MJLib.PopulateMenuItemList(dataBitsList, dataBitOptions, DEFAULT_DATA_BITS, MJLib.menuMutuallyExclusiveMenuItem_Click);
+		MJLib.PopulateMenuItemList(stopBitsList, stopBitOptions, DEFAULT_STOP_BITS, MJLib.menuMutuallyExclusiveMenuItem_Click);
+		MJLib.PopulateMenuItemList(handshakingList, handshakingOptions, DEFAULT_HANDSHAKING, MJLib.menuMutuallyExclusiveMenuItem_Click);
+	}
+
+	public void PopulateSerialPorts()
+	{
+		connectButton.IsEnabled = false;
+		string[] ports = SerialPort.GetPortNames();
+		portList.Items.Clear();
+
+		for (int i = 0; i < ports.Length; i++)
+		{
+			MenuItem item = new MenuItem { Header = ports[i] };
+			item.Click += new RoutedEventHandler(menuCommunicationPortListItem_Click);
+			item.IsCheckable = true;
+
+			portList.Items.Add(item);
+
+			if(item.ToString() == currentlyConnectedPort)
+			{
+				item.IsChecked = true;
+				connectButton.IsEnabled = true;
+			}
+		}
+
+		if (portList.Items.Count == 0)
+		{
+			MenuItem nonefound = new MenuItem { Header = "No Com Ports Found" };
+			portList.Items.Add(nonefound);
+			nonefound.IsEnabled = false;
+			connectButton.IsEnabled = false;
+		}
+	}
+	public void PopulateSerialPorts(object sender, MouseEventArgs e)
+	{
+		connectButton.IsEnabled = false;
+		string[] ports = SerialPort.GetPortNames();
+		portList.Items.Clear();
+
+		for (int i = 0; i < ports.Length; i++)
+		{
+			MenuItem item = new MenuItem { Header = ports[i] };
+			item.Click += new RoutedEventHandler(menuCommunicationPortListItem_Click);
+			item.IsCheckable = true;
+
+			portList.Items.Add(item);
+
+			if (item.ToString() == currentlyConnectedPort)
+			{
+				item.IsChecked = true;
+				connectButton.IsEnabled = true;
+			}
+		}
+
+		if (portList.Items.Count == 0)
+		{
+			MenuItem nonefound = new MenuItem { Header = "No Com Ports Found" };
+			portList.Items.Add(nonefound);
+			nonefound.IsEnabled = false;
+			connectButton.IsEnabled = false;
+		}
+	}
+
+
+	private void menuCommunicationPortListItem_Click(object sender, RoutedEventArgs e)
+	{
+		MJLib.menuMutuallyExclusiveMenuItem_Click(sender, e);
+		connectButton.IsEnabled = true;
+		currentlyConnectedPort = sender.ToString();
+	}
+
+
+	public void menuCommunicationConnect_Click(object sender, RoutedEventArgs e)
 	{
 
-		//
-		static class MsgDir
+		if (!_serialPort.IsOpen)
 		{
-			public const int RX = 0;
-			public const int TX = 1;
-		}
+			//get all the serial port settings (we poll this once when we attempt to connect, this instead could be done by events when each button is pressed)
+			MenuItem port = MJLib.GetCheckedItemInList(portList, true);
+			_serialPort.PortName = port.Header.ToString();
 
+			MenuItem baud = MJLib.GetCheckedItemInList(baudList, true);
+			_serialPort.BaudRate = int.Parse(baud.Header.ToString());
 
-		public SerialPort _serialPort;
-		Queue<Message> txBuffer;
-		Queue<Message> rxMessages;
+			MenuItem parity = MJLib.GetCheckedItemInList(parityList, true);
+			_serialPort.Parity = (Parity)Enum.Parse(typeof(Parity), parity.Header.ToString(), true);
 
-		private Message txMessage;
+			MenuItem data = MJLib.GetCheckedItemInList(dataBitsList, true);
+			_serialPort.DataBits = Convert.ToInt32(data.Header.ToString());
 
+			MenuItem stop = MJLib.GetCheckedItemInList(stopBitsList, true);
+			string str1 = null;
+			string str2 = null;
+			str1 = stop.Header.ToString();
+			str2 = Regex.Replace(stop.Header.ToString(), @"\s+", "");                               //we need to remove spaces
+			_serialPort.StopBits = (StopBits)Enum.Parse(typeof(StopBits), str2, true);
 
-		public struct Message
-		{
-			private byte headerByte1;
-			private byte headerByte2;
+			MenuItem handshake = MJLib.GetCheckedItemInList(handshakingList, true);
+			_serialPort.Handshake = (Handshake)Enum.Parse(typeof(Handshake), handshake.Header.ToString(), true);
 
-			public byte robotID;
-			public byte length;
-			public byte[] message;
-
-			public byte closeByte;
-
-
-			public Message(byte id, byte[] msg, int dir)
+			try
 			{
-				if (dir == MsgDir.TX)
-				{
-					headerByte1 = 0xC4;     //magic "numbers" for heading, should be set by a const definition elsewhere
-					headerByte2 = 0x3B;
-					closeByte = 0xA5;
-				}
-				else
-				{
-					headerByte1 = 0;
-					headerByte2 = 0;
-					closeByte = 0;
-				}
-
-				robotID = id;
-
-				length = (byte)msg.Length;
-
-				message = msg;
+				_serialPort.Open();
+				connectButton.Header = "Disconnect";
+			}
+			catch (Exception excpt)
+			{
+				MessageBox.Show(excpt.ToString());
+			}
+		}
+		else    //if the serial port is currently open
+		{
+			try
+			{
+				_serialPort.Close();
+			}
+			catch (Exception excpt)
+			{
+				MessageBox.Show(excpt.ToString());
 			}
 
 
+			//creates a list with all settings in it
+			MenuItem[] ports = portList.Items.OfType<MenuItem>().ToArray();
+			MenuItem[] bauds =baudList.Items.OfType<MenuItem>().ToArray();
+			MenuItem[] parity = parityList.Items.OfType<MenuItem>().ToArray();
+			MenuItem[] data = dataBitsList.Items.OfType<MenuItem>().ToArray();
+			MenuItem[] stops = stopBitsList.Items.OfType<MenuItem>().ToArray();
+			MenuItem[] handshakes = handshakingList.Items.OfType<MenuItem>().ToArray();
 
+			List<MenuItem> itemList = new List<MenuItem>(ports.Concat<MenuItem>(ports));
+			itemList.AddRange(bauds);
+			itemList.AddRange(parity);
+			itemList.AddRange(data);
+			itemList.AddRange(stops);
+			itemList.AddRange(handshakes);
 
-			//need to write
-			public override string ToString()
+			MenuItem[] finalArray = itemList.ToArray();
+
+			//re-enables all settings
+			foreach (var item in finalArray)
 			{
-				return String.Format("NOT YET IMPLEMENTED");
+				item.IsEnabled = true;
 			}
 
+			//updates connect button
+			connectButton.Header = "Connect";
+			connectButton.IsChecked = false;
 		}
-
-
-
-		public SerialUARTCommunication()
-		{
-			txBuffer = new Queue<Message>();
-			rxMessages = new Queue<Message>();
-
-			_serialPort = new SerialPort();
-			//_serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
-		}
-
-		public void sendInstruction(byte id, byte[] msg)
-		{
-			if (_serialPort.IsOpen)
-			{
-				txMessage = new Message(id, msg, MsgDir.TX);
-				txBuffer.Enqueue(txMessage);
-			}
-		}
-
-		public void sendInstruction(Message msg)        //overload from predefined messages (?)
-		{
-
-		}
-
-
 	}
 }
 
@@ -159,509 +295,49 @@ namespace SwarmRoboticsGUI
 {
 	public partial class MainWindow : Window
 	{
-		/**********************************************************************************************************************************************
-		* Constants
-		**********************************************************************************************************************************************/
-		#region
-
-		// Tablet to Tower
-		private const byte commsTestTablet2Tower = 0xE0;
-		private const byte setTowerLEDs = 0xE1;
-		private const byte setTowerLights = 0xE2;
-		private const byte requestTowerSensors = 0xE3;
-
-
-		// Tower to Tablet
-		private const byte commsTestTower2Tablet = 0xF0;
-		private const byte towerSensorData = 0xF3;
-
-
-		// Tower to Robot 
-		private const byte commsTestTower2Robot = 41;
-		private const byte dockAtThisPort = 42;
-
-
-		// Tablet to Robot (test mode)
-		private const byte commsTestTablet2Robot = 0xC0;
-		private const byte allTestToggle = 0xC1;
-		private const byte lineTestToggle = 0xC2;
-		private const byte proximityTestToggle = 0xC3;
-		private const byte colourTestToggle = 0xC4;
-		private const byte mouseTestToggle = 0xC5;
-		private const byte batteryTestToggle = 0xC6;
-		private const byte motor1TestPWM = 0xC7;
-		private const byte motor2TestPWM = 0xC8;
-		private const byte motor3TestPWM = 0xC9;
-		private const byte moveRobot = 0xCA;
-		private const byte robotMode = 0xCB;
-		private const byte softReset = 0xCC;
-
-
-		// Robot to Tower   
-		private const byte commsTestRobot2Tower = 51;
-		private const byte requestToDock = 52;
-
-
-		// data associated with the move command
-		private const byte north = 0;
-		private const byte northEast = 1;
-		private const byte east = 2;
-		private const byte southEast = 3;
-		private const byte south = 4;
-		private const byte southWest = 5;
-		private const byte west = 6;
-		private const byte northWest = 7;
-		private const byte clockwise = 8;
-		private const byte anticlockwise = 9;
-		private const byte halt = 10;
-
-
-		// data associated with the mode command
-		private const byte manualMode = 0;
-		private const byte lineFollowMode = 1;
-		private const byte lightFollowMode = 2;
-		private const byte objectAvoidanceMode = 3;
-		private const byte dockMode = 4;
-		private const byte undockMode = 5;
-		private const byte haltMode = 6;
-
-
-		// Robot to Tablet (test mode)
-		private const byte commsTestRobot2Tablet = 0xD0;
-		private const byte allTestData = 0xD1;
-		private const byte lineTestData = 0xD2;
-		private const byte proximityTestData = 0xD3;
-		private const byte colourTestData = 0xD4;
-		private const byte mouseTestData = 0xD5;
-		private const byte batteryTestData = 0xD6;
-
-		// misc data
-		private const byte heartBeatRobot2Tablet = 33;
-		private const byte iAmLinked = 34;
-
-
-		// serial receive state defines
-		private const byte RX_IDLE_STATE = 0;
-		private const byte RX_HEADER_STATE = 1;
-		private const byte RX_ROBOTID_STATE = 2;
-		private const byte RX_COMMAND_STATE = 3;
-		private const byte RX_NUM_OF_BYTES_STATE = 4;
-		private const byte RX_DATA_STATE = 5;
-		private const byte RX_END_PACKET_STATE = 6;
-
-		//default serial port settings
-		private const string DEFAULT_BAUD_RATE = "9600";
-		private const string DEFAULT_STOP_BITS = "One";
-		private const string DEFAULT_PARITY = "None";
-
-		#endregion
-
-		/**********************************************************************************************************************************************
-		* Variables
-		**********************************************************************************************************************************************/
-		#region
-
-		// flags
-		private bool instructionReceivedFlag = false;
-		private bool commsRobotTestFlag = false;
-		private bool commsTowerTestFlag = false;
-		private bool lineTestFlag = false;
-		private bool colourTestFlag = false;
-		private bool allTestFlag = false;
-		private bool proximityTestFlag = false;
-		private bool mouseTestFlag = false;
-		private bool batteryTestFlag = false;
-
-
-		// variables
-		private byte robotId = 1;
-		private byte[] rxBuffer = new byte[100];
-		private byte rxState = RX_IDLE_STATE;
-		private byte rxInstruction = 0;
-		private byte rxChar;
-		private byte rxCount;
-		private byte rxNumberDataBytes;
-		private byte[] txBuffer = new byte[100];
-
-		private int commsTestTimer = 10;
-
-		private byte[] rxTowerSensorData = new byte[6];
-		private byte towerLedState;
-		private byte towerLightState;
-		private byte towerSensorVal0, towerSensorVal1, towerSensorVal2, towerSensorVal3, towerSensorVal4, towerSensorVal5;
-
-		//private SerialPort _serialPort;
-		private int _serialStatus = SerialStatuses.CLOSED;
 		private static byte[] indata = new byte[100];
-		//private Bitmap robot = null;
-
-		#endregion
-
 		
-
-
-		//data binding would be a better way to do this
-		public void PopulateSerialSettings()
-		{
-			string[] baudRates = new string[] { "4800", "9600", "19200", "38400", "57600", "115200", "230400", "460800", "921600" };
-
-			menuCommunicationBaudList.Items.Clear();
-			for (int i = 0; i < baudRates.Length; i++)
-			{
-				MenuItem item = new MenuItem { Header = baudRates[i] };
-				item.Click += new RoutedEventHandler(menuCommunicationBaudRateListItem_Click);
-				item.IsCheckable = true;
-
-				if(baudRates[i] == DEFAULT_BAUD_RATE)
-				{
-					item.IsChecked = true;
-				}
-				
-				menuCommunicationBaudList.Items.Add(item);
-			}
-
-			string[] stopBits = new string[] { "None", "One", "One Point Five", "Two" };
-
-			menuCommunicationStopBitsList.Items.Clear();
-			for (int i = 0; i < stopBits.Length; i++)
-			{
-				MenuItem item = new MenuItem { Header = stopBits[i] };
-				item.Click += new RoutedEventHandler(menuCommunicationStopBitsListItem_Click);
-				item.IsCheckable = true;
-
-
-				if (stopBits[i] == DEFAULT_STOP_BITS)
-				{
-					item.IsChecked = true;
-				}
-
-
-				menuCommunicationStopBitsList.Items.Add(item);
-			}
-
-			string[] parity = new string[] { "None", "Odd", "Even", "Mark", "Space" };
-
-			menuCommunicationParityList.Items.Clear();
-			for (int i = 0; i < parity.Length; i++)
-			{
-				MenuItem item = new MenuItem { Header = parity[i] };
-				item.Click += new RoutedEventHandler(menuCommunicationParityListItem_Click);
-				item.IsCheckable = true;
-
-				if (parity[i] == DEFAULT_PARITY)
-				{
-					item.IsChecked = true;
-				}
-
-				menuCommunicationParityList.Items.Add(item);
-			}
-		}
-
-
-
-		public void PopulateSerialPorts()
-		{
-			string[] ports = SerialPort.GetPortNames();
-
-			for (int i = 0; i < ports.Length; i++)
-			{
-				MenuItem item = new MenuItem { Header = ports[i] };
-				item.Click += new RoutedEventHandler(menuCommunicationPortListItem_Click);
-				item.IsCheckable = true;
-
-				menuCommunicationPortList.Items.Add(item);
-
-				if (menuCommunicationPortList.Items.Count == 0)
-				{
-					MenuItem nonefound = new MenuItem { Header = "No Com Ports Found" };
-					menuCommunicationPortList.Items.Add(nonefound);
-					nonefound.IsEnabled = false;
-					menuCommunicationConnect.IsEnabled = false;
-				}
-
-			}
-		}
-
-
-
-		private void menuCommunicationBaudRateListItem_Click(object sender, RoutedEventArgs e)
-		{
-			MenuItem menusender = (MenuItem)sender;
-			String menusenderstring = menusender.ToString();
-
-			if (_serialStatus == SerialStatuses.CLOSED)
-			{
-
-				var allitems = menuCommunicationBaudList.Items.OfType<MenuItem>().ToArray();
-
-				foreach (var item in allitems)
-				{
-					item.IsChecked = false;
-				}
-
-				menusender.IsChecked = true;
-
-			}
-		}
-
-
-
-		private void menuCommunicationStopBitsListItem_Click(object sender, RoutedEventArgs e)
-		{
-			MenuItem menusender = (MenuItem)sender;
-			String menusenderstring = menusender.ToString();
-
-			if (_serialStatus == SerialStatuses.CLOSED)
-			{
-
-				var allitems = menuCommunicationStopBitsList.Items.OfType<MenuItem>().ToArray();
-
-				foreach (var item in allitems)
-				{
-					item.IsChecked = false;
-				}
-
-				menusender.IsChecked = true;
-
-			}
-		}
-
-
-
-		private void menuCommunicationParityListItem_Click(object sender, RoutedEventArgs e)
-		{
-			MenuItem menusender = (MenuItem)sender;
-			String menusenderstring = menusender.ToString();
-
-			if (_serialStatus == SerialStatuses.CLOSED)
-			{
-
-				var allitems = menuCommunicationParityList.Items.OfType<MenuItem>().ToArray();
-
-				foreach (var item in allitems)
-				{
-					item.IsChecked = false;
-				}
-
-				menusender.IsChecked = true;
-
-			}
-		}
-
-
-
-		private void menuCommunicationPortListItem_Click(object sender, RoutedEventArgs e)
-		{
-			MenuItem menusender = (MenuItem)sender;
-			String menusenderstring = menusender.ToString();
-
-			if (_serialStatus == SerialStatuses.CLOSED)
-			{
-
-				var allitems = menuCommunicationPortList.Items.OfType<MenuItem>().ToArray();
-
-				foreach (var item in allitems)
-				{
-					item.IsChecked = false;
-				}
-
-				menusender.IsChecked = true;
-				menuCommunicationConnect.IsEnabled = true;
-
-			}
-		}
-
-
-
-		public void menuCommunicationConnect_Click(object sender, RoutedEventArgs e)
-		{
-			MenuItem menusender = (MenuItem)sender;
-			String menusenderstring = menusender.ToString();
-
-			
-			//if (_capturestatus == CaptureStatuses.STOPPED && currentlyconnectedcamera != menusenderstring) //also check if the same menu option is clicked twice
-			if (_serialStatus == SerialStatuses.CLOSED )
-			{
-				
-
-				//repeated code split into function
-				var portItems = menuCommunicationPortList.Items.OfType<MenuItem>().ToArray();
-
-				foreach (var item in portItems)
-				{
-					if (item.IsChecked)
-					{
-						item.IsEnabled = false;
-						serial._serialPort.PortName = item.Header.ToString();
-					}
-					else
-					{
-						item.IsChecked = false;
-						item.IsEnabled = false;
-					}
-				}
-
-
-				var baudItems = menuCommunicationBaudList.Items.OfType<MenuItem>().ToArray();
-
-				
-
-				foreach (var item in baudItems)
-				{
-					if (item.IsChecked)
-					{
-						//string name = item.Header.ToString();
-						item.IsEnabled = false;
-						serial._serialPort.BaudRate = int.Parse(item.Header.ToString());
-					}
-					else
-					{
-						item.IsChecked = false;
-						item.IsEnabled = false;
-					}
-				}
-
-
-				var parityItems = menuCommunicationParityList.Items.OfType<MenuItem>().ToArray();
-				//string methodName = null;
-
-				foreach (var item in parityItems)
-				{
-					if (item.IsChecked)
-					{
-						item.IsEnabled = false;
-
-						serial._serialPort.Parity = (Parity)Enum.Parse(typeof(Parity), item.Header.ToString(), true);
-					}
-					else
-					{
-						item.IsChecked = false;
-						item.IsEnabled = false;
-					}
-				}
-
-				//default value always
-				serial._serialPort.DataBits = 8;
-
-
-				var stopBitsItems = menuCommunicationStopBitsList.Items.OfType<MenuItem>().ToArray();
-
-				foreach (var item in stopBitsItems)
-				{
-					if (item.IsChecked)
-					{
-						item.IsEnabled = false;
-						string str1 = null;
-						string str2 = null;
-						str1 = item.Header.ToString();
-						str2 = Regex.Replace(item.Header.ToString(), @"\s+", "");
-						//_serialPort.StopBits = (StopBits)Enum.Parse(typeof(StopBits), Regex.Replace(item.Header.ToString(), @"\s+", ""), true);
-						serial._serialPort.StopBits = (StopBits)Enum.Parse(typeof(StopBits), str2, true);      //might need to remve spaces for "one point five" to work
-																										//1.5 stop bits causes an error unless data bits is 5
-					}
-					else
-					{
-						item.IsChecked = false;
-						item.IsEnabled = false;
-					}
-
-
-					//default value always (no menu yet)
-					serial._serialPort.Handshake = Handshake.None;
-
-					if(serial._serialPort.IsOpen)
-					{
-						try
-						{
-							serial._serialPort.Close();
-						}
-						catch (Exception excpt)
-						{
-							MessageBox.Show(excpt.ToString());
-						}
-					}
-
-
-					try
-					{
-						serial._serialPort.Open();
-
-						if (serial._serialPort.IsOpen)
-						{
-							_serialStatus = SerialStatuses.OPEN;
-						}
-					}
-					catch (Exception excpt)
-					{
-						MessageBox.Show(excpt.ToString());
-					}
-				}
-			}
-			else
-			{
-				try
-				{
-					serial._serialPort.Close();
-				}
-				catch (Exception excpt)
-				{
-					MessageBox.Show(excpt.ToString());
-				}
-
-				_serialStatus = SerialStatuses.CLOSED;
-
-				MenuItem[] ports = menuCommunicationPortList.Items.OfType<MenuItem>().ToArray();
-				MenuItem[] bauds = menuCommunicationBaudList.Items.OfType<MenuItem>().ToArray();
-				MenuItem[] stops = menuCommunicationStopBitsList.Items.OfType<MenuItem>().ToArray();
-				MenuItem[] parity = menuCommunicationParityList.Items.OfType<MenuItem>().ToArray();
-
-				List<MenuItem> itemList = new List<MenuItem>(ports.Concat<MenuItem>(bauds));
-				//allItems = allItems + List<MenuItem>(stops.Concat<MenuItem>(parity));
-				itemList.AddRange(stops);
-				itemList.AddRange(parity);
-
-				MenuItem[] finalArray = itemList.ToArray();
-
-				//var items = menuCommunicationPortList.Items.OfType<MenuItem>().ToArray();
-
-				foreach (var item in finalArray)
-				{
-					item.IsEnabled = true;
-					menuCommunicationConnect.IsChecked = false;
-				}
-			}
-		}
-
-		public  void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
+		public void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
 		{
 			SerialPort sp = (SerialPort)sender;
 			int bytes = sp.BytesToRead;
 			//string indata = sp.Read()
-			
+
 			sp.Read(indata, 0, bytes);
 
-			for(int i = 0; i < bytes; i++)
+			for (int i = 0; i < bytes; i++)
 			{
 				//rtbSerial.AppendText(indata[i].ToString());	//threading error
 
 				//avoid's threading error
-				rtbSerial.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), new object[] { indata, bytes });
+				rtbSerialReceived.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), new object[] { indata, bytes });
 			}
-			
+
 		}
-
-
-
+		
 		public delegate void UpdateTextCallback(byte[] message, int number);
 
 		private void UpdateText(byte[] message, int number)
 		{
 			for (int i = 0; i < number; i++)
 			{
-				rtbSerial.AppendText(message[i].ToString()); 
+				rtbSerialReceived.AppendText(message[i].ToString());
 			}
-			rtbSerial.AppendText(Environment.NewLine);
+			//rtbSerialReceived.AppendText(Environment.NewLine);
 		}
 
+
+
+		private void Button_Click(object sender, RoutedEventArgs e)
+		{
+			rtbSendBuffer.SelectAll();
+			string text = rtbSendBuffer.Selection.Text.ToString();
+			byte[] bytes = Encoding.ASCII.GetBytes(text);
+
+			serial._serialPort.Write(bytes, 0, bytes.Length);
+
+			rtbSerialSent.AppendText(text);
+			rtbSendBuffer.Document.Blocks.Clear();
+		}
 	}
 }

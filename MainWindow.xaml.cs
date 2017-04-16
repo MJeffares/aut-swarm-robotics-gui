@@ -269,7 +269,7 @@ namespace SwarmRoboticsGUI
 		private int _timeDisplayMode = TimeDisplayMode.FROM_START;
 		private DateTime startTime;
 		//public SerialUARTCommunication serial = null;
-		public SerialUARTCommunication serial = new SerialUARTCommunication();
+		public SerialUARTCommunication serial;
 
 
 		//private SerialPort _serialPort;
@@ -299,12 +299,8 @@ namespace SwarmRoboticsGUI
 			CvInvoke.UseOpenCL = false;
 			PopulateFilters();
 			PopulateCameras();
-			PopulateSerialSettings();
-			PopulateSerialPorts();
 
-			//_serialPort = new SerialPort();
-			//_serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
-			//SerialUARTCommunication serial = new SerialUARTCommunication();
+			serial = new SerialUARTCommunication(menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);
 			serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
 
 			openvideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
@@ -313,8 +309,6 @@ namespace SwarmRoboticsGUI
 			FpsTimer.Tick += FpsTimerTick;
 			FpsTimer.Interval = new TimeSpan(0, 0, 1);
 			FpsTimer.Start();
-
-
 
 
 			//popoutCameraWindow = new CameraPopOutWindow();
@@ -524,7 +518,7 @@ namespace SwarmRoboticsGUI
 		VectorOfVectorOfPoint mycontours = new VectorOfVectorOfPoint();
 		VectorOfVectorOfPoint largecontours = new VectorOfVectorOfPoint();
 		VectorOfVectorOfPoint approx = new VectorOfVectorOfPoint();
-		double area;
+		//double area;
 		Mat testFrame = new Mat();
 
 
@@ -1142,8 +1136,6 @@ namespace SwarmRoboticsGUI
 			}
 		}
 
-
 		
-
 	}
 }
