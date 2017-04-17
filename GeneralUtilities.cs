@@ -27,6 +27,7 @@
 #region
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -38,6 +39,26 @@ using System.Windows.Controls;
 * Structures and Classes
 **********************************************************************************************************************************************/
 #region
+
+public static class ExtensionMethod
+{
+	public static LinkedListNode<T> getNodeAt<T>(this LinkedList<T> _list, int position)
+	{
+		LinkedListNode<T> mark = _list.First;
+		int i = 0;
+		while (i < position)
+		{
+			mark = mark.Next;
+			i++;
+		}
+		return mark;
+	}
+}
+
+
+
+
+
 
 static class MJLib
 {

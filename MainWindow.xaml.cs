@@ -3,7 +3,7 @@
 *
 *	Developed By: Mansel Jeffares
 *	First Build: 7 March 2017
-*	Current Build:  23 March 2017
+*	Current Build:  27 April 2017
 *
 *	Description :
 *		Graphics User Interface for Swarm Robotics Project
@@ -270,7 +270,7 @@ namespace SwarmRoboticsGUI
 		private DateTime startTime;
 		//public SerialUARTCommunication serial = null;
 		public SerialUARTCommunication serial;
-
+		public XbeeHandler xbee;
 
 		//private SerialPort _serialPort;
 
@@ -300,8 +300,10 @@ namespace SwarmRoboticsGUI
 			PopulateFilters();
 			PopulateCameras();
 
-			serial = new SerialUARTCommunication(menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);
-			serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+			xbee = new XbeeHandler();
+
+			serial = new SerialUARTCommunication(this, menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);
+			//serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
 
 			openvideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
 			savevideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
@@ -1075,8 +1077,8 @@ namespace SwarmRoboticsGUI
 		{
 			if (_cameraWindowStatus == CameraWindowStatus.MAXIMISED)
 			{
-				cameraWindowSize = mainGrid.ColumnDefinitions[2].ActualWidth;		//set size of window when it was minimised
-				mainGrid.ColumnDefinitions[2].Width = new GridLength((double)0);    //minimise window (make width = 0)
+				cameraWindowSize = mainGrid.ColumnDefinitions[3].ActualWidth;		//set size of window when it was minimised
+				mainGrid.ColumnDefinitions[3].Width = new GridLength((double)0);    //minimise window (make width = 0)
 
 				_cameraWindowStatus = CameraWindowStatus.MINIMISED;                  //set variable/flag
 				cameraGridSplitter.IsEnabled = false;								//disable the grid splitter so window cannont be changed size until it is expanded
@@ -1087,7 +1089,7 @@ namespace SwarmRoboticsGUI
 			}
 			else if(_cameraWindowStatus == CameraWindowStatus.MINIMISED)
 			{
-				mainGrid.ColumnDefinitions[2].Width = new GridLength(cameraWindowSize);     //set window to the size it had been before it was minimised
+				mainGrid.ColumnDefinitions[3].Width = new GridLength(cameraWindowSize);     //set window to the size it had been before it was minimised
 
 				_cameraWindowStatus = CameraWindowStatus.MAXIMISED;							//set variable/flag
 				cameraGridSplitter.IsEnabled = true;										//re-enable the grid splitter so its size can be changed
@@ -1104,8 +1106,8 @@ namespace SwarmRoboticsGUI
 
 			if(_cameraWindowStatus != CameraWindowStatus.POPPED_OUT)
 			{
-				cameraWindowSize = mainGrid.ColumnDefinitions[2].ActualWidth;       //set size of window when it was minimised
-				mainGrid.ColumnDefinitions[2].Width = new GridLength((double)0);    //minimise window (make width = 0)
+				cameraWindowSize = mainGrid.ColumnDefinitions[3].ActualWidth;       //set size of window when it was minimised
+				mainGrid.ColumnDefinitions[3].Width = new GridLength((double)0);    //minimise window (make width = 0)
 
 				_cameraWindowStatus = CameraWindowStatus.POPPED_OUT;                  //set variable/flag
 				cameraGridSplitter.IsEnabled = false;                               //disable the grid splitter so window cannont be changed size until it is expanded
@@ -1124,7 +1126,7 @@ namespace SwarmRoboticsGUI
 				popoutCameraWindow.Close();
 
 
-				mainGrid.ColumnDefinitions[2].Width = new GridLength(cameraWindowSize);     //set window to the size it had been before it was minimised
+				mainGrid.ColumnDefinitions[3].Width = new GridLength(cameraWindowSize);     //set window to the size it had been before it was minimised
 
 				_cameraWindowStatus = CameraWindowStatus.MAXIMISED;                         //set variable/flag
 				cameraGridSplitter.IsEnabled = true;                                        //re-enable the grid splitter so its size can be changed

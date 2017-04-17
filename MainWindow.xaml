@@ -7,10 +7,10 @@
     xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
     xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
     mc:Ignorable="d"
-    Title="Swarm Robotics Graphics User Interface" Height="900" Width="1600">
+    Title="Swarm Robotics Graphics User Interface" Height="900" Width="1600" MinHeight="300" MinWidth="500">
 
     <DockPanel x:Name="innerWin">
-        <Menu DockPanel.Dock="Top" MouseEnter="menu_hover" Height="21">
+        <Menu DockPanel.Dock="Top" MouseEnter="menu_hover" Height="21" MinWidth="300">
 
             <MenuItem Header="File" MouseEnter="menu_hover" Click="menu_hover">
                 <MenuItem x:Name="menuRecordNew" Header="New Recording" IsEnabled="False" Click="menuRecordNew_Click" />
@@ -128,13 +128,36 @@
         <Grid x:Name="mainGrid">
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition x:Name="Column0" Width="*"/>
-                <ColumnDefinition x:Name="Column1" Width="5"/>
-                <ColumnDefinition x:Name="Column2" Width="*"/>
+                <ColumnDefinition x:Name="Column0" Width="*" MinWidth="150"/>
+                <ColumnDefinition x:Name="Column1" Width="2*" MinWidth="300"/>
+                <ColumnDefinition x:Name="Column2" Width="5"/>
+                <ColumnDefinition x:Name="Column3" Width="2*"/>
             </Grid.ColumnDefinitions>
 
-            <DockPanel Grid.Column="0">
-                <StatusBar DockPanel.Dock="Right" Background="Transparent">
+            
+
+            <Grid Grid.Column="0">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Received Data" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10,10,10,0"/>
+                <WrapPanel Grid.Row="1">
+                    <Button x:Name="receivedDataNewline" Content="/n" Margin="10" Click="receivedDataNewline_Click"/>
+                    <Button x:Name="receivedDataClear" Content="clear" Margin="10" Click="receivedDataClear_Click"/>
+                    <Button Content="Placeholder Freeze" Margin="10"/>
+                </WrapPanel>
+                <RichTextBox Grid.Row="2" x:Name="rtbSerialReceived" Margin="10,10,10,10" VerticalScrollBarVisibility="Visible" IsReadOnly="True" Height="Auto" Width="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+
+            </Grid>
+
+            
+            
+            <DockPanel Grid.Column="1">
+                <StatusBar DockPanel.Dock="Right" Background="Transparent" Margin="10,0,0,0">
                     <StatusBar.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Grid>
@@ -148,10 +171,6 @@
                             </Grid>
                         </ItemsPanelTemplate>
                     </StatusBar.ItemsPanel>
-
-
-
-
 
                     <StatusBarItem Grid.Row="1" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0" MouseDown="CameraMinimise" Width="22" Height="16">
                         <Label x:Name="cameraArrowTop" Content="   >" Padding="0"/>
@@ -173,32 +192,71 @@
 
 
                 </StatusBar>
-                <Grid>
-                    <StackPanel Orientation="Vertical">
+                <TabControl>
+                    <TabItem Header="Serial Communication">
+                        <Grid>
 
-                        <TextBlock Text="Recieved Data" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10"/>
-                        <RichTextBox x:Name="rtbSerialReceived" Margin="10" IsReadOnly="True" Height="220"/>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
 
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Data to Send:" HorizontalAlignment="Left" Margin="10"/>
-                            <RichTextBox x:Name="rtbSendBuffer" Margin="10" HorizontalContentAlignment="Stretch" Width="500"/>
-                            <Button Content="Send" Margin="10" Click="Button_Click"/>
-                        </StackPanel>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
 
-                        <TextBlock Text="Sent Data" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10"/>
-                        <RichTextBox x:Name="rtbSerialSent" Margin="10" IsReadOnly="True" Height="220"/>
+                            <TextBlock Grid.Column="0" Text="Data to Send:" HorizontalAlignment="Left" Margin="10"/>
+                            <RichTextBox Grid.Column="1" x:Name="rtbSendBuffer" Margin="10" HorizontalAlignment="Stretch" Width="Auto"/>
+                            <Button Grid.Column="2" Content="Send" x:Name="btnSerialSend" Margin="10" Click="Button_Click" HorizontalAlignment="Right"/>
 
-                        <!--fills space in left space-->
-                    </StackPanel>
-                </Grid>
+                            <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Text="Sent Data" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10,00,10,0"/>
+                            <RichTextBox Grid.Row="2" Grid.ColumnSpan="3" x:Name="rtbSerialSent" Margin="30,10,30,30" IsReadOnly="True" Height="Auto"/>
+
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem Header="Xbee Communication">
+                        <Grid>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Column="0" Text="Frame:" HorizontalAlignment="Left" Margin="10"/>
+                            <RichTextBox Grid.Column="1" x:Name="rtbXbeeSendBuffer" Margin="10" HorizontalAlignment="Stretch" Width="Auto"/>
+                            <Button Grid.Column="2" Content="Send" x:Name="btnXbeeSend" Margin="10"  HorizontalAlignment="Right"/>
+
+                            <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Text="Sent Data" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10,00,10,0"/>
+                            <RichTextBox Grid.Row="2" Grid.ColumnSpan="3" x:Name="rtbXbeeSent" Margin="30,10,30,30" IsReadOnly="True" Height="Auto"/>
+
+                        </Grid>
+                    </TabItem>
+                    
+                    <TabItem Header="Placeholder"/>
+                    <TabItem Header="Placeholder"/>
+                    <TabItem Header="Placeholder"/>
+                </TabControl>
             </DockPanel>
 
-            <GridSplitter x:Name="cameraGridSplitter" Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
 
 
+            <GridSplitter x:Name="cameraGridSplitter" Grid.Column="2" Width="5" HorizontalAlignment="Center">
+            </GridSplitter>
 
 
-            <WindowsFormsHost Grid.Column="2" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,0,0,0" Visibility="Hidden">
+            
+            <WindowsFormsHost Grid.Column="3" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,0,0,0" Visibility="Hidden">
                 <em:ImageBox x:Name="captureImageBox" Height="240" Width="320" SizeMode="StretchImage" FunctionalMode="Minimum"/>
             </WindowsFormsHost>
 

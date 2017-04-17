@@ -96,6 +96,7 @@
     <Compile Include="SelectFolder.cs" />
     <Compile Include="SerialCommunication.cs" />
     <Compile Include="SwarmRoboticsSerialProtocol.cs" />
+    <Compile Include="XbeeCommunication.cs" />
     <Page Include="CameraPopOutWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
