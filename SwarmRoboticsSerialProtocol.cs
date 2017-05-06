@@ -1,4 +1,103 @@
-﻿
+﻿/**********************************************************************************************************************************************
+*	File: SwarmRoboticsProtocol.cs
+*
+*	Developed By: Mansel Jeffares
+*	First Build: 28 April 2017
+*	Current Build:  28 April 2017
+*
+*	Description :
+*		Swarm Robotics Project Custom Protocol
+*		Built for x64, .NET 4.5.2
+*		
+*	Useage :
+*		Used ontop of Xbee protocol
+*
+*	Limitations :
+*		Build for x64
+*   
+*		Naming Conventions:
+*			
+*			Variables, camelCase, start lower case, subsequent words also upper case, if another object goes by the same name, then also with an underscore
+*			Methods, PascalCase, start upper case, subsequent words also upper case
+*			Constants, all upper case, unscores for seperation
+* 
+**********************************************************************************************************************************************/
+
+
+
+/**********************************************************************************************************************************************
+* Namespaces
+**********************************************************************************************************************************************/
+#region
+
+using SwarmRoboticsGUI;
+using System;
+using System.Collections.Generic;
+using System.IO.Ports;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Threading;
+
+#endregion
+
+
+
+/**********************************************************************************************************************************************
+* Structures and Classes
+**********************************************************************************************************************************************/
+public class ProtocolClass
+{
+	private MainWindow window = null;
+
+	public ProtocolClass(MainWindow main)
+	{
+		window = main;
+	}
+
+
+
+	public static class MESSAGE_TYPES
+	{
+		public const byte COMMUNICATION_TEST = 0x00;
+	}
+
+	public void MessageReceived(byte[] message)
+	{
+		switch(message[0])
+		{
+			case MESSAGE_TYPES.COMMUNICATION_TEST:
+
+				window.UpdateSerialReceivedTextBox("\rCommunication Test Successful\r");
+				//XXX
+				//display the data here
+				break;
+
+		}
+	}
+
+
+	public void SendMessage(byte type)
+	{
+		switch (type)
+		{
+			case MESSAGE_TYPES.COMMUNICATION_TEST:
+
+				window.xbee.SendTransmitRequest(XbeeHandler.DESTINATION.COORDINATOR, MESSAGE_TYPES.COMMUNICATION_TEST);
+
+				break;
+
+		}
+	}
+
+}
+
+
+#region old_parts
+
 /*
 **********************************************************************************************************************************************
 		* Constants
@@ -239,4 +338,4 @@ public class SerialUARTCommunication
 
 }
 */
-  
+#endregion

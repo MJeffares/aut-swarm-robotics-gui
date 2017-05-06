@@ -41,6 +41,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 #endregion
 
@@ -54,8 +55,7 @@ using System.Windows.Input;
 
 public class SerialUARTCommunication
 {
-	private static byte[] indata = new byte[100];
-
+	
 
 	//supported serial port settings
 	private string[] baudRateOptions = new string[] { "4800", "9600", "19200", "38400", "57600", "115200", "230400", "460800", "921600" };
@@ -90,6 +90,9 @@ public class SerialUARTCommunication
 
 	private string currentlyConnectedPort = null;
 
+	private DispatcherTimer ReceiveTimer = new DispatcherTimer();   // one second timer to calculate and update the fps count
+
+
 	public SerialUARTCommunication(MainWindow main)
 	{
 		window = main;
@@ -98,6 +101,11 @@ public class SerialUARTCommunication
 
 		_serialPort = new SerialPort();
 		_serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+
+		//ReceiveTimer.Tick += ReceiveTimerTick;
+		//ReceiveTimer.Interval = new TimeSpan(0, 0, 0, 0, 10);
+		//ReceiveTimer.Start();
+
 	}
 	public SerialUARTCommunication(MainWindow main, MenuItem port, MenuItem baud, MenuItem parity, MenuItem data, MenuItem stop, MenuItem handshaking, MenuItem connect)
 	{
@@ -120,6 +128,10 @@ public class SerialUARTCommunication
 		connectButton.Click += new RoutedEventHandler(menuCommunicationConnect_Click);
 				
 		_serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+
+		//ReceiveTimer.Tick += ReceiveTimerTick;
+		//ReceiveTimer.Interval = new TimeSpan(0, 0, 0, 0, 10);
+		//ReceiveTimer.Start();
 	}
 
 
@@ -300,20 +312,129 @@ public class SerialUARTCommunication
 
 	public void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
 	{
+		
 		SerialPort sp = (SerialPort)sender;
 		int bytes = sp.BytesToRead;
 
+		byte[] indata = new byte[bytes];
+
 		sp.Read(indata, 0, bytes);
-		
-		for (int i = 0; i < bytes; i++)
+
+
+		indata = window.xbee.DeEscape(indata);
+		bytes = indata.Length;
+
+
+		for(int i = 0; i < indata.Length; i++)
 		{
-			//avoid's threading error
-			//rtbSerialReceived.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), new object[] { indata, bytes });
-			window.UpdateSerialReceivedTextBox(indata, bytes);
+			rxBuffer.Enqueue(indata[i]);
 		}
+
+		/*
+		byte[] indata = new byte[bytes*2];	//for worst case with all escaped character
+		
+		sp.Read(indata, 0, bytes);
+
+		for(int i = 0; i < indata.Length; i++)
+		{
+			if (indata[i] == 0x7D)
+			{
+				i++;
+				rxBuffer.Enqueue((byte)(indata[i] ^ 0x20));
+			}
+			else
+			{
+				rxBuffer.Enqueue(indata[i]);
+			}
+		}
+		*/
+		
+		//avoid's threading error
+		//rtbSerialReceived.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), new object[] { indata, bytes });
+		window.UpdateSerialReceivedTextBox(indata, bytes);
+
+		window.xbee.InterperateXbeeFrame();
+
+
+		//start thread to process on the receive side
+		//XXXX
+
+		//ReceiveTimer.Stop();
+		//ReceiveTimer.Start();
+		/*
+		for(int i = 0; i < 100; i++)
+		{
+			if (window.xbee.ReceiveMessage() != null)
+			{
+				window.UpdateSerialReceivedTextBox("\rXbee Message Received\r");
+				i = 100;
+			}
+			else
+			{
+
+			}
+		}
+		
+		while(window.xbee.ReceiveMessage() == null)
+		{
+
+		}
+		*/
 
 	}
 
+
+	
+	/*
+
+	private int receiveMaxCount;
+
+	private void ReceiveTimerTick(object sender, EventArgs arg)
+	{
+		if(receiveMaxCount > 1000)
+		{
+			ReceiveTimer.Stop();
+			receiveMaxCount = 0;
+			window.UpdateSerialReceivedTextBox("\rMessage Receive Attempt Timeout\r");
+		}
+
+		byte[] xbeeData = window.xbee.ReceiveMessage();
+
+
+		if (xbeeData != null)
+		{
+			
+
+			if(xbeeData[0] == 0x90) //Received message
+			{
+				window.UpdateSerialReceivedTextBox("\rXbee Message Received (Receive Packet Frame)\r");
+
+				byte[] rawMessage = new byte[xbeeData.Length - 12];
+
+				Array.Copy(xbeeData, 12, rawMessage, 0, xbeeData.Length - 12);
+
+				//XXXX
+				//call swarm serial function passing "xbeeData" too it
+				window.protocol.MessageReceived(rawMessage);
+				//window.protocol.MessageReceived(xbeeData);
+
+			}
+			else
+			{
+				window.UpdateSerialReceivedTextBox("\rXbee Not Implemented Message Received\r");
+			}
+
+			
+
+
+			ReceiveTimer.Stop();
+			receiveMaxCount = 0;
+		}
+
+
+		receiveMaxCount++;
+	}
+	*/
 }
 
 
@@ -340,9 +461,40 @@ namespace SwarmRoboticsGUI
 
 			for (int i = 0; i < number; i++)
 			{
-				messageString += Encoding.ASCII.GetString(message,0,1);
+				//messageString += Encoding.ASCII.GetString(message,0,1);	
+
+				string temp = message[i].ToString("X");
+
+				if (temp == "7E")
+				{
+					messageString += "\r";
+					messageString += temp;
+				}
+				else if (message[i] < 0x10)
+				{
+					messageString += "0";
+					messageString += temp;
+				}
+				else
+				{
+					messageString += temp;
+				}
+
+
+				
+
+				
+				/*
+				if ((i % 2) == 0)
+				{
+					messageString += "-";
+				}
+				*/
+
+
 			}
 			rtbSerialReceived.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), new object[] { messageString });
+			
 		}
 		
 		private void UpdateText(string text)
@@ -351,10 +503,14 @@ namespace SwarmRoboticsGUI
 			rtbSerialReceived.ScrollToEnd();
 		}
 
+		
+
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
 			if (serial._serialPort.IsOpen)
 			{
+				byte test = 0 ; //
+
 
 				rtbSendBuffer.SelectAll();
 				string text = rtbSendBuffer.Selection.Text.ToString();
@@ -373,6 +529,11 @@ namespace SwarmRoboticsGUI
 				{
 					byte[] bytes = bytes = Enumerable.Range(0, textToSend.Length).Where(x => x % 2 == 0).Select(x => Convert.ToByte(textToSend.Substring(x, 2), 16)).ToArray();
 
+
+					 //test = xbee.CalculateChecksum(bytes); //
+
+					
+
 					//bytes = xbee.Escape(bytes); //escapes bytes
 					
 
@@ -385,6 +546,7 @@ namespace SwarmRoboticsGUI
 
 
 				rtbSerialSent.AppendText(text);
+				//rtbSerialSent.AppendText(test.ToString()); //
 				rtbSendBuffer.Document.Blocks.Clear();
 				rtbSerialSent.ScrollToEnd();
 			}

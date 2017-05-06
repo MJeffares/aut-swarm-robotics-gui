@@ -271,6 +271,7 @@ namespace SwarmRoboticsGUI
 		//public SerialUARTCommunication serial = null;
 		public SerialUARTCommunication serial;
 		public XbeeHandler xbee;
+		public ProtocolClass protocol;
 
 		//private SerialPort _serialPort;
 
@@ -300,7 +301,8 @@ namespace SwarmRoboticsGUI
 			PopulateFilters();
 			PopulateCameras();
 
-			xbee = new XbeeHandler();
+			xbee = new XbeeHandler(this);
+			protocol = new ProtocolClass(this);
 
 			serial = new SerialUARTCommunication(this, menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);
 			//serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
@@ -1138,6 +1140,9 @@ namespace SwarmRoboticsGUI
 			}
 		}
 
-		
+		private void btnCommunicationTest_Click(object sender, RoutedEventArgs e)
+		{
+			protocol.SendMessage(ProtocolClass.MESSAGE_TYPES.COMMUNICATION_TEST);
+		}
 	}
 }

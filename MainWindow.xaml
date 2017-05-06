@@ -233,17 +233,22 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Column="0" Text="Frame:" HorizontalAlignment="Left" Margin="10"/>
+                            <TextBlock Grid.Column="0" Text="Message Data:" HorizontalAlignment="Left" Margin="10"/>
                             <RichTextBox Grid.Column="1" x:Name="rtbXbeeSendBuffer" Margin="10" HorizontalAlignment="Stretch" Width="Auto"/>
-                            <Button Grid.Column="2" Content="Send" x:Name="btnXbeeSend" Margin="10"  HorizontalAlignment="Right"/>
+                            <Button Grid.Column="2" Content="Send" x:Name="btnXbeeSend" Margin="10"  HorizontalAlignment="Right" Click="btnXbeeSend_Click"/>
 
                             <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Text="Sent Data" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10,00,10,0"/>
                             <RichTextBox Grid.Row="2" Grid.ColumnSpan="3" x:Name="rtbXbeeSent" Margin="30,10,30,30" IsReadOnly="True" Height="Auto"/>
 
                         </Grid>
                     </TabItem>
+
+                    <TabItem Header="Robot">
+                        <WrapPanel>
+                            <Button Grid.Column="2" Content="Communication Test" x:Name="btnCommunicationTest" Margin="10" Click="btnCommunicationTest_Click" />
+                        </WrapPanel>
+                    </TabItem>
                     
-                    <TabItem Header="Placeholder"/>
                     <TabItem Header="Placeholder"/>
                     <TabItem Header="Placeholder"/>
                 </TabControl>
