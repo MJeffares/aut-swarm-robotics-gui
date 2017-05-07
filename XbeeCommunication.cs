@@ -372,7 +372,7 @@ public class XbeeHandler
 		//SerialUARTCommunication serial
 		try
 		{
-			window.serial.sendByteArray(XbeeFrame(frame_data));
+			window.serial.SendByteArray(XbeeFrame(frame_data));
 		}
 		catch (Exception excpt)
 		{
@@ -404,7 +404,7 @@ public class XbeeHandler
 		//SerialUARTCommunication serial
 		try
 		{
-			window.serial.sendByteArray(XbeeFrame(frame_data));
+			window.serial.SendByteArray(XbeeFrame(frame_data));
 		}
 		catch (Exception excpt)
 		{

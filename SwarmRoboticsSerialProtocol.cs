@@ -31,16 +31,6 @@
 #region
 
 using SwarmRoboticsGUI;
-using System;
-using System.Collections.Generic;
-using System.IO.Ports;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Threading;
 
 #endregion
 
@@ -51,12 +41,8 @@ using System.Windows.Threading;
 **********************************************************************************************************************************************/
 public class ProtocolClass
 {
+	// variables
 	private MainWindow window = null;
-
-	public ProtocolClass(MainWindow main)
-	{
-		window = main;
-	}
 
 
 
@@ -64,6 +50,15 @@ public class ProtocolClass
 	{
 		public const byte COMMUNICATION_TEST = 0x00;
 	}
+
+
+	// constructor
+	public ProtocolClass(MainWindow main)
+	{
+		window = main;
+	}
+	
+
 
 	public void MessageReceived(byte[] message)
 	{
