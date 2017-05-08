@@ -87,11 +87,6 @@ struct Video_Device
  */
 static public class CaptureFilters
 {
-	public const int NUM_FILTERS = 4;
-	public const int NO_FILTER = 0;
-    public const int GREYSCALE = 1;
-	public const int CANNY_EDGES = 2;
-	public const int BRAE_EDGES = 3;
 	// HSV ranges.
 	private const int LowerH = 0;
 	private const int UpperH = 255;
@@ -103,92 +98,8 @@ static public class CaptureFilters
 	private const int BlurC = 1;
 	private const int LowerC = 128;
 	private const int UpperC = 255;
-
-	///<summary>
-	///Calculates the output for the current filter
-	/// </summary>
-	/// <returns>The proccessed frame matrix</returns>
-	static public Mat Process(int filter, Mat inputframe, Mat outputframe)
-	{
-		
-		switch (filter)
-		{
-			case CaptureFilters.NO_FILTER:
-				return inputframe;
-				
-
-			case CaptureFilters.GREYSCALE:
-				CvInvoke.CvtColor(inputframe, outputframe, ColorConversion.Bgr2Gray);
-				return outputframe;
-
-			case CaptureFilters.CANNY_EDGES:
-				CvInvoke.CvtColor(inputframe, outputframe, ColorConversion.Bgr2Gray);
-				CvInvoke.PyrDown(outputframe, outputframe);
-				CvInvoke.PyrUp(outputframe, outputframe);
-				CvInvoke.Canny(outputframe, outputframe, 80, 40);
-				return outputframe;
-
-			case CaptureFilters.BRAE_EDGES:
-				CvInvoke.CvtColor(inputframe, outputframe, ColorConversion.Bgr2Gray);
-				CvInvoke.Threshold(outputframe, outputframe, LowerC, UpperC, ThresholdType.Binary);
-				CvInvoke.AdaptiveThreshold(outputframe, outputframe, UpperC, AdaptiveThresholdType.GaussianC, ThresholdType.Binary, 3, 0);
-				//CvInvoke.FindContours(outputframe, mycontours, null, RetrType.External, ChainApproxMethod.ChainApproxNone, 0);
-				
-				
-				return outputframe;
-
-			default:
-				return inputframe;
-		}
-	}
-	///<summary>
-	///Represent the Filter as a string
-	/// </summary>
-	/// <returns>The string representation of this Filter</returns>
-	static public string ToString(int filter)
-	{
-		switch (filter)
-		{
-			case CaptureFilters.NO_FILTER:
-				return String.Format("No Filter");
-
-			case CaptureFilters.GREYSCALE:
-				return String.Format("Greyscale");
-
-			case CaptureFilters.CANNY_EDGES:
-				return String.Format("Canny Edges");
-
-			case CaptureFilters.BRAE_EDGES:
-				return String.Format("Brae Edges");
-
-			default:
-				return String.Format("Filter Text Error");
-
-		}
-	}
 }
 //cannot use precomplier defines therefore we use a static class
-static class CaptureStatuses
-{
-	public const int PLAYING = 0;
-	public const int PAUSED = 1;
-	public const int STOPPED = 2;
-	public const int REPLAY_ACTIVE = 3;
-	public const int REPLAY_PAUSED = 4;
-	public const int RECORDING = 5;
-}
-static class TimeDisplayMode
-{
-	public const int CURRENT = 0;
-	public const int FROM_START = 1;
-	public const int START = 2;
-}
-static class CameraWindowStatus
-{
-	public const int MAXIMISED = 0;
-	public const int MINIMISED = 1;
-	public const int POPPED_OUT = 2;
-}
 #endregion
 
 namespace SwarmRoboticsGUI
@@ -200,10 +111,10 @@ namespace SwarmRoboticsGUI
 	{
 		// Variables
 		#region
-        public Camera camera = new Camera();
+        public Camera camera;
 
 		//fps timer variables
-		private int _fpscount = 0;                                  // number of frames captured in the current second
+		//private int _fpscount = 0;                                  // number of frames captured in the current second
 		private DispatcherTimer FpsTimer = new DispatcherTimer();   // one second timer to calculate and update the fps count
 
 		// video record/replay variables
@@ -213,31 +124,17 @@ namespace SwarmRoboticsGUI
 		private double replaytotalframes = 0;
 		//private int recordframewidth;
 		//private int recordframeheight;
-		private double replayframecount;
-		private VideoWriter _videowriter;
-		//private Stopwatch _stopwatch;
-		private double replayspeed = 1;
+		//private double replayframecount;
+		//private double replayspeed = 1;
 		private int recordframerate = 30;
 		private System.Drawing.Size recordsize = new System.Drawing.Size();
-		private int _timeDisplayMode = TimeDisplayMode.FROM_START;
-		private DateTime startTime;
-		//public SerialUARTCommunication serial = null;
+		//private DateTime startTime;
+
 		public SerialUARTCommunication serial;
 		public XbeeHandler xbee;
 		public ProtocolClass protocol;
+		//public CameraPopOutWindow popoutCameraWindow;
 
-		//private SerialPort _serialPort;
-
-		private double cameraWindowSize = 0;
-		//private bool cameraWindowMaximised = true;
-		private int _cameraWindowStatus = CameraWindowStatus.MAXIMISED;
-		public CameraPopOutWindow popoutCameraWindow;
-
-		//System.Windows.Forms.FolderBrowserDialog test;
-
-		//public Mat mycontours = new Mat();
-		//VectorCollection mycontours = new VectorCollection();
-		//VectorOfVectorOfPoint mycontours = new VectorOfVectorOfPoint();
 
 		#endregion
 
@@ -248,8 +145,9 @@ namespace SwarmRoboticsGUI
 		{
 			InitializeComponent();
 
+            host1.Visibility = Visibility.Visible;
 
-
+            camera = new Camera(captureImageBox);
             CvInvoke.UseOpenCL = false;
 			PopulateFilters();
 			PopulateCameras();
@@ -325,125 +223,13 @@ namespace SwarmRoboticsGUI
 			}
 		}
 
-        /// <summary>
-        /// starts capturing stream from video camera (update to support video files?, currently we use seperate methods)
-        /// </summary>
-		private void StartCapture()
-		{
-            //if the capture has perviously been used and not disposed of we should dispose of it now
-			if (capture != null)
-			{
-				capture.Dispose();
-			}
-
-            //if the frame has perviously been used and not disposed of we should dispose of it now     // TODO: make a clean up method?
-            if(frame != null)
-            {
-                frame.Dispose();
-            }
-
-			try
-			{
-                // change the visibility of our winforms host (our stream viewer is inside this)
-                host1.Visibility = Visibility.Visible;
-                // update the capture object           
-                capture = new VideoCapture(cameradeviceindex);
-                // add event handler for our new capture  
-                capture.ImageGrabbed += ProcessFrame;
-                // create a new matrix to hold our image
-                frame = new Mat();
-                // Update the header on our connect/disconnect button
-                menuCameraConnect.Header = "Stop Capture";
-                // enable the freeze frame button
-                menuCameraFreeze.IsEnabled = true;                
-                menuRecordNew.IsEnabled = true;
-
-                // update our status
-                _capturestatus = CaptureStatuses.PLAYING;
-                // start the capture       
-                capture.Start();
-                // start our fps timer                             
-                //FpsTimer.Start();                                  
-                _fpscount = 1;
-
-				// set start date time as a variable 
-				startTime = DateTime.Now;
-
-			}
-			catch (NullReferenceException excpt)
-			{
-				MessageBox.Show(excpt.Message);
-			}
-		}
-		private void StopCapture()
-		{
-            if (_capturestatus == CaptureStatuses.PLAYING)
-            {
-                try
-                {
-                    capture.Stop();
-                    //FpsTimer.Stop();
-                    statusFPS.Text = "FPS: ";
-                    capture.Dispose();
-                    host1.Visibility = Visibility.Hidden;
-                    _capturestatus = CaptureStatuses.STOPPED;
-                    menuCameraConnect.Header = "Start Capture";
-                    menuCameraFreeze.Header = "Freeze";
-                    menuCameraFreeze.IsChecked = false;
-                    menuCameraFreeze.IsEnabled = false;
-                    menuRecordNew.IsEnabled = false;
-                }
-                catch (Exception excpt)
-                {
-                    MessageBox.Show(excpt.Message);
-                }
-            }
-            else
-            {
-                MessageBox.Show("stop recording before stopping capture");  //we should provide an options/confirmation box
-            }
-		}
-        // but what if were recording. we just dont want to display
-		private void PauseCapture()
-		{
-			try
-			{
-				capture.Pause();
-				//FpsTimer.Stop();
-				statusFPS.Text = "FPS: ";
-				_capturestatus = CaptureStatuses.PAUSED;
-				menuCameraFreeze.Header = "Un-Freeze";
-				menuCameraFreeze.IsChecked = true;
-                menuRecordNew.IsEnabled = false;
-			}
-			catch (Exception excpt)
-			{
-				MessageBox.Show(excpt.Message);
-			}
-		}
-		private void ResumeCapture()
-		{
-			try
-			{
-				capture.Start();
-				//FpsTimer.Start();
-				_capturestatus = CaptureStatuses.PLAYING;
-				menuCameraFreeze.Header = "Freeze";
-				menuCameraFreeze.IsChecked = false;
-                menuRecordNew.IsEnabled = true;
-			}
-			catch (Exception excpt)
-			{
-				MessageBox.Show(excpt.Message);
-			}
-		}
         // auto matically adds the filters defined in the class into our menu for selecting filters
 		private void PopulateFilters()
 		{
             //loops through our filters and adds them to our menu
-			for(int i =0; i < CaptureFilters.NUM_FILTERS; i++)
+			for(int i =0; i < (int)Camera.FilterType.NUM_FILTERS; i++)
 			{
-				MenuItem item = new MenuItem { Header = CaptureFilters.ToString(i) };
+				MenuItem item = new MenuItem { Header = Camera.ToString((Camera.FilterType)i) };
 				item.Click += new RoutedEventHandler(menuFilterListItem_Click);
 				item.IsCheckable = true;
                 //by default select our first filter (no filter)
@@ -468,186 +254,66 @@ namespace SwarmRoboticsGUI
 		//double area;
 		Mat testFrame = new Mat();
         private Video_Device[] webcams;
-
-        // menu will not display correctly if image refreshed while menu is being rendered 
-        // blocking display for a frame if the menu has been clicked/hovered over
-        private void DisplayFrame()
-		{
-			if (captureblockedframes == 0)
-			{
-				_fpscount++;
-
-				switch(_cameraWindowStatus)
-				{
-					case CameraWindowStatus.MAXIMISED:
-						captureImageBox.Image = CaptureFilters.Process(filter, frame, outputframe);
-                        //captureImageBox2.Image = CaptureFilters.Process(filter, _frame, outputframe);
-                        //testFrame = _frame;
-                        //captureImageBox2.Image = testFrame;
-
-                        /// Testing code for detection of hexagon
-                        ///_frame = CaptureFilters.Process(CaptureFilters.BRAE_EDGES, _frame, outputframe);
-                        ///CvInvoke.FindContours(_frame, mycontours, null, RetrType.External, ChainApproxMethod.ChainApproxNone);
-                        ///largecontours.Clear();
-                        ///for(int i = 0; i < mycontours.Size; i++)
-                        ///{
-                        ///	area = Math.Abs(CvInvoke.ContourArea(mycontours[i]));
-                        ///	if(area > 100 && area <= 100000)
-                        ///	{
-                        ///		largecontours.Push(mycontours[i]);
-                        ///	}
-                        ///}
-                        ///approx.Push(largecontours);
-                        ///for(int i = 0; i < largecontours.Size; i++)
-                        ///{
-                        ///	CvInvoke.ApproxPolyDP(largecontours[i], approx[i], 4.0, true);
-                        ///	if(approx[i].Size == 6)
-                        ///	{
-                        ///		bool isHexagon = true;
-                        ///		System.Drawing.Point[] pts = approx[i].ToArray();
-                        ///		LineSegment2D[] edges = Emgu.CV.PointCollection.PolyLine(pts, true);
-                        ///		for(int j = 0; j < edges.Length; j++)
-                        ///		{
-                        ///			double angle = Math.Abs(edges[(j + 1) % edges.Length].GetExteriorAngleDegree(edges[j]));
-                        ///			if(angle < 40 || angle > 80)
-                        ///			{
-                        ///				isHexagon = false;
-                        ///			}
-                        ///		}
-                        ///		if (isHexagon)
-                        ///		{
-                        ///			CvInvoke.DrawContours(_frame, approx, i, new MCvScalar(255, 0, 0), 5);
-                        ///		}							
-                        ///		System.Drawing.Point a = approx[i][0];
-                        ///		System.Drawing.Point b = approx[i][1];
-                        ///		System.Drawing.Point c = approx[i][2];
-                        ///		System.Drawing.Point d = approx[i][3];								
-                        ///		//System.Drawing.Point center = (c.X - a.x, c.Y - a.Y);								
-                        ///		CvInvoke.Circle(_frame, a, 10, new MCvScalar(255, 0, 0),5, LineType.EightConnected, 0);
-                        ///		CvInvoke.Circle(_frame, b, 10, new MCvScalar(255, 0, 0), 5, LineType.EightConnected, 0);
-                        ///		CvInvoke.Circle(_frame, c, 10, new MCvScalar(255, 0, 0), 5, LineType.EightConnected, 0);
-                        ///		CvInvoke.Circle(_frame, d, 10, new MCvScalar(255, 0, 0), 5, LineType.EightConnected, 0);
-                        ///	}
-                        ///}
-                        ///captureImageBox.Image = _frame;
-                        ///
-                        break;
-
-					case CameraWindowStatus.MINIMISED:
-
-						break;
-
-					case CameraWindowStatus.POPPED_OUT:
-
-						Dispatcher.Invoke(() =>
-						{
-							//((CameraPopOutWindow)System.Windows.Application.Current.cameraPopOutWindow).captureImageBox.Image = CaptureFilters.Process(filter, _frame, outputframe);
-							popoutCameraWindow.captureImageBox.Image = CaptureFilters.Process(filter, frame, outputframe);
-						});
-						break;
-				}
+        //private VideoCapture capture;
 
 
-				
-			}
-			else
-			{
-				captureblockedframes--;
-			}
-		}
 		#endregion
 
 		// Repeated/Time Activated Methods
 		#region
-        //process's the currently recieved frame 
-		private void ProcessFrame(object sender, EventArgs arg)
-		{
-			if (capture != null && capture.Ptr != IntPtr.Zero)
-			{
-				capture.Retrieve(frame, 0);
 
-				if (_capturestatus == CaptureStatuses.PLAYING)
-				{
-					DisplayFrame();
-				}
-				else if(_capturestatus == CaptureStatuses.REPLAY_ACTIVE)
-				{
-					replayframecount = capture.GetCaptureProperty(CapProp.PosFrames);
-					//display current frame/time
-					DisplayFrame();	
-					Thread.Sleep((int)(1000.0 / (replayframerate * replayspeed)));
-				}
-				else if(_capturestatus == CaptureStatuses.RECORDING)
-				{
-					DisplayFrame();
-					if (_videowriter.Ptr != IntPtr.Zero)
-					{
-                        //need to write based on the option selected
-						//_videowriter.Write(_frame);
-						_videowriter.Write(CaptureFilters.Process(filter, frame, outputframe));
-					}
-				}
-			}
-		}
 		private void FpsTimerTick(object sender, EventArgs arg)
 		{
 			//serial._serialPort.Write("Test");
 
-			if (_capturestatus == CaptureStatuses.PLAYING || _capturestatus == CaptureStatuses.RECORDING)
-			{
-				if(_capturestatus == CaptureStatuses.PLAYING)
+            /// Error message for zero frames
+			///if (camera.Status == Camera.StatusType.PLAYING || camera.Status == Camera.StatusType.RECORDING)
+			///{
+			///	if(camera.Status == Camera.StatusType.PLAYING)
+			///	{
+			///		if (_fpscount == 0)
+			///		{
+			///			MessageBoxResult result = CustomMessageBox.ShowYesNo(
+			///				"Warning Camera disconnected or significant failure, Please reconnect camera and press continue or stop capturing now",
+			///				"Camera Error",
+			///				"Continue",
+			///				"Stop Capture",
+			///				MessageBoxImage.Error
+			///				);
+			///			//check result do things based on it, add to seperate function
+			///		}
+			///	}
+			///	else if (camera.Status == Camera.StatusType.RECORDING)
+			///	{
+			///		if (_fpscount == 0)
+			///		{
+			///			MessageBoxResult result = CustomMessageBox.ShowYesNo(
+			///				"Warning Camera disconnected or significant failure, Please reconnect camera and press continue or end the recording now",
+			///				"Camera Error",
+			///				"Continue",
+			///				"End Recording",
+			///				MessageBoxImage.Error
+			///				);
+			///			//check result do things based on it, add to seperate function
+			///		}
+			///		//flashes recording dot red/black if recroding is in progress 
+			///		if (statusRecordingDot.Foreground.Equals(Brushes.Red))
+			///		{
+			///			statusRecordingDot.Foreground = Brushes.Black;
+			///		}
+			///		else
+			///		{
+			///			statusRecordingDot.Foreground = Brushes.Red;
+			///		}
+			///	}
+			///	//updates FPS counter
+			///	statusFPS.Text = "FPS: " + _fpscount.ToString();
+			///	_fpscount = 0;
+			///}
+
+			switch(camera.TimeDisplayMode)
 				{
-					if (_fpscount == 0)
-					{
-						MessageBoxResult result = CustomMessageBox.ShowYesNo(
-							"Warning Camera disconnected or significant failure, Please reconnect camera and press continue or stop capturing now",
-							"Camera Error",
-							"Continue",
-							"Stop Capture",
-							MessageBoxImage.Error
-							);
-						//check result do things based on it, add to seperate function
-					}
-				}
-				else if (_capturestatus == CaptureStatuses.RECORDING)
-				{
-					if (_fpscount == 0)
-					{
-						MessageBoxResult result = CustomMessageBox.ShowYesNo(
-							"Warning Camera disconnected or significant failure, Please reconnect camera and press continue or end the recording now",
-							"Camera Error",
-							"Continue",
-							"End Recording",
-							MessageBoxImage.Error
-							);
-						//check result do things based on it, add to seperate function
-					}
-
-
-					//flashes recording dot red/black if recroding is in progress 
-					if (statusRecordingDot.Foreground.Equals(Brushes.Red))
-					{
-						statusRecordingDot.Foreground = Brushes.Black;
-					}
-					else
-					{
-						statusRecordingDot.Foreground = Brushes.Red;
-					}
-				}
-
-				
-
-
-
-				//updates FPS counter
-				statusFPS.Text = "FPS: " + _fpscount.ToString();
-				_fpscount = 0;
-			}
-
-
-			switch(_timeDisplayMode)
-				{
-					case TimeDisplayMode.CURRENT:
+					case Camera.TimeDisplayModeType.CURRENT:
 					//statusTime.Text = DateTime.Now.ToString();
 					//statusTime.Text = String.Format("{0:d dd HH:mm:ss}" ,DateTime.Now);
 					//statusTime.Text = String.Format("{0:T}", DateTime.Now.ToString());
@@ -655,13 +321,13 @@ namespace SwarmRoboticsGUI
 					break;
 
 
-					case TimeDisplayMode.FROM_START:
-						if (_capturestatus == CaptureStatuses.RECORDING)
+					case Camera.TimeDisplayModeType.FROM_START:
+						if (camera.Status == Camera.StatusType.RECORDING)
 						{
 						//TimeSpan displayTime = (DateTime.Now - startTime);
 						//statusTime.Text = displayTime.ToString(@"dd\.hh\:mm\:ss");
 
-						statusTime.Text = (DateTime.Now - startTime).ToString(@"dd\.hh\:mm\:ss");
+						//statusTime.Text = (DateTime.Now - startTime).ToString(@"dd\.hh\:mm\:ss");
 
 
 						//displayTime = displayTime.Add(-((TimeSpan)displayTime.Ticks % TimeSpan.TicksPerSecond));
@@ -669,8 +335,6 @@ namespace SwarmRoboticsGUI
 					}
 					break;
 				}
-
-
 		}
 		#endregion
 		
@@ -681,10 +345,10 @@ namespace SwarmRoboticsGUI
 			MenuItem menusender = (MenuItem)sender;
 			String menusenderstring = menusender.ToString();
 
-			if (_capturestatus == CaptureStatuses.STOPPED && currentlyconnectedcamera != menusenderstring) //also check if the same menu option is clicked twice
+			if (camera.Status == Camera.StatusType.STOPPED && camera.Name != menusenderstring) //also check if the same menu option is clicked twice
 			{
 				//var allitems = menuCameraList.Items.Cast<System.Windows.Controls.MenuItem>().ToArray();
-				var allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
+				MenuItem[] allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
 
 				foreach (var item in allitems)
 				{
@@ -694,53 +358,49 @@ namespace SwarmRoboticsGUI
 
 				menusender.IsEnabled = true;
 				menusender.IsChecked = true;
-				currentlyconnectedcamera = menusender.ToString();
+                camera.Name = menusender.ToString();
 				statusCameraName.Text = menusender.Header.ToString();
-				cameradeviceindex = menuCameraList.Items.IndexOf(menusender);
+                camera.Index = menuCameraList.Items.IndexOf(menusender);
 				menuCameraConnect.IsEnabled = true;
 
 			}
-			else if (currentlyconnectedcamera == menusenderstring)
+			else if (camera.Name == menusenderstring)
 			{
-				//var allitems = menuCameraList.Items.Cast<System.Windows.Controls.MenuItem>().ToArray();
-				var allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
+                //var allitems = menuCameraList.Items.Cast<System.Windows.Controls.MenuItem>().ToArray();
+                MenuItem[] allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
 
 				foreach (var item in allitems)
 				{
 					item.IsChecked = false;
 					item.IsEnabled = true;
 				}
-				currentlyconnectedcamera = "No Camera Selected";
+                camera.Name = "No Camera Selected";
 				statusCameraName.Text = null;
-				cameradeviceindex = -1;
+                camera.Index = -1;
 				menuCameraConnect.IsEnabled = false;
 			}
 		}
 		private void menuFilterListItem_Click(object sender, RoutedEventArgs e)
 		{
-			
 			MenuItem menusender = (MenuItem)sender;
 			String menusenderstring = menusender.ToString();
 
-			if(menusenderstring != CaptureFilters.ToString(filter))
+            if (menusenderstring != Camera.ToString(camera.Filter))
+            {
+                MenuItem[] allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
+
+                foreach (var item in allitems)
+                {
+                    item.IsChecked = false;
+                }
+                menusender.IsChecked = true;
+                camera.Filter = (Camera.FilterType)menuFilterList.Items.IndexOf(menusender);
+                //
+                statusDisplayFilter.Text = Camera.ToString(camera.Filter);
+            }
+            else if (menusenderstring == Camera.ToString(camera.Filter) && camera.Filter != Camera.FilterType.NONE);
 			{
-				var allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
-
-				foreach (var item in allitems)
-				{
-					item.IsChecked = false;
-				}
-
-				menusender.IsChecked = true;
-
-				filter = menuFilterList.Items.IndexOf(menusender);
-
-				//
-				statusDisplayFilter.Text = CaptureFilters.ToString(filter);
-			}
-			else if (menusenderstring == CaptureFilters.ToString(filter) && CaptureFilters.ToString(filter) != CaptureFilters.ToString(CaptureFilters.NO_FILTER))
-			{
-				var allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
+				MenuItem[] allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
 
 				foreach (var item in allitems)
 				{
@@ -751,27 +411,27 @@ namespace SwarmRoboticsGUI
 		}
 		private void MenuItem_MouseEnter(object sender, MouseEventArgs e)
 		{
-			captureblockedframes++;
+			camera.captureblockedframes++;
 			PopulateCameras();
 		}
 		private void menuCameraConnect_Click(object sender, RoutedEventArgs e)
 		{
-			if (_capturestatus == CaptureStatuses.PLAYING || _capturestatus == CaptureStatuses.PAUSED)
+			if (camera.Status == Camera.StatusType.PLAYING || camera.Status == Camera.StatusType.PAUSED)
 			{
-				StopCapture();
+				camera.StopCapture();
 
-				var allitems = menuCameraList.Items.Cast<MenuItem>().ToArray();
+				MenuItem[] allitems = menuCameraList.Items.Cast<MenuItem>().ToArray();
 
 				foreach (var item in allitems)
 				{
 					item.IsEnabled = true;
 				}
 			}
-			else if (_capturestatus == CaptureStatuses.STOPPED)
+			else if (camera.Status == Camera.StatusType.STOPPED)
 			{
-				StartCapture();
+				camera.StartCapture();
 
-				var allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
+                MenuItem[] allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
 
 				foreach (var item in allitems)
 				{
@@ -782,11 +442,11 @@ namespace SwarmRoboticsGUI
 		private void menuCameraOptions_Click(object sender, RoutedEventArgs e)
 		{
 			//need try/catch or checks 
-            if (currentlyconnectedcamera != null)
+            if (camera.Name != null)
             {
                 try
                 {
-                    capture.SetCaptureProperty(CapProp.Settings, 1);
+                    camera.Capture.SetCaptureProperty(CapProp.Settings, 1);
                 }
                 catch (Exception excpt)
                 {
@@ -800,62 +460,60 @@ namespace SwarmRoboticsGUI
 		}
 		private void menuCameraFreeze_Click(object sender, RoutedEventArgs e)
 		{
-			if (_capturestatus == CaptureStatuses.PLAYING)
+			if (camera.Status == Camera.StatusType.PLAYING)
 			{
-				PauseCapture();
+                camera.PauseCapture();
 			}
-			else if (_capturestatus == CaptureStatuses.PAUSED)
+			else if (camera.Status == Camera.StatusType.PAUSED)
 			{
-				ResumeCapture();
+				camera.ResumeCapture();
 			}
 		}
 		private void menuFilterFlipVertical_Click(object sender, RoutedEventArgs e)
 		{
-			if (capture != null)
+			if (camera.Capture != null)
 			{
-				capture.FlipVertical = !capture.FlipVertical;
+                camera.Capture.FlipVertical = !camera.Capture.FlipVertical;
 			}
 		}
 		private void menuFilterFlipHorizontal_Click(object sender, RoutedEventArgs e)
 		{
-			if (capture != null)
+			if (camera.Capture != null)
 			{
-				capture.FlipHorizontal = !capture.FlipHorizontal;
+                camera.Capture.FlipHorizontal = !camera.Capture.FlipHorizontal;
 			}
 		}
 		private void menu_hover(object sender, RoutedEventArgs e)
 		{
-			captureblockedframes++;
+            // TODO: work out why this was here
+			//camera.captureblockedframes++;
 		}
         private void menuReplayOpen_Click(object sender, RoutedEventArgs e)
         {
-            if (_capturestatus == CaptureStatuses.STOPPED)
+            if (camera.Status == Camera.StatusType.STOPPED)
             {
                 if (openvideodialog.ShowDialog() == true)
                 {
-                    if (capture != null)
+                    if (camera.Capture != null)
                     {
-                        capture.Dispose();
+                        camera.Capture.Dispose();
                     }
-
                     try
                     {
                         statusRecordingText.Text = "Replaying Video: " + openvideodialog.FileName;
 
-                        _capturestatus = CaptureStatuses.REPLAY_ACTIVE;
-                        capture = new VideoCapture(openvideodialog.FileName);
-                        capture.ImageGrabbed += ProcessFrame;
+                        camera.Status = Camera.StatusType.REPLAY_ACTIVE;
+                        camera.Capture = new VideoCapture(openvideodialog.FileName);
+                        camera.Capture.ImageGrabbed += camera.ProcessFrame;
                         host1.Visibility = Visibility.Visible;
 
 
-                        replayframerate = capture.GetCaptureProperty(CapProp.Fps);
-                        replaytotalframes = capture.GetCaptureProperty(CapProp.FrameCount);
+                        replayframerate = camera.Capture.GetCaptureProperty(CapProp.Fps);
+                        replaytotalframes = camera.Capture.GetCaptureProperty(CapProp.FrameCount);
 
-                        frame = new Mat();
-                        capture.Start();
+                        camera.frame = new Mat();
+                        camera.Capture.Start();
                         //FpsTimer.Start();
-
-
                     }
                     catch (NullReferenceException excpt)
                     {
@@ -866,7 +524,7 @@ namespace SwarmRoboticsGUI
         }
         private void menuRecordNew_Click(object sender, RoutedEventArgs e)
         {
-            if (_capturestatus == CaptureStatuses.PLAYING)
+            if (camera.Status == Camera.StatusType.PLAYING)
             {
                 if (savevideodialog.ShowDialog() == true)
                 {
@@ -907,8 +565,8 @@ namespace SwarmRoboticsGUI
                          * isColor.
                          *      true if this is a color video, false otherwise
                          */
-                        _videowriter = new VideoWriter(savevideodialog.FileName, -1, recordframerate, recordsize, true);
-                        _capturestatus = CaptureStatuses.RECORDING;
+                        camera.videowriter = new VideoWriter(savevideodialog.FileName, -1, recordframerate, recordsize, true);
+                        camera.Status = Camera.StatusType.RECORDING;
 						menuRecordStop.IsEnabled = true;
                         //_capture.Start();
                     }
@@ -921,8 +579,8 @@ namespace SwarmRoboticsGUI
         }
         private void menuRecordStop_Click(object sender, RoutedEventArgs e)
         {
-            _videowriter.Dispose();
-            _capturestatus = CaptureStatuses.PLAYING;
+            camera.videowriter.Dispose();
+            camera.Status = Camera.StatusType.PLAYING;
             menuCameraConnect.IsEnabled = true;
             menuCameraFreeze.IsEnabled = true;
 			menuRecordStop.IsEnabled = false;
@@ -935,39 +593,36 @@ namespace SwarmRoboticsGUI
         }
         private void menuDisplayPopOut_Click(object sender, RoutedEventArgs e)
         {
-
-
-            if (_cameraWindowStatus != CameraWindowStatus.POPPED_OUT)
+            switch (camera.WindowStatus)
             {
-                cameraWindowSize = mainGrid.ColumnDefinitions[3].ActualWidth;       //set size of window when it was minimised
-                mainGrid.ColumnDefinitions[3].Width = new GridLength((double)0);    //minimise window (make width = 0)
+                case Camera.WindowStatusType.POPPED_OUT:
+                    camera.popoutWindow.Close();
 
-                _cameraWindowStatus = CameraWindowStatus.POPPED_OUT;                  //set variable/flag
-                cameraGridSplitter.IsEnabled = false;                               //disable the grid splitter so window cannont be changed size until it is expanded
+                    mainGrid.ColumnDefinitions[3].Width = new GridLength(camera.WindowSize);     //set window to the size it had been before it was minimised
 
-                //update arrow direction
-                cameraArrowTop.Content = "  < ";
-                cameraArrowBottom.Content = "  <  ";
+                    camera.WindowStatus = Camera.WindowStatusType.MAXIMISED;                         //set variable/flag
+                    cameraGridSplitter.IsEnabled = true;                                        //re-enable the grid splitter so its size can be changed
 
+                    //update arrow direction
+                    cameraArrowTop.Content = "   >";
+                    cameraArrowBottom.Content = "   >";
+                    break;
+                default:
+                    camera.WindowSize = mainGrid.ColumnDefinitions[3].ActualWidth;       //set size of window when it was minimised
+                    mainGrid.ColumnDefinitions[3].Width = new GridLength((double)0);    //minimise window (make width = 0)
 
-                //create and show the window
-                popoutCameraWindow = new CameraPopOutWindow();
-                popoutCameraWindow.Show();
-            }
-            else
-            {
-                popoutCameraWindow.Close();
+                    camera.WindowStatus = Camera.WindowStatusType.POPPED_OUT;                  //set variable/flag
+                    cameraGridSplitter.IsEnabled = false;                               //disable the grid splitter so window cannont be changed size until it is expanded
 
+                    //update arrow direction
+                    cameraArrowTop.Content = "  < ";
+                    cameraArrowBottom.Content = "  <  ";
 
-                mainGrid.ColumnDefinitions[3].Width = new GridLength(cameraWindowSize);     //set window to the size it had been before it was minimised
-
-                _cameraWindowStatus = CameraWindowStatus.MAXIMISED;                         //set variable/flag
-                cameraGridSplitter.IsEnabled = true;                                        //re-enable the grid splitter so its size can be changed
-
-                //update arrow direction
-                cameraArrowTop.Content = "   >";
-                cameraArrowBottom.Content = "   >";
-
+                    //create and show the window
+                    camera.popoutWindow = new CameraPopOutWindow();
+                    camera.popoutWindow.Show();
+                    camera.popoutWindow.captureImageBox.Image = captureImageBox.Image;
+                    break;
             }
         }
         private void btnCommunicationTest_Click(object sender, RoutedEventArgs e)
@@ -977,29 +632,32 @@ namespace SwarmRoboticsGUI
         //minimises camera window when camera minimise button is clicked
         private void CameraMinimise(object sender, MouseButtonEventArgs e)
 		{
-			if (_cameraWindowStatus == CameraWindowStatus.MAXIMISED)
-			{
-				cameraWindowSize = mainGrid.ColumnDefinitions[3].ActualWidth;		//set size of window when it was minimised
-				mainGrid.ColumnDefinitions[3].Width = new GridLength((double)0);    //minimise window (make width = 0)
+            switch (camera.WindowStatus)
+            {
+                case Camera.WindowStatusType.MAXIMISED:
+                    camera.WindowSize = mainGrid.ColumnDefinitions[3].ActualWidth;      //set size of window when it was minimised
+                    mainGrid.ColumnDefinitions[3].Width = new GridLength((double)0);    //minimise window (make width = 0)
 
-				_cameraWindowStatus = CameraWindowStatus.MINIMISED;                  //set variable/flag
-				cameraGridSplitter.IsEnabled = false;								//disable the grid splitter so window cannont be changed size until it is expanded
+                    camera.WindowStatus = Camera.WindowStatusType.MINIMISED;                  //set variable/flag
+                    cameraGridSplitter.IsEnabled = false;                               //disable the grid splitter so window cannont be changed size until it is expanded
 
-				//update arrow direction
-				cameraArrowTop.Content = "  < ";
-				cameraArrowBottom.Content = "  <  ";
-			}
-			else if(_cameraWindowStatus == CameraWindowStatus.MINIMISED)
-			{
-				mainGrid.ColumnDefinitions[3].Width = new GridLength(cameraWindowSize);     //set window to the size it had been before it was minimised
+                    //update arrow direction
+                    cameraArrowTop.Content = "  < ";
+                    cameraArrowBottom.Content = "  <  ";
+                    break;
+                case Camera.WindowStatusType.MINIMISED:
+                    mainGrid.ColumnDefinitions[3].Width = new GridLength(camera.WindowSize);     //set window to the size it had been before it was minimised
 
-				_cameraWindowStatus = CameraWindowStatus.MAXIMISED;							//set variable/flag
-				cameraGridSplitter.IsEnabled = true;										//re-enable the grid splitter so its size can be changed
-												
-				//update arrow direction
-				cameraArrowTop.Content = "   >";
-				cameraArrowBottom.Content = "   >";
-			}
+                    camera.WindowStatus = Camera.WindowStatusType.MAXIMISED;                            //set variable/flag
+                    cameraGridSplitter.IsEnabled = true;                                        //re-enable the grid splitter so its size can be changed
+
+                    //update arrow direction
+                    cameraArrowTop.Content = "   >";
+                    cameraArrowBottom.Content = "   >";
+                    break;
+                default:
+                    break;
+            }
 		}
         #endregion
     }

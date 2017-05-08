@@ -29,6 +29,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Emgu.CV.UI;
 
 #endregion
 
@@ -45,10 +46,9 @@ namespace SwarmRoboticsGUI
 	public partial class CameraPopOutWindow : Window
 	{
 		public CameraPopOutWindow()
-		{
+		{ 
 			InitializeComponent();
-			
-		}
+        }
 
 		/*
 		public delegate void UpdateImageCallback(Mat _image);

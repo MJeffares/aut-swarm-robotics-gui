@@ -19,19 +19,22 @@ namespace SwarmRoboticsGUI
     {
         public enum StatusType { PLAYING, PAUSED, STOPPED, REPLAY_ACTIVE, REPLAY_PAUSED, RECORDING };
         public enum WindowStatusType { MAXIMISED, MINIMISED, POPPED_OUT };
-        public enum TimeDisplayMode { CURRENT, FROM_START, START };
+        public enum TimeDisplayModeType { CURRENT, FROM_START, START };
         public enum FilterType { NONE, GREYSCALE, CANNY_EDGES, BRAE_EDGES, NUM_FILTERS };
 
-        // Stay
+        // TODO: deal with these objects
+        // TODO: remove duplicate data
         private ImageBox captureImageBox = new ImageBox();
-        private WindowsFormsHost host1 = new WindowsFormsHost();
-        private VideoCapture Capture;                       // the capture itself (ie camera when recording/viewing or a video file when replaying)
-        private Video_Device[] webcams;                             // a list of connected video devices
-        private Mat frame;                                         // openCV Matrix image
-        private Mat outputframe = new Mat();                        // openCV Matric image of filter output   
-        private DispatcherTimer FpsTimer = new DispatcherTimer();   // one second timer to calculate and update the fps count
+        public CameraPopOutWindow popoutWindow;
 
-        // Sort
+        // the capture (camera when recording/viewing or a video file when replaying)
+        public VideoCapture Capture { get; set; }
+        // openCV Matrix image
+        public Mat frame { get; set; }
+        // openCV Matric image of filter output   
+        public Mat outputframe { get; set; }
+
+        // TODO: Sort
         #region
         // HSV ranges.
         private const int LowerH = 0;
@@ -45,22 +48,22 @@ namespace SwarmRoboticsGUI
         private const int LowerC = 128;
         private const int UpperC = 255;
         // TODO:
-        private int captureblockedframes = 0;                       // number of frames to delay drawing to screen                                                                 //fps timer variables
-        private int _fpscount = 0;                                  // number of frames captured in the current second
+        public int captureblockedframes = 0;                       // number of frames to delay drawing to screen           //fps timer variables
+        //private int _fpscount = 0;                                  // number of frames captured in the current second
 
         // video record/replay variables
         OpenFileDialog openvideodialog = new OpenFileDialog();
         SaveFileDialog savevideodialog = new SaveFileDialog();
         private double replayframerate = 0;
-        private double replaytotalframes = 0;
+        //private double replaytotalframes = 0;
         private double replayframecount;
-        private VideoWriter _videowriter;
+        public VideoWriter videowriter;
 
         private double replayspeed = 1;
-        private int recordframerate = 30;
-        private System.Drawing.Size recordsize = new System.Drawing.Size();
-        
-        private DateTime startTime;
+        //private int recordframerate = 30;
+        //private System.Drawing.Size recordsize = new System.Drawing.Size();
+
+        //private DateTime startTime;
         #endregion
 
         public string Name { get; set; }
@@ -68,14 +71,40 @@ namespace SwarmRoboticsGUI
         public FilterType Filter { get; set; }
         public StatusType Status { get; set; }
         public WindowStatusType WindowStatus { get; set; }
-        public TimeDisplayMode _timeDisplayMode { get; set; }
+        public TimeDisplayModeType TimeDisplayMode { get; set; }
 
+        public double WindowSize { get; set; }
 
-
-
-        public Camera()
+        // TODO: replace
+        static public string ToString(FilterType filter)
         {
+            switch (filter)
+            {
+                case FilterType.NONE:
+                    return String.Format("No Filter");
+
+                case FilterType.GREYSCALE:
+                    return String.Format("Greyscale");
+
+                case FilterType.CANNY_EDGES:
+                    return String.Format("Canny Edges");
+
+                case FilterType.BRAE_EDGES:
+                    return String.Format("Brae Edges");
+
+                default:
+                    return String.Format("Filter Text Error");
+
+            }
+        }
+
+
+        public Camera(ImageBox box)
+        {
+            captureImageBox = box;
+
             // Stay
+
             Name = null;
             Index = 0;
             Status = StatusType.STOPPED;
@@ -83,10 +112,7 @@ namespace SwarmRoboticsGUI
 
             // Possibly go
             WindowStatus = WindowStatusType.MAXIMISED;
-            _timeDisplayMode = TimeDisplayMode.FROM_START;
-
-
-        captureImageBox.Parent.Name = host1.Name;
+            TimeDisplayMode = TimeDisplayModeType.FROM_START;
         }
 
         public Mat Process()
@@ -116,7 +142,7 @@ namespace SwarmRoboticsGUI
             return outputframe;
         }
 
-        private void StartCapture()
+        public void StartCapture()
         {
             //if the capture has perviously been used and not disposed of we should dispose of it now
             if (Capture != null)
@@ -133,7 +159,7 @@ namespace SwarmRoboticsGUI
             try
             {
                 // change the visibility of our winforms host (our stream viewer is inside this)
-                host1.Visibility = Visibility.Visible;
+                captureImageBox.Visible = true;
                 // update the capture object           
                 Capture = new VideoCapture(Index);
                 // add event handler for our new capture  
@@ -141,7 +167,7 @@ namespace SwarmRoboticsGUI
                 // create a new matrix to hold our image
                 frame = new Mat();
                 // update our status
-                Status = CaptureStatuses.PLAYING;
+                Status = Camera.StatusType.PLAYING;
                 // start the capture       
                 Capture.Start();
                 // start our fps timer                             
@@ -152,7 +178,7 @@ namespace SwarmRoboticsGUI
                 MessageBox.Show(excpt.Message);
             }
         }
-        private void StopCapture()
+        public void StopCapture()
         {
             if (Status == StatusType.PLAYING)
             {
@@ -160,7 +186,7 @@ namespace SwarmRoboticsGUI
                 {
                     Capture.Stop();
                     Capture.Dispose();
-                    host1.Visibility = Visibility.Hidden;
+                    captureImageBox.Visible = false;
                     Status = StatusType.STOPPED;
                 }
                 catch (Exception excpt)
@@ -174,7 +200,7 @@ namespace SwarmRoboticsGUI
             }
         }
         // TODO: but what if were recording. we just dont want to display
-        private void PauseCapture()
+        public void PauseCapture()
         {
             try
             {
@@ -186,7 +212,7 @@ namespace SwarmRoboticsGUI
                 MessageBox.Show(excpt.Message);
             }
         }
-        private void ResumeCapture()
+        public void ResumeCapture()
         {
             try
             {
@@ -198,7 +224,7 @@ namespace SwarmRoboticsGUI
                 MessageBox.Show(excpt.Message);
             }
         }
-        private void DisplayFrame()
+        public void DisplayFrame()
         {
             if (captureblockedframes == 0)
             {
@@ -214,16 +240,13 @@ namespace SwarmRoboticsGUI
 
                     case WindowStatusType.POPPED_OUT:
                         // TODO: camera popout window
-                        ///Dispatcher.Invoke(() =>
-                        ///{
-                        ///    //((CameraPopOutWindow)System.Windows.Application.Current.cameraPopOutWindow).captureImageBox.Image = CaptureFilters.Process(filter, _frame, outputframe);
-                        ///    popoutCameraWindow.captureImageBox.Image = CaptureFilters.Process(filter, _frame, outputframe);
-                        ///});
+                        captureImageBox.Image = Process();
+                        Dispatcher.Invoke(() =>
+                        {
+                            popoutWindow.captureImageBox.Image = Process();
+                        });
                         break;
                 }
-
-
-
             }
             else
             {
@@ -232,7 +255,7 @@ namespace SwarmRoboticsGUI
         }
 
 
-        private void ProcessFrame(object sender, EventArgs arg)
+        public void ProcessFrame(object sender, EventArgs arg)
         {
             if (Capture != null && Capture.Ptr != IntPtr.Zero)
             {
@@ -252,11 +275,11 @@ namespace SwarmRoboticsGUI
                 else if (Status == StatusType.RECORDING)
                 {
                     DisplayFrame();
-                    if (_videowriter.Ptr != IntPtr.Zero)
+                    if (videowriter.Ptr != IntPtr.Zero)
                     {
                         //need to write based on the option selected
                         //_videowriter.Write(_frame);
-                        _videowriter.Write(Process());
+                        videowriter.Write(Process());
                     }
                 }
             }
