@@ -1,0 +1,12 @@
+C:\Users\Brae HW\Source\Repos\Industrial Project\CustomMessageBox\bin\Debug\WPFCustomMessageBox.XML
+C:\Users\Brae HW\Source\Repos\Industrial Project\CustomMessageBox\bin\Debug\WPFCustomMessageBox.dll
+C:\Users\Brae HW\Source\Repos\Industrial Project\CustomMessageBox\bin\Debug\WPFCustomMessageBox.pdb
+C:\Users\Brae HW\Source\Repos\Industrial Project\CustomMessageBox\obj\Debug\WPFCustomMessageBox.csprojResolveAssemblyReference.cache
+C:\Users\Brae HW\Source\Repos\Industrial Project\CustomMessageBox\obj\Debug\CustomMessageBoxWindow.baml
+C:\Users\Brae HW\Source\Repos\Industrial Project\CustomMessageBox\obj\Debug\CustomMessageBoxWindow.g.cs
+C:\Users\Brae HW\Source\Repos\Industrial Project\CustomMessageBox\obj\Debug\WPFCustomMessageBox_MarkupCompile.cache
+C:\Users\Brae HW\Source\Repos\Industrial Project\CustomMessageBox\obj\Debug\WPFCustomMessageBox.g.resources
+C:\Users\Brae HW\Source\Repos\Industrial Project\CustomMessageBox\obj\Debug\WPFCustomMessageBox.Properties.Resources.resources
+C:\Users\Brae HW\Source\Repos\Industrial Project\CustomMessageBox\obj\Debug\WPFCustomMessageBox.csproj.GenerateResource.Cache
+C:\Users\Brae HW\Source\Repos\Industrial Project\CustomMessageBox\obj\Debug\WPFCustomMessageBox.dll
+C:\Users\Brae HW\Source\Repos\Industrial Project\CustomMessageBox\obj\Debug\WPFCustomMessageBox.pdb
