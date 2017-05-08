@@ -23,8 +23,6 @@
 * 
 **********************************************************************************************************************************************/
 
-
-
 /**********************************************************************************************************************************************
 * Namespaces
 **********************************************************************************************************************************************/
@@ -34,8 +32,6 @@ using SwarmRoboticsGUI;
 
 #endregion
 
-
-
 /**********************************************************************************************************************************************
 * Structures and Classes
 **********************************************************************************************************************************************/
@@ -43,23 +39,16 @@ public class ProtocolClass
 {
 	// variables
 	private MainWindow window = null;
-
-
-
 	public static class MESSAGE_TYPES
 	{
 		public const byte COMMUNICATION_TEST = 0x00;
 	}
-
 
 	// constructor
 	public ProtocolClass(MainWindow main)
 	{
 		window = main;
 	}
-	
-
-
 	public void MessageReceived(byte[] message)
 	{
 		switch(message[0])
@@ -73,8 +62,6 @@ public class ProtocolClass
 
 		}
 	}
-
-
 	public void SendMessage(byte type)
 	{
 		switch (type)
@@ -87,7 +74,6 @@ public class ProtocolClass
 
 		}
 	}
-
 }
 
 

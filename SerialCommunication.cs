@@ -53,24 +53,18 @@ using System.Windows.Input;
 
 public class SerialUARTCommunication
 {
-	
-
 	//supported serial port settings
 	private string[] baudRateOptions = new string[] { "4800", "9600", "19200", "38400", "57600", "115200", "230400", "460800", "921600" };
 	private string[] parityOptions = new string[] { "None", "Odd", "Even", "Mark", "Space" };
 	private string[] dataBitOptions = new string[] { "8", "7", "6", "5" };
 	private string[] stopBitOptions = new string[] { "None", "One", "One Point Five", "Two" };
 	private string[] handshakingOptions = new string[] { "None", "XOnXOff", "RequestToSend", "RequestToSendXOnXOff" };
-
-
 	//default serial port settings
 	private const string DEFAULT_BAUD_RATE = "9600";
 	private const string DEFAULT_PARITY = "None";
 	private const string DEFAULT_DATA_BITS = "8";
 	private const string DEFAULT_STOP_BITS = "One";
 	private const string DEFAULT_HANDSHAKING = "None";
-	
-
 	//menu Items
 	MenuItem portList = null;
 	MenuItem baudList = null;
@@ -79,16 +73,11 @@ public class SerialUARTCommunication
 	MenuItem stopBitsList = null;
 	MenuItem handshakingList = null;
 	MenuItem connectButton = null;
-
-
 	//variables
 	MainWindow window = null;
 	public SerialPort _serialPort;
 	public Queue<byte> rxBuffer;
 	private string currentlyConnectedPort = null;
-
-
-
 	//constructor
 	public SerialUARTCommunication(MainWindow main, MenuItem port, MenuItem baud, MenuItem parity, MenuItem data, MenuItem stop, MenuItem handshaking, MenuItem connect)
 	{
@@ -113,8 +102,6 @@ public class SerialUARTCommunication
 		_serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
 
 	}
-
-	
 	public void SendByteArray(byte[] msg)
 	{
 		if (_serialPort.IsOpen)
@@ -122,8 +109,6 @@ public class SerialUARTCommunication
 			_serialPort.Write(msg, 0, msg.Length);
 		}
 	}
-
-
 	public void SendString(String msg)
 	{
 		if (_serialPort.IsOpen)
@@ -131,8 +116,6 @@ public class SerialUARTCommunication
 			_serialPort.Write(msg);
 		}
 	}
-
-
 	private void PopulateSerialSettings()
 	{
 		MJLib.PopulateMenuItemList(baudList, baudRateOptions, DEFAULT_BAUD_RATE, MJLib.menuMutuallyExclusiveMenuItem_Click);
@@ -141,8 +124,6 @@ public class SerialUARTCommunication
 		MJLib.PopulateMenuItemList(stopBitsList, stopBitOptions, DEFAULT_STOP_BITS, MJLib.menuMutuallyExclusiveMenuItem_Click);
 		MJLib.PopulateMenuItemList(handshakingList, handshakingOptions, DEFAULT_HANDSHAKING, MJLib.menuMutuallyExclusiveMenuItem_Click);
 	}
-
-
 	public void PopulateSerialPorts()
 	{
 		connectButton.IsEnabled = false;
@@ -201,16 +182,12 @@ public class SerialUARTCommunication
 			connectButton.IsEnabled = false;
 		}
 	}
-
-
 	private void menuCommunicationPortListItem_Click(object sender, RoutedEventArgs e)
 	{
 		MJLib.menuMutuallyExclusiveMenuItem_Click(sender, e);
 		connectButton.IsEnabled = true;
 		currentlyConnectedPort = sender.ToString();
 	}
-
-
 	public void menuCommunicationConnect_Click(object sender, RoutedEventArgs e)
 	{
 
@@ -290,8 +267,6 @@ public class SerialUARTCommunication
 		}
 
 	}
-
-
 	public void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
 	{
 		SerialPort sp = (SerialPort)sender;
@@ -317,25 +292,17 @@ public class SerialUARTCommunication
 
 	}
 }
-
-
 #endregion
-
-
 
 namespace SwarmRoboticsGUI
 {
 	public partial class MainWindow : Window
 	{
-	
-
 		public delegate void UpdateTextCallback(string text);
-
 		public void UpdateSerialReceivedTextBox(string text)
 		{
 			rtbSerialReceived.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), new object[] { text });
 		}
-
 		public void UpdateSerialReceivedTextBox(byte[] message, int number)
 		{
 			string messageString = null;
@@ -364,14 +331,11 @@ namespace SwarmRoboticsGUI
 			rtbSerialReceived.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), new object[] { messageString });
 			
 		}
-		
 		private void UpdateText(string text)
 		{
 			rtbSerialReceived.AppendText(text);
 			rtbSerialReceived.ScrollToEnd();
 		}
-
-		
 
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
@@ -418,15 +382,11 @@ namespace SwarmRoboticsGUI
 				MessageBox.Show("Port not open");
 			}
 		}
-
-
 		private void receivedDataNewline_Click(object sender, RoutedEventArgs e)
 		{
 			rtbSerialReceived.AppendText("\r");
 			rtbSerialReceived.ScrollToEnd(); ;
 		}
-
-
 		private void receivedDataClear_Click(object sender, RoutedEventArgs e)
 		{
 			rtbSerialReceived.Document.Blocks.Clear();

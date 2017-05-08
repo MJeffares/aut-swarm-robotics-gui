@@ -7,7 +7,7 @@
     xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
     xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
     mc:Ignorable="d"
-    Title="Swarm Robotics Graphics User Interface" Height="900" Width="1600" MinHeight="300" MinWidth="500">
+    Title="Swarm Robotics Graphics User Interface" Height="900" Width="1600" MinHeight="300" MinWidth="500" WindowStartupLocation="CenterScreen">
 
     <DockPanel x:Name="innerWin">
         <Menu DockPanel.Dock="Top" MouseEnter="menu_hover" Height="21" MinWidth="300">

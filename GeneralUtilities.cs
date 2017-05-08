@@ -19,8 +19,6 @@
 * 
 **********************************************************************************************************************************************/
 
-
-
 /**********************************************************************************************************************************************
 * Namespaces
 **********************************************************************************************************************************************/
@@ -34,12 +32,10 @@ using System.Windows.Controls;
 
 #endregion
 
-
 /**********************************************************************************************************************************************
 * Structures and Classes
 **********************************************************************************************************************************************/
 #region
-
 public static class ExtensionMethod
 {
 	public static LinkedListNode<T> getNodeAt<T>(this LinkedList<T> _list, int position)
@@ -54,11 +50,6 @@ public static class ExtensionMethod
 		return mark;
 	}
 }
-
-
-
-
-
 
 static class MJLib
 {
@@ -116,8 +107,6 @@ static class MJLib
 			menusender.IsChecked = true;
 		}
 	}
-
-
 
 	/// <summary>
 	/// Populates a menuItem Sub heading with a list from an array of strings
@@ -203,5 +192,4 @@ static class MJLib
 		return checkedItem;
 	}
 }
-
 #endregion
