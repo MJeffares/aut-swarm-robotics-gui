@@ -62,8 +62,8 @@ namespace SwarmRoboticsGUI
     public partial class MainWindow : Window
     {
         // Declarations
-        // TODO: comment declarations
         #region
+        // TODO: comment declarations
         public Camera camera;
         public SerialUARTCommunication serial;
         public XbeeHandler xbee;
@@ -85,6 +85,8 @@ namespace SwarmRoboticsGUI
         private System.Drawing.Size recordsize = new System.Drawing.Size();
         private DateTime startTime;
         #endregion
+
+        // Main
         public MainWindow()
         {
             InitializeComponent();
@@ -127,6 +129,7 @@ namespace SwarmRoboticsGUI
         }
 
         // Methods
+        #region
         /// <summary>
         /// Finds the Connected Cameras by using Directshow.net dll library by carles iloret.
         /// As the project is build for x64, only cameras with x64 drivers will be found/displayed.
@@ -232,8 +235,10 @@ namespace SwarmRoboticsGUI
                     break;
             }
         }
+        #endregion
 
         // Timer events
+        #region
         private void Timer1_Tick(object sender, EventArgs arg)
         {
             //serial._serialPort.Write("Test");
@@ -322,14 +327,45 @@ namespace SwarmRoboticsGUI
                     break;
             }
         }
+        #endregion
 
         // Input events
-        #region
-        private void menu_Hover(object sender, RoutedEventArgs e)
+        #region       
+        // Display menu
+        private void menuFilterListItem_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: work out why this was here
-            //camera.captureblockedframes++;
+            MenuItem menusender = (MenuItem)sender;
+            String menusenderstring = menusender.ToString();
+
+            if (menusenderstring != Camera.ToString(camera.Filter))
+            {
+                MenuItem[] allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
+
+                foreach (var item in allitems)
+                {
+                    item.IsChecked = false;
+                }
+                menusender.IsChecked = true;
+                camera.Filter = (Camera.FilterType)menuFilterList.Items.IndexOf(menusender);
+                //
+                statusDisplayFilter.Text = Camera.ToString(camera.Filter);
+            }
+            else if (camera.Filter != Camera.FilterType.NONE)
+            {
+                MenuItem[] allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
+
+                foreach (var item in allitems)
+                {
+                    item.IsChecked = false;
+                    item.IsEnabled = true;
+                }
+            }
         }
+        private void menuDisplayPopOut_Click(object sender, RoutedEventArgs e)
+        {
+            ToggleCameraWindow();
+        }
+        // Camera menu
         private void menuCameraListItem_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menusender = (MenuItem)sender;
@@ -370,36 +406,6 @@ namespace SwarmRoboticsGUI
                 menuCameraConnect.IsEnabled = false;
             }
         }
-        private void menuFilterListItem_Click(object sender, RoutedEventArgs e)
-        {
-            MenuItem menusender = (MenuItem)sender;
-            String menusenderstring = menusender.ToString();
-
-            if (menusenderstring != Camera.ToString(camera.Filter))
-            {
-                MenuItem[] allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
-
-                foreach (var item in allitems)
-                {
-                    item.IsChecked = false;
-                }
-                menusender.IsChecked = true;
-                camera.Filter = (Camera.FilterType)menuFilterList.Items.IndexOf(menusender);
-                //
-                statusDisplayFilter.Text = Camera.ToString(camera.Filter);
-            }
-            else if (camera.Filter != Camera.FilterType.NONE)
-            {
-                MenuItem[] allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
-
-                foreach (var item in allitems)
-                {
-                    item.IsChecked = false;
-                    item.IsEnabled = true;
-                }
-            }
-        }
-
         private void MenuItem_MouseEnter(object sender, MouseEventArgs e)
         {
             // TODO: what is this and why does it populate the camera?
@@ -461,7 +467,6 @@ namespace SwarmRoboticsGUI
                 camera.ResumeCapture();
             }
         }
-
         private void menuFilterFlipVertical_Click(object sender, RoutedEventArgs e)
         {
             if (camera.Capture != null)
@@ -476,7 +481,7 @@ namespace SwarmRoboticsGUI
                 camera.Capture.FlipHorizontal = !camera.Capture.FlipHorizontal;
             }
         }
-
+        // Replay menu
         private void menuReplayOpen_Click(object sender, RoutedEventArgs e)
         {
             if (camera.Status == Camera.StatusType.STOPPED)
@@ -576,19 +581,16 @@ namespace SwarmRoboticsGUI
             statusRecordingText.Text = "Not Recording";
             statusRecordingDot.Foreground = Brushes.Black;
         }
-        private void menuPlaceHolder_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Sorry Placeholder");
-        }
-        private void menuDisplayPopOut_Click(object sender, RoutedEventArgs e)
-        {
-            ToggleCameraWindow();
-        }
+        // Communications menu
         private void btnCommunicationTest_Click(object sender, RoutedEventArgs e)
         {
             protocol.SendMessage(ProtocolClass.MESSAGE_TYPES.COMMUNICATION_TEST);
         }
-        //minimises camera window when camera minimise button is clicked
+        // Other
+        private void menu_Hover(object sender, RoutedEventArgs e)
+        {
+            // TODO: work out why this was here
+        }
         private void btnCameraMinimise_Click(object sender, MouseButtonEventArgs e)
         {
             switch (camera.WindowStatus)
@@ -617,6 +619,10 @@ namespace SwarmRoboticsGUI
                 default:
                     break;
             }
+        }
+        private void menuPlaceHolder_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Sorry Placeholder");
         }
         #endregion
     }
