@@ -10,9 +10,9 @@
     Title="Swarm Robotics Graphics User Interface" Height="900" Width="1600" MinHeight="300" MinWidth="500" WindowStartupLocation="CenterScreen">
 
     <DockPanel x:Name="innerWin">
-        <Menu DockPanel.Dock="Top" MouseEnter="menu_hover" Height="21" MinWidth="300">
+        <Menu DockPanel.Dock="Top" MouseEnter="menu_Hover" Height="21" MinWidth="300">
 
-            <MenuItem Header="File" MouseEnter="menu_hover" Click="menu_hover">
+            <MenuItem Header="File" MouseEnter="menu_Hover" Click="menu_Hover">
                 <MenuItem x:Name="menuRecordNew" Header="New Recording" IsEnabled="False" Click="menuRecordNew_Click" />
                 <MenuItem x:Name="menuRecordPause" Header="Pause Recording" IsCheckable="True" IsEnabled="False"/>
                 <MenuItem x:Name="menuRecordStop" Header="Stop Recording" IsEnabled="False" Click="menuRecordStop_Click" />
@@ -20,9 +20,9 @@
                 <MenuItem x:Name="menuRecordingSettings" Header="Recording Settings" />
             </MenuItem>
 
-            <MenuItem Header="Display" MouseEnter="menu_hover" Click="menu_hover">
-                <MenuItem x:Name="menuFilterList" Header="Filters" MouseEnter="menu_hover" Click="menu_hover"/>
-                <MenuItem x:Name="menuOverlayList" Header="Overlays" MouseEnter="menu_hover" Click="menu_hover">
+            <MenuItem Header="Display" MouseEnter="menu_Hover" Click="menu_Hover">
+                <MenuItem x:Name="menuFilterList" Header="Filters" MouseEnter="menu_Hover" Click="menu_Hover"/>
+                <MenuItem x:Name="menuOverlayList" Header="Overlays" MouseEnter="menu_Hover" Click="menu_Hover">
                     <MenuItem x:Name="menuOverlayNone" Header="No Overlay" IsCheckable="True" IsChecked="True" Click="menuPlaceHolder_Click"/>
                     <MenuItem x:Name="menuOverlayPlaceHolderOne" Header="PlaceHolder" IsCheckable="True" Click="menuPlaceHolder_Click"/>
                     <MenuItem x:Name="menuFilterPlaceHolderTwo" Header="PlaceHolder" IsCheckable="True" Click="menuPlaceHolder_Click"/>
@@ -35,27 +35,27 @@
 
             </MenuItem>
 
-            <MenuItem Header="Camera" MouseEnter="MenuItem_MouseEnter" Click="menu_hover">
-                <MenuItem x:Name="menuCameraList" Header="Connected Cameras" MouseEnter="menu_hover"/>
+            <MenuItem Header="Camera" MouseEnter="MenuItem_MouseEnter" Click="menu_Hover">
+                <MenuItem x:Name="menuCameraList" Header="Connected Cameras" MouseEnter="menu_Hover"/>
                 <MenuItem x:Name="menuCameraConnect" Header="Start Capture" IsEnabled="False" IsCheckable="True"  Click="menuCameraConnect_Click"/>
                 <MenuItem x:Name="menuCameraFreeze" Header="Freeze Frame" IsEnabled="False" IsCheckable="True" Click="menuCameraFreeze_Click" />
                 <Separator/>
                 <MenuItem x:Name="menuCameraOptions" Header="Camera Options" Click="menuCameraOptions_Click"/>
             </MenuItem>
 
-            <MenuItem Header="Serial Comms" MouseEnter="MenuItem_MouseEnter" Click="menu_hover">
-                <MenuItem x:Name="menuCommunicationPortList" Header="Communication Port" MouseEnter="menu_hover"/>
-                <MenuItem x:Name="menuCommunicationBaudList" Header="Baud Rate" MouseEnter="menu_hover"/>
-                <MenuItem x:Name="menuCommunicationParityList" Header="Parity" MouseEnter="menu_hover"/>
-                <MenuItem x:Name="menuCommunicationDataList" Header="Data Bits" MouseEnter="menu_hover"/>
-                <MenuItem x:Name="menuCommunicationStopBitsList" Header="Stop Bits" MouseEnter="menu_hover"/>
-                <MenuItem x:Name="menuCommunicationHandshakeList" Header="Handshaking" MouseEnter="menu_hover"/>
+            <MenuItem Header="Serial Comms" MouseEnter="MenuItem_MouseEnter" Click="menu_Hover">
+                <MenuItem x:Name="menuCommunicationPortList" Header="Communication Port" MouseEnter="menu_Hover"/>
+                <MenuItem x:Name="menuCommunicationBaudList" Header="Baud Rate" MouseEnter="menu_Hover"/>
+                <MenuItem x:Name="menuCommunicationParityList" Header="Parity" MouseEnter="menu_Hover"/>
+                <MenuItem x:Name="menuCommunicationDataList" Header="Data Bits" MouseEnter="menu_Hover"/>
+                <MenuItem x:Name="menuCommunicationStopBitsList" Header="Stop Bits" MouseEnter="menu_Hover"/>
+                <MenuItem x:Name="menuCommunicationHandshakeList" Header="Handshaking" MouseEnter="menu_Hover"/>
                 <MenuItem x:Name="menuCommunicationConnect" Header="Connect" IsEnabled="False" IsCheckable="True" />
                 <Separator/>
                 <MenuItem x:Name="menuCommunicationoptions" Header="Options" Click="menuCameraOptions_Click"/>
             </MenuItem>
 
-            <MenuItem Header="Replay" MouseEnter="menu_hover" Click="menu_hover">
+            <MenuItem Header="Replay" MouseEnter="menu_Hover" Click="menu_Hover">
                 <MenuItem x:Name="menuReplayOpen" Header="Open Replay" Click="menuReplayOpen_Click"/>
                 <MenuItem x:Name="menuReplayPause" Header="Pause Replay" IsCheckable="True" IsEnabled="False"/>
                 <Separator/>
@@ -172,11 +172,11 @@
                         </ItemsPanelTemplate>
                     </StatusBar.ItemsPanel>
 
-                    <StatusBarItem Grid.Row="1" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0" MouseDown="CameraMinimise" Width="22" Height="16">
+                    <StatusBarItem Grid.Row="1" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0" MouseDown="btnCameraMinimise_Click" Width="22" Height="16">
                         <Label x:Name="cameraArrowTop" Content="   >" Padding="0"/>
                     </StatusBarItem>
 
-                    <StatusBarItem Grid.Row="2" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0" MouseDown="CameraMinimise"  Width="22" Height="46">
+                    <StatusBarItem Grid.Row="2" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0" MouseDown="btnCameraMinimise_Click"  Width="22" Height="46">
 
                         <Label Content="Camera" Padding="3">
                             <Label.LayoutTransform>
@@ -186,7 +186,7 @@
 
                     </StatusBarItem>
 
-                    <StatusBarItem Grid.Row="3" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0" MouseDown="CameraMinimise" Width="22" Height="16">
+                    <StatusBarItem Grid.Row="3" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0" MouseDown="btnCameraMinimise_Click" Width="22" Height="16">
                         <Label x:Name="cameraArrowBottom" Content="   >" Padding="0"/>
                     </StatusBarItem>
 
@@ -261,7 +261,7 @@
 
 
             
-            <WindowsFormsHost Grid.Column="3" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,0,0,0" Visibility="Hidden">
+            <WindowsFormsHost Grid.Column="3" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,0,0,0" Visibility="Visible">
                 <em:ImageBox x:Name="captureImageBox" Height="240" Width="320" SizeMode="StretchImage" FunctionalMode="Minimum"/>
             </WindowsFormsHost>
 

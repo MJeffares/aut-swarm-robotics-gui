@@ -1,41 +1,9 @@
 ﻿/**********************************************************************************************************************************************
 * Namespaces
 **********************************************************************************************************************************************/
-#region 
-
-using DirectShowLib;
 using Emgu.CV;
-using Emgu.CV.CvEnum;
-using folderHack;
-using Microsoft.Win32;
 using System;
-using System.Diagnostics;
-using System.IO;
-using System.IO.Ports;
-using System.Linq;
-using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Threading;
-using WPFCustomMessageBox;
-
-
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using Emgu.CV.UI;
-
-#endregion
-
-
-
-
 
 
 namespace SwarmRoboticsGUI
@@ -45,19 +13,17 @@ namespace SwarmRoboticsGUI
 	/// </summary>
 	public partial class CameraPopOutWindow : Window
 	{
-		public CameraPopOutWindow()
+        public CameraPopOutWindow(MainWindow main)
 		{ 
 			InitializeComponent();
+            this.main = main;
         }
 
-		/*
-		public delegate void UpdateImageCallback(Mat _image);
+        private MainWindow main;
 
-
-		private void UpdateImage(Mat _image)
-		{
-			captureImageBox.Image = _image;
-		}
-		*/
-	}
+        private void CameraPopOutWindow_Closed(object sender, EventArgs e)
+        {
+            main.ToggleCameraWindow();
+        }
+    }
 }

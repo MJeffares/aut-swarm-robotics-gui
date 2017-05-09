@@ -7,7 +7,7 @@
         xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
         mc:Ignorable="d"
         
-        Title="Swarm Robotics Camera Feed" Height="480" Width="640">
+        Title="Swarm Robotics Camera Feed" Height="480" Width="640" Closed="CameraPopOutWindow_Closed">
     <Grid>
         <WindowsFormsHost Grid.Column="1" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,0,0,0" Visibility="Visible">
             <em:ImageBox x:Name="captureImageBox" Height="640" Width="480" SizeMode="StretchImage" FunctionalMode="Minimum"/>
