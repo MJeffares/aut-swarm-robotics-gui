@@ -21,14 +21,23 @@ namespace SwarmRoboticsGUI
         public enum FilterType { NONE, GREYSCALE, CANNY_EDGES, BRAE_EDGES, NUM_FILTERS };
         #endregion
 
-        // Video Capturing
-        #region
-        public VideoCapture Capture { get; set; }
-        // openCV Matrix image
+        // Camera Properties
+        public string Name { get; set; }
+        public int Index { get; set; }
+        public int FPS { get; private set; }   
+        public FilterType Filter { get; set; }
+        public StatusType Status { get; set; }
+        public WindowStatusType WindowStatus { get; set; }
+        public TimeDisplayModeType TimeDisplayMode { get; set; }
+        public double WindowSize { get; set; }
         public Mat Frame { get; set; }
-        #endregion
 
+        //
+        public VideoWriter videowriter;
+        private VideoCapture Capture;
         private Timer FpsTimer;
+        private int FrameCount;
+
         // TODO: Sort variables
         #region
         // HSV ranges.
@@ -44,36 +53,25 @@ namespace SwarmRoboticsGUI
         private const int UpperC = 255;
         #endregion
 
-        // Camera Properties
-        public string Name { get; set; }
-        public int Index { get; set; }
-        public int FPS { get; private set; }
-        private int FrameCount { get; set; }
-        public FilterType Filter { get; set; }
-        public StatusType Status { get; set; }
-        public WindowStatusType WindowStatus { get; set; }
-        public TimeDisplayModeType TimeDisplayMode { get; set; }
-        public double WindowSize { get; set; }
-        
+
         public override string ToString()
         {
-            return String.Format("[{0}]{1}", Index, Name);
+            return string.Format("[{0}]{1}", Index, Name);
         }
-        // TODO: Not a fan of this here
         public static string ToString(FilterType filter)
         {
             switch (filter)
             {
                 case FilterType.NONE:
-                    return String.Format("No Filter");
+                    return string.Format("No Filter");
                 case FilterType.GREYSCALE:
-                    return String.Format("Greyscale");
+                    return string.Format("Greyscale");
                 case FilterType.CANNY_EDGES:
-                    return String.Format("Canny Edges");
+                    return string.Format("Canny Edges");
                 case FilterType.BRAE_EDGES:
-                    return String.Format("Brae Edges");
+                    return string.Format("Brae Edges");
                 default:
-                    return String.Format("Filter Text Error");
+                    return string.Format("Filter Text Error");
             }
         }
        
@@ -101,7 +99,7 @@ namespace SwarmRoboticsGUI
             FrameCount = 0;
         }
         // Methods
-        public Mat ProcessFilter()
+        private Mat ProcessFilter()
         {
             switch (Filter)
             {
@@ -151,8 +149,7 @@ namespace SwarmRoboticsGUI
                 // update our status
                 Status = StatusType.PLAYING;
                 // start the capture       
-                Capture.Start();
-                // start our fps timer                             
+                Capture.Start();                           
             }
             catch (NullReferenceException excpt)
             {
@@ -180,7 +177,6 @@ namespace SwarmRoboticsGUI
                 MessageBox.Show("stop recording before stopping capture");  
             }
         }
-        // TODO: but what if were recording. we just dont want to display
         public void PauseCapture()
         {
             try
@@ -205,13 +201,102 @@ namespace SwarmRoboticsGUI
                 MessageBox.Show(excpt.Message);
             }
         }
+
+        public void StartReplaying(string path)
+        {
+            if (Capture != null)
+            {
+                Capture.Dispose();
+            }
+            Status = StatusType.REPLAY_ACTIVE;
+            Capture = new VideoCapture(path);
+            Capture.ImageGrabbed += ProcessFrame;
+            Frame = new Mat();
+            Capture.Start();
+        }
+        public void StartRecording(string path)
+        {
+            try
+            {
+                //recordframewidth = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
+                //recordframeheight = (int)_capture.GetCaptureProperty(CapProp.FrameHeight);
+
+                //recordsize.Width = recordframewidth;
+                //recordsize.Height = recordframeheight;
+                System.Drawing.Size recordsize = new System.Drawing.Size();
+                recordsize.Width = 640;
+                recordsize.Height = 480;
+                try
+                {
+                    // TODO: Fix recording
+                    videowriter = new VideoWriter(path, -1, 30, recordsize, true);
+                }
+                catch (Exception)
+                {
+
+                }
+                Status = StatusType.RECORDING;
+            }
+            catch (NullReferenceException excpt)
+            {
+                MessageBox.Show(excpt.Message);
+            }
+        }
+        public void StopRecording()
+        {
+            videowriter.Dispose();
+            Status = StatusType.PLAYING;
+        }
+
+
         public void ProcessFrame(object sender, EventArgs arg)
         {    
             if (Capture != null && Capture.Ptr != IntPtr.Zero)
             {
                 Capture.Retrieve(Frame, 0);
                 FrameCount++;
+                if (FrameCount > 60)
+                {
+                    FrameCount = 0;
+                    // Timer wasn't enabled
+                    FpsTimer.Enabled = true;
+                }
                 ProcessFilter();
+            }
+        }
+
+        public void FlipVertical()
+        {
+            if (Capture != null)
+            {
+                Capture.FlipVertical = !Capture.FlipVertical;
+            }
+        }
+        public void FlipHorizontal()
+        {
+            if (Capture != null)
+            {
+                Capture.FlipHorizontal = !Capture.FlipHorizontal;
+            }
+        }
+
+        public void OpenSettings()
+        {
+            //need try/catch or checks 
+            if (Name != null)
+            {
+                try
+                {
+                    Capture.SetCaptureProperty(CapProp.Settings, 1);
+                }
+                catch (Exception excpt)
+                {
+                    MessageBox.Show(excpt.Message);
+                }
+            }
+            else
+            {
+                MessageBox.Show("No Currently Connected Camera!");
             }
         }
     }

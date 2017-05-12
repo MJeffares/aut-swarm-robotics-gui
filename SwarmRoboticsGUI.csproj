@@ -56,6 +56,12 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AForge.Video">
+      <HintPath>D:\Documents\Industrial Project\Programs\AForge.NET Framework-2.1.5-(libs only)\Release\AForge.Video.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Video.DirectShow">
+      <HintPath>D:\Documents\Industrial Project\Programs\AForge.NET Framework-2.1.5-(libs only)\Release\AForge.Video.DirectShow.dll</HintPath>
+    </Reference>
     <Reference Include="DirectShowLib-2005">
       <HintPath>DirectShow\DirectShowLib-2005.dll</HintPath>
     </Reference>

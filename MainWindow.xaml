@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:SwarmRoboticsGUI"
     xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
     xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
+    
     mc:Ignorable="d"
     Title="Swarm Robotics Graphics User Interface" Height="900" Width="1600" MinHeight="300" MinWidth="500" WindowStartupLocation="CenterScreen">
 
@@ -134,7 +135,7 @@
                 <ColumnDefinition x:Name="Column3" Width="2*"/>
             </Grid.ColumnDefinitions>
 
-            
+
 
             <Grid Grid.Column="0">
 
@@ -154,8 +155,8 @@
 
             </Grid>
 
-            
-            
+
+
             <DockPanel Grid.Column="1">
                 <StatusBar DockPanel.Dock="Right" Background="Transparent" Margin="10,0,0,0">
                     <StatusBar.ItemsPanel>
@@ -248,7 +249,7 @@
                             <Button Grid.Column="2" Content="Communication Test" x:Name="btnCommunicationTest" Margin="10" Click="btnCommunicationTest_Click" />
                         </WrapPanel>
                     </TabItem>
-                    
+
                     <TabItem Header="Placeholder"/>
                     <TabItem Header="Placeholder"/>
                 </TabControl>
@@ -260,7 +261,6 @@
             </GridSplitter>
 
 
-            
             <WindowsFormsHost Grid.Column="3" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,0,0,0" Visibility="Visible">
                 <em:ImageBox x:Name="captureImageBox" Height="240" Width="320" SizeMode="StretchImage" FunctionalMode="Minimum"/>
             </WindowsFormsHost>
