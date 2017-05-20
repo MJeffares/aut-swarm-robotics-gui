@@ -29,6 +29,7 @@ namespace SwarmRoboticsGUI
         public TimeDisplayModeType TimeDisplayMode { get; set; }
         public double WindowSize { get; set; }
         public Mat Frame { get; set; }
+        private Mat newFrame { get; set; }
         public ImageProcessing imgProc;
         //
         public VideoWriter videowriter;
@@ -84,16 +85,9 @@ namespace SwarmRoboticsGUI
         // Methods
         public void StartCapture()
         {
-            //if the capture has perviously been used and not disposed of we should dispose of it now
             if (Capture != null)
             {
                 Capture.Dispose();
-            }
-            //if the frame has perviously been used and not disposed of we should dispose of it now     
-            // TODO: make a clean up method?
-            if (Frame != null)
-            {
-                Frame.Dispose();
             }
             try
             {
@@ -120,7 +114,6 @@ namespace SwarmRoboticsGUI
                 try
                 {
                     Capture.Stop();
-                    Capture.Dispose();
                     Status = StatusType.STOPPED;
                 }
                 catch (Exception excpt)
@@ -183,15 +176,10 @@ namespace SwarmRoboticsGUI
                 System.Drawing.Size recordsize = new System.Drawing.Size();
                 recordsize.Width = 640;
                 recordsize.Height = 480;
-                try
-                {
-                    // TODO: Fix recording
-                    videowriter = new VideoWriter(path, -1, 30, recordsize, true);
-                }
-                catch (Exception)
-                {
 
-                }
+                // TODO: Fix recording
+                videowriter = new VideoWriter(path, -1, 30, recordsize, true);
+
                 Status = StatusType.RECORDING;
             }
             catch (NullReferenceException excpt)
@@ -208,7 +196,7 @@ namespace SwarmRoboticsGUI
 
         public void ProcessFrame(object sender, EventArgs arg)
         {
-            Mat newFrame = new Mat();
+            newFrame = new Mat();
             if (Capture != null && Capture.Ptr != IntPtr.Zero)
             {
                 Capture.Retrieve(newFrame, 0);

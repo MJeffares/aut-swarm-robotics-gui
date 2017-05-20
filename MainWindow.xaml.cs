@@ -225,6 +225,9 @@ namespace SwarmRoboticsGUI
                     // update arrow direction
                     cameraArrowTop.Content = "   >";
                     cameraArrowBottom.Content = "   >";
+                    // TEMP: toggles the name of the button
+                    menuDisplayPopOut.Header = "Pop Out Window";
+
                     break;
                 default:
                     // set size of window to original
@@ -238,6 +241,8 @@ namespace SwarmRoboticsGUI
                     // update arrow direction
                     cameraArrowTop.Content = "  < ";
                     cameraArrowBottom.Content = "  <  ";
+                    // TEMP: toggles the name of the button
+                    menuDisplayPopOut.Header = "Pop In Window";
                     // create and show the window
                     PopoutWindow = new CameraPopOutWindow(this);
                     PopoutWindow.Show();
@@ -427,6 +432,8 @@ namespace SwarmRoboticsGUI
                 // Stop capturing
                 camera.StopCapture();
                 //
+                captureImageBox.Visible = false;
+                //
                 menuCameraConnect.Header = "Start Capture";
                 menuCameraFreeze.Header = "Freeze";
                 menuCameraFreeze.IsChecked = false;
@@ -437,8 +444,7 @@ namespace SwarmRoboticsGUI
                 foreach (var item in allitems)
                 {
                     item.IsEnabled = true;
-                }
-                
+                }         
             }
             else if (camera.Status == Camera.StatusType.STOPPED)
             {
@@ -447,11 +453,12 @@ namespace SwarmRoboticsGUI
                 //
                 captureImageBox.Visible = true;
                 menuCameraConnect.Header = "Stop Capture";          // Update the header on our connect/disconnect button
+                // TODO: What should this say?
+                menuCameraFreeze.Header = "Freeze";
                 menuCameraFreeze.IsEnabled = true;                  // enable the freeze frame button
                 menuRecordNew.IsEnabled = true;
                 //
                 MenuItem[] allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
-
                 foreach (var item in allitems)
                 {
                     item.IsEnabled = false;

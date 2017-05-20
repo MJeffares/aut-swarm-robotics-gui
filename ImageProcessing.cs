@@ -29,7 +29,6 @@ namespace SwarmRoboticsGUI
         private const int BlurC = 1;
         private const int LowerC = 128;
         private const int UpperC = 255;
-
         VectorOfVectorOfPoint mycontours = new VectorOfVectorOfPoint();
         VectorOfVectorOfPoint largecontours = new VectorOfVectorOfPoint();
         VectorOfVectorOfPoint approx = new VectorOfVectorOfPoint();
