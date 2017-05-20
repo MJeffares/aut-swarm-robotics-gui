@@ -18,20 +18,18 @@ namespace SwarmRoboticsGUI
         public enum StatusType { PLAYING, PAUSED, STOPPED, REPLAY_ACTIVE, REPLAY_PAUSED, RECORDING };
         public enum WindowStatusType { MAXIMISED, MINIMISED, POPPED_OUT };
         public enum TimeDisplayModeType { CURRENT, FROM_START, START };
-        public enum FilterType { NONE, GREYSCALE, CANNY_EDGES, BRAE_EDGES, NUM_FILTERS };
         #endregion
 
         // Camera Properties
         public string Name { get; set; }
         public int Index { get; set; }
         public int FPS { get; private set; }   
-        public FilterType Filter { get; set; }
         public StatusType Status { get; set; }
         public WindowStatusType WindowStatus { get; set; }
         public TimeDisplayModeType TimeDisplayMode { get; set; }
         public double WindowSize { get; set; }
         public Mat Frame { get; set; }
-
+        public ImageProcessing imgProc;
         //
         public VideoWriter videowriter;
         private VideoCapture Capture;
@@ -58,22 +56,6 @@ namespace SwarmRoboticsGUI
         {
             return string.Format("[{0}]{1}", Index, Name);
         }
-        public static string ToString(FilterType filter)
-        {
-            switch (filter)
-            {
-                case FilterType.NONE:
-                    return string.Format("No Filter");
-                case FilterType.GREYSCALE:
-                    return string.Format("Greyscale");
-                case FilterType.CANNY_EDGES:
-                    return string.Format("Canny Edges");
-                case FilterType.BRAE_EDGES:
-                    return string.Format("Brae Edges");
-                default:
-                    return string.Format("Filter Text Error");
-            }
-        }
        
         // Camera
         public Camera()
@@ -81,7 +63,8 @@ namespace SwarmRoboticsGUI
             Name = null;
             Index = 0;
             Status = StatusType.STOPPED;
-            Filter = FilterType.NONE;
+
+            imgProc = new ImageProcessing();
 
             // TODO: possible change
             WindowStatus = WindowStatusType.MAXIMISED;
@@ -99,32 +82,6 @@ namespace SwarmRoboticsGUI
             FrameCount = 0;
         }
         // Methods
-        private Mat ProcessFilter()
-        {
-            switch (Filter)
-            {
-                case FilterType.NONE:
-                    return Frame;
-                case FilterType.GREYSCALE:
-                    CvInvoke.CvtColor(Frame, Frame, ColorConversion.Bgr2Gray);
-                    break;
-                case FilterType.CANNY_EDGES:
-                    CvInvoke.CvtColor(Frame, Frame, ColorConversion.Bgr2Gray);
-                    CvInvoke.PyrDown(Frame, Frame);
-                    CvInvoke.PyrUp(Frame, Frame);
-                    CvInvoke.Canny(Frame, Frame, 80, 40);
-                    break;
-                case FilterType.BRAE_EDGES:
-                    CvInvoke.CvtColor(Frame, Frame, ColorConversion.Bgr2Gray);
-                    CvInvoke.Threshold(Frame, Frame, LowerC, UpperC, ThresholdType.Binary);
-                    CvInvoke.AdaptiveThreshold(Frame, Frame, UpperC, AdaptiveThresholdType.GaussianC, ThresholdType.Binary, 3, 0);
-                    //CvInvoke.FindContours(outputframe, mycontours, null, RetrType.External, ChainApproxMethod.ChainApproxNone, 0);
-                    break;
-                default:
-                    break;
-            }
-            return Frame;
-        }
         public void StartCapture()
         {
             //if the capture has perviously been used and not disposed of we should dispose of it now
@@ -250,10 +207,12 @@ namespace SwarmRoboticsGUI
 
 
         public void ProcessFrame(object sender, EventArgs arg)
-        {    
+        {
+            Mat newFrame = new Mat();
             if (Capture != null && Capture.Ptr != IntPtr.Zero)
             {
-                Capture.Retrieve(Frame, 0);
+                Capture.Retrieve(newFrame, 0);
+                Frame = imgProc.ProcessFilter(newFrame);
                 FrameCount++;
                 if (FrameCount > 60)
                 {
@@ -261,7 +220,6 @@ namespace SwarmRoboticsGUI
                     // Timer wasn't enabled
                     FpsTimer.Enabled = true;
                 }
-                ProcessFilter();
             }
         }
 

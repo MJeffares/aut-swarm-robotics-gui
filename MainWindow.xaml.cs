@@ -74,6 +74,7 @@ namespace SwarmRoboticsGUI
         public XbeeHandler xbee;
         public ProtocolClass protocol;
         public CameraPopOutWindow PopoutWindow;
+        public OverlayWindow Overlay;
         // one second timer to calculate and update the fps count
         private DispatcherTimer Timer1;
         // timer to draw new frame
@@ -91,6 +92,12 @@ namespace SwarmRoboticsGUI
         public MainWindow()
         {
             InitializeComponent();
+
+
+
+            Overlay = new OverlayWindow(this);
+            Overlay.Show();
+
 
             camera = new Camera();
             // TODO: remove class dependency on main
@@ -183,9 +190,9 @@ namespace SwarmRoboticsGUI
         private void PopulateFilters()
         {
             //loops through our filters and adds them to our menu
-            for (int i = 0; i < (int)Camera.FilterType.NUM_FILTERS; i++)
+            for (int i = 0; i < (int)ImageProcessing.FilterType.NUM_FILTERS; i++)
             {
-                MenuItem item = new MenuItem { Header = Camera.ToString((Camera.FilterType)i) };
+                MenuItem item = new MenuItem { Header = ImageProcessing.ToString((ImageProcessing.FilterType)i) };
                 item.Click += new RoutedEventHandler(menuFilterListItem_Click);
                 item.IsCheckable = true;
                 //by default select our first filter (no filter)
@@ -340,7 +347,7 @@ namespace SwarmRoboticsGUI
             MenuItem menusender = (MenuItem)sender;
             String menusenderstring = menusender.ToString();
 
-            if (menusenderstring != Camera.ToString(camera.Filter))
+            if (menusenderstring != ImageProcessing.ToString(camera.imgProc.Filter))
             {
                 MenuItem[] allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
 
@@ -349,11 +356,11 @@ namespace SwarmRoboticsGUI
                     item.IsChecked = false;
                 }
                 menusender.IsChecked = true;
-                camera.Filter = (Camera.FilterType)menuFilterList.Items.IndexOf(menusender);
+                camera.imgProc.Filter = (ImageProcessing.FilterType)menuFilterList.Items.IndexOf(menusender);
                 //
-                statusDisplayFilter.Text = Camera.ToString(camera.Filter);
+                statusDisplayFilter.Text = ImageProcessing.ToString(camera.imgProc.Filter);
             }
-            else if (camera.Filter != Camera.FilterType.NONE)
+            else if (camera.imgProc.Filter != ImageProcessing.FilterType.NONE)
             {
                 MenuItem[] allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
 

@@ -25,3 +25,5 @@ C:\Users\Brae HW\Source\Repos\Industrial Project\obj\Debug\SwarmRoboticsGUI.Prop
 C:\Users\Brae HW\Source\Repos\Industrial Project\obj\Debug\SwarmRoboticsGUI.csproj.GenerateResource.Cache
 C:\Users\Brae HW\Source\Repos\Industrial Project\obj\Debug\SwarmRoboticsGUI.exe
 C:\Users\Brae HW\Source\Repos\Industrial Project\obj\Debug\SwarmRoboticsGUI.pdb
+C:\Users\Brae HW\Source\Repos\Industrial Project\obj\Debug\OverlayWindow.g.cs
+C:\Users\Brae HW\Source\Repos\Industrial Project\obj\Debug\OverlayWindow.baml
