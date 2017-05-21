@@ -25,6 +25,21 @@ namespace SwarmRoboticsGUI
         {
             InitializeComponent();
             this.mainWindow = mainWindow;
+            DataContext = this;
+        }
+
+        public int UpperC { get; set; } = 255;
+        public int LowerC { get; set; } = 128;
+        public double LowerH { get; set; } = 1;
+        public double LowerS { get; set; } = 1;
+        public double LowerV { get; set; } = 1;
+        public double UpperH { get; set; } = 254;
+        public double UpperS { get; set; } = 254;
+        public double UpperV { get; set; } = 254;
+
+        private void Overlay_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+
         }
     }
 }

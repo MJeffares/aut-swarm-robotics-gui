@@ -64,13 +64,12 @@ namespace SwarmRoboticsGUI
             Name = null;
             Index = 0;
             Status = StatusType.STOPPED;
-
+            //
             imgProc = new ImageProcessing();
-
             // TODO: possible change
             WindowStatus = WindowStatusType.MAXIMISED;
             TimeDisplayMode = TimeDisplayModeType.CURRENT;
-
+            //
             FpsTimer = new Timer(1000);
             FpsTimer.AutoReset = true;
             FpsTimer.Elapsed += FpsTimer_Tick;
@@ -193,15 +192,20 @@ namespace SwarmRoboticsGUI
             Status = StatusType.PLAYING;
         }
 
-
         public void ProcessFrame(object sender, EventArgs arg)
         {
+            // Stores newest frame
             newFrame = new Mat();
+            // Check capture exists
             if (Capture != null && Capture.Ptr != IntPtr.Zero)
             {
+                // Get the new frame
                 Capture.Retrieve(newFrame, 0);
-                Frame = imgProc.ProcessFilter(newFrame);
+                // Apply image processing
+                imgProc.ProcessFilter(newFrame);
+                // 
                 FrameCount++;
+                // Check framerate validity
                 if (FrameCount > 60)
                 {
                     FrameCount = 0;
@@ -209,6 +213,10 @@ namespace SwarmRoboticsGUI
                     FpsTimer.Enabled = true;
                 }
             }
+            // Store new frame
+            Frame = newFrame.Clone();
+            // 
+            newFrame.Dispose();
         }
 
         public void FlipVertical()

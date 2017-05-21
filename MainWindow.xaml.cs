@@ -85,44 +85,39 @@ namespace SwarmRoboticsGUI
         private OpenFileDialog openvideodialog = new OpenFileDialog();
         private SaveFileDialog savevideodialog = new SaveFileDialog();
         // 
-        private Video_Device[] webcams;       
+        private Video_Device[] webcams;
         #endregion
 
         // Main
         public MainWindow()
         {
             InitializeComponent();
-
-
-
-            Overlay = new OverlayWindow(this);
-            Overlay.Show();
-
-
+            //
             camera = new Camera();
-            // TODO: remove class dependency on main
+
+            // MANSEL: remove class dependency on main if possible
             xbee = new XbeeHandler(this);
             protocol = new ProtocolClass(this);
-            // TODO: why is it so long? maybe make a struct. Also look at SerialPort class
+            // MANSEL: why is it so long? maybe make a struct. Also look at SerialPort class
             serial = new SerialUARTCommunication(this, menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);
             //serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
 
             CvInvoke.UseOpenCL = false;
             PopulateFilters();
             PopulateCameras();
-
+            //
             openvideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
             savevideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
             savevideodialog.Title = "Record: Save As";
-
+            //
             startTime = new DateTime();
             startTime = DateTime.Now;
-
+            //
             Timer1 = new DispatcherTimer();
             Timer1.Tick += Timer1_Tick;
             Timer1.Interval = new TimeSpan(0, 0, 1);
             Timer1.Start();
-
+            //
             Timer2 = new Timer(50);
             Timer2.Elapsed += Timer2_Tick;
             Timer2.Start();
@@ -308,7 +303,7 @@ namespace SwarmRoboticsGUI
 
             switch (camera.TimeDisplayMode)
             {
-                case Camera.TimeDisplayModeType.CURRENT:                 
+                case Camera.TimeDisplayModeType.CURRENT:
                     statusTime.Text = DateTime.Now.ToString("t");
                     ///statusTime.Text = DateTime.Now.ToString();
                     ///statusTime.Text = String.Format("{0:d dd HH:mm:ss}" ,DateTime.Now);
@@ -330,10 +325,26 @@ namespace SwarmRoboticsGUI
         }
         private void Timer2_Tick(object sender, ElapsedEventArgs e)
         {
+            if (Overlay != null)
+            {
+                // TODO: Find a better way to bind properties between windows
+                // HACK: update them every frame
+                camera.imgProc.UpperC = Overlay.UpperC;
+                camera.imgProc.LowerC = Overlay.LowerC;
+
+                camera.imgProc.LowerH = Overlay.LowerH;
+                camera.imgProc.LowerS = Overlay.LowerS;
+                camera.imgProc.LowerV = Overlay.LowerV;
+                camera.imgProc.UpperH = Overlay.UpperH;
+                camera.imgProc.UpperS = Overlay.UpperS;
+                camera.imgProc.UpperV = Overlay.UpperV;
+
+                Overlay.captureImageBox.Image = camera.imgProc.OverlayImage;
+            }
             switch (camera.WindowStatus)
             {
                 case Camera.WindowStatusType.POPPED_OUT:
-                    PopoutWindow.captureImageBox.Image = camera.Frame;
+                    PopoutWindow.captureImageBox.Image = camera.Frame;                    
                     break;
                 case Camera.WindowStatusType.MAXIMISED:
                     captureImageBox.Image = camera.Frame;
@@ -444,7 +455,9 @@ namespace SwarmRoboticsGUI
                 foreach (var item in allitems)
                 {
                     item.IsEnabled = true;
-                }         
+                }
+                //
+                Overlay.Close();
             }
             else if (camera.Status == Camera.StatusType.STOPPED)
             {
@@ -465,6 +478,9 @@ namespace SwarmRoboticsGUI
                 }
                 //set start date time as a variable 
                 startTime = DateTime.Now;
+                //
+                Overlay = new OverlayWindow(this);
+                Overlay.Show();
             }
         }
         private void menuCameraOptions_Click(object sender, RoutedEventArgs e)
@@ -559,7 +575,7 @@ namespace SwarmRoboticsGUI
                     //set variable/flag
                     camera.WindowStatus = Camera.WindowStatusType.MINIMISED;
                     //disable the grid splitter so window cannont be changed size until it is expanded         
-                    cameraGridSplitter.IsEnabled = false;                              
+                    cameraGridSplitter.IsEnabled = false;
                     //update arrow direction
                     cameraArrowTop.Content = "  < ";
                     cameraArrowBottom.Content = "  <  ";
@@ -570,7 +586,7 @@ namespace SwarmRoboticsGUI
                     //set variable/flag
                     camera.WindowStatus = Camera.WindowStatusType.MAXIMISED;
                     //re-enable the grid splitter so its size can be changed                
-                    cameraGridSplitter.IsEnabled = true;                                      
+                    cameraGridSplitter.IsEnabled = true;
                     //update arrow direction
                     cameraArrowTop.Content = "   >";
                     cameraArrowBottom.Content = "   >";
@@ -584,5 +600,18 @@ namespace SwarmRoboticsGUI
             MessageBox.Show("Sorry Placeholder");
         }
         #endregion
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // BRAE: Implement child control
+            if (PopoutWindow != null)
+            {
+                PopoutWindow.Close();
+            }
+            if (Overlay != null)
+            {
+                Overlay.Close();
+            }
+        }
     }
 }
