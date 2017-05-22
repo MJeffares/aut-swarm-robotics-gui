@@ -21,15 +21,15 @@ namespace SwarmRoboticsGUI
         #region
         // HSV ranges.
         public double LowerH = 0;
-        public double UpperH = 0;
+        public double UpperH = 255;
         public double LowerS = 0;
-        public double UpperS = 0;
+        public double UpperS = 255;
         public double LowerV = 0;
-        public double UpperV = 0;
+        public double UpperV = 255;
         // Blur, Canny, and Threshold values.
         private const int BlurC = 1;
-        public int LowerC = 128;
-        public int UpperC = 255;
+        public double LowerC = 128;
+        public double UpperC = 255;
         VectorOfVectorOfPoint mycontours = new VectorOfVectorOfPoint();
         VectorOfVectorOfPoint largecontours = new VectorOfVectorOfPoint();
         VectorOfVectorOfPoint approx = new VectorOfVectorOfPoint();
@@ -104,39 +104,39 @@ namespace SwarmRoboticsGUI
         private Mat IdentifyRobot(Mat Visual, Mat Frame)
         {
             Mat Thresh = new Mat();
+            Mat Test = new Mat();
 
-            using (Mat VisualHsv = new Mat())
-            using (Mat mask = Visual.Clone())
+            using (Mat VisualHsv = new Image<Hsv, byte>(Frame.Size).Mat)
+            using (Mat mask = new Image<Gray,byte>(Frame.Size).Mat)
+            using (Mat Black = new Image<Bgr, byte>(Frame.Size).Mat)
             using (Mat LowerHsv = new Image<Hsv, byte>(1, 1, new Hsv(LowerH, LowerS, LowerV)).Mat)
             using (Mat UpperHsv = new Image<Hsv, byte>(1, 1, new Hsv(UpperH, UpperS, UpperV)).Mat)
             {
-                CvInvoke.CvtColor(mask, mask, ColorConversion.Bgr2Gray);
-                CvInvoke.Subtract(Frame, Visual, Visual, mask);
-                CvInvoke.CvtColor(Visual, VisualHsv, ColorConversion.Bgr2Hsv);
+                CvInvoke.CvtColor(Visual, mask, ColorConversion.Bgr2Gray);
+                // TODO: Possibly an easier way to mask
+                // TODO: Could use rectangle region to mask instead
+                // HACK: Removes pixels outside the hexagon from the frame
+                // This is done to focus colour detection to one robot
+                CvInvoke.Subtract(Frame, Black, Thresh, mask);
+
+                CvInvoke.CvtColor(Thresh, VisualHsv, ColorConversion.Bgr2Hsv);
                 CvInvoke.Blur(VisualHsv, VisualHsv, new Size(1, 1), new Point(0, 0));
                 CvInvoke.InRange(VisualHsv, LowerHsv, UpperHsv, Thresh);
             }
-            if (Thresh != null)
-            {
-                return Thresh;
-            }
-            else
-                return Visual;
+            CvInvoke.CvtColor(Thresh, Thresh, ColorConversion.Gray2Bgr);
+            return Thresh;
         }
 
         public Mat ShapeRecognition(Mat Frame)
         {
-            Mat Out = new Mat();
-            CvInvoke.CvtColor(Frame, Out, ColorConversion.Bgr2Gray);
+            Mat Out = Frame.Clone();
+            CvInvoke.CvtColor(Out, Out, ColorConversion.Bgr2Gray);
             CvInvoke.Threshold(Out, Out, LowerC, UpperC, ThresholdType.Binary);
             CvInvoke.AdaptiveThreshold(Out, Out, UpperC, AdaptiveThresholdType.GaussianC, ThresholdType.Binary, 3, 0);
             CvInvoke.FindContours(Out, mycontours, null, RetrType.External, ChainApproxMethod.ChainApproxNone);
 
             double area;
-            // TODO: Need to find a way to create blank image w/o causing graphical issues
-            // TEMP: Clones Frame then covers image with black rectancle
-            Mat Visual = Frame.Clone();
-            CvInvoke.Rectangle(Visual, new Rectangle(0, 0, 640, 480), new MCvScalar(0, 0, 0), -1);
+            Mat Visual = new Image<Bgr,byte>(Frame.Size).Mat;
             //
             largecontours.Clear();
             //
@@ -157,9 +157,13 @@ namespace SwarmRoboticsGUI
                 //
                 if (IsHexagon(approx[i]))
                 {               
-                    MCvScalar HexCenter = CvInvoke.Mean(approx[i]);
-                    CvInvoke.DrawContours(Visual, approx, i, new MCvScalar(1, 1, 1), -1);
-                    Visual = IdentifyRobot(Visual, Frame);
+                    // Creates mask of current robot
+                    CvInvoke.DrawContours(Visual, approx, i, new MCvScalar(255, 255, 255), -1);
+                    // TEMP: Returns threshold value to see if colours are found/correct
+                    Visual = IdentifyRobot(Visual.Clone(), Frame.Clone());
+
+                    // Draws a circle in the center
+                    //MCvScalar HexCenter = CvInvoke.Mean(approx[i]);
                     //CvInvoke.Circle(Visual, new Point((int)HexCenter.V0, (int)HexCenter.V1), 5, new MCvScalar(100, 0, 0), -1);
                 }
             }

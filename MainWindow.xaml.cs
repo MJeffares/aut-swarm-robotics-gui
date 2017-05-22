@@ -42,7 +42,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using WPFCustomMessageBox;
 
 // Structures
 struct Video_Device
