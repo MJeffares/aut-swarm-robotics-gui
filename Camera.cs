@@ -205,7 +205,7 @@ namespace SwarmRoboticsGUI
                 imgProc.ProcessFilter(newFrame);
                 // 
                 FrameCount++;
-                // Check framerate validity
+                // Check framerate
                 if (FrameCount > 60)
                 {
                     FrameCount = 0;

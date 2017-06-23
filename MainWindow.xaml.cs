@@ -19,8 +19,8 @@
 ///
 
 // MANSEL: This is an example of a Mansel task
-// BRAE: Use this to get Brae to do shit
-// TODO: This is for general shit
+// BRAE: Use this to get Brae to do something for once
+// TODO: This is for general things that need doing
 // UNDONE: This is life
 
 // Namespaces
@@ -75,9 +75,9 @@ namespace SwarmRoboticsGUI
         public CameraPopOutWindow PopoutWindow;
         public OverlayWindow Overlay;
         // one second timer to calculate and update the fps count
-        private DispatcherTimer Timer1;
+        private DispatcherTimer InterfaceTimer;
         // timer to draw new frame
-        private Timer Timer2;
+        private Timer FrameTimer;
         // 
         private DateTime startTime;
         //
@@ -112,14 +112,14 @@ namespace SwarmRoboticsGUI
             startTime = new DateTime();
             startTime = DateTime.Now;
             //
-            Timer1 = new DispatcherTimer();
-            Timer1.Tick += Timer1_Tick;
-            Timer1.Interval = new TimeSpan(0, 0, 1);
-            Timer1.Start();
+            InterfaceTimer = new DispatcherTimer();
+            InterfaceTimer.Tick += Interface_Tick;
+            InterfaceTimer.Interval = new TimeSpan(0, 0, 1);
+            InterfaceTimer.Start();
             //
-            Timer2 = new Timer(50);
-            Timer2.Elapsed += Timer2_Tick;
-            Timer2.Start();
+            FrameTimer = new Timer(50);
+            FrameTimer.Elapsed += Frame_Tick;
+            FrameTimer.Start();
 
             ///example of select folder dialog
             ///var selectFolderDialog = new FolderSelectDialog { Title = "Select a folder to save data to" };
@@ -247,8 +247,7 @@ namespace SwarmRoboticsGUI
 
         // Timer events
         #region
-        // TODO: Rename and comment timers
-        private void Timer1_Tick(object sender, EventArgs arg)
+        private void Interface_Tick(object sender, EventArgs arg)
         {
             //serial._serialPort.Write("Test");
 
@@ -322,23 +321,15 @@ namespace SwarmRoboticsGUI
                     break;
             }
         }
-        private void Timer2_Tick(object sender, ElapsedEventArgs e)
+        private void Frame_Tick(object sender, ElapsedEventArgs e)
         {
             if (Overlay != null)
             {
-                // TODO: Find a better way to bind properties between windows
+                // Draw new image to overlay
+                Overlay.captureImageBox.Image = camera.imgProc.OverlayImage;
                 // HACK: update them every frame
                 camera.imgProc.UpperC = Overlay.UpperC;
-                camera.imgProc.LowerC = Overlay.LowerC;
-
-                camera.imgProc.LowerH = Overlay.LowerH;
-                camera.imgProc.LowerS = Overlay.LowerS;
-                camera.imgProc.LowerV = Overlay.LowerV;
-                camera.imgProc.UpperH = Overlay.UpperH;
-                camera.imgProc.UpperS = Overlay.UpperS;
-                camera.imgProc.UpperV = Overlay.UpperV;
-
-                Overlay.captureImageBox.Image = camera.imgProc.OverlayImage;
+                camera.imgProc.LowerC = Overlay.LowerC;              
             }
             switch (camera.WindowStatus)
             {
@@ -603,6 +594,7 @@ namespace SwarmRoboticsGUI
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             // BRAE: Implement child control
+            // CONTROL YOUR CHILDREN MISTER
             if (PopoutWindow != null)
             {
                 PopoutWindow.Close();

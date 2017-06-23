@@ -28,18 +28,14 @@ namespace SwarmRoboticsGUI
             DataContext = this;
         }
 
-        public double UpperC { get; set; } = 255;
-        public double LowerC { get; set; } = 128;
-        public double LowerH { get; set; } = 0;
-        public double LowerS { get; set; } = 0;
-        public double LowerV { get; set; } = 0;
-        public double UpperH { get; set; } = 255;
-        public double UpperS { get; set; } = 255;
-        public double UpperV { get; set; } = 255;
 
         private void Overlay_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
 
         }
+
+        public double UpperC { get; set; } = 255;
+        public double LowerC { get; set; } = 0;
+
     }
 }
