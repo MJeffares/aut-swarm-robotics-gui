@@ -329,8 +329,11 @@ namespace SwarmRoboticsGUI
                 Overlay.captureImageBox.Image = camera.imgProc.OverlayImage;
                 // HACK: update them every frame
                 camera.imgProc.UpperC = Overlay.UpperC;
-                camera.imgProc.LowerC = Overlay.LowerC;              
-            }
+                camera.imgProc.LowerC = Overlay.LowerC;
+                camera.imgProc.ColourCount = Overlay.ColourCount;
+                camera.imgProc.LowerH = Overlay.LowerH;
+                camera.imgProc.UpperH = Overlay.UpperH;
+    }
             switch (camera.WindowStatus)
             {
                 case Camera.WindowStatusType.POPPED_OUT:

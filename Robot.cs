@@ -11,12 +11,13 @@ namespace SwarmRoboticsGUI
 {
     class Robot
     {
-        public int ID { get; set; }
         public int Battery { get; set; }
+        public bool hasImage { get; set; }
         // TODO: Create task enum
         // TEMP: object type
         public object Task { get; set; }
         public Point Location { get; set; }
         public Mat RobotImage { get; set; }
+        public bool Tracked { get; set; }
     }
 }
