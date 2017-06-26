@@ -21,6 +21,9 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
@@ -31,19 +34,31 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Column="1" Grid.Row="0" Height="20" Width="Auto" Text="Threshold, Upper, Lower" HorizontalAlignment="Center"/>
+            <TextBlock Grid.Column="1" Grid.Row="0" Height="20" Width="Auto" Text="Threshold" HorizontalAlignment="Center"/>
             <TextBox Grid.Column="0" Grid.Row="1" Height="20" Width="50" Text="{Binding Value, ElementName=slider}"/>
             <TextBox Grid.Column="0" Grid.Row="2" Height="20" Width="50" Text="{Binding Value, ElementName=slider1}"/>
-            <Slider Grid.Column="1" Grid.Row="1" x:Name="slider" Value="{Binding Path=UpperC, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="150" Maximum="255"/>
-            <Slider Grid.Column="1" Grid.Row="2" x:Name="slider1" Value="{Binding Path=LowerC, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="150" Maximum="255"/>
+            <Slider Grid.Column="1" Grid.Row="1" x:Name="slider" Value="{Binding Path=UpperC, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="255"/>
+            <Slider Grid.Column="1" Grid.Row="2" x:Name="slider1" Value="{Binding Path=LowerC, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="255"/>
             
-            <TextBlock Grid.Column="3" Grid.Row="0" Height="20" Width="Auto" Text="UpperH, LowerH, Colour" HorizontalAlignment="Center"/>
+            <TextBlock Grid.Column="3" Grid.Row="0" Height="20" Width="Auto" Text="Hue, Count" HorizontalAlignment="Center"/>
             <TextBox Grid.Column="2" Grid.Row="1" Height="20" Width="50" Text="{Binding Value, ElementName=slider2}"/>
             <TextBox Grid.Column="2" Grid.Row="2" Height="20" Width="50" Text="{Binding Value, ElementName=slider3}"/>
             <TextBox Grid.Column="2" Grid.Row="3" Height="20" Width="50" Text="{Binding Value, ElementName=slider4}"/>
-            <Slider Grid.Column="3" Grid.Row="1" x:Name="slider2" Value="{Binding Path=UpperH, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="150" Maximum="255"/>
-            <Slider Grid.Column="3" Grid.Row="2" x:Name="slider3" Value="{Binding Path=LowerH, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="150" Maximum="255"/>
-            <Slider Grid.Column="3" Grid.Row="3" x:Name="slider4" Value="{Binding Path=ColourC, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="150" Maximum="10000"/>
+            <Slider Grid.Column="3" Grid.Row="1" x:Name="slider2" Value="{Binding Path=UpperH, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="255"/>
+            <Slider Grid.Column="3" Grid.Row="2" x:Name="slider3" Value="{Binding Path=LowerH, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="255"/>
+            <Slider Grid.Column="3" Grid.Row="3" x:Name="slider4" Value="{Binding Path=ColourC, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="10000"/>
+
+            <TextBlock Grid.Column="5" Grid.Row="0" Height="20" Width="Auto" Text="Saturation" HorizontalAlignment="Center"/>
+            <TextBox Grid.Column="4" Grid.Row="1" Height="20" Width="50" Text="{Binding Value, ElementName=slider5}"/>
+            <TextBox Grid.Column="4" Grid.Row="2" Height="20" Width="50" Text="{Binding Value, ElementName=slider6}"/>
+            <Slider Grid.Column="5" Grid.Row="1" x:Name="slider5" Value="{Binding Path=UpperS, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="255"/>
+            <Slider Grid.Column="5" Grid.Row="2" x:Name="slider6" Value="{Binding Path=LowerS, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="255"/>
+
+            <TextBlock Grid.Column="7" Grid.Row="0" Height="20" Width="Auto" Text="Value" HorizontalAlignment="Center"/>
+            <TextBox Grid.Column="6" Grid.Row="1" Height="20" Width="50" Text="{Binding Value, ElementName=slider7}"/>
+            <TextBox Grid.Column="6" Grid.Row="2" Height="20" Width="50" Text="{Binding Value, ElementName=slider8}"/>
+            <Slider Grid.Column="7" Grid.Row="1" x:Name="slider7" Value="{Binding Path=UpperV, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="255"/>
+            <Slider Grid.Column="7" Grid.Row="2" x:Name="slider8" Value="{Binding Path=LowerV, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="255"/>
         </Grid>
     </Grid>
 </Window>

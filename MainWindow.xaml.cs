@@ -332,8 +332,12 @@ namespace SwarmRoboticsGUI
                 camera.imgProc.LowerC = Overlay.LowerC;
                 camera.imgProc.ColourCount = Overlay.ColourCount;
                 camera.imgProc.LowerH = Overlay.LowerH;
+                camera.imgProc.LowerS = Overlay.LowerS;
+                camera.imgProc.LowerV = Overlay.LowerV;
                 camera.imgProc.UpperH = Overlay.UpperH;
-    }
+                camera.imgProc.UpperS = Overlay.UpperS;
+                camera.imgProc.UpperV = Overlay.UpperV;
+            }
             switch (camera.WindowStatus)
             {
                 case Camera.WindowStatusType.POPPED_OUT:
