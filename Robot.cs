@@ -17,7 +17,7 @@ namespace SwarmRoboticsGUI
         // TEMP: object type
         public object Task { get; set; }
         public Point Location { get; set; }
-        public Mat RobotImage { get; set; }
-        public bool Tracked { get; set; }
+        public VectorOfPoint RobotContour { get; set; }
+        public bool IsTracked { get; set; }
     }
 }

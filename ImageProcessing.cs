@@ -32,8 +32,6 @@ namespace SwarmRoboticsGUI
         public int UpperS = 255;
         public int UpperV = 255;
 
-        private Mat test = new Mat();
-
         private Robot[] RobotList = new Robot[6];
         #endregion
 
@@ -91,26 +89,37 @@ namespace SwarmRoboticsGUI
         private void DrawOverlay(Mat Frame)
         {
             OverlayImage = new Image<Bgr, byte>(Frame.Width, Frame.Height).Mat;
-            // Creates mask of current robot
-            for (int i = 0; i < RobotList.Length; i++)
-            {
-                if (RobotList[i].RobotImage != null)
-                {
-                    CvInvoke.Add(OverlayImage, RobotList[i].RobotImage, OverlayImage);
 
-                    if (!RobotList[i].Tracked)
+            // Creates mask of current robot
+            using (VectorOfVectorOfPoint ContourVect = new VectorOfVectorOfPoint())
+            {
+                for (int i = 0; i < RobotList.Length; i++)
+                {
+                    if (RobotList[i].RobotContour != null)
                     {
-                        // Red indicates robot image is unchanged
-                        CvInvoke.Circle(OverlayImage, RobotList[i].Location, 10, new MCvScalar(0, 0, 255), -1);
-                    }
-                    else
-                    {
-                        // Green indicates new image
-                        CvInvoke.Circle(OverlayImage, RobotList[i].Location, 10, new MCvScalar(0, 255, 0), -1);
-                        RobotList[i].Tracked = false;
+
+                        ContourVect.Push(RobotList[i].RobotContour);
                     }
                 }
+                CvInvoke.DrawContours(OverlayImage, ContourVect, -1, new MCvScalar(255, 255, 255), -1);
             }
+
+            for (int i = 0; i < RobotList.Length; i++)
+            {
+                if (!RobotList[i].IsTracked)
+                {
+                    // Red indicates robot is not currently tracked, the image will be its previous location
+                    CvInvoke.Circle(OverlayImage, RobotList[i].Location, 10, new MCvScalar(0, 0, 255), -1);
+                }
+                else
+                {
+                    // Green indicates new image
+                    CvInvoke.Circle(OverlayImage, RobotList[i].Location, 10, new MCvScalar(0, 255, 0), -1);
+                    RobotList[i].IsTracked = false;
+                }
+                CvInvoke.PutText(OverlayImage, i.ToString(), RobotList[i].Location, FontFace.HersheyPlain, 10, new MCvScalar(50, 50, 50), 2);
+            }
+
         }
 
         private bool IsHexagon(VectorOfPoint Contour)
@@ -132,8 +141,14 @@ namespace SwarmRoboticsGUI
         }
         private int IdentifyRobot(VectorOfPoint Contour, Mat Frame)
         {
-            // TEMP: detected the red robot
+            // TEMP: detected the single coloured robot
             bool IsRed;
+            bool IsBlue;
+            bool IsYellow;
+            bool IsGreen;
+            bool IsMagenta;
+            bool IsCyan;
+
             int RobotID = -1;
 
             using (Mat Mask = new Image<Gray, byte>(Frame.Size).Mat)
@@ -144,56 +159,108 @@ namespace SwarmRoboticsGUI
                 CvInvoke.DrawContours(Mask, ContourVect, 0, new MCvScalar(255, 255, 255), -1);
                 // This is done to focus colour detection to one robot
                 CvInvoke.Subtract(Frame, Out, Out, Mask);
+                
 
-                IsRed = ColourRecognition(Out, Colour.RED);
+                IsRed = ColourRecognition(Out, Color.Red);
+                IsBlue = ColourRecognition(Out, Color.Blue);
+                IsYellow = ColourRecognition(Out, Color.Yellow);
+                IsGreen = ColourRecognition(Out, Color.Green);
+                IsMagenta = ColourRecognition(Out, Color.Magenta);
+                IsCyan = ColourRecognition(Out, Color.Cyan);
             }
-
             if (IsRed)
             {
                 RobotID = 0;
             }
-            else
+            if (IsBlue)
             {
                 RobotID = 1;
+            }
+            if (IsYellow)
+            {
+                RobotID = 2;
+            }
+            if (IsGreen)
+            {
+                RobotID = 3;
+            }
+            if (IsMagenta)
+            {
+                RobotID = 4;
+            }
+            if (IsCyan)
+            {
+                RobotID = 5;
             }
             return RobotID;
         }
 
 
-        public bool ColourRecognition(Mat Frame, Colour TargetColour)
+        public bool ColourRecognition(Mat Frame, Color TargetColour)
         {
-            Mat Out = Frame.Clone();
-            Hsv Lower = new Hsv();
-            Hsv Upper = new Hsv();
             int Count;
+            double LowerH = 0;
+            double UpperH = 0;
             // BRAE: do other colours
             // could just use hsv values instead of an enum
             // then this wouldnt need to know corresponding hue values
-            if (TargetColour == Colour.RED)
+            if (TargetColour == Color.Red)
             {
-                Lower.Hue = (double)LowerH;
-                Lower.Satuation = (double)LowerS;
-                Lower.Value = (double)LowerV;
-                Upper.Hue = (double)UpperH;
-                Upper.Satuation = (double)UpperS;
-                Upper.Value = (double)UpperV;
+                LowerH = 0;
+                UpperH = 0;
+            }
+            if (TargetColour == Color.Blue)
+            {
+                LowerH = 120 - 10;
+                UpperH = 120 + 10;
+                //LowerH = this.LowerH;
+                //UpperH = this.UpperH;
+            }
+            if (TargetColour == Color.Yellow)
+            {
+                LowerH = 30 - 10;
+                UpperH = 30 + 10;
+            }
+            if (TargetColour == Color.Green)
+            {
+                LowerH = 70 - 10;
+                UpperH = 70 + 10;
+            }
+            if (TargetColour == Color.Magenta)
+            {
+                LowerH = 160 - 10;
+                UpperH = 160 + 10;
+            }
+            if (TargetColour == Color.Cyan)
+            {
+                LowerH = 100 - 10;
+                UpperH = 100 + 10;
             }
 
-            using (var LowerHsv = new Image<Hsv, byte>(1, 1, Lower))
-            using (var UpperHsv = new Image<Hsv, byte>(1, 1, Upper))
+            using (Mat Out = Frame.Clone())
             using (Mat GrayOut = new Image<Gray, byte>(Frame.Size).Mat)
-            using (Mat HsvOut = new Image<Gray, byte>(Frame.Size).Mat)
             {
+                CvInvoke.CvtColor(Out, Out, ColorConversion.Bgr2Hsv);
+                CvInvoke.Blur(Out, Out, new Size(1, 1), new Point(0, 0));
 
-                CvInvoke.CvtColor(Out, HsvOut, ColorConversion.Bgr2Hsv);
+                using (ScalarArray lower = new ScalarArray(LowerH))
+                using (ScalarArray upper = new ScalarArray(UpperH))
+                using (Mat HOut = new Image<Gray, byte>(Frame.Size).Mat)
+                {
+                    CvInvoke.ExtractChannel(Out, HOut, 0);
+                    CvInvoke.InRange(HOut, lower, upper, GrayOut);
+                }
 
-                CvInvoke.Blur(HsvOut, HsvOut, new Size(1, 1), new Point(0, 0));
-                CvInvoke.InRange(HsvOut, LowerHsv, UpperHsv, GrayOut);
-
+                using (Mat SOut = new Image<Gray, byte>(Frame.Size).Mat)
+                {
+                    CvInvoke.ExtractChannel(Out, SOut, 1);
+                    CvInvoke.Threshold(SOut, SOut, 10, 255, ThresholdType.Binary);
+                    CvInvoke.BitwiseAnd(GrayOut, SOut, GrayOut);
+                }
+                //
                 Count = CvInvoke.CountNonZero(GrayOut);
-                test = GrayOut.Clone();
-                CvInvoke.CvtColor(test, test, ColorConversion.Gray2Bgr);
             }
+
             if (Count > ColourCount)
             {
                 return true;
@@ -206,6 +273,7 @@ namespace SwarmRoboticsGUI
             VectorOfVectorOfPoint Contours = new VectorOfVectorOfPoint();
             VectorOfVectorOfPoint LargeContours = new VectorOfVectorOfPoint();
             VectorOfVectorOfPoint ApproxContours = new VectorOfVectorOfPoint();
+            double Area;
 
             using (Mat Input = Frame.Clone())
             {
@@ -216,7 +284,6 @@ namespace SwarmRoboticsGUI
                 CvInvoke.FindContours(Input, Contours, null, RetrType.External, ChainApproxMethod.ChainApproxSimple);
             }
 
-            double Area;
             //
             for (int i = 0; i < Contours.Size; i++)
             {
@@ -228,38 +295,47 @@ namespace SwarmRoboticsGUI
                 }
             }
             ApproxContours.Push(LargeContours);
+
             for (int i = 0; i < LargeContours.Size; i++)
             {
-                // Get approximate shape of contours
+                // Get approximate polygonal shape of contour
                 CvInvoke.ApproxPolyDP(LargeContours[i], ApproxContours[i], 3.0, true);
-                //
+                // Check if contour is the right shape (hexagon)
                 if (IsHexagon(ApproxContours[i]))
                 {
-                    // Returns robot ID based on colour code
-                    int RobotID = IdentifyRobot(ApproxContours[i], Frame.Clone());
-
-                    if (!RobotList[i].HasImage)
+                    int RobotID;
+                    // Rectangular region that encompasses the contour
+                    Rectangle RobotBounds = CvInvoke.BoundingRectangle(ApproxContours[i]);
+                    // Create an image from the frame cropped down to the contour region
+                    using (Mat RobotImage = new Mat(Frame, RobotBounds))
                     {
-                        RobotList[i].RobotImage = new Image<Bgr, byte>(Frame.Width, Frame.Height).Mat;
-                        RobotList[i].HasImage = true;
+                        // New contour points relative to cropped region
+                        Point[] RelativePoints = new Point[ApproxContours[i].Size];
+                        // Old contour points relative to original frame
+                        Point[] AbsolutePoints = ApproxContours[i].ToArray();
+                        // Reevaluate the contour points based on the new image coordinates
+                        for (int j = 0; j < ApproxContours[i].Size; j++)
+                        {
+                            RelativePoints[j].X = AbsolutePoints[j].X - RobotBounds.X;
+                            RelativePoints[j].Y = AbsolutePoints[j].Y - RobotBounds.Y;
+                        }
+                        VectorOfPoint RelativeContour = new VectorOfPoint(RelativePoints);
+                        // Returns robot ID based on colour code
+                        RobotID = IdentifyRobot(RelativeContour, RobotImage.Clone());
                     }
                     if (RobotID != -1)
                     {
                         MCvMoments RobotMoment = CvInvoke.Moments(ApproxContours[i]);
                         MCvPoint2D64f RobotCOM = RobotMoment.GravityCenter;
-                        RobotList[i].Location = new Point((int)RobotCOM.X, (int)RobotCOM.Y);
-                        RobotList[i].Tracked = true;
-
-                        using (Mat RobotImage = new Image<Bgr, byte>(Frame.Width, Frame.Height).Mat)
-                        {
-                            CvInvoke.DrawContours(RobotImage, ApproxContours, i, new MCvScalar(255, 255, 255), -1);
-                            CvInvoke.PutText(RobotImage, i.ToString(), RobotList[i].Location, FontFace.HersheyPlain, 10, new MCvScalar(50, 50, 50), 2);
-                            RobotList[i].RobotImage = test.Clone();//RobotImage.Clone();
-                        }
+                        RobotList[RobotID].Location = new Point((int)RobotCOM.X, (int)RobotCOM.Y);
+                        RobotList[RobotID].IsTracked = true;
+                        RobotList[RobotID].RobotContour = ApproxContours[i];
                     }
                 }
             }
             return true;
         }
-    }
-}
+
+    }// CLASS END
+
+}// NAMESPACE END

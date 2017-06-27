@@ -194,15 +194,11 @@ namespace SwarmRoboticsGUI
 
         public void ProcessFrame(object sender, EventArgs arg)
         {
-            // Stores newest frame
-            newFrame = new Mat();
             // Check capture exists
             if (Capture != null && Capture.Ptr != IntPtr.Zero)
             {
                 // Get the new frame
-                Capture.Retrieve(newFrame, 0);
-                // Apply image processing
-                imgProc.ProcessFilter(newFrame);
+                Capture.Retrieve(Frame, 0);
                 // 
                 FrameCount++;
                 // Check framerate
@@ -213,10 +209,6 @@ namespace SwarmRoboticsGUI
                     FpsTimer.Enabled = true;
                 }
             }
-            // Store new frame
-            Frame = newFrame.Clone();
-            // 
-            newFrame.Dispose();
         }
 
         public void FlipVertical()
