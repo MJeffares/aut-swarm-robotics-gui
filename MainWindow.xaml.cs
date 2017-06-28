@@ -887,6 +887,8 @@ namespace SwarmRoboticsGUI
 				{
 					item.IsEnabled = false;
 				}
+
+				//menuCameraList.IsEnabled = false;
 			}
 		}
 
@@ -1143,6 +1145,12 @@ namespace SwarmRoboticsGUI
 		private void btnCommunicationTest_Click(object sender, RoutedEventArgs e)
 		{
 			protocol.SendMessage(ProtocolClass.MESSAGE_TYPES.COMMUNICATION_TEST);
+		}
+
+
+		private void btnBatteryVoltage_Click(object sender, RoutedEventArgs e)
+		{
+			protocol.SendMessage(ProtocolClass.MESSAGE_TYPES.BATTERY_VOLTAGE);
 		}
 	}
 }

@@ -148,7 +148,7 @@
                 <WrapPanel Grid.Row="1">
                     <Button x:Name="receivedDataNewline" Content="/n" Margin="10" Click="receivedDataNewline_Click"/>
                     <Button x:Name="receivedDataClear" Content="clear" Margin="10" Click="receivedDataClear_Click"/>
-                    <Button Content="Placeholder Freeze" Margin="10"/>
+                    <!--<Button Content="Placeholder Freeze" Margin="10"/>-->
                 </WrapPanel>
                 <RichTextBox Grid.Row="2" x:Name="rtbSerialReceived" Margin="10,10,10,10" VerticalScrollBarVisibility="Visible" IsReadOnly="True" Height="Auto" Width="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
 
@@ -246,11 +246,12 @@
                     <TabItem Header="Robot">
                         <WrapPanel>
                             <Button Grid.Column="2" Content="Communication Test" x:Name="btnCommunicationTest" Margin="10" Click="btnCommunicationTest_Click" />
+                            <Button Grid.Column="2" Content="Battery Voltage" x:Name="btnBatteryVoltage" Margin="10" Click="btnBatteryVoltage_Click" />
                         </WrapPanel>
                     </TabItem>
-                    
+                    <!--
                     <TabItem Header="Placeholder"/>
-                    <TabItem Header="Placeholder"/>
+                    <TabItem Header="Placeholder"/> -->
                 </TabControl>
             </DockPanel>
 

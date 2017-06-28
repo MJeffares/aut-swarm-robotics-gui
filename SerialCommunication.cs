@@ -299,7 +299,7 @@ public class SerialUARTCommunication
 		byte[] indata = new byte[bytes];
 
 		sp.Read(indata, 0, bytes);
-		
+
 		indata = window.xbee.DeEscape(indata);
 		bytes = indata.Length;
 
@@ -311,7 +311,8 @@ public class SerialUARTCommunication
 
 		
 		//avoid's threading error
-		window.UpdateSerialReceivedTextBox(indata, bytes);
+        //XXXX this will print the raw data to the display
+		//window.UpdateSerialReceivedTextBox(indata, bytes);
 
 		window.xbee.InterperateXbeeFrame();
 
