@@ -37,7 +37,7 @@ namespace SwarmRoboticsGUI
         public double UpperC { get; set; } = 255;
         public double LowerC { get; set; } = 0;
 
-        public int ColourCount { get; set; } = 100;
+        public int ColourC { get; set; } = 10;
         public int LowerH { get; set; } = 0;
         public int LowerS { get; set; } = 0;
         public int LowerV { get; set; } = 0;

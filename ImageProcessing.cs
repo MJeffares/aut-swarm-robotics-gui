@@ -22,15 +22,15 @@ namespace SwarmRoboticsGUI
 
         #region
         // Blur, Canny, and Threshold values.
-        public double LowerC = 128;
-        public double UpperC = 255;
-        public int ColourCount = 100;
-        public int LowerH = 0;
-        public int LowerS = 0;
-        public int LowerV = 0;
-        public int UpperH = 255;
-        public int UpperS = 255;
-        public int UpperV = 255;
+        public double LowerC { get; set; }
+        public double UpperC { get; set; } = 255;
+        public int ColourC { get; set; }
+        public int LowerH { get; set; }
+        public int LowerS { get; set; }
+        public int LowerV { get; set; }
+        public int UpperH { get; set; }
+        public int UpperS { get; set; }
+        public int UpperV { get; set; }
 
         private Robot[] RobotList = new Robot[6];
         #endregion
@@ -78,7 +78,7 @@ namespace SwarmRoboticsGUI
                     CvInvoke.Canny(Frame, Frame, 80, 40);
                     break;
                 case FilterType.BRAE_EDGES:
-                    Mat image = CvInvoke.Imread("D:/testimg.png");
+                    Mat image = CvInvoke.Imread("D:/ColourCodes.png");
                     ShapeRecognition(image);
                     DrawOverlay(image);
                     break;
@@ -98,7 +98,7 @@ namespace SwarmRoboticsGUI
                     if (RobotList[i].RobotContour != null)
                     {
 
-                        ContourVect.Push(RobotList[i].RobotContour);
+                        ContourVect.Push(new VectorOfPoint(RobotList[i].RobotContour));
                     }
                 }
                 CvInvoke.DrawContours(OverlayImage, ContourVect, -1, new MCvScalar(255, 255, 255), -1);
@@ -115,39 +115,33 @@ namespace SwarmRoboticsGUI
                 {
                     // Green indicates new image
                     CvInvoke.Circle(OverlayImage, RobotList[i].Location, 10, new MCvScalar(0, 255, 0), -1);
-                    RobotList[i].IsTracked = false;
-                }
+                }                
                 CvInvoke.PutText(OverlayImage, i.ToString(), RobotList[i].Location, FontFace.HersheyPlain, 10, new MCvScalar(50, 50, 50), 2);
+                RobotList[i].IsTracked = false;
             }
 
         }
 
         private bool IsHexagon(VectorOfPoint Contour)
         {
-            if (Contour.Size == 6)
+            if (Contour.Size != 6)
             {
-                LineSegment2D[] edges = PointCollection.PolyLine(Contour.ToArray(), true);
-                for (int j = 0; j < edges.Length; j++)
-                {
-                    double angle = Math.Abs(edges[(j + 1) % edges.Length].GetExteriorAngleDegree(edges[j]));
-                    if (angle < 30 || angle > 90)
-                    {
-                        return false;
-                    }
-                }
-                return true;
+                return false;
             }
-            return false;
+            LineSegment2D[] edges = PointCollection.PolyLine(Contour.ToArray(), true);
+            for (int j = 0; j < edges.Length; j++)
+            {
+                double angle = Math.Abs(edges[(j + 1) % edges.Length].GetExteriorAngleDegree(edges[j]));
+                if (angle < 30 || angle > 90)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
         private int IdentifyRobot(VectorOfPoint Contour, Mat Frame)
         {
-            // TEMP: detected the single coloured robot
-            bool IsRed;
-            bool IsBlue;
-            bool IsYellow;
-            bool IsGreen;
-            bool IsMagenta;
-            bool IsCyan;
+            bool IsRed, IsYellow, IsGreen, IsCyan, IsBlue, IsMagenta;          
 
             int RobotID = -1;
 
@@ -159,39 +153,27 @@ namespace SwarmRoboticsGUI
                 CvInvoke.DrawContours(Mask, ContourVect, 0, new MCvScalar(255, 255, 255), -1);
                 // This is done to focus colour detection to one robot
                 CvInvoke.Subtract(Frame, Out, Out, Mask);
-                
-
+                // Look for colours on the robot
                 IsRed = ColourRecognition(Out, Color.Red);
-                IsBlue = ColourRecognition(Out, Color.Blue);
                 IsYellow = ColourRecognition(Out, Color.Yellow);
                 IsGreen = ColourRecognition(Out, Color.Green);
-                IsMagenta = ColourRecognition(Out, Color.Magenta);
                 IsCyan = ColourRecognition(Out, Color.Cyan);
+                IsBlue = ColourRecognition(Out, Color.Blue);
+                IsMagenta = ColourRecognition(Out, Color.Magenta);  
             }
-            if (IsRed)
-            {
-                RobotID = 0;
-            }
-            if (IsBlue)
-            {
-                RobotID = 1;
-            }
-            if (IsYellow)
-            {
-                RobotID = 2;
-            }
-            if (IsGreen)
-            {
-                RobotID = 3;
-            }
-            if (IsMagenta)
-            {
-                RobotID = 4;
-            }
-            if (IsCyan)
-            {
-                RobotID = 5;
-            }
+
+            if (IsRed && IsYellow && IsGreen) RobotID = 0;
+
+            if (IsRed && IsYellow && IsCyan) RobotID = 1;
+
+            if (IsRed && IsYellow && IsBlue) RobotID = 2;
+
+            if (IsRed && IsYellow && IsMagenta) RobotID = 3;
+
+            if (IsRed && IsGreen && IsBlue) RobotID = 4;
+
+            if (IsRed && IsGreen && IsMagenta) RobotID = 5;
+
             return RobotID;
         }
 
@@ -201,41 +183,9 @@ namespace SwarmRoboticsGUI
             int Count;
             double LowerH = 0;
             double UpperH = 0;
-            // BRAE: do other colours
-            // could just use hsv values instead of an enum
-            // then this wouldnt need to know corresponding hue values
-            if (TargetColour == Color.Red)
-            {
-                LowerH = 0;
-                UpperH = 0;
-            }
-            if (TargetColour == Color.Blue)
-            {
-                LowerH = 120 - 10;
-                UpperH = 120 + 10;
-                //LowerH = this.LowerH;
-                //UpperH = this.UpperH;
-            }
-            if (TargetColour == Color.Yellow)
-            {
-                LowerH = 30 - 10;
-                UpperH = 30 + 10;
-            }
-            if (TargetColour == Color.Green)
-            {
-                LowerH = 70 - 10;
-                UpperH = 70 + 10;
-            }
-            if (TargetColour == Color.Magenta)
-            {
-                LowerH = 160 - 10;
-                UpperH = 160 + 10;
-            }
-            if (TargetColour == Color.Cyan)
-            {
-                LowerH = 100 - 10;
-                UpperH = 100 + 10;
-            }
+
+            LowerH = TargetColour.GetHue() / 2 - 10;
+            UpperH = TargetColour.GetHue() / 2 + 10;
 
             using (Mat Out = Frame.Clone())
             using (Mat GrayOut = new Image<Gray, byte>(Frame.Size).Mat)
@@ -261,7 +211,7 @@ namespace SwarmRoboticsGUI
                 Count = CvInvoke.CountNonZero(GrayOut);
             }
 
-            if (Count > ColourCount)
+            if (Count > ColourC)
             {
                 return true;
             }
@@ -329,7 +279,7 @@ namespace SwarmRoboticsGUI
                         MCvPoint2D64f RobotCOM = RobotMoment.GravityCenter;
                         RobotList[RobotID].Location = new Point((int)RobotCOM.X, (int)RobotCOM.Y);
                         RobotList[RobotID].IsTracked = true;
-                        RobotList[RobotID].RobotContour = ApproxContours[i];
+                        RobotList[RobotID].RobotContour = ApproxContours[i].ToArray();
                     }
                 }
             }

@@ -330,16 +330,16 @@ namespace SwarmRoboticsGUI
                 Camera1.imgProc.ProcessFilter(Camera1.Frame);
                 // Draw new image to overlay
                 Overlay.captureImageBox.Image = Camera1.imgProc.OverlayImage;
-                // HACK: update them every frame
-                Camera1.imgProc.UpperC = Overlay.UpperC;
-                Camera1.imgProc.LowerC = Overlay.LowerC;
-                Camera1.imgProc.ColourCount = Overlay.ColourCount;
-                Camera1.imgProc.LowerH = Overlay.LowerH;
-                Camera1.imgProc.LowerS = Overlay.LowerS;
-                Camera1.imgProc.LowerV = Overlay.LowerV;
-                Camera1.imgProc.UpperH = Overlay.UpperH;
-                Camera1.imgProc.UpperS = Overlay.UpperS;
-                Camera1.imgProc.UpperV = Overlay.UpperV;
+                // HACK: update them every frame               
+                Camera1.imgProc.ColourC = Overlay.ColourC;
+                //Camera1.imgProc.UpperC = Overlay.UpperC;
+                //Camera1.imgProc.LowerC = Overlay.LowerC;
+                //Camera1.imgProc.LowerH = Overlay.LowerH;
+                //Camera1.imgProc.LowerS = Overlay.LowerS;
+                //Camera1.imgProc.LowerV = Overlay.LowerV;
+                //Camera1.imgProc.UpperH = Overlay.UpperH;
+                //Camera1.imgProc.UpperS = Overlay.UpperS;
+                //Camera1.imgProc.UpperV = Overlay.UpperV;
             }
             switch (Camera1.WindowStatus)
             {
