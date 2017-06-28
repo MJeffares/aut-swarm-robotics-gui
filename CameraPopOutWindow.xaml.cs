@@ -2,7 +2,9 @@
 * Namespaces
 **********************************************************************************************************************************************/
 using Emgu.CV;
+using Emgu.CV.UI;
 using System;
+using System.Timers;
 using System.Windows;
 
 
@@ -13,17 +15,25 @@ namespace SwarmRoboticsGUI
 	/// </summary>
 	public partial class CameraPopOutWindow : Window
 	{
-        public CameraPopOutWindow(MainWindow main)
+        private Timer FrameTimer { get; set; }
+        private MainWindow mainWindow { get; set; }
+
+        public CameraPopOutWindow(MainWindow mainWindow)
 		{ 
 			InitializeComponent();
-            this.main = main;
+            this.mainWindow = mainWindow;
+
+            FrameTimer = new Timer(50);
+            FrameTimer.Elapsed += Frame_Tick;
+            FrameTimer.Start();
         }
-
-        private MainWindow main;
-
+        private void Frame_Tick(object sender, ElapsedEventArgs e)
+        {
+            captureImageBox.Image = mainWindow.captureImageBox.Image;
+        }
         private void CameraPopOutWindow_Closed(object sender, EventArgs e)
         {
-            main.ToggleCameraWindow();
+            mainWindow.ToggleCameraWindow();
         }
     }
 }

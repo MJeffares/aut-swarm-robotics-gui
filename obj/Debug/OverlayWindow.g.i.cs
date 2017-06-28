@@ -61,7 +61,7 @@ namespace SwarmRoboticsGUI {
         
         #line 14 "..\..\OverlayWindow.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
-        internal Emgu.CV.UI.ImageBox captureImageBox;
+        internal Emgu.CV.UI.ImageBox OverlayImageBox;
         
         #line default
         #line hidden
@@ -181,7 +181,7 @@ namespace SwarmRoboticsGUI {
             this.host1 = ((System.Windows.Forms.Integration.WindowsFormsHost)(target));
             return;
             case 3:
-            this.captureImageBox = ((Emgu.CV.UI.ImageBox)(target));
+            this.OverlayImageBox = ((Emgu.CV.UI.ImageBox)(target));
             return;
             case 4:
             this.slider = ((System.Windows.Controls.Slider)(target));

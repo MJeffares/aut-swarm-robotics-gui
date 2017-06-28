@@ -28,6 +28,7 @@ using DirectShowLib;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using Emgu.CV.UI;
 using Emgu.CV.Util;
 using folderHack;
 using Microsoft.Win32;
@@ -48,7 +49,7 @@ struct Video_Device
 {
 	public string deviceName;
 	public int deviceId;
-	public Guid identifier;
+    public Guid identifier;
 	public Video_Device(int id, string name, Guid identity = new Guid())
 	{
 		deviceId = id;
@@ -76,8 +77,6 @@ namespace SwarmRoboticsGUI
         public OverlayWindow Overlay;
         // one second timer to calculate and update the fps count
         private DispatcherTimer InterfaceTimer;
-        // timer to draw new frame
-        private Timer FrameTimer;
         // 
         private DateTime startTime;
         //
@@ -85,6 +84,12 @@ namespace SwarmRoboticsGUI
         private SaveFileDialog savevideodialog = new SaveFileDialog();
         // 
         private Video_Device[] webcams;
+
+        public enum WindowStatusType { MAXIMISED, MINIMISED, POPPED_OUT };
+        public enum TimeDisplayModeType { CURRENT, FROM_START, START };
+        public WindowStatusType WindowStatus { get; set; }
+        public TimeDisplayModeType TimeDisplayMode { get; set; }
+        public double WindowSize { get; set; }
         #endregion
 
         // Main
@@ -92,16 +97,17 @@ namespace SwarmRoboticsGUI
         {
             InitializeComponent();
             //
-            Camera1 = new Camera();
+            Camera1 = new Camera(this);
 
-            // MANSEL: remove class dependency on main if possible
             xbee = new XbeeHandler(this);
             protocol = new ProtocolClass(this);
-            // MANSEL: why is it so long? maybe make a struct. Also look at SerialPort class
-            serial = new SerialUARTCommunication(this, menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);
-            //serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
-
-            CvInvoke.UseOpenCL = false;
+            // MANSEL: Maybe make a struct. Also look at SerialPort class
+            serial = new SerialUARTCommunication(this, menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);           
+            //
+            Overlay = new OverlayWindow(this);
+            //
+            CvInvoke.UseOpenCL = true;
+            //
             PopulateFilters();
             PopulateCameras();
             //
@@ -117,20 +123,15 @@ namespace SwarmRoboticsGUI
             InterfaceTimer.Interval = new TimeSpan(0, 0, 1);
             InterfaceTimer.Start();
             //
-            FrameTimer = new Timer(50);
-            FrameTimer.Elapsed += Frame_Tick;
-            FrameTimer.Start();
-
-            ///example of select folder dialog
-            ///var selectFolderDialog = new FolderSelectDialog { Title = "Select a folder to save data to" };
-            ///if (selectFolderDialog.Show())
-            ///{
-            ///	rtbSerial.AppendText(selectFolderDialog.FileName.ToString());
-            ///}
-            Overlay = new OverlayWindow(this);
+            TimeDisplayMode = TimeDisplayModeType.CURRENT;
+            WindowStatus = WindowStatusType.MAXIMISED;
+            
+            // TEMP: display overlay on starup for debugging
             Overlay.Show();
-        }
 
+            //serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+        }
+        
 
         // Methods
         #region
@@ -154,7 +155,7 @@ namespace SwarmRoboticsGUI
                 // loops through cameras and adds them to menu
                 for (int i = 0; i < _SystemCameras.Length; i++)
                 {
-                    webcams[i] = new Video_Device(i, _SystemCameras[i].Name); ;
+                    webcams[i] = new Video_Device(i, _SystemCameras[i].Name);
                     MenuItem item = new MenuItem { Header = webcams[i].ToString() };
                     item.Click += new RoutedEventHandler(menuCameraListItem_Click);
                     item.IsCheckable = true;
@@ -207,14 +208,14 @@ namespace SwarmRoboticsGUI
         }
         public void ToggleCameraWindow()
         {
-            switch (Camera1.WindowStatus)
+            switch (WindowStatus)
             {
-                case Camera.WindowStatusType.POPPED_OUT:
+                case WindowStatusType.POPPED_OUT:
                     PopoutWindow.Close();
                     //set window to the size it had been before it was minimised
-                    mainGrid.ColumnDefinitions[3].Width = new GridLength(Camera1.WindowSize);
+                    mainGrid.ColumnDefinitions[3].Width = new GridLength(WindowSize);
                     //set variable/flag
-                    Camera1.WindowStatus = Camera.WindowStatusType.MAXIMISED;
+                    WindowStatus = WindowStatusType.MAXIMISED;
                     //re-enable the grid splitter so its size can be changed
                     cameraGridSplitter.IsEnabled = true;
                     // update arrow direction
@@ -226,11 +227,11 @@ namespace SwarmRoboticsGUI
                     break;
                 default:
                     // set size of window to original
-                    Camera1.WindowSize = mainGrid.ColumnDefinitions[3].ActualWidth;
+                    WindowSize = mainGrid.ColumnDefinitions[3].ActualWidth;
                     // minimise window (make width = 0)     
                     mainGrid.ColumnDefinitions[3].Width = new GridLength((double)0);
                     // change camera window status to popped out
-                    Camera1.WindowStatus = Camera.WindowStatusType.POPPED_OUT;
+                    WindowStatus = WindowStatusType.POPPED_OUT;
                     // disable the grid splitter so window cannont be changed size until it is expanded               
                     cameraGridSplitter.IsEnabled = false;
                     // update arrow direction
@@ -251,6 +252,17 @@ namespace SwarmRoboticsGUI
         private void Interface_Tick(object sender, EventArgs arg)
         {
             //serial._serialPort.Write("Test");
+
+            // HACK: update them every frame               
+            Overlay.imgProc.ColourC = Overlay.ColourC;
+            //Camera1.imgProc.UpperC = Overlay.UpperC;
+            //Camera1.imgProc.LowerC = Overlay.LowerC;
+            //Camera1.imgProc.LowerH = Overlay.LowerH;
+            //Camera1.imgProc.LowerS = Overlay.LowerS;
+            //Camera1.imgProc.LowerV = Overlay.LowerV;
+            //Camera1.imgProc.UpperH = Overlay.UpperH;
+            //Camera1.imgProc.UpperS = Overlay.UpperS;
+            //Camera1.imgProc.UpperV = Overlay.UpperV;
 
             /// Error message for zero frames
             ///if (camera.Status == Camera.StatusType.PLAYING || camera.Status == Camera.StatusType.RECORDING)
@@ -300,9 +312,9 @@ namespace SwarmRoboticsGUI
             //updates FPS counter
             statusFPS.Text = "FPS: " + Camera1.FPS;
 
-            switch (Camera1.TimeDisplayMode)
+            switch (TimeDisplayMode)
             {
-                case Camera.TimeDisplayModeType.CURRENT:
+                case TimeDisplayModeType.CURRENT:
                     statusTime.Text = DateTime.Now.ToString("t");
                     ///statusTime.Text = DateTime.Now.ToString();
                     ///statusTime.Text = String.Format("{0:d dd HH:mm:ss}" ,DateTime.Now);
@@ -310,7 +322,7 @@ namespace SwarmRoboticsGUI
                     break;
 
 
-                case Camera.TimeDisplayModeType.FROM_START:
+                case TimeDisplayModeType.FROM_START:
                     if (Camera1.Status == Camera.StatusType.RECORDING)
                     {
                         statusTime.Text = (DateTime.Now - startTime).ToString(@"dd\.hh\:mm\:ss");
@@ -319,37 +331,6 @@ namespace SwarmRoboticsGUI
                         ///displayTime = displayTime.Add(-((TimeSpan)displayTime.Ticks % TimeSpan.TicksPerSecond));
                         ///statusTime.Text = (DateTime.Now - startTime).ToString("t");
                     }
-                    break;
-            }
-        }
-        private void Frame_Tick(object sender, ElapsedEventArgs e)
-        {
-            if (Overlay != null)
-            {
-                // Apply image processing
-                Camera1.imgProc.ProcessFilter(Camera1.Frame);
-                // Draw new image to overlay
-                Overlay.captureImageBox.Image = Camera1.imgProc.OverlayImage;
-                // HACK: update them every frame               
-                Camera1.imgProc.ColourC = Overlay.ColourC;
-                //Camera1.imgProc.UpperC = Overlay.UpperC;
-                //Camera1.imgProc.LowerC = Overlay.LowerC;
-                //Camera1.imgProc.LowerH = Overlay.LowerH;
-                //Camera1.imgProc.LowerS = Overlay.LowerS;
-                //Camera1.imgProc.LowerV = Overlay.LowerV;
-                //Camera1.imgProc.UpperH = Overlay.UpperH;
-                //Camera1.imgProc.UpperS = Overlay.UpperS;
-                //Camera1.imgProc.UpperV = Overlay.UpperV;
-            }
-            switch (Camera1.WindowStatus)
-            {
-                case Camera.WindowStatusType.POPPED_OUT:
-                    PopoutWindow.captureImageBox.Image = Camera1.Frame;                    
-                    break;
-                case Camera.WindowStatusType.MAXIMISED:
-                    captureImageBox.Image = Camera1.Frame;
-                    break;
-                default:
                     break;
             }
         }
@@ -363,7 +344,7 @@ namespace SwarmRoboticsGUI
             MenuItem menusender = (MenuItem)sender;
             String menusenderstring = menusender.ToString();
 
-            if (menusenderstring != ImageProcessing.ToString(Camera1.imgProc.Filter))
+            if (menusenderstring != ImageProcessing.ToString(Overlay.imgProc.Filter))
             {
                 MenuItem[] allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
 
@@ -372,11 +353,11 @@ namespace SwarmRoboticsGUI
                     item.IsChecked = false;
                 }
                 menusender.IsChecked = true;
-                Camera1.imgProc.Filter = (ImageProcessing.FilterType)menuFilterList.Items.IndexOf(menusender);
+                Overlay.imgProc.Filter = (ImageProcessing.FilterType)menuFilterList.Items.IndexOf(menusender);
                 //
-                statusDisplayFilter.Text = ImageProcessing.ToString(Camera1.imgProc.Filter);
+                statusDisplayFilter.Text = ImageProcessing.ToString(Overlay.imgProc.Filter);
             }
-            else if (Camera1.imgProc.Filter != ImageProcessing.FilterType.NONE)
+            else if (Overlay.imgProc.Filter != ImageProcessing.FilterType.NONE)
             {
                 MenuItem[] allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
 
@@ -562,26 +543,26 @@ namespace SwarmRoboticsGUI
         private void btnCameraMinimise_Click(object sender, MouseButtonEventArgs e)
         {
             // TODO: Will probably move window status out of camera class
-            switch (Camera1.WindowStatus)
+            switch (WindowStatus)
             {
-                case Camera.WindowStatusType.MAXIMISED:
+                case WindowStatusType.MAXIMISED:
                     // set size of window when it was minimised
-                    Camera1.WindowSize = mainGrid.ColumnDefinitions[3].ActualWidth;
+                    WindowSize = mainGrid.ColumnDefinitions[3].ActualWidth;
                     //minimise window (make width = 0)
                     mainGrid.ColumnDefinitions[3].Width = new GridLength((double)0);
                     //set variable/flag
-                    Camera1.WindowStatus = Camera.WindowStatusType.MINIMISED;
+                    WindowStatus = WindowStatusType.MINIMISED;
                     //disable the grid splitter so window cannont be changed size until it is expanded         
                     cameraGridSplitter.IsEnabled = false;
                     //update arrow direction
                     cameraArrowTop.Content = "  < ";
                     cameraArrowBottom.Content = "  <  ";
                     break;
-                case Camera.WindowStatusType.MINIMISED:
+                case WindowStatusType.MINIMISED:
                     //set window to the size it had been before it was minimised
-                    mainGrid.ColumnDefinitions[3].Width = new GridLength(Camera1.WindowSize);
+                    mainGrid.ColumnDefinitions[3].Width = new GridLength(WindowSize);
                     //set variable/flag
-                    Camera1.WindowStatus = Camera.WindowStatusType.MAXIMISED;
+                    WindowStatus = WindowStatusType.MAXIMISED;
                     //re-enable the grid splitter so its size can be changed                
                     cameraGridSplitter.IsEnabled = true;
                     //update arrow direction
@@ -601,6 +582,7 @@ namespace SwarmRoboticsGUI
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             // BRAE: Implement child control
+            // This a thing in WPF?
             // CONTROL YOUR CHILDREN MISTER
             if (PopoutWindow != null)
             {
