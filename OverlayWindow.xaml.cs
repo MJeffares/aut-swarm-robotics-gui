@@ -20,41 +20,70 @@ namespace SwarmRoboticsGUI
     /// </summary>
     public partial class OverlayWindow : Window
     {
-        public double UpperC { get; set; } = 255;
-        public double LowerC { get; set; } = 0;
-        public int ColourC { get; set; } = 10;
-        public int LowerH { get; set; } = 0;
-        public int LowerS { get; set; } = 0;
-        public int LowerV { get; set; } = 0;
-        public int UpperH { get; set; } = 255;
-        public int UpperS { get; set; } = 255;
-        public int UpperV { get; set; } = 255;
+        public double UpperC { get; set; }
+        public double LowerC { get; set; }
+        public int ColourC { get; set; }
+        public int LowerH { get; set; } 
+        public int LowerS { get; set; }
+        public int LowerV { get; set; }
+        public int UpperH { get; set; }
+        public int UpperS { get; set; }
+        public int UpperV { get; set; }
 
         public ImageProcessing imgProc { get; set; }
         private MainWindow mainWindow { get; set; }
         private Timer FrameTimer { get; set; }
+        private Timer InterfaceTimer { get; set; }
 
         public OverlayWindow(MainWindow mainWindow)
         {
             InitializeComponent();
+            imgProc = new ImageProcessing();
             this.mainWindow = mainWindow;
             DataContext = this;
-
+            ColourC = 1000;
+            LowerS = 25;
             FrameTimer = new Timer(50);
             FrameTimer.Elapsed += Frame_Tick;
             FrameTimer.Start();
 
-            imgProc = new ImageProcessing();
+            InterfaceTimer = new Timer(200);
+            InterfaceTimer.Elapsed += Interface_Tick;
+            InterfaceTimer.Start();
         }
         private void Frame_Tick(object sender, ElapsedEventArgs e)
         {
             // Apply image processing
-            imgProc.ProcessFilter(mainWindow.Camera1.Frame);
-            OverlayImageBox.Image = imgProc.OverlayImage;
+            if (mainWindow.Camera1.Frame != null)
+            {
+                imgProc.ProcessFilter(mainWindow.Camera1.Frame);
+                OverlayImageBox.Image = imgProc.OverlayImage;
+            }
+            //imgProc.ProcessFilter(null);
+            //OverlayImageBox.Image = imgProc.OverlayImage;
         }
+
+        private void Interface_Tick(object sender, ElapsedEventArgs e)
+        {
+            // HACK: update them every frame               
+            imgProc.ColourC = ColourC;
+            //Camera1.imgProc.UpperC = Overlay.UpperC;
+            //Camera1.imgProc.LowerC = Overlay.LowerC;
+            imgProc.LowerH = LowerH;
+            imgProc.LowerS = LowerS;
+            //Camera1.imgProc.LowerV = Overlay.LowerV;
+            imgProc.UpperH = UpperH;
+            //Camera1.imgProc.UpperV = Overlay.UpperV;
+        }
+
         private void Overlay_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
 
+        }
+
+        private void btnClear_Click(object sender, RoutedEventArgs e)
+        {
+            imgProc.ClearRobots();
         }
     }
 }

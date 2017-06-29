@@ -253,17 +253,6 @@ namespace SwarmRoboticsGUI
         {
             //serial._serialPort.Write("Test");
 
-            // HACK: update them every frame               
-            Overlay.imgProc.ColourC = Overlay.ColourC;
-            //Camera1.imgProc.UpperC = Overlay.UpperC;
-            //Camera1.imgProc.LowerC = Overlay.LowerC;
-            //Camera1.imgProc.LowerH = Overlay.LowerH;
-            //Camera1.imgProc.LowerS = Overlay.LowerS;
-            //Camera1.imgProc.LowerV = Overlay.LowerV;
-            //Camera1.imgProc.UpperH = Overlay.UpperH;
-            //Camera1.imgProc.UpperS = Overlay.UpperS;
-            //Camera1.imgProc.UpperV = Overlay.UpperV;
-
             /// Error message for zero frames
             ///if (camera.Status == Camera.StatusType.PLAYING || camera.Status == Camera.StatusType.RECORDING)
             ///{

@@ -11,6 +11,14 @@ namespace SwarmRoboticsGUI
 {
     class Robot
     {
+        public Robot()
+        {
+            Battery = 0;
+            Location = new Point(0, 0);
+            Heading = new Point(0, 0);
+            IsTracked = false;
+        }
+
         public int Battery { get; set; }
         // TODO: Create task enum
         // TEMP: object type

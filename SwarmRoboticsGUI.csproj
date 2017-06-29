@@ -170,6 +170,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Resource Include="Images\ColourCodes.png" />
+    <Resource Include="Images\robotcutouts.png" />
+    <Resource Include="Images\robotcutouts2.png" />
     <Content Include="msvcp140.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
