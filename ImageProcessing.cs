@@ -39,8 +39,9 @@ namespace SwarmRoboticsGUI
         #endregion
 
 #if DEBUG
-        private int noOfhex { get; set; }
-        private int noOflarge { get; set; }
+        private int HexCount { get; set; }
+        private int LargeContourCount { get; set; }
+        private int RobotCount { get; set; }
 
         public UMat test = new UMat();
 #endif
@@ -120,7 +121,6 @@ namespace SwarmRoboticsGUI
                     break;
             }
         }
-
         public void ClearRobots()
         {
             for (int i = 0; i < RobotList.Length; i++)
@@ -128,7 +128,6 @@ namespace SwarmRoboticsGUI
                 RobotList[i] = new Robot();
             }
         }
-
         private void DrawOverlay(UMat Frame)
         {
             Mat Input = new Image<Bgr, byte>(Frame.Cols, Frame.Rows).Mat;
@@ -161,18 +160,21 @@ namespace SwarmRoboticsGUI
                         // Green indicates new image
                         CvInvoke.Circle(Input, RobotList[i].Location, 10, new MCvScalar(0, 255, 0), -1, LineType.AntiAlias);
                     }
-                    CvInvoke.ArrowedLine(Input, RobotList[i].Location, RobotList[i].Heading, new MCvScalar(20, 20, 20), 2, LineType.AntiAlias, 0, 0.5);
+                    if (RobotList[i].Heading.X > 0 && RobotList[i].Heading.Y > 0)
+                    {
+                        CvInvoke.ArrowedLine(Input, RobotList[i].Location, RobotList[i].Heading, new MCvScalar(20, 20, 20), 2, LineType.AntiAlias, 0, 0.5);
+                    }
                     CvInvoke.PutText(Input, i.ToString(), new Point(RobotList[i].Location.X + 20, RobotList[i].Location.Y + 10), FontFace.HersheyScriptSimplex, 1, new MCvScalar(50, 50, 50), 2, LineType.AntiAlias);
                 }
                 RobotList[i].IsTracked = false;
             }
 #if DEBUG
-            CvInvoke.PutText(Input, noOflarge.ToString(), new Point(40, 40), FontFace.HersheyScriptSimplex, 1, new MCvScalar(50, 50, 50), 2, LineType.AntiAlias);
-            CvInvoke.PutText(Input, noOfhex.ToString(), new Point(40, 80), FontFace.HersheyScriptSimplex, 1, new MCvScalar(50, 50, 50), 2, LineType.AntiAlias);
+            CvInvoke.PutText(Input, LargeContourCount.ToString(), new Point(20, 40), FontFace.HersheyScriptSimplex, 1, new MCvScalar(50, 50, 50), 2, LineType.AntiAlias);
+            CvInvoke.PutText(Input, HexCount.ToString(), new Point(20, 80), FontFace.HersheyScriptSimplex, 1, new MCvScalar(50, 50, 50), 2, LineType.AntiAlias);
+            CvInvoke.PutText(Input, RobotCount.ToString(), new Point(20, 120), FontFace.HersheyScriptSimplex, 1, new MCvScalar(50, 50, 50), 2, LineType.AntiAlias);
 #endif
             OverlayImage = Input.Clone().GetUMat(AccessType.Read);
         }
-
         private bool IsHexagon(VectorOfPoint Contour)
         {
             if (Contour.Size != 6)
@@ -207,7 +209,6 @@ namespace SwarmRoboticsGUI
             }
             return true;
         }
-
         private int IdentifyRobot(VectorOfPoint Contour, UMat Frame)
         {
             bool IsOrange = false, IsYellow = false, IsGreen = false, IsDarkBlue = false, IsLightBlue = false, IsPurple = false;
@@ -363,7 +364,6 @@ namespace SwarmRoboticsGUI
             }
             return false;
         }
-
         public bool GetRobots(UMat Frame)
         {
             VectorOfVectorOfPoint Contours = new VectorOfVectorOfPoint();
@@ -374,9 +374,9 @@ namespace SwarmRoboticsGUI
             using (UMat Input = Frame.Clone())
             {
                 CvInvoke.CvtColor(Input, Input, ColorConversion.Bgr2Gray);
+                CvInvoke.GaussianBlur(Input, Input, new Size(5, 5), 0);
                 CvInvoke.BitwiseNot(Input, Input);
-                //CvInvoke.Blur(Input, Input, new Size(1, 1), new Point(0, 0));
-                CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.GaussianC, ThresholdType.Binary, 3, 0);
+                CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 3, 0);
                 CvInvoke.FindContours(Input, Contours, null, RetrType.External, ChainApproxMethod.ChainApproxNone);
             }
 
@@ -392,19 +392,19 @@ namespace SwarmRoboticsGUI
             }
             ApproxContours.Push(LargeContours);
 #if DEBUG
-            int counthex = 0;
-            noOflarge = LargeContours.Size;
+            int HexCount = 0;
+            int RobotCount = 0;
 #endif
             for (int i = 0; i < LargeContours.Size; i++)
             {
 
                 // Get approximate polygonal shape of contour
-                CvInvoke.ApproxPolyDP(LargeContours[i], ApproxContours[i], 3.0, true);
+                CvInvoke.ApproxPolyDP(LargeContours[i], ApproxContours[i], 5.0, true);
                 // Check if contour is the right shape (hexagon)
                 if (IsHexagon(ApproxContours[i]))
                 {
 #if DEBUG
-                    counthex++;
+                    HexCount++;
 #endif
                     int RobotID;
                     // Rectangular region that encompasses the contour
@@ -430,6 +430,9 @@ namespace SwarmRoboticsGUI
 
                         if (RobotID != -1)
                         {
+#if DEBUG
+                            RobotCount++;
+#endif
                             Point RelativeHeading = FindHeading(RobotImage);
                             if (RelativeHeading.X > 0 && RelativeHeading.Y > 0)
                                 RobotList[RobotID].Heading = new Point(RelativeHeading.X + RobotBounds.X, RelativeHeading.Y + RobotBounds.Y);
@@ -440,12 +443,21 @@ namespace SwarmRoboticsGUI
                     }
                 }
 #if DEBUG
-                noOfhex = counthex;
+                this.HexCount = HexCount;
+                this.RobotCount = RobotCount;
+                LargeContourCount = LargeContours.Size;
 #endif
             }
             return true;
         }
-
+        public void Dispose()
+        {
+            image.Dispose();
+            OverlayImage.Dispose();
+#if DEBUG
+            test.Dispose();
+#endif
+        }
     }// CLASS END
 
 }// NAMESPACE END

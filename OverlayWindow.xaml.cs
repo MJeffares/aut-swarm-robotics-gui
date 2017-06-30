@@ -41,9 +41,11 @@ namespace SwarmRoboticsGUI
             imgProc = new ImageProcessing();
             this.mainWindow = mainWindow;
             DataContext = this;
+
             ColourC = 1000;
             LowerS = 25;
-            FrameTimer = new Timer(50);
+
+            FrameTimer = new Timer(34);
             FrameTimer.Elapsed += Frame_Tick;
             FrameTimer.Start();
 
@@ -78,7 +80,8 @@ namespace SwarmRoboticsGUI
 
         private void Overlay_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-
+            FrameTimer.Dispose();
+            InterfaceTimer.Dispose();
         }
 
         private void btnClear_Click(object sender, RoutedEventArgs e)

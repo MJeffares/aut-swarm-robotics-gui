@@ -220,5 +220,12 @@ namespace SwarmRoboticsGUI
                 MessageBox.Show("No Currently Connected Camera!");
             }
         }
+
+        public void Dispose()
+        {
+            FpsTimer.Dispose();
+            videoCapture.Dispose();
+            Frame.Dispose();
+        }
     }
 }

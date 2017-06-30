@@ -31,9 +31,16 @@ namespace SwarmRoboticsGUI
         {
             captureImageBox.Image = mainWindow.captureImageBox.Image;
         }
-        private void CameraPopOutWindow_Closed(object sender, EventArgs e)
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            FrameTimer.Dispose();
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
         {
             mainWindow.ToggleCameraWindow();
         }
+
+        
     }
 }

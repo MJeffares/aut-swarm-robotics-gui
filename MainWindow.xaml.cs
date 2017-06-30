@@ -570,9 +570,6 @@ namespace SwarmRoboticsGUI
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            // BRAE: Implement child control
-            // This a thing in WPF?
-            // CONTROL YOUR CHILDREN MISTER
             if (PopoutWindow != null)
             {
                 PopoutWindow.Close();
@@ -581,6 +578,8 @@ namespace SwarmRoboticsGUI
             {
                 Overlay.Close();
             }
+            Overlay.imgProc.Dispose();
+            Camera1.Dispose();
         }
     }
 }
