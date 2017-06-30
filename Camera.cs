@@ -131,10 +131,10 @@ namespace SwarmRoboticsGUI
             {
                 videoCapture.Dispose();
             }
-            Status = StatusType.REPLAY_ACTIVE;
             videoCapture = new VideoCapture(path);
-            videoCapture.ImageGrabbed += ProcessFrame;
             Frame = new UMat();
+            videoCapture.ImageGrabbed += ProcessFrame;
+            Status = StatusType.REPLAY_ACTIVE;
             videoCapture.Start();
         }
         public void StartRecording(string path)

@@ -8,7 +8,7 @@
     xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
     
     mc:Ignorable="d"
-    Title="Swarm Robotics Graphics User Interface" Height="900" Width="1600" MinHeight="300" MinWidth="500" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+    Title="Swarm Robotics Graphics User Interface" Height="900" Width="1600" MinHeight="300" MinWidth="500" WindowStartupLocation="CenterScreen">
 
     <DockPanel x:Name="innerWin">
         <Menu DockPanel.Dock="Top" MouseEnter="menu_Hover" Height="21" MinWidth="300">

@@ -567,19 +567,5 @@ namespace SwarmRoboticsGUI
             MessageBox.Show("Sorry Placeholder");
         }
         #endregion
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if (PopoutWindow != null)
-            {
-                PopoutWindow.Close();
-            }
-            if (Overlay != null)
-            {
-                Overlay.Close();
-            }
-            Overlay.imgProc.Dispose();
-            Camera1.Dispose();
-        }
     }
 }
