@@ -314,6 +314,8 @@ namespace SwarmRoboticsGUI
 			FpsTimer.Interval = new TimeSpan(0, 0, 1);
 			FpsTimer.Start();
 
+			//Adds robots to display selection
+			//dispSelectRobot.ItemsSource = Enum.GetValues(typeof(XbeeHandler.robots));
 
 			//popoutCameraWindow = new CameraPopOutWindow();
 
@@ -1088,8 +1090,8 @@ namespace SwarmRoboticsGUI
 				cameraGridSplitter.IsEnabled = false;								//disable the grid splitter so window cannont be changed size until it is expanded
 
 				//update arrow direction
-				cameraArrowTop.Content = "  < ";
-				cameraArrowBottom.Content = "  <  ";
+				displayArrowTop.Content = "  < ";
+				displayArrowBottom.Content = "  <  ";
 			}
 			else if(_cameraWindowStatus == CameraWindowStatus.MINIMISED)
 			{
@@ -1099,8 +1101,8 @@ namespace SwarmRoboticsGUI
 				cameraGridSplitter.IsEnabled = true;										//re-enable the grid splitter so its size can be changed
 												
 				//update arrow direction
-				cameraArrowTop.Content = "   >";
-				cameraArrowBottom.Content = "   >";
+				displayArrowTop.Content = "   >";
+				displayArrowBottom.Content = "   >";
 			}
 		}
 
@@ -1117,8 +1119,8 @@ namespace SwarmRoboticsGUI
 				cameraGridSplitter.IsEnabled = false;                               //disable the grid splitter so window cannont be changed size until it is expanded
 
 				//update arrow direction
-				cameraArrowTop.Content = "  < ";
-				cameraArrowBottom.Content = "  <  ";
+				displayArrowTop.Content = "  < ";
+				displayArrowBottom.Content = "  <  ";
 				
 
 				//create and show the window
@@ -1136,8 +1138,8 @@ namespace SwarmRoboticsGUI
 				cameraGridSplitter.IsEnabled = true;                                        //re-enable the grid splitter so its size can be changed
 
 				//update arrow direction
-				cameraArrowTop.Content = "   >";
-				cameraArrowBottom.Content = "   >";
+				displayArrowTop.Content = "   >";
+				displayArrowBottom.Content = "   >";
 				
 			}
 		}
@@ -1152,5 +1154,32 @@ namespace SwarmRoboticsGUI
 		{
 			protocol.SendMessage(ProtocolClass.MESSAGE_TYPES.BATTERY_VOLTAGE);
 		}
+
+
+		/*
+		private void dispSelectBtnPrevious_Click(object sender, RoutedEventArgs e)
+		{
+			if(dispSelectRobot.SelectedIndex > 0)
+			{
+				dispSelectRobot.SelectedIndex--;
+			}
+			else if(dispSelectRobot.SelectedIndex == 0)
+			{
+				dispSelectRobot.SelectedIndex = dispSelectRobot.Items.Count - 1;
+			}
+		}
+
+		private void dispSelectBtnNext_Click(object sender, RoutedEventArgs e)
+		{
+			if(dispSelectRobot.SelectedIndex < dispSelectRobot.Items.Count -1)
+			{
+				dispSelectRobot.SelectedIndex++;
+			}
+			else if(dispSelectRobot.SelectedIndex == dispSelectRobot.Items.Count - 1)
+			{
+				dispSelectRobot.SelectedIndex = 0;
+			}
+		}
+		*/
 	}
 }

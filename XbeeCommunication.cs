@@ -98,14 +98,19 @@ public class XbeeHandler
 
 	public static class DESTINATION
 	{
-		private const UInt32 SERIAL_NUMBER_HIGH = 0x0013A200;
+		//private const UInt32 SERIAL_NUMBER_HIGH = 0x0013A200;
 
 
 		public const UInt64 COORDINATOR = 0x0000000000000000;
 		public const UInt64 BROADCAST = 0x000000000000FFFF;
 
-		public const UInt64 ROBOT_ONE = SERIAL_NUMBER_HIGH * 2 ^ 32 + 0x41065FB3;
+		//public const UInt64 ROBOT_ONE = SERIAL_NUMBER_HIGH * 2 ^ 32 + 0x41065FB3;
+		public const UInt64 ROBOT_ONE = 0x0013A20041065FB3;
 	}
+
+	public enum robots : UInt64 {	COORDINATOR = 0x0000000000000000,
+									BROADCAST = 0x000000000000FFFF,
+									ROBOT_ONE = 0x0013A20041065FB3 }
 
 	public static class FRAME_STATUS
 	{
