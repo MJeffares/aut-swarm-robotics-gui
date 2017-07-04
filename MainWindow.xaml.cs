@@ -328,6 +328,10 @@ namespace SwarmRoboticsGUI
 				rtbSerial.AppendText(selectFolderDialog.FileName.ToString());
 			}
 			*/
+
+
+			//lvCommunicatedMessages.ItemsSource = serial.communicatedMessages;
+
 		}
 
 
@@ -1156,7 +1160,7 @@ namespace SwarmRoboticsGUI
 		}
 
 
-		/*
+		
 		private void dispSelectBtnPrevious_Click(object sender, RoutedEventArgs e)
 		{
 			if(dispSelectRobot.SelectedIndex > 0)
@@ -1180,6 +1184,6 @@ namespace SwarmRoboticsGUI
 				dispSelectRobot.SelectedIndex = 0;
 			}
 		}
-		*/
+		
 	}
 }
