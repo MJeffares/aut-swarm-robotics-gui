@@ -66,6 +66,8 @@ namespace SwarmRoboticsGUI
             {
                 // update the capture object           
                 videoCapture = new VideoCapture(Index);
+                //videoCapture.SetCaptureProperty(CapProp.FrameHeight, 720);
+                //videoCapture.SetCaptureProperty(CapProp.FrameWidth, 1280);
                 // create a new matrix to hold our image
                 Frame = new UMat();
                 // add event handler for our new capture  
@@ -147,8 +149,8 @@ namespace SwarmRoboticsGUI
                 //recordsize.Width = recordframewidth;
                 //recordsize.Height = recordframeheight;
                 System.Drawing.Size recordsize = new System.Drawing.Size();
-                recordsize.Width = 640;
-                recordsize.Height = 480;
+                recordsize.Width = 1280;
+                recordsize.Height = 720;
 
                 // TODO: Fix recording
                 videoWriter = new VideoWriter(path, -1, 30, recordsize, true);

@@ -7,10 +7,10 @@
         xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
         mc:Ignorable="d"
         
-        Title="Swarm Robotics Camera Feed" Height="500" Width="640" Closed="Window_Closed">
+        Title="Swarm Robotics Camera Feed" Closed="Window_Closed" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
     <Grid>
         <WindowsFormsHost Grid.Column="1" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,0,0,0" Visibility="Visible">
-            <em:ImageBox x:Name="captureImageBox" Height="640" Width="480" SizeMode="StretchImage" FunctionalMode="Minimum"/>
+            <em:ImageBox x:Name="captureImageBox" SizeMode="AutoSize" FunctionalMode="Minimum"/>
         </WindowsFormsHost>
     </Grid>
 </Window>
