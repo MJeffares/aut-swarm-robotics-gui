@@ -63,6 +63,82 @@ public static class ExtensionMethod
 static class MJLib
 {
 	/// <summary>
+	/// Converts a byte to hexidecimal string
+	/// </summary>
+	/// <param name="data">Sender object from handler</param>
+	/// <param name="prefix">If true will prefix string with "0x"</param>
+	/// <returns>A string</returns>
+	public static string HexToString(byte data, bool prefix)
+	{
+		string messageString = null;    //temporary string to hold results
+
+		//if 0x prefix is required
+		if (prefix)
+		{
+			messageString += "0x";
+		}
+
+		//by default if byte is less than 0x10 the leading zero isnt added we amnmend this
+		string temp = data.ToString("X");		
+		if (data < 0x10)
+		{
+			messageString += "0";
+			messageString += temp;
+		}
+		else
+		{
+			messageString += temp;
+		}
+
+		return messageString;
+	}
+	/// <summary>
+	/// Converts a byte array to hexidecimal string
+	/// </summary>
+	/// <param name="data">Sender object from handler</param>
+	/// <param name="index">Index of byte array to start at</param>
+	/// <param name="length">Number of bytes from index to convert</param>
+	/// <param name="prefix">If true will prefix string with "0x"</param>
+	/// <returns>A string</returns>
+	public static string HexToString(byte[] data, int index, int length, bool prefix)
+	{
+		//if there is nothing to convert we return null
+		if (data == null)
+		{
+			return null;
+		}
+		else
+		{
+			string messageString = null;	//temporary string to hold results
+
+			//if 0x prefix is required
+			if(prefix)
+			{
+				messageString += "0x";
+			}
+
+			//loop does the conversion
+			for (int i = index; i < index+length ; i++)
+			{
+				//by default if byte is less than 0x10 the leading zero isnt added we amnmend this
+				string temp = data[i].ToString("X");				
+				if (data[i] < 0x10)
+				{
+					messageString += "0";
+					messageString += temp;
+				}
+				else
+				{
+					messageString += temp;
+				}
+			}
+			return messageString;
+		}
+	}
+
+
+
+	/// <summary>
 	/// Handles exclusively checking a menu item within a list
 	/// </summary>
 	/// <param name="sender">Sender object from handler</param>

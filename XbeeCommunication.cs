@@ -488,6 +488,7 @@ public class XbeeHandler
 					length +=  window.serial.rxBuffer.Dequeue();
 					data = new byte[length];
 					check = 0;
+					window.serial.NewestMessage.frame_length = length;
 					_receiveState = ReceiveStates.WAIT;
 					break;
 
@@ -503,19 +504,30 @@ public class XbeeHandler
 					break;
 
 				case ReceiveStates.DATA:
+					
 					for (int i = 0; i < length; i++)
 					{
 						data[i] = window.serial.rxBuffer.Dequeue();
 						check += data[i];
+						//window.serial.NewestMessage.frame_checksum = data[i];
 					}
 
-
-					check += window.serial.rxBuffer.Dequeue();
+					//check += window.serial.rxBuffer.Dequeue();
+					window.serial.NewestMessage.frame_checksum = window.serial.rxBuffer.Dequeue();
+					check += window.serial.NewestMessage.frame_checksum;
 
 					if ((byte)(check) == 0xFF)
 					{
 						//window.UpdateSerialReceivedTextBox("\rXbee Message Received\r");
 						_receiveState = ReceiveStates.START;
+						window.serial.NewestMessage.frame_cmd_ID = data[0];
+
+						byte[] temp = new byte[data.Length - 1];
+						
+						Array.Copy(data, 1,temp, 0, data.Length - 1);
+						window.serial.NewestMessage.command_data = temp;
+						//window.serial.NewestMessage.command_data = data;
+
 						return data;
 
 					}
@@ -611,6 +623,17 @@ public class XbeeHandler
 
 					//XXXX
 					//call swarm serial function passing "xbeeData" too it
+					window.serial.NewestMessage.message_type = rawMessage[0];
+					//Array.Copy(rawMessage, 1, window.serial.NewestMessage.message_data, 0, rawMessage.Length - 1);
+
+					byte[] temp = new byte[rawMessage.Length - 1];
+
+					Array.Copy(rawMessage, 1, temp, 0, rawMessage.Length - 1);
+					window.serial.NewestMessage.message_data = temp;
+
+
+
+
 					window.protocol.MessageReceived(rawMessage);
 					//window.protocol.MessageReceived(xbeeData);
 

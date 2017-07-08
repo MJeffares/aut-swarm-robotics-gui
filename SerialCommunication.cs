@@ -53,7 +53,7 @@ using System.Windows.Input;
 
 public class SerialUARTCommunication
 {
-	
+
 
 	//supported serial port settings
 	private string[] baudRateOptions = new string[] { "4800", "9600", "19200", "38400", "57600", "115200", "230400", "460800", "921600" };
@@ -69,7 +69,7 @@ public class SerialUARTCommunication
 	private const string DEFAULT_DATA_BITS = "8";
 	private const string DEFAULT_STOP_BITS = "One";
 	private const string DEFAULT_HANDSHAKING = "None";
-	
+
 
 	//menu Items
 	MenuItem portList = null;
@@ -86,8 +86,14 @@ public class SerialUARTCommunication
 	public SerialPort _serialPort;
 	public Queue<byte> rxBuffer;
 	private string currentlyConnectedPort = null;
+	public List<communicated_message> communicatedMessages;
+	private communicated_message newestMessage;
 
-
+	public communicated_message NewestMessage
+	{
+		get { return newestMessage; }
+		set { newestMessage = value; }
+	}
 
 	//constructor
 	public SerialUARTCommunication(MainWindow main, MenuItem port, MenuItem baud, MenuItem parity, MenuItem data, MenuItem stop, MenuItem handshaking, MenuItem connect)
@@ -103,6 +109,13 @@ public class SerialUARTCommunication
 
 		rxBuffer = new Queue<byte>();
 		_serialPort = new SerialPort();
+		communicatedMessages = new List<communicated_message>();
+
+		newestMessage = new communicated_message() { time_stamp = DateTime.Now };
+		communicatedMessages.Add(newestMessage);
+		window.UpdateListViewBinding(communicatedMessages);
+		communicatedMessages.Clear();
+		window.RefreshListView();
 
 		PopulateSerialSettings();
 		PopulateSerialPorts();
@@ -316,14 +329,22 @@ public class SerialUARTCommunication
 			rxBuffer.Enqueue(indata[i]);
 		}
 
-		
+
 		//avoid's threading error
-        //XXXX this will print the raw data to the display
+		//XXXX this will print the raw data to the display
 		//window.UpdateSerialReceivedTextBox(indata, bytes);
+
+		newestMessage = new communicated_message() { time_stamp = DateTime.Now, raw_message = indata };
+		communicatedMessages.Add(newestMessage);
+		//window.lvCommunicatedMessages.ItemsSource = communicatedMessages;
+		//window.UpdateListView(communicatedMessages);
+		window.RefreshListView();
+
 
 		window.xbee.InterperateXbeeFrame();
 
 	}
+
 }
 
 
@@ -333,9 +354,177 @@ public class SerialUARTCommunication
 
 namespace SwarmRoboticsGUI
 {
+	public class communicated_message
+	{
+		public DateTime time_stamp { get; set; }
+
+		public byte[] raw_message { get; set; }
+		
+		public int frame_length { get; set; }
+
+		public byte frame_cmd_ID { get; set; }
+		public byte[] command_data { get; set; }
+		public byte frame_checksum { get; set; }
+
+		public byte[] source16 { get; set; }
+		public byte[] source64 { get; set; }
+
+		public byte message_type { get; set; }
+		public byte[] message_data { get; set; }
+
+		public string  RawMessageDisplay
+		{
+			get
+			{
+				return MJLib.HexToString(raw_message, 0, frame_length + 4, false);
+			}
+		}
+
+		public string FrameLengthDisplay
+		{
+			get
+			{
+				return MJLib.HexToString(BitConverter.GetBytes(frame_length), 0, 1, true) + "," + frame_length.ToString();
+			}
+		}
+
+		public string FrameCommandIDDisplay	//display in words
+		{
+			get
+			{
+				return MJLib.HexToString(frame_cmd_ID, true);
+				//return frame_cmd_ID.ToString("X");
+			}
+		}
+
+		public string CommandDataDisplay
+		{
+			get
+			{
+				return MJLib.HexToString(raw_message, 0, frame_length, false);
+
+				/*
+				string messageString = null;
+
+				for (int i = 0; i < this.frame_length; i++)
+				{
+					string temp = raw_message[i].ToString("X");
+
+					if (raw_message[i] < 0x10)
+					{
+						messageString += "0";
+						messageString += temp;
+					}
+					else
+					{
+						messageString += temp;
+					}
+
+				}
+
+				return messageString;	*/
+			}
+		}
+
+		public string FrameChecksumDisplay
+		{
+			get
+			{
+				return MJLib.HexToString(frame_checksum, true);
+			}
+		}
+
+		public string Source16Display
+		{
+			get
+			{
+				return MJLib.HexToString(source16, 0, 2, true);
+			}
+		}
+
+		public string Source64Display
+		{
+			get
+			{
+				return MJLib.HexToString(source64, 0, 8, false);
+			}
+		}
+
+		public string MessageTypeDisplay //display in words
+		{
+			get
+			{
+				return message_type.ToString("X");
+			}
+		}
+
+		public string MessageDataDisplay
+		{
+			get
+			{
+				//return MJLib.HexToString(message_data, 15, frame_length - 14, false);
+
+				
+
+				string messageString = null;
+
+				for (int i = 15; i < frame_length - 14 ; i++)
+				{
+					string temp = message_data[i].ToString("X");
+
+					if (source16[i] < 0x10)
+					{
+						messageString += "0";
+						messageString += temp;
+					}
+					else
+					{
+						messageString += temp;
+					}
+
+				}
+
+				return messageString;	
+			}
+		}
+
+	}
+
+
+
 	public partial class MainWindow : Window
 	{
-	
+		public delegate void RefreshListViewCallback();
+
+		public void RefreshListView()
+		{
+			lvCommunicatedMessages.Dispatcher.Invoke(new RefreshListViewCallback(this.Refresh));
+		}
+
+		private void Refresh()
+		{
+			lvCommunicatedMessages.Items.Refresh();
+		}
+
+		public delegate void UpdateListViewBindingCallback(List<communicated_message> messages);
+
+		public void UpdateListViewBinding(List<communicated_message> messages)
+		{
+			lvCommunicatedMessages.Dispatcher.Invoke(new UpdateListViewBindingCallback(this.UpdateBinding), new object[] { messages });
+		}
+
+		private void UpdateBinding(List<communicated_message> messages)
+		{
+			DataContext = this;
+			lvCommunicatedMessages.ItemsSource = messages;
+			lvCommunicatedMessages.Items.Refresh();
+		}
+
+
+
+
+
+
 
 		public delegate void UpdateTextCallback(string text);
 

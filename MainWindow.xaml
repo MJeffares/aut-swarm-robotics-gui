@@ -165,8 +165,8 @@
                         <GridViewColumn Header="Raw Data" DisplayMemberBinding="{Binding RawMessageDisplay}"/>
                         <GridViewColumn Header="Xbee Frame Length" DisplayMemberBinding="{Binding FrameLengthDisplay}"/>
                         <GridViewColumn Header="Xbee Frame ID" DisplayMemberBinding="{Binding FrameCommandIDDisplay}"/>
-                        <GridViewColumn Header="Xbee Frame Data" DisplayMemberBinding="{Binding command_data}"/>
-                        <GridViewColumn Header="Xbee Frame Checksum" DisplayMemberBinding="{Binding FameChecksumDisplay}"/>
+                        <GridViewColumn Header="Xbee Frame Data" DisplayMemberBinding="{Binding CommandDataDisplay}"/>
+                        <GridViewColumn Header="Xbee Frame Checksum" DisplayMemberBinding="{Binding FrameChecksumDisplay}"/>
                         <GridViewColumn Header="16-Bit Source Address" DisplayMemberBinding="{Binding Source16Display}"/>
                         <GridViewColumn Header="64-Bit Source Address" DisplayMemberBinding="{Binding Source64Display}"/>
                         <GridViewColumn Header="Message Type" DisplayMemberBinding="{Binding MessageTypeDisplay}"/>
