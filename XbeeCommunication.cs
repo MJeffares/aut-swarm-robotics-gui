@@ -47,7 +47,7 @@ using System.Windows.Threading;
 
 
 
-/**********************************************************************************************************************************************
+/***************************************************************************************************************************************
 * Structures and Classes
 **********************************************************************************************************************************************/
 #region
@@ -98,14 +98,19 @@ public class XbeeHandler
 
 	public static class DESTINATION
 	{
-		private const UInt32 SERIAL_NUMBER_HIGH = 0x0013A200;
+		//private const UInt32 SERIAL_NUMBER_HIGH = 0x0013A200;
 
 
 		public const UInt64 COORDINATOR = 0x0000000000000000;
 		public const UInt64 BROADCAST = 0x000000000000FFFF;
 
-		public const UInt64 ROBOT_ONE = SERIAL_NUMBER_HIGH * 2 ^ 32 + 0x41065FB3;
+		//public const UInt64 ROBOT_ONE = SERIAL_NUMBER_HIGH * 2 ^ 32 + 0x41065FB3;
+		public const UInt64 ROBOT_ONE = 0x0013A20041065FB3;
 	}
+
+	public enum robots : UInt64 {	COORDINATOR = 0x0000000000000000,
+									BROADCAST = 0x000000000000FFFF,
+									ROBOT_ONE = 0x0013A20041065FB3 }
 
 	public static class FRAME_STATUS
 	{
@@ -295,6 +300,8 @@ public class XbeeHandler
 		return list.ToArray();
 	}
 
+	bool escapeCarryOver = false;
+
 	public byte[] DeEscape(byte[] Frame_To_DeEscape)
 	{
 		Queue<byte> temp = new Queue<byte>();
@@ -306,7 +313,20 @@ public class XbeeHandler
 			if (Frame_To_DeEscape[i] == 0x7D)
 			{
 				i++;
+
+				if (i >= Frame_To_DeEscape.Length)
+				{
+					escapeCarryOver = true;
+				}
+				else
+				{
+					temp.Enqueue((byte)(Frame_To_DeEscape[i] ^ 0x20));
+				}
+			}
+			else if(escapeCarryOver)
+			{
 				temp.Enqueue((byte)(Frame_To_DeEscape[i] ^ 0x20));
+				escapeCarryOver = false;
 			}
 			else
 			{
@@ -386,9 +406,12 @@ public class XbeeHandler
 		frame_data[0] = API_FRAME.ZIGBEE_TRANSMIT_REQUEST;
 		frame_data[1] = 200;
 
-		byte[] destination_address_64 = BitConverter.GetBytes(destination);
+		//byte[] destination_address_64 = BitConverter.GetBytes(destination);
 
-		destination_address_64.CopyTo(frame_data, 2);
+		//destination_address_64.CopyTo(frame_data, 2);
+
+		frame_data[8] = 0xFF;
+		frame_data[9] = 0xFF;
 
 		byte[] destination_address_16 = { 0xFF, 0xFE };
 
@@ -420,9 +443,10 @@ public class XbeeHandler
 	static private class ReceiveStates
 	{
 		public const int START = 0;
-		public const int LENGTH = 1;
-		public const int WAIT = 2;
-		public const int DATA = 3;
+		public const int LENGTH_MSB = 1;
+		public const int LENGTH_LSB = 2;
+		public const int WAIT = 3;
+		public const int DATA = 4;
 
 	}
 
@@ -450,16 +474,20 @@ public class XbeeHandler
 				case ReceiveStates.START:
 					if (window.serial.rxBuffer.Dequeue() == FRAME_DELIMITER)
 					{
-						_receiveState = ReceiveStates.LENGTH;
+						_receiveState = ReceiveStates.LENGTH_MSB;
 					}
 					break;
 
-				case ReceiveStates.LENGTH:
+				case ReceiveStates.LENGTH_MSB:
 					length = 0;
-					length = window.serial.rxBuffer.Dequeue() * 256 + window.serial.rxBuffer.Dequeue();
+					length = window.serial.rxBuffer.Dequeue() * 256;
+					_receiveState = ReceiveStates.LENGTH_LSB;
+					break;
+
+				case ReceiveStates.LENGTH_LSB:
+					length +=  window.serial.rxBuffer.Dequeue();
 					data = new byte[length];
 					check = 0;
-
 					_receiveState = ReceiveStates.WAIT;
 					break;
 
@@ -559,23 +587,23 @@ public class XbeeHandler
 			{
 
 				case API_FRAME.AT_COMMAND_RESPONSE:
-					window.UpdateSerialReceivedTextBox("\rXBEE: AT Command Response Received (N/H)\r");
+					window.UpdateSerialReceivedTextBox("\rXBEE: AT Command Response Received (N/H)");
 					break;
 
 
 				case API_FRAME.MODEM_STATUS:
-					window.UpdateSerialReceivedTextBox("\rXBEE: Modem Status Received (N/H)\r");
+					window.UpdateSerialReceivedTextBox("\rXBEE: Modem Status Received (N/H)");
 					break;
 
 
 				case API_FRAME.ZIGBEE_TRANSMIT_STATUS:
-					window.UpdateSerialReceivedTextBox("\rXBEE: Transmit Status Received (N/H)\r");
+					window.UpdateSerialReceivedTextBox("\rXBEE: Transmit Status Received (N/H)");
 					break;
 
 
 				case API_FRAME.ZIGBEE_RECEIVE_PACKET:
 
-					window.UpdateSerialReceivedTextBox("\rXBEE: Data Packet Received \r");
+					window.UpdateSerialReceivedTextBox("\rXBEE: Data Packet Received ");
 
 					byte[] rawMessage = new byte[xbeeData.Length - 12];
 
@@ -590,51 +618,51 @@ public class XbeeHandler
 
 
 				case API_FRAME.ZIGBEE_EXPLICIT_RX_INDICATOR:
-					window.UpdateSerialReceivedTextBox("\rXBEE: Explicit Data Packet Received (N/H)\r");
+					window.UpdateSerialReceivedTextBox("\rXBEE: Explicit Data Packet Received (N/H)");
 					break;
 
 
 				case API_FRAME.ZIGBEE_IO_DATA_SAMPLE_RX_INDICATOR:
-					window.UpdateSerialReceivedTextBox("\rXBEE: IO Sample Received (N/H)\r");		
+					window.UpdateSerialReceivedTextBox("\rXBEE: IO Sample Received (N/H)");		
 					break;
 
 
 				case API_FRAME.XBEE_SENSOR_READ_INDICATOR:
-					window.UpdateSerialReceivedTextBox("\rXBEE: Sensor Read Indicator Received (N/H)\r");		
+					window.UpdateSerialReceivedTextBox("\rXBEE: Sensor Read Indicator Received (N/H)");		
 					break;
 
 
 				case API_FRAME.NODE_IDENTIFICATION_INDICATOR:
-					window.UpdateSerialReceivedTextBox("\rXBEE: Node Identification Indicator Received (N/H)\r");
+					window.UpdateSerialReceivedTextBox("\rXBEE: Node Identification Indicator Received (N/H)");
 					break;
 
 
 				case API_FRAME.REMOTE_COMMAND_RESPONSE:
-					window.UpdateSerialReceivedTextBox("\rXBEE: Remote Command Response Received (N/H)\r");
+					window.UpdateSerialReceivedTextBox("\rXBEE: Remote Command Response Received (N/H)");
 					break;
 
 
 				case API_FRAME.EXTENDED_MODEM_STATUS:
-					window.UpdateSerialReceivedTextBox("\rXBEE: Extended Modem Status Received (N/H)\r");
+					window.UpdateSerialReceivedTextBox("\rXBEE: Extended Modem Status Received (N/H)");
 					break;
 
 
 				case API_FRAME.OTA_FIRMWARE_UPDATE_STATUS:
-					window.UpdateSerialReceivedTextBox("\rXBEE: OTA Firmware Update Status Received (N/H)\r");
+					window.UpdateSerialReceivedTextBox("\rXBEE: OTA Firmware Update Status Received (N/H)");
 					break;
 
 
 				case API_FRAME.ROUTE_RECORD_INDICATOR:
-					window.UpdateSerialReceivedTextBox("\rXBEE: Route Record Indicator Received (N/H)\r");
+					window.UpdateSerialReceivedTextBox("\rXBEE: Route Record Indicator Received (N/H)");
 					break;
 
 
 				case API_FRAME.MANY_TO_ONE_ROUTE_REQUEST_INDICATOR:
-					window.UpdateSerialReceivedTextBox("\rXBEE: Many To One Route Request Indicator Received (N/H)\r");
+					window.UpdateSerialReceivedTextBox("\rXBEE: Many To One Route Request Indicator Received (N/H)");
 					break;
 
 				default:
-					window.UpdateSerialReceivedTextBox("\rWARNING ERROR XBEE: unhandled message received\r");
+					window.UpdateSerialReceivedTextBox("\rWARNING ERROR XBEE: unhandled message received");
 					break;
 			}
 

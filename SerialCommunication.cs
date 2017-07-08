@@ -126,60 +126,67 @@ public class SerialUARTCommunication
 	}
 	public void PopulateSerialPorts()
 	{
-		connectButton.IsEnabled = false;
-		string[] ports = SerialPort.GetPortNames();
-		portList.Items.Clear();
-
-		for (int i = 0; i < ports.Length; i++)
+		if (!_serialPort.IsOpen)
 		{
-			MenuItem item = new MenuItem { Header = ports[i] };
-			item.Click += new RoutedEventHandler(menuCommunicationPortListItem_Click);
-			item.IsCheckable = true;
 
-			portList.Items.Add(item);
-
-			if(item.ToString() == currentlyConnectedPort)
-			{
-				item.IsChecked = true;
-				connectButton.IsEnabled = true;
-			}
-		}
-
-		if (portList.Items.Count == 0)
-		{
-			MenuItem nonefound = new MenuItem { Header = "No Com Ports Found" };
-			portList.Items.Add(nonefound);
-			nonefound.IsEnabled = false;
 			connectButton.IsEnabled = false;
+			string[] ports = SerialPort.GetPortNames();
+			portList.Items.Clear();
+
+			for (int i = 0; i < ports.Length; i++)
+			{
+				MenuItem item = new MenuItem { Header = ports[i] };
+				item.Click += new RoutedEventHandler(menuCommunicationPortListItem_Click);
+				item.IsCheckable = true;
+
+				portList.Items.Add(item);
+
+				if (item.ToString() == currentlyConnectedPort)
+				{
+					item.IsChecked = true;
+					connectButton.IsEnabled = true;
+				}
+			}
+
+			if (portList.Items.Count == 0)
+			{
+				MenuItem nonefound = new MenuItem { Header = "No Com Ports Found" };
+				portList.Items.Add(nonefound);
+				nonefound.IsEnabled = false;
+				connectButton.IsEnabled = false;
+			}
 		}
 	}
 	public void PopulateSerialPorts(object sender, MouseEventArgs e)
 	{
-		connectButton.IsEnabled = false;
-		string[] ports = SerialPort.GetPortNames();
-		portList.Items.Clear();
-
-		for (int i = 0; i < ports.Length; i++)
+		if (!_serialPort.IsOpen)
 		{
-			MenuItem item = new MenuItem { Header = ports[i] };
-			item.Click += new RoutedEventHandler(menuCommunicationPortListItem_Click);
-			item.IsCheckable = true;
-
-			portList.Items.Add(item);
-
-			if (item.ToString() == currentlyConnectedPort)
-			{
-				item.IsChecked = true;
-				connectButton.IsEnabled = true;
-			}
-		}
-
-		if (portList.Items.Count == 0)
-		{
-			MenuItem nonefound = new MenuItem { Header = "No Com Ports Found" };
-			portList.Items.Add(nonefound);
-			nonefound.IsEnabled = false;
 			connectButton.IsEnabled = false;
+			string[] ports = SerialPort.GetPortNames();
+			portList.Items.Clear();
+
+			for (int i = 0; i < ports.Length; i++)
+			{
+				MenuItem item = new MenuItem { Header = ports[i] };
+				item.Click += new RoutedEventHandler(menuCommunicationPortListItem_Click);
+				item.IsCheckable = true;
+
+				portList.Items.Add(item);
+
+				if (item.ToString() == currentlyConnectedPort)
+				{
+					item.IsChecked = true;
+					connectButton.IsEnabled = true;
+				}
+			}
+
+			if (portList.Items.Count == 0)
+			{
+				MenuItem nonefound = new MenuItem { Header = "No Com Ports Found" };
+				portList.Items.Add(nonefound);
+				nonefound.IsEnabled = false;
+				connectButton.IsEnabled = false;
+			}
 		}
 	}
 	private void menuCommunicationPortListItem_Click(object sender, RoutedEventArgs e)
@@ -274,7 +281,7 @@ public class SerialUARTCommunication
 		byte[] indata = new byte[bytes];
 
 		sp.Read(indata, 0, bytes);
-		
+
 		indata = window.xbee.DeEscape(indata);
 		bytes = indata.Length;
 
@@ -286,7 +293,8 @@ public class SerialUARTCommunication
 
 		
 		//avoid's threading error
-		window.UpdateSerialReceivedTextBox(indata, bytes);
+        //XXXX this will print the raw data to the display
+		//window.UpdateSerialReceivedTextBox(indata, bytes);
 
 		window.xbee.InterperateXbeeFrame();
 

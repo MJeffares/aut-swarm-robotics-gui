@@ -21,9 +21,10 @@
                 <MenuItem x:Name="menuRecordingSettings" Header="Recording Settings" />
             </MenuItem>
 
-            <MenuItem Header="Display" MouseEnter="menu_Hover" Click="menu_Hover">
-                <MenuItem x:Name="menuFilterList" Header="Filters" MouseEnter="menu_Hover" Click="menu_Hover"/>
-                <MenuItem x:Name="menuOverlayList" Header="Overlays" MouseEnter="menu_Hover" Click="menu_Hover">
+            <MenuItem Header="Display" MouseEnter="menu_hover" Click="menu_hover">
+                <MenuItem x:Name="menuViewList" Header="View"/>
+                <MenuItem x:Name="menuFilterList" Header="Camera Filters" MouseEnter="menu_hover" Click="menu_hover"/>
+                <MenuItem x:Name="menuOverlayList" Header="Overlays" MouseEnter="menu_hover" Click="menu_hover">
                     <MenuItem x:Name="menuOverlayNone" Header="No Overlay" IsCheckable="True" IsChecked="True" Click="menuPlaceHolder_Click"/>
                     <MenuItem x:Name="menuOverlayPlaceHolderOne" Header="PlaceHolder" IsCheckable="True" Click="menuPlaceHolder_Click"/>
                     <MenuItem x:Name="menuFilterPlaceHolderTwo" Header="PlaceHolder" IsCheckable="True" Click="menuPlaceHolder_Click"/>
@@ -135,9 +136,13 @@
                 <ColumnDefinition x:Name="Column3" Width="2*"/>
             </Grid.ColumnDefinitions>
 
+            <Grid.RowDefinitions>
+                <RowDefinition x:Name="Row0" Height="3*"/>
+                <RowDefinition x:Name="Row1" Height="1*"/>
+            </Grid.RowDefinitions>
 
 
-            <Grid Grid.Column="0">
+            <Grid Grid.Column="0" Grid.RowSpan="1">
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -149,13 +154,28 @@
                 <WrapPanel Grid.Row="1">
                     <Button x:Name="receivedDataNewline" Content="/n" Margin="10" Click="receivedDataNewline_Click"/>
                     <Button x:Name="receivedDataClear" Content="clear" Margin="10" Click="receivedDataClear_Click"/>
-                    <Button Content="Placeholder Freeze" Margin="10"/>
+                    <!--<Button Content="Placeholder Freeze" Margin="10"/>-->
                 </WrapPanel>
+
                 <RichTextBox Grid.Row="2" x:Name="rtbSerialReceived" Margin="10,10,10,10" VerticalScrollBarVisibility="Visible" IsReadOnly="True" Height="Auto" Width="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
-
             </Grid>
+            <ListView Name="lvCommunicatedMessages" Grid.Column="0" Grid.Row="2" Margin="5">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="TimeStamp" DisplayMemberBinding="{Binding time_stamp}"/>
+                        <GridViewColumn Header="Raw Data" DisplayMemberBinding="{Binding RawMessageDisplay}"/>
+                        <GridViewColumn Header="Xbee Frame Length" DisplayMemberBinding="{Binding FrameLengthDisplay}"/>
+                        <GridViewColumn Header="Xbee Frame ID" DisplayMemberBinding="{Binding FrameCommandIDDisplay}"/>
+                        <GridViewColumn Header="Xbee Frame Data" DisplayMemberBinding="{Binding command_data}"/>
+                        <GridViewColumn Header="Xbee Frame Checksum" DisplayMemberBinding="{Binding FameChecksumDisplay}"/>
+                        <GridViewColumn Header="16-Bit Source Address" DisplayMemberBinding="{Binding Source16Display}"/>
+                        <GridViewColumn Header="64-Bit Source Address" DisplayMemberBinding="{Binding Source64Display}"/>
+                        <GridViewColumn Header="Message Type" DisplayMemberBinding="{Binding MessageTypeDisplay}"/>
+                        <GridViewColumn Header="Message Data" DisplayMemberBinding="{Binding MessageDataDisplay}"/>
 
-
+                    </GridView>
+                </ListView.View>
+            </ListView>
 
             <DockPanel Grid.Column="1">
                 <StatusBar DockPanel.Dock="Right" Background="Transparent" Margin="10,0,0,0">
@@ -173,13 +193,13 @@
                         </ItemsPanelTemplate>
                     </StatusBar.ItemsPanel>
 
-                    <StatusBarItem Grid.Row="1" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0" MouseDown="btnCameraMinimise_Click" Width="22" Height="16">
-                        <Label x:Name="cameraArrowTop" Content="   >" Padding="0"/>
+                    <StatusBarItem Grid.Row="1" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0" MouseDown="CameraMinimise" Width="22" Height="16">
+                        <Label x:Name="displayArrowTop" Content="   >" Padding="0"/>
                     </StatusBarItem>
 
                     <StatusBarItem Grid.Row="2" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0" MouseDown="btnCameraMinimise_Click"  Width="22" Height="46">
 
-                        <Label Content="Camera" Padding="3">
+                        <Label Content="Display" Padding="3">
                             <Label.LayoutTransform>
                                 <RotateTransform Angle="270" />
                             </Label.LayoutTransform>
@@ -187,85 +207,158 @@
 
                     </StatusBarItem>
 
-                    <StatusBarItem Grid.Row="3" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0" MouseDown="btnCameraMinimise_Click" Width="22" Height="16">
-                        <Label x:Name="cameraArrowBottom" Content="   >" Padding="0"/>
+                    <StatusBarItem Grid.Row="3" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0" MouseDown="CameraMinimise" Width="22" Height="16">
+                        <Label x:Name="displayArrowBottom" Content="   >" Padding="0"/>
                     </StatusBarItem>
 
 
                 </StatusBar>
+
                 <TabControl>
-                    <TabItem Header="Serial Communication">
-                        <Grid>
-
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Grid.Column="0" Text="Data to Send:" HorizontalAlignment="Left" Margin="10"/>
-                            <RichTextBox Grid.Column="1" x:Name="rtbSendBuffer" Margin="10" HorizontalAlignment="Stretch" Width="Auto"/>
-                            <Button Grid.Column="2" Content="Send" x:Name="btnSerialSend" Margin="10" Click="Button_Click" HorizontalAlignment="Right"/>
-
-                            <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Text="Sent Data" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10,00,10,0"/>
-                            <RichTextBox Grid.Row="2" Grid.ColumnSpan="3" x:Name="rtbSerialSent" Margin="30,10,30,30" IsReadOnly="True" Height="Auto"/>
-
-                        </Grid>
-                    </TabItem>
-
-                    <TabItem Header="Xbee Communication">
-                        <Grid>
-
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Grid.Column="0" Text="Message Data:" HorizontalAlignment="Left" Margin="10"/>
-                            <RichTextBox Grid.Column="1" x:Name="rtbXbeeSendBuffer" Margin="10" HorizontalAlignment="Stretch" Width="Auto"/>
-                            <Button Grid.Column="2" Content="Send" x:Name="btnXbeeSend" Margin="10"  HorizontalAlignment="Right" Click="btnXbeeSend_Click"/>
-
-                            <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Text="Sent Data" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10,00,10,0"/>
-                            <RichTextBox Grid.Row="2" Grid.ColumnSpan="3" x:Name="rtbXbeeSent" Margin="30,10,30,30" IsReadOnly="True" Height="Auto"/>
-
-                        </Grid>
-                    </TabItem>
-
-                    <TabItem Header="Robot">
-                        <WrapPanel>
-                            <Button Grid.Column="2" Content="Communication Test" x:Name="btnCommunicationTest" Margin="10" Click="btnCommunicationTest_Click" />
+                    <TabItem Header="Robot Control">
+                        <WrapPanel Orientation="Vertical">
+                            <Button Content="Communication Test"  Margin="10" />
+                            <Button Content="Battery Voltage"  Margin="10" />
                         </WrapPanel>
                     </TabItem>
 
-                    <TabItem Header="Placeholder"/>
-                    <TabItem Header="Placeholder"/>
+                    <TabItem Header="Tower Control">
+
+                    </TabItem>
+
+
+
+                    <TabItem Header="Debug">
+                        <TabControl Margin="5" TabStripPlacement="Left">
+
+                            <!-- The following code alllows vertical tabs -->
+                            <TabControl.Resources>
+                                <Style TargetType="{x:Type TabItem}">
+                                    <Setter Property="HeaderTemplate">
+                                        <Setter.Value>
+                                            <DataTemplate>
+                                                <ContentPresenter Content="{TemplateBinding Content}">
+                                                    <ContentPresenter.LayoutTransform>
+                                                        <RotateTransform Angle="270" />
+                                                    </ContentPresenter.LayoutTransform>
+                                                </ContentPresenter>
+                                            </DataTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="Padding" Value="5" />
+                                </Style>
+                            </TabControl.Resources>
+                            <!--********-->
+
+                            <TabItem Header="Serial Communication">
+                                <Grid>
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Column="0" Text="Data to Send:" HorizontalAlignment="Left" Margin="10"/>
+                                    <RichTextBox Grid.Column="1" x:Name="rtbSendBuffer" Margin="10" HorizontalAlignment="Stretch" Width="Auto"/>
+                                    <Button Grid.Column="2" Content="Send" x:Name="btnSerialSend" Margin="10" Click="Button_Click" HorizontalAlignment="Right"/>
+                                    <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Text="Sent Data" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10,00,10,0"/>
+                                    <RichTextBox Grid.Row="2" Grid.ColumnSpan="3" x:Name="rtbSerialSent" Margin="30,10,30,30" IsReadOnly="True" Height="Auto"/>
+
+                                </Grid>
+                            </TabItem>
+
+                            <TabItem Header="Xbee Communication">
+                                <Grid>
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Column="0" Text="Message Data:" HorizontalAlignment="Left" Margin="10"/>
+                                    <RichTextBox Grid.Column="1" x:Name="rtbXbeeSendBuffer" Margin="10" HorizontalAlignment="Stretch" Width="Auto"/>
+                                    <Button Grid.Column="2" Content="Send" x:Name="btnXbeeSend" Margin="10"  HorizontalAlignment="Right" Click="btnXbeeSend_Click"/>
+                                    <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Text="Sent Data" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10,00,10,0"/>
+                                    <RichTextBox Grid.Row="2" Grid.ColumnSpan="3" x:Name="rtbXbeeSent" Margin="30,10,30,30" IsReadOnly="True" Height="Auto"/>
+
+                                </Grid>
+                            </TabItem>
+
+                            <TabItem Header="Robot Commands">
+                                <WrapPanel Orientation="Vertical">
+                                    <Button Grid.Column="2" Content="Communication Test" x:Name="btnCommunicationTest" Margin="10" Click="btnCommunicationTest_Click" />
+                                    <Button Grid.Column="2" Content="Battery Voltage" x:Name="btnBatteryVoltage" Margin="10" Click="btnBatteryVoltage_Click" />
+                                </WrapPanel>
+                            </TabItem>
+
+                            <TabItem Header="Robot Sensors"/>
+                            <!--<TabItem Header="Placeholder"/>-->
+                        </TabControl>
+                    </TabItem>
                 </TabControl>
             </DockPanel>
-
-
 
             <GridSplitter x:Name="cameraGridSplitter" Grid.Column="2" Width="5" HorizontalAlignment="Center">
             </GridSplitter>
 
-
-            <WindowsFormsHost Grid.Column="3" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,0,0,0" Visibility="Visible">
-                <em:ImageBox x:Name="captureImageBox" Height="480" Width="640" SizeMode="StretchImage" FunctionalMode="Minimum"/>
+            <WindowsFormsHost Grid.Column="3" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,0,0,0" Visibility="Hidden">
+                <em:ImageBox x:Name="captureImageBox" Height="240" Width="320" SizeMode="StretchImage" FunctionalMode="Minimum"/>
             </WindowsFormsHost>
 
 
+
+            <Grid Grid.Column="1" Grid.ColumnSpan="3" Grid.Row="2" Height="Auto" Width="Auto">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width = "Auto"/>
+                    <ColumnDefinition Width = "Auto"/>
+                    <ColumnDefinition Width = "Auto"/>
+                    <ColumnDefinition Width = "Auto"/>
+                    <ColumnDefinition Width = "Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height = "Auto"/>
+                    <RowDefinition Height = "Auto"/>
+                    <RowDefinition Height = "Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel>
+                    <ComboBox x:Name = "dispSelectRobot"  MinHeight = "24" MinWidth = "89" Margin = "10" SelectedIndex = "0"/>
+
+                    <WrapPanel>
+                        <Button Name="dispSelectBtnPrevious" Margin="5,0" Width="60" Click="dispSelectBtnPrevious_Click">Previous</Button>
+                        <Button Name="dispSelectBtnNext" Margin="5,0" Width="60" Click="dispSelectBtnNext_Click">Next</Button>
+                        <Button Name="dispSelectBtnBlue" Margin="5,0" Width="60">Groups</Button>
+                    </WrapPanel>
+                </StackPanel>
+
+                <WrapPanel x:Name="dispRobotPanels"  Grid.Column="0" Grid.Row="2" >
+                    <StackPanel Background="AliceBlue" Margin="5">
+                        <WrapPanel Orientation="Vertical">
+                            <Label Content="Robot One"/>
+                            <Label Content="Battery Voltage: "/>
+                            <Label Content="Postion X:"/>
+                            <Label Content="Position Y:"/>
+                        </WrapPanel>
+                    </StackPanel>
+                </WrapPanel>
+
+            </Grid>
         </Grid>
     </DockPanel>
 </Window>

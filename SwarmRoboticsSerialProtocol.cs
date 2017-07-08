@@ -42,6 +42,7 @@ public class ProtocolClass
 	public static class MESSAGE_TYPES
 	{
 		public const byte COMMUNICATION_TEST = 0x00;
+		public const byte BATTERY_VOLTAGE = 0x01;
 	}
 
 	// constructor
@@ -55,9 +56,16 @@ public class ProtocolClass
 		{
 			case MESSAGE_TYPES.COMMUNICATION_TEST:
 
-				window.UpdateSerialReceivedTextBox("\rCommunication Test Successful\r");
+				window.UpdateSerialReceivedTextBox("\rCommunication Test Successful");
 				//XXX
 				//display the data here
+				break;
+
+			case MESSAGE_TYPES.BATTERY_VOLTAGE:
+				float voltage = message[1] * 256 + message[2];
+				voltage = voltage * 5 / 1000;
+				window.UpdateSerialReceivedTextBox("\rBattery Voltage:");
+				window.UpdateSerialReceivedTextBox(voltage.ToString());
 				break;
 
 		}
@@ -68,7 +76,13 @@ public class ProtocolClass
 		{
 			case MESSAGE_TYPES.COMMUNICATION_TEST:
 
-				window.xbee.SendTransmitRequest(XbeeHandler.DESTINATION.COORDINATOR, MESSAGE_TYPES.COMMUNICATION_TEST);
+				window.xbee.SendTransmitRequest(XbeeHandler.DESTINATION.BROADCAST, MESSAGE_TYPES.COMMUNICATION_TEST);
+
+				break;
+
+			case MESSAGE_TYPES.BATTERY_VOLTAGE:
+
+				window.xbee.SendTransmitRequest(XbeeHandler.DESTINATION.BROADCAST, MESSAGE_TYPES.BATTERY_VOLTAGE);
 
 				break;
 
