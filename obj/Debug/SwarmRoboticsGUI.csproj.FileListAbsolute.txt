@@ -1,1 +1,3 @@
 C:\Users\Brae HW\Source\Repos\Industrial Project\bin\Debug\SwarmRoboticsGUI.exe.config
+C:\Users\Brae HW\Source\Repos\Industrial Project\obj\Debug\SwarmRoboticsGUI.exe
+C:\Users\Brae HW\Source\Repos\Industrial Project\obj\Debug\SwarmRoboticsGUI.pdb
