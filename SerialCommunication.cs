@@ -34,12 +34,15 @@
 using SwarmRoboticsGUI;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO.Ports;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
 
 #endregion
 
@@ -338,11 +341,11 @@ public class SerialUARTCommunication
 		communicatedMessages.Add(newestMessage);
 		//window.lvCommunicatedMessages.ItemsSource = communicatedMessages;
 		//window.UpdateListView(communicatedMessages);
-		window.RefreshListView();
+		
 
 
 		window.xbee.InterperateXbeeFrame();
-
+		window.RefreshListView();
 	}
 
 }
@@ -361,10 +364,8 @@ namespace SwarmRoboticsGUI
 		public byte[] raw_message { get; set; }
 		
 		public int frame_length { get; set; }
-
-		public byte frame_cmd_ID { get; set; }
-		public byte[] command_data { get; set; }
-		public byte frame_checksum { get; set; }
+		public byte frame_ID { get; set; }
+		public byte[] frame_data { get; set; }
 
 		public byte[] source16 { get; set; }
 		public byte[] source64 { get; set; }
@@ -372,11 +373,19 @@ namespace SwarmRoboticsGUI
 		public byte message_type { get; set; }
 		public byte[] message_data { get; set; }
 
+		public string TimeStampDisplay
+		{
+			get
+			{
+				return time_stamp.ToString("HH:mm:ss");
+			}
+		}
+
 		public string  RawMessageDisplay
 		{
 			get
 			{
-				return MJLib.HexToString(raw_message, 0, frame_length + 4, false);
+				return MJLib.HexToString(raw_message, 0, frame_length + 4, true);
 			}
 		}
 
@@ -384,77 +393,39 @@ namespace SwarmRoboticsGUI
 		{
 			get
 			{
-				return MJLib.HexToString(BitConverter.GetBytes(frame_length), 0, 1, true) + "," + frame_length.ToString();
+				return MJLib.HexToString(BitConverter.GetBytes(frame_length), 0, 1, true) + " (" + frame_length.ToString() + ")";
 			}
 		}
 
-		public string FrameCommandIDDisplay	//display in words
+		public string FrameIDDisplay
 		{
 			get
 			{
-				return MJLib.HexToString(frame_cmd_ID, true);
-				//return frame_cmd_ID.ToString("X");
+				return XbeeHandler.GetXbeeFrameType(frame_ID) + " (" + MJLib.HexToString(frame_ID, true) + ")";
 			}
 		}
 
-		public string CommandDataDisplay
+		public string FrameDataDisplay
 		{
 			get
 			{
-				return MJLib.HexToString(raw_message, 0, frame_length, false);
-
-				/*
-				string messageString = null;
-
-				for (int i = 0; i < this.frame_length; i++)
-				{
-					string temp = raw_message[i].ToString("X");
-
-					if (raw_message[i] < 0x10)
-					{
-						messageString += "0";
-						messageString += temp;
-					}
-					else
-					{
-						messageString += temp;
-					}
-
-				}
-
-				return messageString;	*/
+				return MJLib.HexToString(frame_data, 0, frame_length, true);
 			}
 		}
 
-		public string FrameChecksumDisplay
+		public string SourceDisplay
 		{
 			get
 			{
-				return MJLib.HexToString(frame_checksum, true);
+				return XbeeHandler.DESTINATION.ToString(BitConverter.ToUInt64(source64, 0)) + " (" + MJLib.HexToString(source64, 0, 8, true) + " , " + MJLib.HexToString(source16, 0, 2, true) + ")";
 			}
 		}
 
-		public string Source16Display
+		public string MessageTypeDisplay
 		{
 			get
 			{
-				return MJLib.HexToString(source16, 0, 2, true);
-			}
-		}
-
-		public string Source64Display
-		{
-			get
-			{
-				return MJLib.HexToString(source64, 0, 8, false);
-			}
-		}
-
-		public string MessageTypeDisplay //display in words
-		{
-			get
-			{
-				return message_type.ToString("X");
+				return ProtocolClass.GetMessageType(message_type) + " (" +  MJLib.HexToString(message_type, true) + ")";
 			}
 		}
 
@@ -462,32 +433,9 @@ namespace SwarmRoboticsGUI
 		{
 			get
 			{
-				//return MJLib.HexToString(message_data, 15, frame_length - 14, false);
-
-				
-
-				string messageString = null;
-
-				for (int i = 15; i < frame_length - 14 ; i++)
-				{
-					string temp = message_data[i].ToString("X");
-
-					if (source16[i] < 0x10)
-					{
-						messageString += "0";
-						messageString += temp;
-					}
-					else
-					{
-						messageString += temp;
-					}
-
-				}
-
-				return messageString;	
+				return ProtocolClass.GetMessageData(message_type, message_data) + " (" + MJLib.HexToString(message_data, 0, frame_length - 13, true) + ")";
 			}
 		}
-
 	}
 
 
@@ -499,12 +447,95 @@ namespace SwarmRoboticsGUI
 		public void RefreshListView()
 		{
 			lvCommunicatedMessages.Dispatcher.Invoke(new RefreshListViewCallback(this.Refresh));
+			
 		}
 
 		private void Refresh()
 		{
 			lvCommunicatedMessages.Items.Refresh();
 		}
+
+
+		//this stuff is temporary XXXX
+		/*
+		private void receivedDataRemove_Click(object sender, RoutedEventArgs e)
+		{
+			gvCommunicatedMessages.Columns.Remove(gvcTimeStamp);
+		}
+
+		private void receivedDataAdd_Click(object sender, RoutedEventArgs e)
+		{
+			gvCommunicatedMessages.Columns.Add(gvcTimeStamp);
+		}
+
+		private GridViewColumnHeader lvCommunicatedMessagesSortCol = null;
+		private SortAdorner lvCommunicatedMessagesSortAdorner = null;
+		
+		private void GridViewColumnHeader_Click(object sender, RoutedEventArgs e)
+		{
+			GridViewColumnHeader column = (sender as GridViewColumnHeader);
+			string sortBy = column.Tag.ToString();
+
+			if(lvCommunicatedMessagesSortCol != null)
+			{
+				AdornerLayer.GetAdornerLayer(lvCommunicatedMessagesSortCol).Remove(lvCommunicatedMessagesSortAdorner);
+				lvCommunicatedMessages.Items.SortDescriptions.Clear();
+			}
+
+			ListSortDirection newDir = ListSortDirection.Ascending;
+			if (lvCommunicatedMessagesSortCol == column && lvCommunicatedMessagesSortAdorner.Direction == newDir)
+				newDir = ListSortDirection.Descending;
+
+			lvCommunicatedMessagesSortCol = column;
+			lvCommunicatedMessagesSortAdorner = new SortAdorner(lvCommunicatedMessagesSortCol, newDir);
+			AdornerLayer.GetAdornerLayer(lvCommunicatedMessagesSortCol).Add(lvCommunicatedMessagesSortAdorner);
+			lvCommunicatedMessages.Items.SortDescriptions.Add(new SortDescription(sortBy, newDir));
+			lvCommunicatedMessages.Items.Refresh();
+		}
+
+		public class SortAdorner : Adorner
+		{
+			private static Geometry ascGeometry =
+					Geometry.Parse("M 0 4 L 3.5 0 L 7 4 Z");
+
+			private static Geometry descGeometry =
+					Geometry.Parse("M 0 0 L 3.5 4 L 7 0 Z");
+
+			public ListSortDirection Direction { get; private set; }
+
+			public SortAdorner(UIElement element, ListSortDirection dir)
+					: base(element)
+			{
+				this.Direction = dir;
+			}
+
+			protected override void OnRender(DrawingContext drawingContext)
+			{
+				base.OnRender(drawingContext);
+
+				if (AdornedElement.RenderSize.Width < 20)
+					return;
+
+				TranslateTransform transform = new TranslateTransform
+						(
+								AdornedElement.RenderSize.Width - 15,
+								(AdornedElement.RenderSize.Height - 5) / 2
+						);
+				drawingContext.PushTransform(transform);
+
+				Geometry geometry = ascGeometry;
+				if (this.Direction == ListSortDirection.Descending)
+					geometry = descGeometry;
+				drawingContext.DrawGeometry(Brushes.Black, null, geometry);
+
+				drawingContext.Pop();
+			}
+		}
+		*/
+
+
+
+
 
 		public delegate void UpdateListViewBindingCallback(List<communicated_message> messages);
 
@@ -522,10 +553,55 @@ namespace SwarmRoboticsGUI
 
 
 
+		private void Button_Click(object sender, RoutedEventArgs e)
+		{
+			if (serial._serialPort.IsOpen)
+			{
+				rtbSendBuffer.SelectAll();
+				string text = rtbSendBuffer.Selection.Text.ToString();
+				string textToSend = text;
+
+				textToSend = textToSend.Replace("\r", string.Empty);
+				textToSend = textToSend.Replace("\n", string.Empty);
+				textToSend = textToSend.Replace(" ", string.Empty);
+				textToSend = textToSend.Replace("-", string.Empty);
+				textToSend = textToSend.Replace("0x", string.Empty);
+
+				text = text.Replace("\n", string.Empty);
+				text = text.Replace(" ", "-");
+
+				try
+				{
+					byte[] bytes = bytes = Enumerable.Range(0, textToSend.Length).Where(x => x % 2 == 0).Select(x => Convert.ToByte(textToSend.Substring(x, 2), 16)).ToArray();
+
+
+					//test = xbee.CalculateChecksum(bytes); //			
+
+					//bytes = xbee.Escape(bytes); //escapes bytes
+
+
+					serial._serialPort.Write(bytes, 0, bytes.Length);
+				}
+				catch (Exception excpt)
+				{
+					MessageBox.Show(excpt.Message);
+				}
+
+
+				rtbSerialSent.AppendText(text);
+				//rtbSerialSent.AppendText(test.ToString()); //
+				rtbSendBuffer.Document.Blocks.Clear();
+				rtbSerialSent.ScrollToEnd();
+			}
+			else
+			{
+				MessageBox.Show("Port not open");
+			}
+		}
 
 
 
-
+		/*
 		public delegate void UpdateTextCallback(string text);
 
 		public void UpdateSerialReceivedTextBox(string text)
@@ -568,55 +644,6 @@ namespace SwarmRoboticsGUI
 			rtbSerialReceived.ScrollToEnd();
 		}
 
-		
-
-		private void Button_Click(object sender, RoutedEventArgs e)
-		{
-			if (serial._serialPort.IsOpen)
-			{
-				rtbSendBuffer.SelectAll();
-				string text = rtbSendBuffer.Selection.Text.ToString();
-				string textToSend = text;
-
-				textToSend = textToSend.Replace("\r", string.Empty);
-				textToSend = textToSend.Replace("\n", string.Empty);
-				textToSend = textToSend.Replace(" ", string.Empty);
-				textToSend = textToSend.Replace("-", string.Empty);
-				textToSend = textToSend.Replace("0x", string.Empty);
-
-				text = text.Replace("\n", string.Empty);
-				text = text.Replace(" ", "-");
-
-				try
-				{
-					byte[] bytes = bytes = Enumerable.Range(0, textToSend.Length).Where(x => x % 2 == 0).Select(x => Convert.ToByte(textToSend.Substring(x, 2), 16)).ToArray();
-
-
-					 //test = xbee.CalculateChecksum(bytes); //			
-
-					//bytes = xbee.Escape(bytes); //escapes bytes
-					
-
-					serial._serialPort.Write(bytes, 0, bytes.Length);
-				}
-				catch (Exception excpt)
-				{
-					MessageBox.Show(excpt.Message);
-				}
-
-
-				rtbSerialSent.AppendText(text);
-				//rtbSerialSent.AppendText(test.ToString()); //
-				rtbSendBuffer.Document.Blocks.Clear();
-				rtbSerialSent.ScrollToEnd();
-			}
-			else
-			{
-				MessageBox.Show("Port not open");
-			}
-		}
-
-
 		private void receivedDataNewline_Click(object sender, RoutedEventArgs e)
 		{
 			rtbSerialReceived.AppendText("\r");
@@ -629,5 +656,6 @@ namespace SwarmRoboticsGUI
 			rtbSerialReceived.Document.Blocks.Clear();
 			rtbSerialReceived.ScrollToEnd(); ;
 		}
+		*/
 	}
 }

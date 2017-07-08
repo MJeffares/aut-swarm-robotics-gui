@@ -54,8 +54,8 @@ namespace SwarmRoboticsGUI
             ClearRobots();
 
             //UMat image = CvInvoke.Imread("...\\...\\Images\\ColourCodes.png").GetUMat(AccessType.Read);
-            image = CvInvoke.Imread("...\\...\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
-            CvInvoke.Resize(image, image, new Size(480, 640));
+            //image = CvInvoke.Imread("...\\...\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
+            //CvInvoke.Resize(image, image, new Size(480, 640));
         }
         public static string ToString(FilterType filter)
         {

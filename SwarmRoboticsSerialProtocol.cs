@@ -56,7 +56,7 @@ public class ProtocolClass
 		{
 			case MESSAGE_TYPES.COMMUNICATION_TEST:
 
-				window.UpdateSerialReceivedTextBox("\rCommunication Test Successful");
+				//window.UpdateSerialReceivedTextBox("\rCommunication Test Successful");
 				//XXX
 				//display the data here
 				break;
@@ -64,8 +64,8 @@ public class ProtocolClass
 			case MESSAGE_TYPES.BATTERY_VOLTAGE:
 				float voltage = message[1] * 256 + message[2];
 				voltage = voltage * 5 / 1000;
-				window.UpdateSerialReceivedTextBox("\rBattery Voltage:");
-				window.UpdateSerialReceivedTextBox(voltage.ToString());
+				//window.UpdateSerialReceivedTextBox("\rBattery Voltage:");
+				//window.UpdateSerialReceivedTextBox(voltage.ToString());
 				break;
 
 		}
@@ -86,6 +86,37 @@ public class ProtocolClass
 
 				break;
 
+		}
+	}
+
+	public static string GetMessageType(byte messageType)
+	{
+		switch (messageType)
+		{
+			case MESSAGE_TYPES.COMMUNICATION_TEST:
+				return "Communication Test";
+
+			case MESSAGE_TYPES.BATTERY_VOLTAGE:
+				return "Battery Voltage:";
+
+			default:
+				return "WARNING: Message Type Unhandled";
+		}
+	}
+
+	public static string GetMessageData(byte messageType, byte[] messageData)
+	{
+		switch (messageType)
+		{
+			case MESSAGE_TYPES.COMMUNICATION_TEST:
+				return "Sucessful";
+
+			case MESSAGE_TYPES.BATTERY_VOLTAGE:
+				float voltage = (float) (messageData[0] * 256 + messageData[1]) * 5 / 1000;
+				return voltage.ToString() + " Volts";
+
+			default:
+				return "WARNING: Unknown data";
 		}
 	}
 }
