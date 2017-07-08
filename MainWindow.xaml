@@ -21,10 +21,10 @@
                 <MenuItem x:Name="menuRecordingSettings" Header="Recording Settings" />
             </MenuItem>
 
-            <MenuItem Header="Display" MouseEnter="menu_hover" Click="menu_hover">
+            <MenuItem Header="Display" MouseEnter="menu_Hover" Click="menu_Hover">
                 <MenuItem x:Name="menuViewList" Header="View"/>
-                <MenuItem x:Name="menuFilterList" Header="Camera Filters" MouseEnter="menu_hover" Click="menu_hover"/>
-                <MenuItem x:Name="menuOverlayList" Header="Overlays" MouseEnter="menu_hover" Click="menu_hover">
+                <MenuItem x:Name="menuFilterList" Header="Camera Filters" MouseEnter="menu_Hover" Click="menu_Hover"/>
+                <MenuItem x:Name="menuOverlayList" Header="Overlays" MouseEnter="menu_Hover" Click="menu_Hover">
                     <MenuItem x:Name="menuOverlayNone" Header="No Overlay" IsCheckable="True" IsChecked="True" Click="menuPlaceHolder_Click"/>
                     <MenuItem x:Name="menuOverlayPlaceHolderOne" Header="PlaceHolder" IsCheckable="True" Click="menuPlaceHolder_Click"/>
                     <MenuItem x:Name="menuFilterPlaceHolderTwo" Header="PlaceHolder" IsCheckable="True" Click="menuPlaceHolder_Click"/>
@@ -193,7 +193,7 @@
                         </ItemsPanelTemplate>
                     </StatusBar.ItemsPanel>
 
-                    <StatusBarItem Grid.Row="1" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0" MouseDown="CameraMinimise" Width="22" Height="16">
+                    <StatusBarItem Grid.Row="1" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0" MouseDown="btnCameraMinimise_Click" Width="22" Height="16">
                         <Label x:Name="displayArrowTop" Content="   >" Padding="0"/>
                     </StatusBarItem>
 
@@ -207,7 +207,7 @@
 
                     </StatusBarItem>
 
-                    <StatusBarItem Grid.Row="3" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0" MouseDown="CameraMinimise" Width="22" Height="16">
+                    <StatusBarItem Grid.Row="3" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0" MouseDown="btnCameraMinimise_Click" Width="22" Height="16">
                         <Label x:Name="displayArrowBottom" Content="   >" Padding="0"/>
                     </StatusBarItem>
 
@@ -315,7 +315,7 @@
             <GridSplitter x:Name="cameraGridSplitter" Grid.Column="2" Width="5" HorizontalAlignment="Center">
             </GridSplitter>
 
-            <WindowsFormsHost Grid.Column="3" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,0,0,0" Visibility="Hidden">
+            <WindowsFormsHost Grid.Column="3" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,0,0,0" Visibility="Visible">
                 <em:ImageBox x:Name="captureImageBox" Height="240" Width="320" SizeMode="StretchImage" FunctionalMode="Minimum"/>
             </WindowsFormsHost>
 

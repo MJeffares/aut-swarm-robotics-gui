@@ -219,8 +219,8 @@ namespace SwarmRoboticsGUI
                     //re-enable the grid splitter so its size can be changed
                     cameraGridSplitter.IsEnabled = true;
                     // update arrow direction
-                    cameraArrowTop.Content = "   >";
-                    cameraArrowBottom.Content = "   >";
+                    displayArrowTop.Content = "   >";
+                    displayArrowBottom.Content = "   >";
                     // TEMP: toggles the name of the button
                     menuDisplayPopOut.Header = "Pop Out Window";
 
@@ -235,8 +235,8 @@ namespace SwarmRoboticsGUI
                     // disable the grid splitter so window cannont be changed size until it is expanded               
                     cameraGridSplitter.IsEnabled = false;
                     // update arrow direction
-                    cameraArrowTop.Content = "  < ";
-                    cameraArrowBottom.Content = "  <  ";
+                    displayArrowTop.Content = "  < ";
+                    displayArrowBottom.Content = "  <  ";
                     // TEMP: toggles the name of the button
                     menuDisplayPopOut.Header = "Pop In Window";
                     // create and show the window
@@ -544,8 +544,8 @@ namespace SwarmRoboticsGUI
                     //disable the grid splitter so window cannont be changed size until it is expanded         
                     cameraGridSplitter.IsEnabled = false;
                     //update arrow direction
-                    cameraArrowTop.Content = "  < ";
-                    cameraArrowBottom.Content = "  <  ";
+                    displayArrowTop.Content = "  < ";
+                    displayArrowBottom.Content = "  <  ";
                     break;
                 case WindowStatusType.MINIMISED:
                     //set window to the size it had been before it was minimised
@@ -555,8 +555,8 @@ namespace SwarmRoboticsGUI
                     //re-enable the grid splitter so its size can be changed                
                     cameraGridSplitter.IsEnabled = true;
                     //update arrow direction
-                    cameraArrowTop.Content = "   >";
-                    cameraArrowBottom.Content = "   >";
+                    displayArrowTop.Content = "   >";
+                    displayArrowBottom.Content = "   >";
                     break;
                 default:
                     break;
@@ -565,6 +565,37 @@ namespace SwarmRoboticsGUI
         private void menuPlaceHolder_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Sorry Placeholder");
+        }
+
+
+
+        private void btnBatteryVoltage_Click(object sender, RoutedEventArgs e)
+        {
+            protocol.SendMessage(ProtocolClass.MESSAGE_TYPES.BATTERY_VOLTAGE);
+        }
+
+        private void dispSelectBtnPrevious_Click(object sender, RoutedEventArgs e)
+        {
+            if (dispSelectRobot.SelectedIndex > 0)
+            {
+                dispSelectRobot.SelectedIndex--;
+            }
+            else if (dispSelectRobot.SelectedIndex == 0)
+            {
+                dispSelectRobot.SelectedIndex = dispSelectRobot.Items.Count - 1;
+            }
+        }
+
+        private void dispSelectBtnNext_Click(object sender, RoutedEventArgs e)
+        {
+            if (dispSelectRobot.SelectedIndex < dispSelectRobot.Items.Count - 1)
+            {
+                dispSelectRobot.SelectedIndex++;
+            }
+            else if (dispSelectRobot.SelectedIndex == dispSelectRobot.Items.Count - 1)
+            {
+                dispSelectRobot.SelectedIndex = 0;
+            }
         }
         #endregion
     }
