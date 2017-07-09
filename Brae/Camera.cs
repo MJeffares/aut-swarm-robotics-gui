@@ -19,7 +19,6 @@ namespace SwarmRoboticsGUI
         #endregion
 
         // Camera Properties
-        public MainWindow main;
         public string Name { get; set; }
         public int Index { get; set; }
         public StatusType Status { get; private set; }
@@ -30,16 +29,18 @@ namespace SwarmRoboticsGUI
         private VideoWriter videoWriter { get; set; }
         private VideoCapture videoCapture { get; set; }
         private Timer FpsTimer { get; set; }
-        
+
+        public delegate void FrameHandler(Camera cam, EventArgs e);
+        public event FrameHandler FrameUpdate;
+
         public override string ToString()
         {
             return string.Format("[{0}]{1}", Index, Name);
         }
        
         // Camera
-        public Camera(MainWindow main)
+        public Camera()
         {
-            this.main = main;
             Name = null;
             Index = 0;
             Status = StatusType.STOPPED;
@@ -175,16 +176,9 @@ namespace SwarmRoboticsGUI
             {
                 // Get the new frame
                 videoCapture.Retrieve(Frame, 0);
-                main.captureImageBox.Image = Frame;
+                FrameUpdate(this, arg);
                 // 
                 FrameCount++;
-                // Check framerate
-                if (FrameCount > 60)
-                {
-                    FrameCount = 0;
-                    // Timer wasn't enabled
-                    FpsTimer.Enabled = true;
-                }
             }
         }
 

@@ -69,12 +69,12 @@ namespace SwarmRoboticsGUI
         // Declarations
         #region
         // TODO: comment declarations
-        public Camera Camera1;
+        public Camera camera1;
         public SerialUARTCommunication serial;
         public XbeeHandler xbee;
         public ProtocolClass protocol;
-        public CameraPopOutWindow PopoutWindow;
-        public OverlayWindow Overlay;
+        public CameraPopOutWindow popoutWindow;
+        public OverlayWindow overlayWindow;
         // one second timer to calculate and update the fps count
         private DispatcherTimer InterfaceTimer;
         // 
@@ -97,18 +97,19 @@ namespace SwarmRoboticsGUI
         {
             InitializeComponent();
             //
-            Camera1 = new Camera(this);
+            camera1 = new Camera();
 
             xbee = new XbeeHandler(this);
             protocol = new ProtocolClass(this);
             // MANSEL: Maybe make a struct. Also look at SerialPort class
             serial = new SerialUARTCommunication(this, menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);           
             //
-            Overlay = new OverlayWindow(this);
+            overlayWindow = new OverlayWindow(this);
             //
             CvInvoke.UseOpenCL = true;
             //
             PopulateFilters();
+            PopulateOverlays();
             PopulateCameras();
             //
             openvideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
@@ -127,8 +128,10 @@ namespace SwarmRoboticsGUI
             WindowStatus = WindowStatusType.MAXIMISED;
             
             // TEMP: display overlay on starup for debugging
-            Overlay.Show();
+            overlayWindow.Show();
 
+
+            camera1.FrameUpdate += new Camera.FrameHandler(DrawCameraFrame);
             //serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
         }
         
@@ -142,7 +145,7 @@ namespace SwarmRoboticsGUI
         private void PopulateCameras()
         {
             // we dont want to update this if we are connected to a camera
-            if (Camera1.Status != Camera.StatusType.PLAYING && Camera1.Status != Camera.StatusType.RECORDING)
+            if (camera1.Status != Camera.StatusType.PLAYING && camera1.Status != Camera.StatusType.RECORDING)
             {
                 // gets currently connected devices
                 DsDevice[] _SystemCameras = DsDevice.GetDevicesOfCat(DirectShowLib.FilterCategory.VideoInputDevice);
@@ -162,11 +165,11 @@ namespace SwarmRoboticsGUI
                     menuCameraList.Items.Add(item);
 
                     // restores currently connect camera selection
-                    if (item.ToString() == Camera1.Name)
+                    if (item.ToString() == camera1.Name)
                     {
                         item.IsEnabled = true;
                         item.IsChecked = true;
-                        Camera1.Index = menuCameraList.Items.IndexOf(item);
+                        camera1.Index = menuCameraList.Items.IndexOf(item);
                         menuCameraConnect.IsEnabled = true;
                     }
                 }
@@ -206,12 +209,39 @@ namespace SwarmRoboticsGUI
             menuFilterList.Items.Add(settingsmenuitem);
             settingsmenuitem.Click += menuPlaceHolder_Click;
         }
+
+        private void PopulateOverlays()
+        {
+            //loops through our filters and adds them to our menu
+            for (int i = 0; i < (int)ImageDisplay.OverlayType.NUM_OVERLAYS; i++)
+            {
+                MenuItem item = new MenuItem { Header = ImageDisplay.ToString((ImageDisplay.OverlayType)i) };
+                item.Click += new RoutedEventHandler(menuOverlayListItem_Click);
+                item.IsCheckable = true;
+                //by default select our first filter (no filter)
+                if (i == 0)
+                {
+                    item.IsChecked = true;
+                }
+                menuOverlayList.Items.Add(item);
+            }
+            // add our seperator and settings menu items
+            Separator sep = new Separator();
+            menuOverlayList.Items.Add(sep);
+
+            MenuItem settingsmenuitem = new MenuItem { Header = "Settings" };
+            menuOverlayList.Items.Add(settingsmenuitem);
+            settingsmenuitem.Click += menuPlaceHolder_Click;
+        }
+
+        
+
         public void ToggleCameraWindow()
         {
             switch (WindowStatus)
             {
                 case WindowStatusType.POPPED_OUT:
-                    PopoutWindow.Close();
+                    popoutWindow.Close();
                     //set window to the size it had been before it was minimised
                     mainGrid.ColumnDefinitions[3].Width = new GridLength(WindowSize);
                     //set variable/flag
@@ -240,14 +270,14 @@ namespace SwarmRoboticsGUI
                     // TEMP: toggles the name of the button
                     menuDisplayPopOut.Header = "Pop In Window";
                     // create and show the window
-                    PopoutWindow = new CameraPopOutWindow(this);
-                    PopoutWindow.Show();
+                    popoutWindow = new CameraPopOutWindow(this);
+                    popoutWindow.Show();
                     break;
             }
         }
         #endregion
 
-        // Timer events
+        // Time events
         #region
         private void Interface_Tick(object sender, EventArgs arg)
         {
@@ -299,7 +329,7 @@ namespace SwarmRoboticsGUI
             ///}
 
             //updates FPS counter
-            statusFPS.Text = "FPS: " + Camera1.FPS;
+            statusFPS.Text = "FPS: " + camera1.FPS;
 
             switch (TimeDisplayMode)
             {
@@ -312,7 +342,7 @@ namespace SwarmRoboticsGUI
 
 
                 case TimeDisplayModeType.FROM_START:
-                    if (Camera1.Status == Camera.StatusType.RECORDING)
+                    if (camera1.Status == Camera.StatusType.RECORDING)
                     {
                         statusTime.Text = (DateTime.Now - startTime).ToString(@"dd\.hh\:mm\:ss");
                         ///TimeSpan displayTime = (DateTime.Now - startTime);
@@ -323,6 +353,17 @@ namespace SwarmRoboticsGUI
                     break;
             }
         }
+
+        private void DrawCameraFrame(Camera cam, EventArgs e)
+        {
+            if (camera1.Frame != null)
+            {
+                overlayWindow.imgProc.ProcessFilter(cam.Frame);
+                captureImageBox.Image = overlayWindow.imgProc.Image;
+            }
+        }
+
+
         #endregion
 
         // Input events
@@ -331,9 +372,9 @@ namespace SwarmRoboticsGUI
         private void menuFilterListItem_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menusender = (MenuItem)sender;
-            String menusenderstring = menusender.ToString();
+            string menusenderstring = menusender.ToString();
 
-            if (menusenderstring != ImageProcessing.ToString(Overlay.imgProc.Filter))
+            if (menusenderstring != ImageProcessing.ToString(overlayWindow.imgProc.Filter))
             {
                 MenuItem[] allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
 
@@ -342,11 +383,11 @@ namespace SwarmRoboticsGUI
                     item.IsChecked = false;
                 }
                 menusender.IsChecked = true;
-                Overlay.imgProc.Filter = (ImageProcessing.FilterType)menuFilterList.Items.IndexOf(menusender);
+                overlayWindow.imgProc.Filter = (ImageProcessing.FilterType)menuFilterList.Items.IndexOf(menusender);
                 //
-                statusDisplayFilter.Text = ImageProcessing.ToString(Overlay.imgProc.Filter);
+                statusDisplayFilter.Text = ImageProcessing.ToString(overlayWindow.imgProc.Filter);
             }
-            else if (Overlay.imgProc.Filter != ImageProcessing.FilterType.NONE)
+            else if (overlayWindow.imgProc.Filter != ImageProcessing.FilterType.NONE)
             {
                 MenuItem[] allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
 
@@ -355,6 +396,25 @@ namespace SwarmRoboticsGUI
                     item.IsChecked = false;
                     item.IsEnabled = true;
                 }
+            }
+        }
+        private void menuOverlayListItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem menusender = (MenuItem)sender;
+            string menusenderstring = menusender.ToString();
+
+            if (menusenderstring != ImageDisplay.ToString(overlayWindow.Display.Overlay))
+            {
+                MenuItem[] allitems = menuOverlayList.Items.OfType<MenuItem>().ToArray();
+
+                foreach (var item in allitems)
+                {
+                    item.IsChecked = false;
+                }
+                menusender.IsChecked = true;
+                overlayWindow.Display.Overlay = (ImageDisplay.OverlayType)menuOverlayList.Items.IndexOf(menusender);
+                // TODO: Not sure where to display this right now
+                //statusDisplayFilter.Text = ImageDisplay.ToString(overlayWindow.Display.Overlay);
             }
         }
         private void menuDisplayPopOut_Click(object sender, RoutedEventArgs e)
@@ -367,7 +427,7 @@ namespace SwarmRoboticsGUI
             MenuItem menusender = (MenuItem)sender;
             string menusenderstring = menusender.ToString();
 
-            if (Camera1.Status == Camera.StatusType.STOPPED && Camera1.Name != menusenderstring) //also check if the same menu option is clicked twice
+            if (camera1.Status == Camera.StatusType.STOPPED && camera1.Name != menusenderstring) //also check if the same menu option is clicked twice
             {
                 //var allitems = menuCameraList.Items.Cast<System.Windows.Controls.MenuItem>().ToArray();
                 MenuItem[] allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
@@ -382,10 +442,10 @@ namespace SwarmRoboticsGUI
                 menuCameraConnect.IsEnabled = true;
                 statusCameraName.Text = menusender.Header.ToString();
 
-                Camera1.Name = menusender.ToString();
-                Camera1.Index = menuCameraList.Items.IndexOf(menusender);
+                camera1.Name = menusender.ToString();
+                camera1.Index = menuCameraList.Items.IndexOf(menusender);
             }
-            else if (Camera1.Name == menusenderstring)
+            else if (camera1.Name == menusenderstring)
             {
                 //var allitems = menuCameraList.Items.Cast<System.Windows.Controls.MenuItem>().ToArray();
                 MenuItem[] allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
@@ -395,9 +455,9 @@ namespace SwarmRoboticsGUI
                     item.IsChecked = false;
                     item.IsEnabled = true;
                 }
-                Camera1.Name = "No Camera Selected";
+                camera1.Name = "No Camera Selected";
                 statusCameraName.Text = null;
-                Camera1.Index = -1;
+                camera1.Index = -1;
                 menuCameraConnect.IsEnabled = false;
             }
         }
@@ -408,10 +468,10 @@ namespace SwarmRoboticsGUI
         }
         private void menuCameraConnect_Click(object sender, RoutedEventArgs e)
         {
-            if (Camera1.Status == Camera.StatusType.PLAYING || Camera1.Status == Camera.StatusType.PAUSED)
+            if (camera1.Status == Camera.StatusType.PLAYING || camera1.Status == Camera.StatusType.PAUSED)
             {
                 // Stop capturing
-                Camera1.StopCapture();
+                camera1.StopCapture();
                 //
                 captureImageBox.Visible = false;
                 //
@@ -427,12 +487,12 @@ namespace SwarmRoboticsGUI
                     item.IsEnabled = true;
                 }
                 //
-                Overlay.Close();
+                overlayWindow.Close();
             }
-            else if (Camera1.Status == Camera.StatusType.STOPPED)
+            else if (camera1.Status == Camera.StatusType.STOPPED)
             {
                 // Start capturing
-                Camera1.StartCapture();
+                camera1.StartCapture();
                 //
                 captureImageBox.Visible = true;
                 menuCameraConnect.Header = "Stop Capture";          // Update the header on our connect/disconnect button
@@ -452,38 +512,38 @@ namespace SwarmRoboticsGUI
         }
         private void menuCameraOptions_Click(object sender, RoutedEventArgs e)
         {
-            Camera1.OpenSettings();
+            camera1.OpenSettings();
         }
         private void menuCameraFreeze_Click(object sender, RoutedEventArgs e)
         {
-            if (Camera1.Status == Camera.StatusType.PLAYING)
+            if (camera1.Status == Camera.StatusType.PLAYING)
             {
-                Camera1.PauseCapture();
+                camera1.PauseCapture();
             }
-            else if (Camera1.Status == Camera.StatusType.PAUSED)
+            else if (camera1.Status == Camera.StatusType.PAUSED)
             {
-                Camera1.ResumeCapture();
+                camera1.ResumeCapture();
             }
         }
         private void menuFilterFlipVertical_Click(object sender, RoutedEventArgs e)
         {
-            Camera1.FlipVertical();
+            camera1.FlipVertical();
         }
         private void menuFilterFlipHorizontal_Click(object sender, RoutedEventArgs e)
         {
-            Camera1.FlipHorizontal();
+            camera1.FlipHorizontal();
         }
         // Replay menu
         private void menuReplayOpen_Click(object sender, RoutedEventArgs e)
         {
-            if (Camera1.Status == Camera.StatusType.STOPPED)
+            if (camera1.Status == Camera.StatusType.STOPPED)
             {
                 if (openvideodialog.ShowDialog() == true)
                 {
                     try
                     {
                         statusRecordingText.Text = "Replaying Video: " + openvideodialog.FileName;
-                        Camera1.StartReplaying(openvideodialog.FileName);
+                        camera1.StartReplaying(openvideodialog.FileName);
                     }
                     catch (NullReferenceException excpt)
                     {
@@ -494,12 +554,12 @@ namespace SwarmRoboticsGUI
         }
         private void menuRecordNew_Click(object sender, RoutedEventArgs e)
         {
-            if (Camera1.Status == Camera.StatusType.PLAYING)
+            if (camera1.Status == Camera.StatusType.PLAYING)
             {
                 if (savevideodialog.ShowDialog() == true)
                 {
                     //
-                    Camera1.StartRecording(savevideodialog.FileName);
+                    camera1.StartRecording(savevideodialog.FileName);
                     //
                     statusRecordingText.Text = "Recording Video: " + savevideodialog.FileName;
                     menuRecordStop.IsEnabled = true;
@@ -511,7 +571,7 @@ namespace SwarmRoboticsGUI
         private void menuRecordStop_Click(object sender, RoutedEventArgs e)
         {
             //
-            Camera1.StopRecording();
+            camera1.StopRecording();
             //
             menuCameraConnect.IsEnabled = true;
             menuCameraFreeze.IsEnabled = true;

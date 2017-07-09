@@ -9,13 +9,13 @@ using Emgu.CV;
 
 namespace SwarmRoboticsGUI
 {
-    class Robot
+    public class Robot
     {
         public Robot()
         {
             Battery = 0;
             Location = new Point(0, 0);
-            Heading = new Point(0, 0);
+            DirectionMarker = new Point(0, 0);
             IsTracked = false;
         }
 
@@ -24,7 +24,8 @@ namespace SwarmRoboticsGUI
         // TEMP: object type
         public object Task { get; set; }
         public Point Location { get; set; }
-        public Point Heading { get; set; }
+        public Point DirectionMarker { get; set; }
+        public double Heading { get; set; }
         public Point[] Contour { get; set; }
         public bool IsTracked { get; set; }
     }

@@ -104,12 +104,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Camera.cs" />
+    <Compile Include="Brae\Camera.cs" />
+    <Compile Include="Brae\ImageDisplay.cs" />
     <Compile Include="CameraPopOutWindow.xaml.cs">
       <DependentUpon>CameraPopOutWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="GeneralUtilities.cs" />
-    <Compile Include="ImageProcessing.cs" />
+    <Compile Include="Brae\ImageProcessing.cs" />
     <Compile Include="OverlayWindow.xaml.cs">
       <DependentUpon>OverlayWindow.xaml</DependentUpon>
     </Compile>
@@ -169,9 +170,9 @@
     <Content Include="cvextern.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Images\ColourCodes.png" />
-    <Resource Include="Images\robotcutouts.png" />
-    <Resource Include="Images\robotcutouts2.png" />
+    <Resource Include="Brae\Images\ColourCodes.png" />
+    <Resource Include="Brae\Images\robotcutouts.png" />
+    <Resource Include="Brae\Images\robotcutouts2.png" />
     <Content Include="msvcp140.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

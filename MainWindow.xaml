@@ -24,13 +24,7 @@
             <MenuItem Header="Display" MouseEnter="menu_Hover" Click="menu_Hover">
                 <MenuItem x:Name="menuViewList" Header="View"/>
                 <MenuItem x:Name="menuFilterList" Header="Camera Filters" MouseEnter="menu_Hover" Click="menu_Hover"/>
-                <MenuItem x:Name="menuOverlayList" Header="Overlays" MouseEnter="menu_Hover" Click="menu_Hover">
-                    <MenuItem x:Name="menuOverlayNone" Header="No Overlay" IsCheckable="True" IsChecked="True" Click="menuPlaceHolder_Click"/>
-                    <MenuItem x:Name="menuOverlayPlaceHolderOne" Header="PlaceHolder" IsCheckable="True" Click="menuPlaceHolder_Click"/>
-                    <MenuItem x:Name="menuFilterPlaceHolderTwo" Header="PlaceHolder" IsCheckable="True" Click="menuPlaceHolder_Click"/>
-                    <Separator/>
-                    <MenuItem x:Name="menuOverlaySettings" Header="Settings" Click="menuPlaceHolder_Click"/>
-                </MenuItem>
+                <MenuItem x:Name="menuOverlayList" Header="Overlays" MouseEnter="menu_Hover" Click="menu_Hover"/>
                 <MenuItem x:Name="menuFilterFlipVertical" Header="Flip Vertical" Click="menuFilterFlipVertical_Click"/>
                 <MenuItem x:Name="menuFilterFlipHorizontal" Header="Flip Horizontal" Click="menuFilterFlipHorizontal_Click"/>
                 <MenuItem x:Name="menuDisplayPopOut" Header="Pop Out Window" Click="menuDisplayPopOut_Click"/>
