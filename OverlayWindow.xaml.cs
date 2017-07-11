@@ -31,43 +31,53 @@ namespace SwarmRoboticsGUI
         public int UpperV { get; set; }
 
         public ImageProcessing imgProc { get; set; }
-        private MainWindow mainWindow { get; set; }
-        private Timer FrameTimer { get; set; }
+        public ImageDisplay Display { get; set; }
         private Timer InterfaceTimer { get; set; }
+        // MANSEL: This robot list has seen the world
+        // TODO: give these robots a home
+        public Robot[] RobotList = new Robot[6];
+
+        public void ClearRobots(Robot[] RobotList)
+        {
+            for (int i = 0; i < RobotList.Length; i++)
+            {
+                RobotList[i] = new Robot();
+            }
+        }
 
         public OverlayWindow(MainWindow mainWindow)
         {
             InitializeComponent();
+            ClearRobots(RobotList);
+
             imgProc = new ImageProcessing();
-            this.mainWindow = mainWindow;
+            Display = new ImageDisplay();
+
             DataContext = this;
 
             ColourC = 1000;
             LowerS = 25;
 
-            FrameTimer = new Timer(34);
-            FrameTimer.Elapsed += Frame_Tick;
-            FrameTimer.Start();
-
             InterfaceTimer = new Timer(200);
             InterfaceTimer.Elapsed += Interface_Tick;
             InterfaceTimer.Start();
+
+            mainWindow.camera1.FrameUpdate += new Camera.FrameHandler(DrawOverlayFrame);
         }
-        private void Frame_Tick(object sender, ElapsedEventArgs e)
+
+        private void DrawOverlayFrame(Camera cam, EventArgs e)
         {
-            // Apply image processing
-            if (mainWindow.Camera1.Frame != null)
+            //
+            if (cam.Frame != null)
             {
-                imgProc.ProcessFilter(mainWindow.Camera1.Frame);
-                OverlayImageBox.Image = imgProc.OverlayImage;
+                RobotList = imgProc.GetRobots(cam.Frame, RobotList);
+                Display.ProcessOverlay(cam.Frame, RobotList);
+                OverlayImageBox.Image = Display.Image;
             }
-            //imgProc.ProcessFilter(null);
-            //OverlayImageBox.Image = imgProc.OverlayImage;
         }
 
         private void Interface_Tick(object sender, ElapsedEventArgs e)
-        {
-            // HACK: update them every frame               
+        {             
             imgProc.ColourC = ColourC;
             //Camera1.imgProc.UpperC = Overlay.UpperC;
             //Camera1.imgProc.LowerC = Overlay.LowerC;
@@ -80,13 +90,12 @@ namespace SwarmRoboticsGUI
 
         private void Overlay_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            FrameTimer.Dispose();
             InterfaceTimer.Dispose();
         }
 
         private void btnClear_Click(object sender, RoutedEventArgs e)
         {
-            imgProc.ClearRobots();
+            ClearRobots(RobotList);
         }
     }
 }

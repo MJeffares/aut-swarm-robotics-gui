@@ -15,17 +15,20 @@ namespace SwarmRoboticsGUI
 {
     public class ImageProcessing
     {
-        public enum FilterType { NONE, GREYSCALE, CANNY_EDGES, BRAE_EDGES, NUM_FILTERS };
-        public enum Colour { RED, GREEN, BLUE, YELLOW, CYAN, MAGENTA };
+        public enum FilterType { NONE, GREYSCALE, CANNY_EDGES, COLOUR, NUM_FILTERS };
+        
 
         public FilterType Filter { get; set; }
-        public UMat OverlayImage { get; set; }
-        private UMat image { get; set; }
+        
+        
+        public UMat Image { get; private set; }
 
+        //public Robot[] RobotList = new Robot[6];
+#if DEBUG
+        // Debugging variables
         #region
         // Blur, Canny, and Threshold values.
         public double LowerC { get; set; }
-        //public double UpperC { get; set; } = 255;
         public int ColourC { get; set; }
         public int LowerH { get; set; }
         public int LowerS { get; set; }
@@ -33,25 +36,18 @@ namespace SwarmRoboticsGUI
         public int UpperH { get; set; }
         public int UpperS { get; set; }
         public int UpperV { get; set; }
-
-        private Robot[] RobotList = new Robot[6];
-
-        #endregion
-
-#if DEBUG
         private int HexCount { get; set; }
         private int LargeContourCount { get; set; }
         private int RobotCount { get; set; }
 
         public UMat test = new UMat();
+        #endregion
 #endif
 
         public ImageProcessing()
         {
-            OverlayImage = new UMat();
+            
             Filter = FilterType.NONE;
-            // BRAE: Robots are currently initialized in the ImageProcessing class
-            ClearRobots();
 
             //UMat image = CvInvoke.Imread("...\\...\\Images\\ColourCodes.png").GetUMat(AccessType.Read);
             //image = CvInvoke.Imread("...\\...\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
@@ -67,8 +63,8 @@ namespace SwarmRoboticsGUI
                     return string.Format("Greyscale");
                 case FilterType.CANNY_EDGES:
                     return string.Format("Canny Edges");
-                case FilterType.BRAE_EDGES:
-                    return string.Format("Brae Edges");
+                case FilterType.COLOUR:
+                    return string.Format("Colour Filtering");
                 default:
                     return string.Format("Filter Text Error");
             }
@@ -78,103 +74,49 @@ namespace SwarmRoboticsGUI
             switch (Filter)
             {
                 case FilterType.NONE:
+                    Image = Frame;
                     break;
                 case FilterType.GREYSCALE:
-                    CvInvoke.CvtColor(Frame, Frame, ColorConversion.Bgr2Gray);
+                    CvInvoke.CvtColor(Frame, Image, ColorConversion.Bgr2Gray);
                     break;
                 case FilterType.CANNY_EDGES:
-                    CvInvoke.CvtColor(Frame, Frame, ColorConversion.Bgr2Gray);
-                    CvInvoke.PyrDown(Frame, Frame);
-                    CvInvoke.PyrUp(Frame, Frame);
-                    CvInvoke.Canny(Frame, Frame, 80, 40);
-                    break;
-                case FilterType.BRAE_EDGES:
-                    //GetRobots(image);
-                    //DrawOverlay(image);
-                    //OverlayImage = test;
-                    if (Frame != null)
+                    using (UMat In = Frame.Clone())
+                    using (UMat Out = Frame.Clone())
                     {
-                        GetRobots(Frame);
-                        DrawOverlay(Frame);
-                        //using (UMat Out = Frame.Clone())
-                        //{
-                        //    CvInvoke.CvtColor(Out, Out, ColorConversion.Bgr2Hsv);
-                        //    using (ScalarArray lower = new ScalarArray(LowerH))
-                        //    using (ScalarArray upper = new ScalarArray(UpperH))
-                        //    using (Mat HOut = new Image<Gray, byte>(Frame.Size).Mat)
-                        //    {
-                        //        CvInvoke.ExtractChannel(Out, HOut, 0);
-                        //        CvInvoke.InRange(HOut, lower, upper, test);
-                        //    }
-                        //    using (Mat SOut = new Image<Gray, byte>(Frame.Size).Mat)
-                        //    {
-                        //        CvInvoke.ExtractChannel(Out, SOut, 1);
-                        //        CvInvoke.Threshold(SOut, SOut, LowerS, 255, ThresholdType.Binary);
-                        //        CvInvoke.BitwiseAnd(test, SOut, test);
-                        //    }
-                        //}
-                        //CvInvoke.PutText(test, CvInvoke.CountNonZero(test).ToString(), new Point(20, 20), FontFace.HersheySimplex, 1, new MCvScalar(128, 128, 128), 2);
-                        //OverlayImage = test;
+                        CvInvoke.CvtColor(In, In, ColorConversion.Bgr2Gray);
+                        CvInvoke.PyrDown(In, In);
+                        CvInvoke.PyrUp(In, In);
+                        CvInvoke.Canny(In, Out, 80, 40);
+                        Image = Out.Clone();
+                    }
+                    break;
+                case FilterType.COLOUR:
+                    using (UMat In = Frame.Clone())
+                    using (UMat Out = Frame.Clone())
+                    {
+                        CvInvoke.CvtColor(In, In, ColorConversion.Bgr2Hsv);
+                        using (ScalarArray lower = new ScalarArray(LowerH))
+                        using (ScalarArray upper = new ScalarArray(UpperH))
+                        using (Mat HueIn = new Image<Gray, byte>(Frame.Size).Mat)
+                        {
+                            CvInvoke.ExtractChannel(In, HueIn, 0);
+                            CvInvoke.InRange(HueIn, lower, upper, Out);
+                        }
+                        using (Mat SatIn = new Image<Gray, byte>(Frame.Size).Mat)
+                        {
+                            CvInvoke.ExtractChannel(In, SatIn, 1);
+                            CvInvoke.Threshold(SatIn, SatIn, LowerS, 255, ThresholdType.Binary);
+                            CvInvoke.BitwiseAnd(Out, SatIn, Out);
+                        }
+                        CvInvoke.PutText(Out, CvInvoke.CountNonZero(Out).ToString(), new Point(20, 20), FontFace.HersheySimplex, 1, new MCvScalar(128, 128, 128), 2);
+                        Image = Out.Clone();
                     }
                     break;
                 default:
                     break;
             }
         }
-        public void ClearRobots()
-        {
-            for (int i = 0; i < RobotList.Length; i++)
-            {
-                RobotList[i] = new Robot();
-            }
-        }
-        private void DrawOverlay(UMat Frame)
-        {
-            Mat Input = new Image<Bgr, byte>(Frame.Cols, Frame.Rows).Mat;
-
-            // Creates mask of current robot
-            using (VectorOfVectorOfPoint ContourVect = new VectorOfVectorOfPoint())
-            {
-                for (int i = 0; i < RobotList.Length; i++)
-                {
-                    if (RobotList[i].Contour != null)
-                    {
-
-                        ContourVect.Push(new VectorOfPoint(RobotList[i].Contour));
-                    }
-                }
-                CvInvoke.DrawContours(Input, ContourVect, -1, new MCvScalar(255, 255, 255), -1, LineType.AntiAlias);
-            }
-
-            for (int i = 0; i < RobotList.Length; i++)
-            {
-                if (RobotList[i].Location.X > 0 && RobotList[i].Location.Y > 0)
-                {
-                    if (!RobotList[i].IsTracked)
-                    {
-                        // Red indicates robot is not currently tracked, the image will be its previous location
-                        CvInvoke.Circle(Input, RobotList[i].Location, 10, new MCvScalar(0, 0, 255), -1, LineType.AntiAlias);
-                    }
-                    else
-                    {
-                        // Green indicates new image
-                        CvInvoke.Circle(Input, RobotList[i].Location, 10, new MCvScalar(0, 255, 0), -1, LineType.AntiAlias);
-                    }
-                    if (RobotList[i].Heading.X > 0 && RobotList[i].Heading.Y > 0)
-                    {
-                        CvInvoke.ArrowedLine(Input, RobotList[i].Location, RobotList[i].Heading, new MCvScalar(20, 20, 20), 2, LineType.AntiAlias, 0, 0.5);
-                    }
-                    CvInvoke.PutText(Input, i.ToString(), new Point(RobotList[i].Location.X + 20, RobotList[i].Location.Y + 10), FontFace.HersheyScriptSimplex, 1, new MCvScalar(50, 50, 50), 2, LineType.AntiAlias);
-                }
-                RobotList[i].IsTracked = false;
-            }
-#if DEBUG
-            CvInvoke.PutText(Input, LargeContourCount.ToString(), new Point(20, 40), FontFace.HersheyScriptSimplex, 1, new MCvScalar(50, 50, 50), 2, LineType.AntiAlias);
-            CvInvoke.PutText(Input, HexCount.ToString(), new Point(20, 80), FontFace.HersheyScriptSimplex, 1, new MCvScalar(50, 50, 50), 2, LineType.AntiAlias);
-            CvInvoke.PutText(Input, RobotCount.ToString(), new Point(20, 120), FontFace.HersheyScriptSimplex, 1, new MCvScalar(50, 50, 50), 2, LineType.AntiAlias);
-#endif
-            OverlayImage = Input.Clone().GetUMat(AccessType.Read);
-        }
+        
         private bool IsHexagon(VectorOfPoint Contour)
         {
             if (Contour.Size != 6)
@@ -246,7 +188,7 @@ namespace SwarmRoboticsGUI
 
             return RobotID;
         }
-        private Point FindHeading(UMat Frame)
+        private Point FindDirection(UMat Frame)
         {
             MCvPoint2D64f TriangleCOM = new MCvPoint2D64f();
             MCvMoments TriangleMoment = new MCvMoments();
@@ -364,7 +306,7 @@ namespace SwarmRoboticsGUI
             }
             return false;
         }
-        public bool GetRobots(UMat Frame)
+        public Robot[] GetRobots(UMat Frame, Robot[] RobotList)
         {
             VectorOfVectorOfPoint Contours = new VectorOfVectorOfPoint();
             VectorOfVectorOfPoint LargeContours = new VectorOfVectorOfPoint();
@@ -433,10 +375,18 @@ namespace SwarmRoboticsGUI
 #if DEBUG
                             RobotCount++;
 #endif
-                            Point RelativeHeading = FindHeading(RobotImage);
-                            if (RelativeHeading.X > 0 && RelativeHeading.Y > 0)
-                                RobotList[RobotID].Heading = new Point(RelativeHeading.X + RobotBounds.X, RelativeHeading.Y + RobotBounds.Y);
-                            RobotList[RobotID].Location = new Point((int)RelativeRobotCOM.X + RobotBounds.X, (int)RelativeRobotCOM.Y + RobotBounds.Y);
+                            Point RelativeDirectionMarker = FindDirection(RobotImage);
+                            if (RelativeDirectionMarker.X > 0 && RelativeDirectionMarker.Y > 0)
+                            {
+                                RobotList[RobotID].DirectionMarker = new Point(RelativeDirectionMarker.X + RobotBounds.X, RelativeDirectionMarker.Y + RobotBounds.Y);
+                                RobotList[RobotID].Location = new Point((int)RelativeRobotCOM.X + RobotBounds.X, (int)RelativeRobotCOM.Y + RobotBounds.Y);
+                                if (RobotList[RobotID].Location.X > 0 && RobotList[RobotID].Location.Y > 0)
+                                {
+                                    int dy = RobotList[RobotID].Location.Y - RobotList[RobotID].DirectionMarker.Y;
+                                    int dx = RobotList[RobotID].Location.X - RobotList[RobotID].DirectionMarker.X;
+                                    RobotList[RobotID].Heading = Math.Atan2(dy, dx);
+                                }
+                            }
                             RobotList[RobotID].Contour = ApproxContours[i].ToArray();
                             RobotList[RobotID].IsTracked = true;
                         }
@@ -448,15 +398,7 @@ namespace SwarmRoboticsGUI
                 LargeContourCount = LargeContours.Size;
 #endif
             }
-            return true;
-        }
-        public void Dispose()
-        {
-            image.Dispose();
-            OverlayImage.Dispose();
-#if DEBUG
-            test.Dispose();
-#endif
+            return RobotList;
         }
     }// CLASS END
 
