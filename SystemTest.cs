@@ -75,10 +75,15 @@ namespace SwarmRoboticsGUI
 				 btnSysTestProxmityA,btnSysTestProxmityB, btnSysTestProxmityC, btnSysTestProxmityD, btnSysTestProxmityE, btnSysTestProxmityF
 			};
 
-			btnControls = new List<Button>()
+
+
+			foreach (var toggleButton in togglebtnControls)
 			{
-				btnSysTestFullTest, btnSysTestNextTest, btnSysTestPreviousTest
-			};
+				toggleButton.IsEnabled = false;
+				toggleButton.Click += new RoutedEventHandler(btnSysTest_Click);
+				toggleButton.Checked += new RoutedEventHandler(sysTestCheck);
+				toggleButton.Unchecked += new RoutedEventHandler(sysTestCheck);
+			}
 
 		}
 
@@ -118,9 +123,11 @@ namespace SwarmRoboticsGUI
 			if (fullSystemTest == false)
 			{
 				btnSysTestFullTest.Content = "End Full Systems Test";
+				togglebtnControls[currentTestItem].IsChecked = false;
 				fullSystemTest = true;
 				btnSysTestNextTest.IsEnabled = true;
 				btnSysTestPreviousTest.IsEnabled = true;
+				currentTestItem = 0;
 				togglebtnControls[currentTestItem].IsChecked = true;
 			}
 			else
@@ -137,13 +144,48 @@ namespace SwarmRoboticsGUI
 
 		private void btnSysTestPreviousTest_Click(object sender, RoutedEventArgs e)
 		{
+			togglebtnControls[currentTestItem].IsChecked = false;
+			currentTestItem--;
 
+			if (currentTestItem < 0)
+			{
+				currentTestItem = togglebtnControls.Count-1;
+			}
+
+			togglebtnControls[currentTestItem].IsChecked = true;
 		}
 
 		private void btnSysTestNextTest_Click(object sender, RoutedEventArgs e)
 		{
+			togglebtnControls[currentTestItem].IsChecked = false;
+			currentTestItem++;
 
+			if(currentTestItem == togglebtnControls.Count)
+			{
+				currentTestItem = 0;
+			}
+
+			togglebtnControls[currentTestItem].IsChecked = true;
 		}
 
+		private void btnSysTest_Click(object sender, RoutedEventArgs e)
+		{
+			var senderToggleButton = sender as ToggleButton;
+
+			if (fullSystemTest == true && currentTestItem == togglebtnControls.IndexOf(senderToggleButton))
+			{
+				togglebtnControls[currentTestItem].IsChecked = true;
+			}
+			else if(currentTestItem != togglebtnControls.IndexOf(senderToggleButton))
+			{
+				togglebtnControls[currentTestItem].IsChecked = false;
+				currentTestItem = togglebtnControls.IndexOf(senderToggleButton);
+			}			
+		}
+
+		private void sysTestCheck(object sender, RoutedEventArgs e)
+		{
+
+		}
 	}
 }

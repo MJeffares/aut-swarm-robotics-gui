@@ -313,32 +313,32 @@
 
                             <WrapPanel>
                                 <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestProxmityA" Content = "Proximity A" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <ToggleButton x:Name="btnSysTestProxmityA" Content = "Proximity A" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False" Click="btnSysTest_Click"/>
                                     <TextBox x:Name="tbSysTestProximityA" Margin="2"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestProxmityB" Content = "Proximity B" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <ToggleButton x:Name="btnSysTestProxmityB" Content = "Proximity B" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False" Click="btnSysTest_Click"/>
                                     <TextBox x:Name="tbSysTestProximityB" Margin="2"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestProxmityC" Content = "Proximity C" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <ToggleButton x:Name="btnSysTestProxmityC" Content = "Proximity C" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False" Click="btnSysTest_Click"/>
                                     <TextBox x:Name="tbSysTestProximityC" Margin="2"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestProxmityD" Content = "Proximity D" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <ToggleButton x:Name="btnSysTestProxmityD" Content = "Proximity D" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False" Click="btnSysTest_Click"/>
                                     <TextBox x:Name="tbSysTestProximityD" Margin="2"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestProxmityE" Content = "Proximity E" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <ToggleButton x:Name="btnSysTestProxmityE" Content = "Proximity E" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False" Click="btnSysTest_Click"/>
                                     <TextBox x:Name="tbSysTestProximityE" Margin="2"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestProxmityF" Content = "Proximity  F" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <ToggleButton x:Name="btnSysTestProxmityF" Content = "Proximity  F" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False" Click="btnSysTest_Click"/>
                                     <TextBox x:Name="tbSysTestProximityF" Margin="2"/>
                                 </StackPanel>
                             </WrapPanel>

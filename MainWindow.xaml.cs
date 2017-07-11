@@ -132,8 +132,11 @@ namespace SwarmRoboticsGUI
 
 
             camera1.FrameUpdate += new Camera.FrameHandler(DrawCameraFrame);
-            //serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
-        }
+			//serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+
+			setupSystemTest();
+
+		}
         
 
         // Methods
