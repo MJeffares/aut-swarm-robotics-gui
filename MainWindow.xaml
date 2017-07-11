@@ -167,26 +167,44 @@
                     </ListView.Resources>
                     <ListView.View>
                         <GridView x:Name = "gvCommunicatedMessages">
-                            <GridViewColumn Header="TimeStamp" x:Name = "gvcTimeStamp" DisplayMemberBinding="{Binding TimeStampDisplay}">
-                                <!--<GridViewColumnHeader Tag="time_stamp" Click="GridViewColumnHeader_Click" >TimeStamp</GridViewColumnHeader>-->
+                            <GridViewColumn x:Name = "gvcTimeStamp" DisplayMemberBinding="{Binding TimeStampDisplay}">
+                                <GridViewColumnHeader Tag="time_stamp" Click="GridViewColumnHeader_Click" Content="TimeStamp      "/>
                             </GridViewColumn>
 
-                                <GridViewColumn Header="Raw Data"  x:Name = "gvcRawData" DisplayMemberBinding="{Binding RawMessageDisplay}"/>
-                            <GridViewColumn Header="Xbee Frame Length" x:Name = "gvcXbeeFrameLength" DisplayMemberBinding="{Binding FrameLengthDisplay}"/>
-                            <GridViewColumn Header="Xbee Frame ID"  x:Name = "gvcXbeeFrameID" DisplayMemberBinding="{Binding FrameIDDisplay}"/>
+                            <GridViewColumn  x:Name = "gvcRawData" DisplayMemberBinding="{Binding RawMessageDisplay}">
+                                <GridViewColumnHeader Tag = "RawMessageDisplay" Click="GridViewColumnHeader_Click" Content="Raw Data      "/>
+                            </GridViewColumn>
+
+                            <GridViewColumn  x:Name = "gvcXbeeFrameLength" DisplayMemberBinding="{Binding FrameLengthDisplay}">
+                                <GridViewColumnHeader Tag = "frame_length" Click="GridViewColumnHeader_Click" Content="Xbee Frame Length      "/>
+                            </GridViewColumn>
+
+                            <GridViewColumn  x:Name = "gvcXbeeFrameID" DisplayMemberBinding="{Binding FrameIDDisplay}">
+                                <GridViewColumnHeader Tag = "frame_ID" Click="GridViewColumnHeader_Click" Content="Xbee Frame ID     "/>
+                            </GridViewColumn>
+
                             <!--<GridViewColumn Header="Xbee Frame Data"  x:Name = "gvcXbeeFrameData" DisplayMemberBinding="{Binding CommandDataDisplay}"/>-->
-                            <GridViewColumn Header="Source Address"  x:Name = "gvcSourceAddress" DisplayMemberBinding="{Binding SourceDisplay}"/>
-                            <GridViewColumn Header="Message Type"  x:Name = "gvcMessageType" DisplayMemberBinding="{Binding MessageTypeDisplay}"/>
-                            <GridViewColumn Header="Message Data"  x:Name = "gvcMessageData" DisplayMemberBinding="{Binding MessageDataDisplay}"/>
+
+                            <GridViewColumn x:Name = "gvcSourceAddress" DisplayMemberBinding="{Binding SourceDisplay}">
+                                <GridViewColumnHeader Tag = "SourceDisplay" Click="GridViewColumnHeader_Click" Content="Source Address     "/>
+                            </GridViewColumn>
+
+                            <GridViewColumn x:Name = "gvcMessageType" DisplayMemberBinding="{Binding MessageTypeDisplay}">
+                                <GridViewColumnHeader Tag = "message_type" Click="GridViewColumnHeader_Click" Content="Message Type     "/>
+                            </GridViewColumn>
+
+                            <GridViewColumn x:Name = "gvcMessageData" DisplayMemberBinding="{Binding MessageDataDisplay}">
+                                <GridViewColumnHeader Tag = "MessageDataDisplay" Click="GridViewColumnHeader_Click" Content="Message Data     "/>
+                            </GridViewColumn>
 
                         </GridView>
                     </ListView.View>
                 </ListView>
             </Grid>
 
-            
-            
-            
+
+
+
             <!--<Grid Grid.Column="0" Grid.RowSpan="1">
 
                 <Grid.RowDefinitions>
@@ -203,7 +221,7 @@
 
                 <RichTextBox Grid.Row="2" x:Name="rtbSerialReceived" Margin="10,10,10,10" VerticalScrollBarVisibility="Visible" IsReadOnly="True" Height="Auto" Width="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
             </Grid>-->
-            
+
             <!--<ListView Name="lvCommunicatedMessages" Grid.Column="0" Grid.Row="2" Margin="5">
                 <ListView.View>
                     <GridView>
@@ -259,11 +277,27 @@
 
                 </StatusBar>
 
-                <TabControl>
+                <TabControl Background="{x:Null}">
                     <TabItem Header="Robot Control">
                         <WrapPanel Orientation="Vertical">
-                            <Button Content="PlaceHolder"  Margin="10" />
-                            <Button Content="PlaceHolder"  Margin="10" />
+                            <ToggleButton Content="PlaceHolder"  Margin="10" />
+                            <ToggleButton Content="PlaceHolder"  Margin="10" Style="{DynamicResource ButtonStyle1}" Background="#FFFB0000" />
+                            <Button Name="button1" Margin="10" Content="Animate Button2!">
+                                <Button.Triggers>
+                                    <EventTrigger RoutedEvent="Button.Click">
+                                        <EventTrigger.Actions>
+                                            <BeginStoryboard>
+                                                <Storyboard BeginTime="00:00:00" RepeatBehavior="Forever" Storyboard.TargetName="button2" Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)">
+                                                    <ColorAnimation From="Black" To="Red" Duration="0:0:1"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger.Actions>
+                                    </EventTrigger>
+                                </Button.Triggers>
+                            </Button>
+
+                            <Button Name="button2" Margin="10" Content="I will get animated!"></Button>
+
                         </WrapPanel>
                     </TabItem>
 
@@ -274,132 +308,133 @@
                     <TabItem Header = "Systems Test" >
                         <StackPanel Margin = "5">
 
-                            <TextBlock>Instructions for how to use this page (TODO) <LineBreak/> Step 1: Do A  <LineBreak/> Step 2: Do B  <LineBreak/> Step 3: Do C</TextBlock> 
+                            <TextBlock>Instructions for how to use this page (TODO) <LineBreak/> Step 1: Do A  <LineBreak/> Step 2: Do B  <LineBreak/> Step 3: Do C</TextBlock>
 
                             <WrapPanel Margin="0,2">
-                                <Button Content = "Enter Test Mode" Margin="5,5,0,5" />
-                                <Button Content = "Previous Test" Margin="5,5,0,5" />
-                                <Button Content = "Next Test" Margin="5,5,0,5" />
+                                <Button x:Name="btnSysTestTestMode" Content = "Enter Test Mode" Margin="5,5,0,5" Click="btnSysTestTestMode_Click" Width="95"/>
+                                <Button x:Name="btnSysTestFullTest" Content = "Begin Full Systems Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestFullTest_Click" Width="130"/>
+                                <Button x:Name="btnSysTestPreviousTest" Content = "Previous Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestPreviousTest_Click"/>
+                                <Button x:Name="btnSysTestNextTest" Content = "Next Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestNextTest_Click"/>
                             </WrapPanel>
 
                             <WrapPanel>
                                 <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "Proximity A"  />
-                                    <TextBox x:Name="tbProximitySensorA" />
-                                </StackPanel>
-                                
-                                <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "Proximity B"  />
-                                    <TextBox x:Name="tbProximitySensorB" />
+                                    <ToggleButton x:Name="btnSysTestProxmityA" Content = "Proximity A" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbSysTestProximityA" Margin="2"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "Proximity C"  />
-                                    <TextBox x:Name="tbProximitySensorC" />
+                                    <ToggleButton x:Name="btnSysTestProxmityB" Content = "Proximity B" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbSysTestProximityB" Margin="2"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "Proximity D"  />
-                                    <TextBox x:Name="tbProximitySensorD" />
+                                    <ToggleButton x:Name="btnSysTestProxmityC" Content = "Proximity C" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbSysTestProximityC" Margin="2"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "Proximity E"  />
-                                    <TextBox x:Name="tbProximitySensorE" />
+                                    <ToggleButton x:Name="btnSysTestProxmityD" Content = "Proximity D" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbSysTestProximityD" Margin="2"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "Proximity  F"  />
-                                    <TextBox x:Name="tbProximitySensorF" />
+                                    <ToggleButton x:Name="btnSysTestProxmityE" Content = "Proximity E" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbSysTestProximityE" Margin="2"/>
                                 </StackPanel>
-                            </WrapPanel>
 
-                            <WrapPanel>
                                 <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "Light Sensor LHS"  />
-                                    <TextBox x:Name="tbLightSensorLHS" />
-                                </StackPanel>
-                                
-                                <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "Light Sensor RHS"  />
-                                    <TextBox x:Name="tbLightSensorRHS" />
+                                    <ToggleButton x:Name="btnSysTestProxmityF" Content = "Proximity  F" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbSysTestProximityF" Margin="2"/>
                                 </StackPanel>
                             </WrapPanel>
 
                             <WrapPanel>
                                 <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "Mouse DX"  />
-                                    <TextBox x:Name="tbMouseDX" />
+                                    <ToggleButton Content = "Light Sensor LHS" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbLightSensorLHS" Margin="2"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "Mouse DY"  />
-                                    <TextBox x:Name="tbMouseDY" />
+                                    <ToggleButton Content = "Light Sensor RHS" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbLightSensorRHS" Margin="2"/>
                                 </StackPanel>
                             </WrapPanel>
 
                             <WrapPanel>
                                 <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "IMU W"  />
-                                    <TextBox x:Name="tbIMUW" />
-                                </StackPanel>
-                                
-                                <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "IMU X"  />
-                                    <TextBox x:Name="tbIMUX" />
-                                </StackPanel>
-                                
-                                <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "IMU Y"  />
-                                    <TextBox x:Name="tbIMUY" />
+                                    <ToggleButton Content = "Mouse DX" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbMouseDX" Margin="2"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "IMU Z"  />
-                                    <TextBox x:Name="tbIMUZ" />
+                                    <ToggleButton Content = "Mouse DY" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbMouseDY" Margin="2"/>
                                 </StackPanel>
                             </WrapPanel>
 
                             <WrapPanel>
                                 <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "Line Follower Far Left"  />
-                                    <TextBox x:Name="tbLineFollowerFarLeft" />
+                                    <ToggleButton Content = "IMU W" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbIMUW" Margin="2"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "Line Follower Centre Left"  />
-                                    <TextBox x:Name="tbLineFollowerCentreLeft" />
+                                    <ToggleButton Content = "IMU X" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbIMUX" Margin="2"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "Line Follower Centre Right"  />
-                                    <TextBox x:Name="tbLineFollowerCentreRight" />
+                                    <ToggleButton Content = "IMU Y" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbIMUY" Margin="2"/>
                                 </StackPanel>
 
                                 <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "Line Follower Far Right"  />
-                                    <TextBox x:Name="tbLineFollowerFarRight" />
-                                </StackPanel>
-                            </WrapPanel>
-
-                            <WrapPanel>
-                                <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "Fast Charge Chip"  />
-                                    <TextBox x:Name="tbFastCharge" />
+                                    <ToggleButton Content = "IMU Z" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbIMUZ" Margin="2"/>
                                 </StackPanel>
                             </WrapPanel>
 
                             <WrapPanel>
                                 <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "TWI Multiplexer"  />
-                                    <TextBox x:Name="tbTWIMultiplexer" />
+                                    <ToggleButton Content = "Line Follower Far Left" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbLineFollowerFarLeft" Margin="2"/>
+                                </StackPanel>
+
+                                <StackPanel Margin="5,0,0,0">
+                                    <ToggleButton Content = "Line Follower Centre Left" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbLineFollowerCentreLeft" Margin="2"/>
+                                </StackPanel>
+
+                                <StackPanel Margin="5,0,0,0">
+                                    <ToggleButton Content = "Line Follower Centre Right" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbLineFollowerCentreRight" Margin="2"/>
+                                </StackPanel>
+
+                                <StackPanel Margin="5,0,0,0">
+                                    <ToggleButton Content = "Line Follower Far Right" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbLineFollowerFarRight" Margin="2"/>
                                 </StackPanel>
                             </WrapPanel>
 
                             <WrapPanel>
                                 <StackPanel Margin="5,0,0,0">
-                                    <Label Content = "OnBoard Camera"  />
-                                    <TextBox x:Name="tbOnBoardCamera" />
+                                    <ToggleButton Content = "Fast Charge Chip" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbFastCharge" Margin="2"/>
+                                </StackPanel>
+                            </WrapPanel>
+
+                            <WrapPanel>
+                                <StackPanel Margin="5,0,0,0">
+                                    <ToggleButton Content = "TWI Multiplexer" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbTWIMultiplexer" Margin="2"/>
+                                </StackPanel>
+                            </WrapPanel>
+
+                            <WrapPanel>
+                                <StackPanel Margin="5,0,0,0">
+                                    <ToggleButton Content = "OnBoard Camera" Style="{DynamicResource ButtonStyle1}" Margin="2" IsEnabled="False"/>
+                                    <TextBox x:Name="tbOnBoardCamera" Margin="2"/>
                                 </StackPanel>
                             </WrapPanel>
 

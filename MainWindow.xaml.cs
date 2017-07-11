@@ -129,8 +129,11 @@ namespace SwarmRoboticsGUI
             // TEMP: display overlay on starup for debugging
             Overlay.Show();
 
-            //serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
-        }
+			//serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+
+			setupSystemTest();
+
+		}
         
 
         // Methods
@@ -597,6 +600,8 @@ namespace SwarmRoboticsGUI
                 dispSelectRobot.SelectedIndex = 0;
             }
         }
+
+
 		#endregion
 
 		
