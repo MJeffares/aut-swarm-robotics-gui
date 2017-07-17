@@ -114,23 +114,29 @@ namespace SwarmRoboticsGUI
 
         public void Resize(int width, int height)
         {
-
+            // Calculate new scale using ratios
             double newWidthScale = (double)width / (double)this.width;
             double newHeightScale = (double)height / (double)this.height;
-            //CursorPosition = new PointF((float)(CursorPosition.X * newWidthScale / widthScale), (float)(CursorPosition.Y * newHeightScale / heightScale));
+            // Scale cursor postion
+            CursorPosition = new PointF((float)(CursorPosition.X * newWidthScale / widthScale), (float)(CursorPosition.Y * newHeightScale / heightScale));
+            // Set new scales
             widthScale = newWidthScale;
             heightScale = newHeightScale;
 
         }
         public void Resize(double widthScale, double heightScale)
         {
+            // Scale cursor position
             CursorPosition = new PointF((float)(CursorPosition.X * widthScale / this.widthScale), (float)(CursorPosition.Y * heightScale / this.heightScale));
+            // Set new scales
             this.widthScale = widthScale;
             this.heightScale = heightScale;
         }
         public void Resize(double Scale)
         {
+            // Scale cursor position
             CursorPosition = new PointF((float)(CursorPosition.X * Scale / this.widthScale), (float)(CursorPosition.Y * Scale / this.heightScale));
+            // Set new scales
             this.widthScale = Scale;
             this.heightScale = Scale;
         }
@@ -141,32 +147,41 @@ namespace SwarmRoboticsGUI
         #region
         private void DrawPrettyOverlay(UMat Frame, Robot[] RobotList)
         {
-            using (Mat Input = new Image<Bgr, byte>(Frame.Cols, Frame.Rows).Mat)
+            using (Mat Input = new Image<Bgr, byte>((int)(Frame.Cols * widthScale), (int)(Frame.Rows * heightScale)).Mat)
             {
                 for (int i = 0; i < RobotList.Length; i++)
                 {
+                    // Robot is in frame
+                    // TODO: make boolean
                     if (RobotList[i].Location.X > 0 && RobotList[i].Location.Y > 0)
                     {
-                        //Point ScaledRobotLocation = new Point((int)(RobotList[i].Location.X), (int)(RobotList[i].Location.Y));
+                        // Scale robot position due to resize
+                        Point ScaledRobotLocation = new Point((int)(RobotList[i].Location.X * widthScale), (int)(RobotList[i].Location.Y * heightScale));
                         //
-                        VectorOfVectorOfPoint ContourVect = DrawHexagon(Input, RobotList[i].Location, (int)(50), RobotList[i].Heading);
-                        //
+                        double MaxScale = Math.Max(widthScale, heightScale);
+                        double MinScale = Math.Min(widthScale, heightScale);
+                        double AvgScale = (widthScale + heightScale) / 2;
+                        // Draw Robots as hexagons
+                        VectorOfVectorOfPoint ContourVect = DrawHexagon(Input, ScaledRobotLocation, (int)(50 * MaxScale), RobotList[i].Heading);
+                        // Check if cursor is within the current robot shape
                         double IsPointInContour = CvInvoke.PointPolygonTest(ContourVect[0], CursorPosition, false);
-                        //
+                        // Robot is on the edge (0) or inside the shape (1) and not outside the shape (-1)
                         if (IsPointInContour >= 0)
                         {
+                            // Current robot is selected
                             RobotList[i].IsSelected = true;
-                            CvInvoke.PutText(Input, i.ToString(), new Point(RobotList[i].Location.X + 20, RobotList[i].Location.Y + 0), FontFace.HersheyScriptSimplex, 0.5, new MCvScalar(50, 50, 50), 1, LineType.AntiAlias);
-                            CvInvoke.PutText(Input, RobotList[i].Battery.ToString(), new Point(RobotList[i].Location.X + 20, RobotList[i].Location.Y + 20), FontFace.HersheyScriptSimplex, 0.5, new MCvScalar(50, 50, 50), 1, LineType.AntiAlias);
+                            // Draw robot information
+                            CvInvoke.PutText(Input, i.ToString(), new Point(ScaledRobotLocation.X + 20, ScaledRobotLocation.Y + 0), FontFace.HersheyScriptSimplex, 0.5 * MinScale, new MCvScalar(50, 50, 50), 1, LineType.AntiAlias);
+                            CvInvoke.PutText(Input, RobotList[i].Battery.ToString(), new Point(ScaledRobotLocation.X + 20, ScaledRobotLocation.Y + (int)(20 * MinScale)), FontFace.HersheyScriptSimplex, 0.5 * MinScale, new MCvScalar(50, 50, 50), 1, LineType.AntiAlias);
                         }
                         else
                         {
+                            // Not selected
                             RobotList[i].IsSelected = false;
                         }
                     }
                 }
                 //DrawHexagon(Input, test, 10, 0);
-                CvInvoke.Resize(Input, Input, new Size((int)(Input.Cols * widthScale), (int)(Input.Rows * heightScale)));
                 Image = Input.Clone().GetUMat(AccessType.Read);
 
             }
@@ -241,7 +256,7 @@ namespace SwarmRoboticsGUI
 
         // Input Events
         #region
-        public void UserClick(System.Windows.Point pos, Robot[] RobotList)
+        public void UserClick(System.Windows.Point pos)
         {
             CursorPosition = new PointF(Math.Abs((float)(pos.X)), Math.Abs((float)(pos.Y)));
         }

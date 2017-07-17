@@ -132,7 +132,7 @@ namespace SwarmRoboticsGUI
             Mouse.Capture(this);
             Point pos = Mouse.GetPosition(this);
             Mouse.Capture(null);
-            Display.UserClick(pos, RobotList);
+            Display.UserClick(pos);
         }
 
         private void Overlay_SizeChanged(object sender, SizeChangedEventArgs e)
