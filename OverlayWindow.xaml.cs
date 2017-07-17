@@ -65,15 +65,31 @@ namespace SwarmRoboticsGUI
             mainWindow.camera1.FrameUpdate += new Camera.FrameHandler(DrawOverlayFrame);
         }
 
-        private void DrawOverlayFrame(Camera cam, EventArgs e)
+        private void DrawOverlayFrame(object sender, EventArgs e)
         {
-            //
-            if (cam.Frame != null)
+            switch (Display.Source)
             {
-                RobotList = imgProc.GetRobots(cam.Frame, RobotList);
-                Display.ProcessOverlay(cam.Frame, RobotList);
-                OverlayImageBox.Image = Display.Image;
+                case ImageDisplay.SourceType.NONE:
+                    break;
+                case ImageDisplay.SourceType.CAMERA:
+                    Camera cam = (Camera)sender;
+                    if (cam.Frame != null)
+                    {
+                        RobotList = imgProc.GetRobots(cam.Frame, RobotList);
+                        Display.ProcessOverlay(cam.Frame, RobotList);
+                        OverlayImageBox.Image = Display.Image;
+                    }
+                    break;
+                case ImageDisplay.SourceType.CUTOUTS:
+                    RobotList = imgProc.GetRobots(imgProc.testImage, RobotList);
+                    Display.ProcessOverlay(imgProc.testImage, RobotList);
+                    OverlayImageBox.Image = Display.Image;
+                    break;
+                default:
+                    break;
             }
+            //
+            
         }
 
         private void Interface_Tick(object sender, ElapsedEventArgs e)
@@ -86,6 +102,19 @@ namespace SwarmRoboticsGUI
             //Camera1.imgProc.LowerV = Overlay.LowerV;
             imgProc.UpperH = UpperH;
             //Camera1.imgProc.UpperV = Overlay.UpperV;
+
+            switch (Display.Source)
+            {
+                case ImageDisplay.SourceType.NONE:
+                    break;
+                case ImageDisplay.SourceType.CAMERA:
+                    break;
+                case ImageDisplay.SourceType.CUTOUTS:
+                    DrawOverlayFrame(this, new EventArgs());
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void Overlay_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -96,6 +125,11 @@ namespace SwarmRoboticsGUI
         private void btnClear_Click(object sender, RoutedEventArgs e)
         {
             ClearRobots(RobotList);
+        }
+
+        private void OverlayImageBox_Click(object sender, EventArgs e)
+        {
+            Point test = Mouse.GetPosition(this);
         }
     }
 }

@@ -40,7 +40,7 @@ namespace SwarmRoboticsGUI
         private int LargeContourCount { get; set; }
         private int RobotCount { get; set; }
 
-        public UMat test = new UMat();
+        public UMat testImage = new UMat();
         #endregion
 #endif
 
@@ -50,8 +50,8 @@ namespace SwarmRoboticsGUI
             Filter = FilterType.NONE;
 
             //UMat image = CvInvoke.Imread("...\\...\\Images\\ColourCodes.png").GetUMat(AccessType.Read);
-            //image = CvInvoke.Imread("...\\...\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
-            //CvInvoke.Resize(image, image, new Size(480, 640));
+            UMat image = CvInvoke.Imread("...\\...\\Brae\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
+            CvInvoke.Resize(image, testImage, new Size(640, 480));
         }
         public static string ToString(FilterType filter)
         {
@@ -201,17 +201,14 @@ namespace SwarmRoboticsGUI
                 CvInvoke.CvtColor(Input, Input, ColorConversion.Bgr2Gray);
                 CvInvoke.BitwiseNot(Input, Input);
                 CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.GaussianC, ThresholdType.Binary, 3, 0);
-                CvInvoke.FindContours(Input, Contours, null, RetrType.External, ChainApproxMethod.ChainApproxSimple);
-#if DEBUG
-                test = Input.Clone();
-#endif
+                CvInvoke.FindContours(Input, Contours, null, RetrType.Ccomp, ChainApproxMethod.ChainApproxSimple);
             }
             //
             for (int i = 0; i < Contours.Size; i++)
             {
                 Area = Math.Abs(CvInvoke.ContourArea(Contours[i]));
                 // Remove high/low freq noise contours
-                if (Area > 50 && Area < 500)
+                if (Area > 0 && Area < 500)
                 {
                     LargeContours.Push(Contours[i]);
                 }
@@ -221,7 +218,8 @@ namespace SwarmRoboticsGUI
             for (int i = 0; i < LargeContours.Size; i++)
             {
                 // Get approximate polygonal shape of contour
-                CvInvoke.ApproxPolyDP(LargeContours[i], ApproxContours[i], 15.0, true);
+                //CvInvoke.ApproxPolyDP(LargeContours[i], ApproxContours[i], 15.0, true);
+                CvInvoke.ApproxPolyDP(LargeContours[i], ApproxContours[i], 5.0, true);
                 // Check if contour is the right shape (triangle)
                 if (IsEquilTriangle(ApproxContours[i]))
                 {
@@ -229,9 +227,6 @@ namespace SwarmRoboticsGUI
                     TriangleCOM = TriangleMoment.GravityCenter;
                 }
             }
-#if DEBUG         
-            CvInvoke.DrawContours(test, ApproxContours, -1, new MCvScalar(255, 255, 255), 2);
-#endif
             return new Point((int)TriangleMoment.GravityCenter.X, (int)TriangleMoment.GravityCenter.Y);
         }
         public bool FindColour(Mat Frame, Color TargetColour)
@@ -376,10 +371,10 @@ namespace SwarmRoboticsGUI
                             RobotCount++;
 #endif
                             Point RelativeDirectionMarker = FindDirection(RobotImage);
+                            RobotList[RobotID].Location = new Point((int)RelativeRobotCOM.X + RobotBounds.X, (int)RelativeRobotCOM.Y + RobotBounds.Y);
                             if (RelativeDirectionMarker.X > 0 && RelativeDirectionMarker.Y > 0)
                             {
                                 RobotList[RobotID].DirectionMarker = new Point(RelativeDirectionMarker.X + RobotBounds.X, RelativeDirectionMarker.Y + RobotBounds.Y);
-                                RobotList[RobotID].Location = new Point((int)RelativeRobotCOM.X + RobotBounds.X, (int)RelativeRobotCOM.Y + RobotBounds.Y);
                                 if (RobotList[RobotID].Location.X > 0 && RobotList[RobotID].Location.Y > 0)
                                 {
                                     int dy = RobotList[RobotID].Location.Y - RobotList[RobotID].DirectionMarker.Y;

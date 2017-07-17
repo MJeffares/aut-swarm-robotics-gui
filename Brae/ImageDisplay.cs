@@ -14,8 +14,10 @@ namespace SwarmRoboticsGUI
     public class ImageDisplay
     {
         public enum OverlayType { NONE, DEBUG, PRETTY, INFO, GRID, TEST, NUM_OVERLAYS };
+        public enum SourceType { NONE, CAMERA, CUTOUTS, NUM_SOURCES };
 
         public OverlayType Overlay { get; set; }
+        public SourceType Source { get; set; }
 
         public UMat Image { get; set; }
 
@@ -44,6 +46,22 @@ namespace SwarmRoboticsGUI
                     return string.Format("Overlay Text Error");
             }
         }
+
+        public static string ToString(SourceType Source)
+        {
+            switch (Source)
+            {
+                case SourceType.NONE:
+                    return string.Format("No Source");
+                case SourceType.CAMERA:
+                    return string.Format("Camera");
+                case SourceType.CUTOUTS:
+                    return string.Format("Cutouts");
+                default:
+                    return string.Format("Source Text Error");
+            }
+        }
+
         public void ProcessOverlay(UMat Frame, Robot[] RobotList)
         {
             if (Frame != null)
@@ -73,15 +91,17 @@ namespace SwarmRoboticsGUI
 
         private void DrawPrettyOverlay(UMat Frame, Robot[] RobotList)
         {
-            Mat Input = new Image<Bgr, byte>(Frame.Cols, Frame.Rows).Mat;
-            for (int i = 0; i < RobotList.Length; i++)
+            using (Mat Input = new Image<Bgr, byte>(Frame.Cols, Frame.Rows).Mat)
             {
-                if (RobotList[i].Location.X > 0 && RobotList[i].Location.Y > 0)
+                for (int i = 0; i < RobotList.Length; i++)
                 {
-                    DrawHexagon(Input, RobotList[i].Location, 50, RobotList[i].Heading);
+                    if (RobotList[i].Location.X > 0 && RobotList[i].Location.Y > 0)
+                    {
+                        DrawHexagon(Input, RobotList[i].Location, 50, RobotList[i].Heading);
+                    }
                 }
+                Image = Input.Clone().GetUMat(AccessType.Read);
             }
-            Image = Input.Clone().GetUMat(AccessType.Read);
         }
 
         private void DrawDebugOverlay(UMat Frame, Robot[] RobotList)
