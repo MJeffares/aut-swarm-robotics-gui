@@ -13,19 +13,39 @@ namespace SwarmRoboticsGUI
 {
     public class ImageDisplay
     {
+        // Enumerations
+        #region
         public enum OverlayType { NONE, DEBUG, PRETTY, INFO, GRID, TEST, NUM_OVERLAYS };
         public enum SourceType { NONE, CAMERA, CUTOUTS, NUM_SOURCES };
+        #endregion
 
+        // Variable Declarations
+        #region
         public OverlayType Overlay { get; set; }
         public SourceType Source { get; set; }
 
         public UMat Image { get; set; }
 
+        private PointF CursorPosition { get; set; }
+
+        public int width { get; private set; }
+        public int height { get; private set; }
+        public double widthScale { get; private set; }
+        public double heightScale { get; private set; }
+        #endregion
+
         public ImageDisplay()
         {
             Image = new UMat();
+
+            width = 640;
+            height = 480;
+            widthScale = 1;
+            heightScale = 1;
         }
 
+        // ToString Overloads
+        #region
         public static string ToString(OverlayType Overlay)
         {
             switch (Overlay)
@@ -61,7 +81,10 @@ namespace SwarmRoboticsGUI
                     return string.Format("Source Text Error");
             }
         }
+        #endregion
 
+        // Methods
+        #region
         public void ProcessOverlay(UMat Frame, Robot[] RobotList)
         {
             if (Frame != null)
@@ -89,6 +112,33 @@ namespace SwarmRoboticsGUI
             }
         }
 
+        public void Resize(int width, int height)
+        {
+
+            double newWidthScale = (double)width / (double)this.width;
+            double newHeightScale = (double)height / (double)this.height;
+            //CursorPosition = new PointF((float)(CursorPosition.X * newWidthScale / widthScale), (float)(CursorPosition.Y * newHeightScale / heightScale));
+            widthScale = newWidthScale;
+            heightScale = newHeightScale;
+
+        }
+        public void Resize(double widthScale, double heightScale)
+        {
+            CursorPosition = new PointF((float)(CursorPosition.X * widthScale / this.widthScale), (float)(CursorPosition.Y * heightScale / this.heightScale));
+            this.widthScale = widthScale;
+            this.heightScale = heightScale;
+        }
+        public void Resize(double Scale)
+        {
+            CursorPosition = new PointF((float)(CursorPosition.X * Scale / this.widthScale), (float)(CursorPosition.Y * Scale / this.heightScale));
+            this.widthScale = Scale;
+            this.heightScale = Scale;
+        }
+
+        #endregion
+
+        // Drawing Methods
+        #region
         private void DrawPrettyOverlay(UMat Frame, Robot[] RobotList)
         {
             using (Mat Input = new Image<Bgr, byte>(Frame.Cols, Frame.Rows).Mat)
@@ -97,10 +147,28 @@ namespace SwarmRoboticsGUI
                 {
                     if (RobotList[i].Location.X > 0 && RobotList[i].Location.Y > 0)
                     {
-                        DrawHexagon(Input, RobotList[i].Location, 50, RobotList[i].Heading);
+                        //Point ScaledRobotLocation = new Point((int)(RobotList[i].Location.X), (int)(RobotList[i].Location.Y));
+                        //
+                        VectorOfVectorOfPoint ContourVect = DrawHexagon(Input, RobotList[i].Location, (int)(50), RobotList[i].Heading);
+                        //
+                        double IsPointInContour = CvInvoke.PointPolygonTest(ContourVect[0], CursorPosition, false);
+                        //
+                        if (IsPointInContour >= 0)
+                        {
+                            RobotList[i].IsSelected = true;
+                            CvInvoke.PutText(Input, i.ToString(), new Point(RobotList[i].Location.X + 20, RobotList[i].Location.Y + 0), FontFace.HersheyScriptSimplex, 0.5, new MCvScalar(50, 50, 50), 1, LineType.AntiAlias);
+                            CvInvoke.PutText(Input, RobotList[i].Battery.ToString(), new Point(RobotList[i].Location.X + 20, RobotList[i].Location.Y + 20), FontFace.HersheyScriptSimplex, 0.5, new MCvScalar(50, 50, 50), 1, LineType.AntiAlias);
+                        }
+                        else
+                        {
+                            RobotList[i].IsSelected = false;
+                        }
                     }
                 }
+                //DrawHexagon(Input, test, 10, 0);
+                CvInvoke.Resize(Input, Input, new Size((int)(Input.Cols * widthScale), (int)(Input.Rows * heightScale)));
                 Image = Input.Clone().GetUMat(AccessType.Read);
+
             }
         }
 
@@ -149,7 +217,7 @@ namespace SwarmRoboticsGUI
             Image = Input.Clone().GetUMat(AccessType.Read);
         }
 
-        private void DrawHexagon(IInputOutputArray img, Point center, int radius, double angle)
+        private VectorOfVectorOfPoint DrawHexagon(IInputOutputArray img, Point center, int radius, double angle)
         {
             var shape = new Point[6];
 
@@ -160,12 +228,23 @@ namespace SwarmRoboticsGUI
                   (int)(center.X + radius * Math.Cos(i * 60 * Math.PI / 180 + angle)),
                   (int)(center.Y + radius * Math.Sin(i * 60 * Math.PI / 180 + angle)));
             }
-
-            using (VectorOfVectorOfPoint ContourVect = new VectorOfVectorOfPoint())
-            {
-                ContourVect.Push(new VectorOfPoint(shape));
-                CvInvoke.DrawContours(img, ContourVect, -1, new MCvScalar(255, 255, 255), -1, LineType.AntiAlias);
-            }
+            //
+            VectorOfVectorOfPoint ContourVect = new VectorOfVectorOfPoint();
+            //
+            ContourVect.Push(new VectorOfPoint(shape));
+            //
+            CvInvoke.DrawContours(img, ContourVect, -1, new MCvScalar(255, 255, 255), -1, LineType.AntiAlias);
+            //
+            return ContourVect;
         }
+        #endregion
+
+        // Input Events
+        #region
+        public void UserClick(System.Windows.Point pos, Robot[] RobotList)
+        {
+            CursorPosition = new PointF(Math.Abs((float)(pos.X)), Math.Abs((float)(pos.Y)));
+        }
+        #endregion
     }
 }

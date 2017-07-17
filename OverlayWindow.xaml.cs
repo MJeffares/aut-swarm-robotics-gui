@@ -58,7 +58,7 @@ namespace SwarmRoboticsGUI
             ColourC = 1000;
             LowerS = 25;
 
-            InterfaceTimer = new Timer(200);
+            InterfaceTimer = new Timer(100);
             InterfaceTimer.Elapsed += Interface_Tick;
             InterfaceTimer.Start();
 
@@ -129,7 +129,16 @@ namespace SwarmRoboticsGUI
 
         private void OverlayImageBox_Click(object sender, EventArgs e)
         {
-            Point test = Mouse.GetPosition(this);
+            Mouse.Capture(this);
+            Point pos = Mouse.GetPosition(this);
+            Mouse.Capture(null);
+            Display.UserClick(pos, RobotList);
+        }
+
+        private void Overlay_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (Display != null)
+                Display.Resize(OverlayImageBox.Width, OverlayImageBox.Height);
         }
     }
 }

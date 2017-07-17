@@ -137,7 +137,7 @@ namespace SwarmRoboticsGUI
 
 			setupSystemTest();
             // TEMP: Default configuration
-            overlayWindow.Display.Overlay = ImageDisplay.OverlayType.DEBUG;
+            overlayWindow.Display.Overlay = ImageDisplay.OverlayType.PRETTY;
             overlayWindow.Display.Source = ImageDisplay.SourceType.CUTOUTS;
 		}
         
