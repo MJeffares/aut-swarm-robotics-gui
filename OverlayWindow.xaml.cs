@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -77,15 +79,19 @@ namespace SwarmRoboticsGUI
         }
 
         private void Interface_Tick(object sender, ElapsedEventArgs e)
-        {             
+        {
+            UMat empty = new UMat();
+            UMat testImage = CvInvoke.Imread("...\\...\\Brae\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
+            CvInvoke.Resize(testImage, testImage, new System.Drawing.Size(640, 480));
+            RobotList = imgProc.GetRobots(testImage, RobotList);
+            Display.ProcessOverlay(imgProc.Image, RobotList);
+            OverlayImageBox.Image = Display.Image;
+
+            Display.testAngle = UpperC;
             imgProc.ColourC = ColourC;
-            //Camera1.imgProc.UpperC = Overlay.UpperC;
-            //Camera1.imgProc.LowerC = Overlay.LowerC;
             imgProc.LowerH = LowerH;
             imgProc.LowerS = LowerS;
-            //Camera1.imgProc.LowerV = Overlay.LowerV;
             imgProc.UpperH = UpperH;
-            //Camera1.imgProc.UpperV = Overlay.UpperV;
         }
 
         private void Overlay_Closing(object sender, System.ComponentModel.CancelEventArgs e)

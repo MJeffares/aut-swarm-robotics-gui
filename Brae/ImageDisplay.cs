@@ -19,9 +19,14 @@ namespace SwarmRoboticsGUI
 
         public UMat Image { get; set; }
 
+        public UMat testImage { get; private set; }
+        public double testAngle { get; set; }
+
         public ImageDisplay()
         {
             Image = new UMat();
+            testImage = CvInvoke.Imread("...\\...\\Brae\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
+            CvInvoke.Resize(testImage, testImage, new Size(640, 480));
         }
 
         public static string ToString(OverlayType Overlay)
@@ -46,28 +51,26 @@ namespace SwarmRoboticsGUI
         }
         public void ProcessOverlay(UMat Frame, Robot[] RobotList)
         {
-            if (Frame != null)
+
+            switch (Overlay)
             {
-                switch (Overlay)
-                {
-                    case OverlayType.NONE:
-                        Image = Frame;
-                        break;
-                    case OverlayType.DEBUG:
-                        DrawDebugOverlay(Frame, RobotList);
-                        break;
-                    case OverlayType.PRETTY:
-                        DrawPrettyOverlay(Frame, RobotList);
-                        break;
-                    case OverlayType.INFO:
-                        break;
-                    case OverlayType.GRID:
-                        break;
-                    case OverlayType.TEST:
-                        break;
-                    default:
-                        break;
-                }
+                case OverlayType.NONE:
+                    Image = Frame;
+                    break;
+                case OverlayType.DEBUG:
+                    DrawDebugOverlay(testImage, RobotList);
+                    break;
+                case OverlayType.PRETTY:
+                    DrawPrettyOverlay(testImage, RobotList);
+                    break;
+                case OverlayType.INFO:
+                    break;
+                case OverlayType.GRID:
+                    break;
+                case OverlayType.TEST:
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -79,8 +82,16 @@ namespace SwarmRoboticsGUI
                 if (RobotList[i].Location.X > 0 && RobotList[i].Location.Y > 0)
                 {
                     DrawHexagon(Input, RobotList[i].Location, 50, RobotList[i].Heading);
+                    
+                }
+                if (RobotList[i].Location.X > 0 && RobotList[i].Location.Y > 0)
+                {
+                    DrawArrow(Input, RobotList[i].Location, RobotList[i].Heading);
                 }
             }
+            DrawHexagon(Input, new Point(200, 200), 100, testAngle * Math.PI / 180);
+            DrawArrow(Input, new Point(200, 200), testAngle * Math.PI / 180);
+            
             Image = Input.Clone().GetUMat(AccessType.Read);
         }
 
@@ -137,8 +148,8 @@ namespace SwarmRoboticsGUI
             for (int i = 0; i < 6; i++)
             {
                 shape[i] = new Point(
-                  (int)(center.X + radius * Math.Cos(i * 60 * Math.PI / 180 + angle)),
-                  (int)(center.Y + radius * Math.Sin(i * 60 * Math.PI / 180 + angle)));
+                  (int)(center.X + radius * Math.Cos(i * 60 * Math.PI / 180 + (angle + Math.PI / 6))),
+                  (int)(center.Y + radius * Math.Sin(i * 60 * Math.PI / 180 + (angle + Math.PI / 6))));
             }
 
             using (VectorOfVectorOfPoint ContourVect = new VectorOfVectorOfPoint())
@@ -146,6 +157,16 @@ namespace SwarmRoboticsGUI
                 ContourVect.Push(new VectorOfPoint(shape));
                 CvInvoke.DrawContours(img, ContourVect, -1, new MCvScalar(255, 255, 255), -1, LineType.AntiAlias);
             }
+        }
+
+        private void DrawArrow(IInputOutputArray img, Point p1, double angle)
+        {
+            Point p2 = new Point();
+            const int length = 30;
+            p2.X = (int)(length * Math.Cos(angle) + p1.X);
+            p2.Y = (int)(length * Math.Sin(angle) + p1.Y);
+
+            CvInvoke.ArrowedLine(img, p1, p2, new MCvScalar(20, 20, 20), 2, LineType.AntiAlias, 0, 0.5);
         }
     }
 }

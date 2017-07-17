@@ -11,7 +11,7 @@
     <Grid>
         <Grid Width="640" Height="480" VerticalAlignment="Top" >
             <WindowsFormsHost Grid.Column="3" Name="host1" Margin="0,0,0,0" Visibility="Visible">
-                <em:ImageBox x:Name="OverlayImageBox" Height="640" Width="480" SizeMode="StretchImage" FunctionalMode="Minimum"/>
+                <em:ImageBox x:Name="OverlayImageBox" Height="480" Width="640" SizeMode="StretchImage" FunctionalMode="Minimum"/>
             </WindowsFormsHost>
         </Grid>
         <Grid Height="100" Width="640" VerticalAlignment="Bottom" Margin="10,0,0,-5">

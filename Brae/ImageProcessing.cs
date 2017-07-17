@@ -22,9 +22,8 @@ namespace SwarmRoboticsGUI
         
         
         public UMat Image { get; private set; }
+        public UMat testImage { get; private set; }
 
-        //public Robot[] RobotList = new Robot[6];
-#if DEBUG
         // Debugging variables
         #region
         // Blur, Canny, and Threshold values.
@@ -39,19 +38,15 @@ namespace SwarmRoboticsGUI
         private int HexCount { get; set; }
         private int LargeContourCount { get; set; }
         private int RobotCount { get; set; }
-
-        public UMat test = new UMat();
         #endregion
-#endif
 
         public ImageProcessing()
         {
             
             Filter = FilterType.NONE;
 
-            //UMat image = CvInvoke.Imread("...\\...\\Images\\ColourCodes.png").GetUMat(AccessType.Read);
-            //image = CvInvoke.Imread("...\\...\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
-            //CvInvoke.Resize(image, image, new Size(480, 640));
+            testImage = CvInvoke.Imread("...\\...\\Brae\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
+            CvInvoke.Resize(testImage, testImage, new Size(640, 480));
         }
         public static string ToString(FilterType filter)
         {
@@ -201,17 +196,14 @@ namespace SwarmRoboticsGUI
                 CvInvoke.CvtColor(Input, Input, ColorConversion.Bgr2Gray);
                 CvInvoke.BitwiseNot(Input, Input);
                 CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.GaussianC, ThresholdType.Binary, 3, 0);
-                CvInvoke.FindContours(Input, Contours, null, RetrType.External, ChainApproxMethod.ChainApproxSimple);
-#if DEBUG
-                test = Input.Clone();
-#endif
+                CvInvoke.FindContours(Input, Contours, null, RetrType.Ccomp, ChainApproxMethod.ChainApproxSimple);
             }
             //
             for (int i = 0; i < Contours.Size; i++)
             {
                 Area = Math.Abs(CvInvoke.ContourArea(Contours[i]));
                 // Remove high/low freq noise contours
-                if (Area > 50 && Area < 500)
+                if (Area > 0 && Area < 50000)
                 {
                     LargeContours.Push(Contours[i]);
                 }
@@ -229,9 +221,6 @@ namespace SwarmRoboticsGUI
                     TriangleCOM = TriangleMoment.GravityCenter;
                 }
             }
-#if DEBUG         
-            CvInvoke.DrawContours(test, ApproxContours, -1, new MCvScalar(255, 255, 255), 2);
-#endif
             return new Point((int)TriangleMoment.GravityCenter.X, (int)TriangleMoment.GravityCenter.Y);
         }
         public bool FindColour(Mat Frame, Color TargetColour)
@@ -271,8 +260,8 @@ namespace SwarmRoboticsGUI
                 UpperH = 175;
             }
 
-            //LowerH = TargetColour.GetHue() / 2 - 10;
-            //UpperH = TargetColour.GetHue() / 2 + 10;
+            //LowerH = TargetColour.GetHue() * 255 / 360 - 2;
+            //UpperH = TargetColour.GetHue() * 255 / 360 + 2;
             //LowerH = this.LowerH;
             //UpperH = this.UpperH;
 
@@ -375,15 +364,17 @@ namespace SwarmRoboticsGUI
 #if DEBUG
                             RobotCount++;
 #endif
+                            RobotList[RobotID].Location = new Point((int)RelativeRobotCOM.X + RobotBounds.X, (int)RelativeRobotCOM.Y + RobotBounds.Y);
+
                             Point RelativeDirectionMarker = FindDirection(RobotImage);
                             if (RelativeDirectionMarker.X > 0 && RelativeDirectionMarker.Y > 0)
                             {
                                 RobotList[RobotID].DirectionMarker = new Point(RelativeDirectionMarker.X + RobotBounds.X, RelativeDirectionMarker.Y + RobotBounds.Y);
-                                RobotList[RobotID].Location = new Point((int)RelativeRobotCOM.X + RobotBounds.X, (int)RelativeRobotCOM.Y + RobotBounds.Y);
+                                
                                 if (RobotList[RobotID].Location.X > 0 && RobotList[RobotID].Location.Y > 0)
                                 {
-                                    int dy = RobotList[RobotID].Location.Y - RobotList[RobotID].DirectionMarker.Y;
-                                    int dx = RobotList[RobotID].Location.X - RobotList[RobotID].DirectionMarker.X;
+                                    int dy = RobotList[RobotID].DirectionMarker.Y - RobotList[RobotID].Location.Y;
+                                    int dx = RobotList[RobotID].DirectionMarker.X - RobotList[RobotID].Location.X;
                                     RobotList[RobotID].Heading = Math.Atan2(dy, dx);
                                 }
                             }
