@@ -7,11 +7,11 @@
         xmlns:local="clr-namespace:SwarmRoboticsGUI"
         xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
         mc:Ignorable="d"
-        Title="Overlay" Height="610" Width="640" ResizeMode="NoResize" Closing="Overlay_Closing">
+        Title="Overlay" Height="610" Width="640" Closing="Overlay_Closing" MinHeight="610" MinWidth="640" SizeChanged="Overlay_SizeChanged">
     <Grid>
-        <Grid Width="640" Height="480" VerticalAlignment="Top" >
+        <Grid VerticalAlignment="Stretch" MinHeight="480" MinWidth="640" Margin="0,0,0,100">
             <WindowsFormsHost Grid.Column="3" Name="host1" Margin="0,0,0,0" Visibility="Visible">
-                <em:ImageBox x:Name="OverlayImageBox" Height="480" Width="640" SizeMode="StretchImage" FunctionalMode="Minimum"/>
+                <em:ImageBox x:Name="OverlayImageBox" SizeMode="Normal" FunctionalMode="Minimum" Click="OverlayImageBox_Click" MinimumSize="640, 480" Dock="Fill"/>
             </WindowsFormsHost>
         </Grid>
         <Grid Height="100" Width="640" VerticalAlignment="Bottom" Margin="10,0,0,-5">

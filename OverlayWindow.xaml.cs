@@ -60,38 +60,60 @@ namespace SwarmRoboticsGUI
             ColourC = 1000;
             LowerS = 25;
 
-            InterfaceTimer = new Timer(200);
+            InterfaceTimer = new Timer(100);
             InterfaceTimer.Elapsed += Interface_Tick;
             InterfaceTimer.Start();
 
             mainWindow.camera1.FrameUpdate += new Camera.FrameHandler(DrawOverlayFrame);
         }
 
-        private void DrawOverlayFrame(Camera cam, EventArgs e)
+        private void DrawOverlayFrame(object sender, EventArgs e)
         {
-            //
-            if (cam.Frame != null)
+            switch (Display.Source)
             {
-                RobotList = imgProc.GetRobots(cam.Frame, RobotList);
-                Display.ProcessOverlay(cam.Frame, RobotList);
-                OverlayImageBox.Image = Display.Image;
+                case ImageDisplay.SourceType.NONE:
+                    break;
+                case ImageDisplay.SourceType.CAMERA:
+                    Camera cam = (Camera)sender;
+                    if (cam.Frame != null)
+                    {
+                        RobotList = imgProc.GetRobots(cam.Frame, RobotList);
+                        Display.ProcessOverlay(cam.Frame, RobotList);
+                        OverlayImageBox.Image = Display.Image;
+                    }
+                    break;
+                case ImageDisplay.SourceType.CUTOUTS:
+                    RobotList = imgProc.GetRobots(imgProc.testImage, RobotList);
+                    Display.ProcessOverlay(imgProc.testImage, RobotList);
+                    OverlayImageBox.Image = Display.Image;
+                    break;
+                default:
+                    break;
             }
+            //
+            
         }
 
         private void Interface_Tick(object sender, ElapsedEventArgs e)
-        {
-            UMat empty = new UMat();
-            UMat testImage = CvInvoke.Imread("...\\...\\Brae\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
-            CvInvoke.Resize(testImage, testImage, new System.Drawing.Size(640, 480));
-            RobotList = imgProc.GetRobots(testImage, RobotList);
-            Display.ProcessOverlay(imgProc.Image, RobotList);
-            OverlayImageBox.Image = Display.Image;
-
-            Display.testAngle = UpperC;
+        {             
             imgProc.ColourC = ColourC;
             imgProc.LowerH = LowerH;
             imgProc.LowerS = LowerS;
             imgProc.UpperH = UpperH;
+            //Camera1.imgProc.UpperV = Overlay.UpperV;
+
+            switch (Display.Source)
+            {
+                case ImageDisplay.SourceType.NONE:
+                    break;
+                case ImageDisplay.SourceType.CAMERA:
+                    break;
+                case ImageDisplay.SourceType.CUTOUTS:
+                    DrawOverlayFrame(this, new EventArgs());
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void Overlay_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -102,6 +124,20 @@ namespace SwarmRoboticsGUI
         private void btnClear_Click(object sender, RoutedEventArgs e)
         {
             ClearRobots(RobotList);
+        }
+
+        private void OverlayImageBox_Click(object sender, EventArgs e)
+        {
+            Mouse.Capture(this);
+            Point pos = Mouse.GetPosition(this);
+            Mouse.Capture(null);
+            Display.UserClick(pos);
+        }
+
+        private void Overlay_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (Display != null)
+                Display.Resize(OverlayImageBox.Width, OverlayImageBox.Height);
         }
     }
 }

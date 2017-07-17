@@ -40,6 +40,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -450,14 +451,24 @@ namespace SwarmRoboticsGUI
 			
 		}
 
+
+		private GridViewColumnHeader lvCommunicatedMessagesSortCol = null;
+		private SortAdorner lvCommunicatedMessagesSortAdorner = null;
+
+
 		private void Refresh()
 		{
+			if (lvCommunicatedMessagesSortAdorner != null && lvCommunicatedMessagesSortCol != null)
+			{
+				lvCommunicatedMessages.Items.SortDescriptions.Add(new SortDescription(lvCommunicatedMessagesSortCol.Tag.ToString(), lvCommunicatedMessagesSortAdorner.Direction));
+			}
+			
 			lvCommunicatedMessages.Items.Refresh();
 		}
 
 
 		//this stuff is temporary XXXX
-		/*
+		
 		private void receivedDataRemove_Click(object sender, RoutedEventArgs e)
 		{
 			gvCommunicatedMessages.Columns.Remove(gvcTimeStamp);
@@ -468,8 +479,7 @@ namespace SwarmRoboticsGUI
 			gvCommunicatedMessages.Columns.Add(gvcTimeStamp);
 		}
 
-		private GridViewColumnHeader lvCommunicatedMessagesSortCol = null;
-		private SortAdorner lvCommunicatedMessagesSortAdorner = null;
+		
 		
 		private void GridViewColumnHeader_Click(object sender, RoutedEventArgs e)
 		{
@@ -490,6 +500,7 @@ namespace SwarmRoboticsGUI
 			lvCommunicatedMessagesSortAdorner = new SortAdorner(lvCommunicatedMessagesSortCol, newDir);
 			AdornerLayer.GetAdornerLayer(lvCommunicatedMessagesSortCol).Add(lvCommunicatedMessagesSortAdorner);
 			lvCommunicatedMessages.Items.SortDescriptions.Add(new SortDescription(sortBy, newDir));
+			//column.Width = column.ActualWidth + 10;
 			lvCommunicatedMessages.Items.Refresh();
 		}
 
@@ -531,7 +542,7 @@ namespace SwarmRoboticsGUI
 				drawingContext.Pop();
 			}
 		}
-		*/
+		
 
 
 

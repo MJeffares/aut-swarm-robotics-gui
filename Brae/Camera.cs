@@ -59,10 +59,6 @@ namespace SwarmRoboticsGUI
         // Methods
         public void StartCapture()
         {
-            if (videoCapture != null)
-            {
-                videoCapture.Dispose();
-            }
             try
             {
                 // update the capture object           
@@ -72,7 +68,7 @@ namespace SwarmRoboticsGUI
                 // create a new matrix to hold our image
                 Frame = new UMat();
                 // add event handler for our new capture  
-                videoCapture.ImageGrabbed += ProcessFrame;               
+                videoCapture.ImageGrabbed += ProcessFrame;
                 // update our status
                 Status = StatusType.PLAYING;
                 // start the capture       

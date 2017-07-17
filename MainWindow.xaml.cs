@@ -111,6 +111,7 @@ namespace SwarmRoboticsGUI
             PopulateFilters();
             PopulateOverlays();
             PopulateCameras();
+            PopulateSources();
             //
             openvideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
             savevideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
@@ -130,10 +131,15 @@ namespace SwarmRoboticsGUI
             // TEMP: display overlay on starup for debugging
             overlayWindow.Show();
 
-
             camera1.FrameUpdate += new Camera.FrameHandler(DrawCameraFrame);
-            //serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
-        }
+            
+			//serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+
+			setupSystemTest();
+            // TEMP: Default configuration
+            overlayWindow.Display.Overlay = ImageDisplay.OverlayType.PRETTY;
+            overlayWindow.Display.Source = ImageDisplay.SourceType.CUTOUTS;
+		}
         
 
         // Methods
@@ -234,7 +240,29 @@ namespace SwarmRoboticsGUI
             settingsmenuitem.Click += menuPlaceHolder_Click;
         }
 
-        
+        private void PopulateSources()
+        {
+            //loops through our filters and adds them to our menu
+            for (int i = 0; i < (int)ImageDisplay.SourceType.NUM_SOURCES; i++)
+            {
+                MenuItem item = new MenuItem { Header = ImageDisplay.ToString((ImageDisplay.SourceType)i) };
+                item.Click += new RoutedEventHandler(menuSourceListItem_Click);
+                item.IsCheckable = true;
+                //by default select our first filter (no filter)
+                if (i == 0)
+                {
+                    item.IsChecked = true;
+                }
+                menuSourceList.Items.Add(item);
+            }
+            // add our seperator and settings menu items
+            Separator sep = new Separator();
+            menuSourceList.Items.Add(sep);
+
+            MenuItem settingsmenuitem = new MenuItem { Header = "Settings" };
+            menuSourceList.Items.Add(settingsmenuitem);
+            settingsmenuitem.Click += menuPlaceHolder_Click;
+        }
 
         public void ToggleCameraWindow()
         {
@@ -352,14 +380,42 @@ namespace SwarmRoboticsGUI
                     }
                     break;
             }
+
+            switch (overlayWindow.Display.Source)
+            {
+                case ImageDisplay.SourceType.NONE:
+                    break;
+                case ImageDisplay.SourceType.CAMERA:
+                    break;
+                case ImageDisplay.SourceType.CUTOUTS:
+                    DrawCameraFrame(this, new EventArgs());
+                    break;
+                default:
+                    break;
+            }
         }
 
-        private void DrawCameraFrame(Camera cam, EventArgs e)
+
+        private void DrawCameraFrame(object sender, EventArgs e)
         {
-            if (camera1.Frame != null)
+            switch (overlayWindow.Display.Source)
             {
-                overlayWindow.imgProc.ProcessFilter(cam.Frame);
-                captureImageBox.Image = overlayWindow.imgProc.Image;
+                case ImageDisplay.SourceType.NONE:
+                    break;
+                case ImageDisplay.SourceType.CAMERA:
+                    Camera cam = (Camera)sender;
+                    if (cam.Frame != null)
+                    {
+                        overlayWindow.imgProc.ProcessFilter(cam.Frame);
+                        captureImageBox.Image = overlayWindow.imgProc.Image;
+                    }                   
+                    break;
+                case ImageDisplay.SourceType.CUTOUTS:
+                    overlayWindow.imgProc.ProcessFilter(overlayWindow.imgProc.testImage);
+                    captureImageBox.Image = overlayWindow.imgProc.Image;
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -417,6 +473,27 @@ namespace SwarmRoboticsGUI
                 //statusDisplayFilter.Text = ImageDisplay.ToString(overlayWindow.Display.Overlay);
             }
         }
+
+        private void menuSourceListItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem menusender = (MenuItem)sender;
+            string menusenderstring = menusender.ToString();
+
+            if (menusenderstring != ImageDisplay.ToString(overlayWindow.Display.Source))
+            {
+                MenuItem[] allitems = menuSourceList.Items.OfType<MenuItem>().ToArray();
+
+                foreach (var item in allitems)
+                {
+                    item.IsChecked = false;
+                }
+                menusender.IsChecked = true;
+                overlayWindow.Display.Source = (ImageDisplay.SourceType)menuSourceList.Items.IndexOf(menusender);
+                // TODO: Not sure where to display this right now
+                //statusDisplayFilter.Text = ImageDisplay.ToString(overlayWindow.Display.Overlay);
+            }
+        }
+
         private void menuDisplayPopOut_Click(object sender, RoutedEventArgs e)
         {
             ToggleCameraWindow();
@@ -473,8 +550,6 @@ namespace SwarmRoboticsGUI
                 // Stop capturing
                 camera1.StopCapture();
                 //
-                captureImageBox.Visible = false;
-                //
                 menuCameraConnect.Header = "Start Capture";
                 menuCameraFreeze.Header = "Freeze";
                 menuCameraFreeze.IsChecked = false;
@@ -494,7 +569,6 @@ namespace SwarmRoboticsGUI
                 // Start capturing
                 camera1.StartCapture();
                 //
-                captureImageBox.Visible = true;
                 menuCameraConnect.Header = "Stop Capture";          // Update the header on our connect/disconnect button
                 // TODO: What should this say?
                 menuCameraFreeze.Header = "Freeze";

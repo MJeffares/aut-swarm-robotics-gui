@@ -28,5 +28,6 @@ namespace SwarmRoboticsGUI
         public double Heading { get; set; }
         public Point[] Contour { get; set; }
         public bool IsTracked { get; set; }
+        public bool IsSelected { get; set; }
     }
 }

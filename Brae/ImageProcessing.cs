@@ -38,6 +38,8 @@ namespace SwarmRoboticsGUI
         private int HexCount { get; set; }
         private int LargeContourCount { get; set; }
         private int RobotCount { get; set; }
+
+        public UMat testImage = new UMat();
         #endregion
 
         public ImageProcessing()
@@ -45,8 +47,9 @@ namespace SwarmRoboticsGUI
             
             Filter = FilterType.NONE;
 
-            testImage = CvInvoke.Imread("...\\...\\Brae\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
-            CvInvoke.Resize(testImage, testImage, new Size(640, 480));
+            //UMat image = CvInvoke.Imread("...\\...\\Images\\ColourCodes.png").GetUMat(AccessType.Read);
+            UMat image = CvInvoke.Imread("...\\...\\Brae\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
+            CvInvoke.Resize(image, testImage, new Size(640, 480));
         }
         public static string ToString(FilterType filter)
         {
@@ -203,7 +206,7 @@ namespace SwarmRoboticsGUI
             {
                 Area = Math.Abs(CvInvoke.ContourArea(Contours[i]));
                 // Remove high/low freq noise contours
-                if (Area > 0 && Area < 50000)
+                if (Area > 0 && Area < 500)
                 {
                     LargeContours.Push(Contours[i]);
                 }
@@ -213,7 +216,8 @@ namespace SwarmRoboticsGUI
             for (int i = 0; i < LargeContours.Size; i++)
             {
                 // Get approximate polygonal shape of contour
-                CvInvoke.ApproxPolyDP(LargeContours[i], ApproxContours[i], 15.0, true);
+                //CvInvoke.ApproxPolyDP(LargeContours[i], ApproxContours[i], 15.0, true);
+                CvInvoke.ApproxPolyDP(LargeContours[i], ApproxContours[i], 5.0, true);
                 // Check if contour is the right shape (triangle)
                 if (IsEquilTriangle(ApproxContours[i]))
                 {
@@ -367,6 +371,7 @@ namespace SwarmRoboticsGUI
                             RobotList[RobotID].Location = new Point((int)RelativeRobotCOM.X + RobotBounds.X, (int)RelativeRobotCOM.Y + RobotBounds.Y);
 
                             Point RelativeDirectionMarker = FindDirection(RobotImage);
+                            RobotList[RobotID].Location = new Point((int)RelativeRobotCOM.X + RobotBounds.X, (int)RelativeRobotCOM.Y + RobotBounds.Y);
                             if (RelativeDirectionMarker.X > 0 && RelativeDirectionMarker.Y > 0)
                             {
                                 RobotList[RobotID].DirectionMarker = new Point(RelativeDirectionMarker.X + RobotBounds.X, RelativeDirectionMarker.Y + RobotBounds.Y);
