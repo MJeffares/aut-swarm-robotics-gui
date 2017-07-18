@@ -36,7 +36,7 @@ namespace SwarmRoboticsGUI
         public ImageDisplay()
         {
             Image = new UMat();
-            IA = new ImageAnimation(0, 0, 100, 1000);
+            IA = new ImageAnimation(0, 0, 100, 200);
             IA.AnimationUpdate += new ImageAnimation.AnimationHandler(AnimateRectangle);
             width = 800;
             height = 600;
@@ -174,6 +174,11 @@ namespace SwarmRoboticsGUI
             float MaxScale = Math.Max(widthScale, heightScale);
             float MinScale = Math.Min(widthScale, heightScale);
 
+            // Information box position
+            Point InfoBoxLocation = new Point(ScaledRobotLocation.X, ScaledRobotLocation.Y - (int)(40 * MaxScale));
+            // Box to hold information about current robot
+            CvInvoke.Rectangle(img, new Rectangle(InfoBoxLocation, new Size(RectWidth, (int)(80 * MaxScale))), new MCvScalar(100, 100, 100), -1);
+
             // Draw robots as hexagons
             VectorOfVectorOfPoint Contour = GetShapeContour(ScaledRobotLocation, 6, (int)(50 * MaxScale), robot.Heading + Math.PI / 6);
             CvInvoke.DrawContours(img, Contour, -1, new MCvScalar(255, 255, 255), -1, LineType.AntiAlias);
@@ -183,9 +188,7 @@ namespace SwarmRoboticsGUI
                 (int)(30 * MaxScale * Math.Sin(robot.Heading) + ScaledRobotLocation.Y));
             Contour = GetShapeContour(Direction, 3, (int)(10 * MaxScale), robot.Heading);
             CvInvoke.DrawContours(img, Contour, -1, new MCvScalar(0, 0, 0), -1, LineType.AntiAlias);
-
-            CvInvoke.Rectangle(img, new Rectangle(ScaledRobotLocation, new Size(RectWidth, 100)), new MCvScalar(100, 100, 100), -1);
-
+            
             // Current robot is selected
             robot.IsSelected = true;
             // Draw robot information
