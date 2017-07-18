@@ -22,6 +22,7 @@ namespace SwarmRoboticsGUI
     /// </summary>
     public partial class OverlayWindow : Window
     {
+        #region Variables
         public double UpperC { get; set; }
         public double LowerC { get; set; }
         public int ColourC { get; set; }
@@ -31,21 +32,16 @@ namespace SwarmRoboticsGUI
         public int UpperH { get; set; }
         public int UpperS { get; set; }
         public int UpperV { get; set; }
+        #endregion
 
+        #region Properties
         public ImageProcessing imgProc { get; set; }
         public ImageDisplay Display { get; set; }
         private Timer InterfaceTimer { get; set; }
         // MANSEL: This robot list has seen the world
         // TODO: give these robots a home
         public Robot[] RobotList = new Robot[6];
-
-        public void ClearRobots(Robot[] RobotList)
-        {
-            for (int i = 0; i < RobotList.Length; i++)
-            {
-                RobotList[i] = new Robot();
-            }
-        }
+        #endregion
 
         public OverlayWindow(MainWindow mainWindow)
         {
@@ -63,39 +59,12 @@ namespace SwarmRoboticsGUI
             InterfaceTimer = new Timer(100);
             InterfaceTimer.Elapsed += Interface_Tick;
             InterfaceTimer.Start();
-
             mainWindow.camera1.FrameUpdate += new Camera.FrameHandler(DrawOverlayFrame);
         }
 
-        private void DrawOverlayFrame(object sender, EventArgs e)
-        {
-            switch (Display.Source)
-            {
-                case ImageDisplay.SourceType.NONE:
-                    break;
-                case ImageDisplay.SourceType.CAMERA:
-                    Camera cam = (Camera)sender;
-                    if (cam.Frame != null)
-                    {
-                        RobotList = imgProc.GetRobots(cam.Frame, RobotList);
-                        Display.ProcessOverlay(cam.Frame, RobotList);
-                        OverlayImageBox.Image = Display.Image;
-                    }
-                    break;
-                case ImageDisplay.SourceType.CUTOUTS:
-                    RobotList = imgProc.GetRobots(imgProc.testImage, RobotList);
-                    Display.ProcessOverlay(imgProc.testImage, RobotList);
-                    OverlayImageBox.Image = Display.Image;
-                    break;
-                default:
-                    break;
-            }
-            //
-            
-        }
-
+        #region Time Events
         private void Interface_Tick(object sender, ElapsedEventArgs e)
-        {             
+        {
             imgProc.ColourC = ColourC;
             imgProc.LowerH = LowerH;
             imgProc.LowerS = LowerS;
@@ -115,7 +84,45 @@ namespace SwarmRoboticsGUI
                     break;
             }
         }
+        private void DrawOverlayFrame(object sender, EventArgs e)
+        {
+            switch (Display.Source)
+            {
+                case ImageDisplay.SourceType.NONE:
+                    break;
+                case ImageDisplay.SourceType.CAMERA:
+                    Camera cam = (Camera)sender;
+                    if (cam.Frame != null)
+                    {
+                        RobotList = imgProc.GetRobots(cam.Frame, RobotList);
+                        Display.ProcessOverlay(cam.Frame, RobotList);
+                        OverlayImageBox.Image = Display.Image;
+                    }
+                    break;
+                case ImageDisplay.SourceType.CUTOUTS:
+                    RobotList = imgProc.GetRobots(imgProc.TestImage, RobotList);
+                    Display.ProcessOverlay(imgProc.TestImage, RobotList);
+                    OverlayImageBox.Image = Display.Image;
+                    break;
+                default:
+                    break;
+            }
+            //
 
+        }
+        #endregion
+
+        #region Methods
+        public void ClearRobots(Robot[] RobotList)
+        {
+            for (int i = 0; i < RobotList.Length; i++)
+            {
+                RobotList[i] = new Robot();
+            }
+        }
+        #endregion
+
+        #region Input Events 
         private void Overlay_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             InterfaceTimer.Dispose();
@@ -131,13 +138,17 @@ namespace SwarmRoboticsGUI
             Mouse.Capture(this);
             Point pos = Mouse.GetPosition(this);
             Mouse.Capture(null);
-            Display.UserClick(pos);
+            Display.Click(pos);
+            DrawOverlayFrame(this, new EventArgs());
         }
 
-        private void Overlay_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void Overlay_SizeChanged(object sender, EventArgs e)
         {
             if (Display != null)
                 Display.Resize(OverlayImageBox.Width, OverlayImageBox.Height);
         }
+        #endregion
+
+
     }
 }
