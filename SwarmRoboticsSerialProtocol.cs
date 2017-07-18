@@ -29,6 +29,8 @@
 #region
 
 using SwarmRoboticsGUI;
+using System.Windows;
+using System.Windows.Controls;
 
 #endregion
 
@@ -43,6 +45,18 @@ public class ProtocolClass
 	{
 		public const byte COMMUNICATION_TEST = 0x00;
 		public const byte BATTERY_VOLTAGE = 0x01;
+
+		public const byte SYSTEM_TEST_COMMUNICATION = 0xE1;
+		public const byte SYSTEM_TEST_PROXIMITY_SENSORS = 0xE4;
+		public const byte SYSTEM_TEST_LIGHT_SENSORS = 0xE5;
+		public const byte SYSTEM_TEST_MOTORS = 0xE6;
+		public const byte SYSTEM_TEST_MOUSE = 0xE7;
+		public const byte SYSTEM_TEST_IMU = 0xE8;
+		public const byte SYSTEM_TEST_LINE_FOLLOWERS = 0xE9;
+		public const byte SYSTEM_TEST_FAST_CHARGE_CHIP = 0xEA;
+		public const byte SYSTEM_TEST_TWI_MUX = 0xEB;
+		public const byte SYSTEM_TEST_TWI_EXTERNAL = 0xEC;
+		public const byte SYSTEM_TEST_CAMERA = 0xED;
 	}
 
 	// constructor
@@ -50,26 +64,123 @@ public class ProtocolClass
 	{
 		window = main;
 	}
+
 	public void MessageReceived(byte[] message)
 	{
-		switch(message[0])
+		string[] tokens;
+
+		if (window.testMode)
 		{
-			case MESSAGE_TYPES.COMMUNICATION_TEST:
+			switch (message[0])
+			{
+				case MESSAGE_TYPES.SYSTEM_TEST_PROXIMITY_SENSORS:
+					string proximityData = GetMessageData(message[0], message, false);
+					tokens = proximityData.Split(',');
 
-				//window.UpdateSerialReceivedTextBox("\rCommunication Test Successful");
-				//XXX
-				//display the data here
-				break;
+					switch (tokens[0])
+					{
+						case "A":
+							//window.tbSysTestProximityA.Text = tokens[1]; //THREAD ERROR
+							window.UpdateTextBox(window.tbSysTestProximityA, tokens[1]);
+							break;
 
-			case MESSAGE_TYPES.BATTERY_VOLTAGE:
-				float voltage = message[1] * 256 + message[2];
-				voltage = voltage * 5 / 1000;
-				//window.UpdateSerialReceivedTextBox("\rBattery Voltage:");
-				//window.UpdateSerialReceivedTextBox(voltage.ToString());
-				break;
+						case "B":
+							window.tbSysTestProximityB.Text = tokens[1];
+							break;
 
+						case "C":
+							window.tbSysTestProximityC.Text = tokens[1];
+							break;
+
+						case "D":
+							window.tbSysTestProximityD.Text = tokens[1];
+							break;
+
+						case "E":
+							window.tbSysTestProximityE.Text = tokens[1];
+							break;
+
+						case "F":
+							window.tbSysTestProximityF.Text = tokens[1];
+							break;
+					}
+					break;
+
+				case MESSAGE_TYPES.SYSTEM_TEST_LIGHT_SENSORS:
+					string lineData = GetMessageData(message[0], message, false);
+					tokens = lineData.Split(',');
+
+					switch (tokens[0])
+					{
+						case "R":
+							window.tbSysTestLightSensorRHS.Text = tokens[1];
+
+							break;
+
+						case "L":
+							window.tbSysTestLightSensorLHS.Text = tokens[1];
+							break;
+					}
+					break;
+
+				case MESSAGE_TYPES.SYSTEM_TEST_MOTORS:
+					//return "System Test Motor";
+					break;
+
+				case MESSAGE_TYPES.SYSTEM_TEST_MOUSE:
+					//return "System Test Mouse";
+					break;
+
+				case MESSAGE_TYPES.SYSTEM_TEST_IMU:
+					//return "System Test IMU";
+					break;
+
+				case MESSAGE_TYPES.SYSTEM_TEST_LINE_FOLLOWERS:
+					//return "System Test Line Followers";
+					break;
+
+				case MESSAGE_TYPES.SYSTEM_TEST_FAST_CHARGE_CHIP:
+					//return "System Test Fast Charge Chip";
+					break;
+
+				case MESSAGE_TYPES.SYSTEM_TEST_TWI_MUX:
+					//return "System Test TWI Mux";
+					break;
+
+				case MESSAGE_TYPES.SYSTEM_TEST_TWI_EXTERNAL:
+					//return "System Test TWI External";
+					break;
+
+				case MESSAGE_TYPES.SYSTEM_TEST_CAMERA:
+					//return "System Test Camera";
+					break;
+			}
+		}
+		else
+		{
+			switch (message[0])
+			{
+
+				
+				case MESSAGE_TYPES.COMMUNICATION_TEST:
+
+					//window.UpdateSerialReceivedTextBox("\rCommunication Test Successful");
+					//XXX
+					//display the data here
+					break;
+
+				case MESSAGE_TYPES.BATTERY_VOLTAGE:
+					float voltage = message[1] * 256 + message[2];
+					voltage = voltage * 5 / 1000;
+					//window.UpdateSerialReceivedTextBox("\rBattery Voltage:");
+					//window.UpdateSerialReceivedTextBox(voltage.ToString());
+					break;
+					
+			}
 		}
 	}
+
+
 	public void SendMessage(byte type)
 	{
 		switch (type)
@@ -97,29 +208,291 @@ public class ProtocolClass
 				return "Communication Test";
 
 			case MESSAGE_TYPES.BATTERY_VOLTAGE:
-				return "Battery Voltage:";
+				return "Battery Voltage";
+
+			case MESSAGE_TYPES.SYSTEM_TEST_COMMUNICATION:
+				return "System Test Communication";
+
+			case MESSAGE_TYPES.SYSTEM_TEST_PROXIMITY_SENSORS:
+				return "System Test Proxmity Sensors";
+
+			case MESSAGE_TYPES.SYSTEM_TEST_LIGHT_SENSORS:
+				return "System Test Light Sensors";
+
+			case MESSAGE_TYPES.SYSTEM_TEST_MOTORS:
+				return "System Test Motor";
+
+			case MESSAGE_TYPES.SYSTEM_TEST_MOUSE:
+				return "System Test Mouse";
+
+			case MESSAGE_TYPES.SYSTEM_TEST_IMU:
+				return "System Test IMU";
+
+			case MESSAGE_TYPES.SYSTEM_TEST_LINE_FOLLOWERS:
+				return "System Test Line Followers";
+
+			case MESSAGE_TYPES.SYSTEM_TEST_FAST_CHARGE_CHIP:
+				return "System Test Fast Charge Chip";
+
+			case MESSAGE_TYPES.SYSTEM_TEST_TWI_MUX:
+				return "System Test TWI Mux";
+
+			case MESSAGE_TYPES.SYSTEM_TEST_TWI_EXTERNAL:
+				return "System Test TWI External";
+
+			case MESSAGE_TYPES.SYSTEM_TEST_CAMERA:
+				return "System Test Camera";
+
 
 			default:
 				return "WARNING: Message Type Unhandled";
 		}
 	}
 
-	public static string GetMessageData(byte messageType, byte[] messageData)
+
+
+	/// <summary>
+	/// Calculates and returns a string representation of message data
+	/// </summary>
+	/// <param name="messageType">The type of message to get the data of</param>
+	/// <param name="messageData">A byte array with the message data</param>
+	/// <param name="words">If true will preface with additional information (e.g. what sensor the data came from)</param>
+	/// <returns>A string</returns>
+	public static string GetMessageData(byte messageType, byte[] messageData, bool words)
 	{
+		string returnMessage = null;
 		switch (messageType)
 		{
 			case MESSAGE_TYPES.COMMUNICATION_TEST:
 				return "Sucessful";
 
 			case MESSAGE_TYPES.BATTERY_VOLTAGE:
-				float voltage = (float) (messageData[0] * 256 + messageData[1]) * 5 / 1000;
+				float voltage = (float)(messageData[0] * 256 + messageData[1]) * 5 / 1000;
 				return voltage.ToString() + " Volts";
+
+			case MESSAGE_TYPES.SYSTEM_TEST_PROXIMITY_SENSORS:
+				float distance = (float)(messageData[2] * 256 + messageData[3]);
+
+				if (words == true)
+				{
+					switch (messageData[1])
+					{
+						case 0xFA:
+							returnMessage = "Sensor A: ";
+							break;
+
+						case 0xFF:
+							returnMessage = "Sensor B: ";
+							break;
+
+						case 0xFE:
+							returnMessage = "Sensor C: ";
+							break;
+
+						case 0xFD:
+							returnMessage = "Sensor D: ";
+							break;
+
+						case 0xFC:
+							returnMessage = "Sensor E: ";
+							break;
+
+						case 0xFB:
+							returnMessage = "Sensor F: ";
+							break;
+					}
+				}
+				else
+				{
+					switch (messageData[1])
+					{
+						case 0xFA:
+							returnMessage = "A,";
+							break;
+
+						case 0xFF:
+							returnMessage = "B,";
+							break;
+
+						case 0xFE:
+							returnMessage = "C,";
+							break;
+
+						case 0xFD:
+							returnMessage = "D,";
+							break;
+
+						case 0xFC:
+							returnMessage = "E, ";
+							break;
+
+						case 0xFB:
+							returnMessage = "F,";
+							break;
+					}
+				}
+
+
+				returnMessage += distance.ToString();
+				return returnMessage;
+
+			case MESSAGE_TYPES.SYSTEM_TEST_LIGHT_SENSORS:
+				float light = (float)(messageData[1] * 256 + messageData[2]);
+
+				if (words == true)
+				{
+					switch (messageData[1])
+					{
+						case 0xF8:
+							returnMessage = "Right Hand Side Sensor";
+							break;
+
+						case 0xF9:
+							returnMessage = "Left Hand Side Sensor";
+							break;
+					}
+				}
+				else
+				{
+					switch (messageData[1])
+					{
+						case 0xF8:
+							returnMessage = "R,";
+							break;
+
+						case 0xF9:
+							returnMessage = "L,";
+							break;
+					}
+				}
+
+				returnMessage += light.ToString();
+				return returnMessage;
+
+			case MESSAGE_TYPES.SYSTEM_TEST_MOTORS:
+				int dir;    //1 for forward, 0 for reverse
+				int speed;
+				int motor = messageData[1];
+
+				if (messageData[3] > 128)
+				{
+					dir = 1;
+				}
+				else
+				{
+					dir = 0;
+				}
+
+				speed = messageData[3] & (~(1 << 7));
+
+				if (words)
+				{
+					switch (messageData[1])
+					{
+						case 1:
+							returnMessage = "Motor 1 ";
+							break;
+
+						case 2:
+							returnMessage = "Motor 2 ";
+							break;
+
+						case 3:
+							returnMessage = "Motor 3 ";
+							break;
+					}
+
+
+					if (dir == 1)
+					{
+						returnMessage += "Fowards " + speed.ToString() + "%";
+					}
+					else
+					{
+						returnMessage += "Reverse " + speed.ToString() + "%";
+					}
+				}
+				else
+				{
+					returnMessage = dir.ToString() + "," + speed.ToString();
+				}
+
+				return returnMessage;
+
+			case MESSAGE_TYPES.SYSTEM_TEST_MOUSE:
+				float dx = (float)(messageData[1] * 256 + messageData[2]);
+				float dy = (float)(messageData[3] * 256 + messageData[4]);
+
+				if (words == true)
+				{
+					returnMessage = "dX: " + dx.ToString() + "dY: " + dy.ToString();
+				}
+				else
+				{
+					returnMessage = dx.ToString() + "," + dy.ToString();
+				}
+				return returnMessage;
+
+			case MESSAGE_TYPES.SYSTEM_TEST_IMU:
+				float w = (float)(messageData[2]);
+				float x = (float)(messageData[3]);
+				float y = (float)(messageData[4]);
+				float z = (float)(messageData[5]);
+
+				if (words == true)
+				{
+					returnMessage = "W: " + w.ToString() + "X: " + x.ToString() + "Y: " + y.ToString() + "Z: " + z.ToString();
+				}
+				else
+				{
+					returnMessage = w.ToString() + "," + x.ToString() + "," + y.ToString() + "," + z.ToString();
+				}
+				return returnMessage;
+
+			case MESSAGE_TYPES.SYSTEM_TEST_LINE_FOLLOWERS:
+				return "NOT YET COMPLETED";
+
+			case MESSAGE_TYPES.SYSTEM_TEST_FAST_CHARGE_CHIP:
+				return "NOT YET COMPLETED";
+
+			case MESSAGE_TYPES.SYSTEM_TEST_TWI_MUX:
+				return "NOT YET COMPLETED";
+
+			case MESSAGE_TYPES.SYSTEM_TEST_TWI_EXTERNAL:
+				return "NOT YET COMPLETED";
+
+			case MESSAGE_TYPES.SYSTEM_TEST_CAMERA:
+				return "NOT YET COMPLETED";
 
 			default:
 				return "WARNING: Unknown data";
 		}
 	}
+
 }
+
+namespace SwarmRoboticsGUI
+{
+	public partial class MainWindow : Window
+	{
+		public delegate void UpdateTextBoxCallback(TextBox control, string text);
+
+		public void UpdateTextBox(TextBox control, string text)
+		{
+			//control.Text = TextAlignment;
+			//lvCommunicatedMessages.Dispatcher.Invoke(new RefreshListViewCallback(this.Refresh));
+			//control.Dispatcher.Invoke(new UpdateTextBoxCallback(this.UpdateText),new object { control, text } );
+			control.Dispatcher.Invoke(new UpdateTextBoxCallback(this.UpdateText), new object[] { control, text });
+		}
+
+
+		private void UpdateText(TextBox control, string text)
+		{
+			control.Text = text;
+		}
+	}
+}
+	
 
 
 #region old_parts
