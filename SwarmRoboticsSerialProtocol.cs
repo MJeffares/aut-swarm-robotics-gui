@@ -80,28 +80,27 @@ public class ProtocolClass
 					switch (tokens[0])
 					{
 						case "A":
-							//window.tbSysTestProximityA.Text = tokens[1]; //THREAD ERROR
 							window.UpdateTextBox(window.tbSysTestProximityA, tokens[1]);
 							break;
 
 						case "B":
-							window.tbSysTestProximityB.Text = tokens[1];
+							window.UpdateTextBox(window.tbSysTestProximityB, tokens[1]);
 							break;
 
 						case "C":
-							window.tbSysTestProximityC.Text = tokens[1];
+							window.UpdateTextBox(window.tbSysTestProximityC, tokens[1]);
 							break;
 
 						case "D":
-							window.tbSysTestProximityD.Text = tokens[1];
+							window.UpdateTextBox(window.tbSysTestProximityD, tokens[1]);
 							break;
 
 						case "E":
-							window.tbSysTestProximityE.Text = tokens[1];
+							window.UpdateTextBox(window.tbSysTestProximityE, tokens[1]);
 							break;
 
 						case "F":
-							window.tbSysTestProximityF.Text = tokens[1];
+							window.UpdateTextBox(window.tbSysTestProximityF, tokens[1]);
 							break;
 					}
 					break;
@@ -113,12 +112,12 @@ public class ProtocolClass
 					switch (tokens[0])
 					{
 						case "R":
-							window.tbSysTestLightSensorRHS.Text = tokens[1];
+							window.UpdateTextBox(window.tbSysTestLightSensorRHS, tokens[1]);
 
 							break;
 
 						case "L":
-							window.tbSysTestLightSensorLHS.Text = tokens[1];
+							window.UpdateTextBox(window.tbSysTestLightSensorLHS, tokens[1]);
 							break;
 					}
 					break;

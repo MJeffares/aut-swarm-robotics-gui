@@ -39,7 +39,6 @@ namespace SwarmRoboticsGUI
         private int LargeContourCount { get; set; }
         private int RobotCount { get; set; }
 
-        public UMat testImage = new UMat();
         #endregion
 
         public ImageProcessing()

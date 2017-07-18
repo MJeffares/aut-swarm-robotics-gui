@@ -302,47 +302,48 @@
 
                     <TabItem Header = "Systems Test" >
                         <StackPanel Margin = "5">
-
-                            <TextBlock>Instructions for how to use this page (TODO) <LineBreak/> Step 1: Do A  <LineBreak/> Step 2: Do B  <LineBreak/> Step 3: Do C</TextBlock>
-
+                            
                             <WrapPanel Margin="0,2">
+                                <Button x:Name="btnSysTestCommunications" Content="Comms Test" Margin="5,5,0,5" />
                                 <Button x:Name="btnSysTestTestMode" Content = "Enter Test Mode" Margin="5,5,0,5" Click="btnSysTestTestMode_Click" Width="95"/>
                                 <Button x:Name="btnSysTestFullTest" Content = "Begin Full Systems Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestFullTest_Click" Width="130"/>
                                 <Button x:Name="btnSysTestPreviousTest" Content = "Previous Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestPreviousTest_Click"/>
                                 <Button x:Name="btnSysTestNextTest" Content = "Next Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestNextTest_Click"/>
                             </WrapPanel>
 
-                            <WrapPanel>
-                                <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestProxmityA" Content = "Proximity A" Tag="Proximity,FA" Style="{DynamicResource ButtonStyle1}" />
-                                    <TextBox x:Name="tbSysTestProximityA" IsReadOnly="True" Margin="2"/>
-                                </StackPanel>
+                            <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" >
+                                <WrapPanel Margin="5">
+                                    <StackPanel Margin="0,0,0,0">
+                                        <ToggleButton x:Name="btnSysTestProxmityA" Content = "Proximity A" Tag="Proximity,FA" Style="{DynamicResource ButtonStyle1}" />
+                                        <TextBox x:Name="tbSysTestProximityA" IsReadOnly="True" Margin="2"/>
+                                    </StackPanel>
 
-                                <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestProxmityB" Content = "Proximity B" Tag="Proximity,FF" Style="{DynamicResource ButtonStyle1}" />
-                                    <TextBox x:Name="tbSysTestProximityB" IsReadOnly="True" Margin="2"/>
-                                </StackPanel>
+                                    <StackPanel Margin="5,0,0,0">
+                                        <ToggleButton x:Name="btnSysTestProxmityB" Content = "Proximity B" Tag="Proximity,FF" Style="{DynamicResource ButtonStyle1}" />
+                                        <TextBox x:Name="tbSysTestProximityB" IsReadOnly="True" Margin="2"/>
+                                    </StackPanel>
 
-                                <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestProxmityC" Content = "Proximity C" Tag="Proximity,FE" Style="{DynamicResource ButtonStyle1}" />
-                                    <TextBox x:Name="tbSysTestProximityC" IsReadOnly="True" Margin="2"/>
-                                </StackPanel>
+                                    <StackPanel Margin="5,0,0,0">
+                                        <ToggleButton x:Name="btnSysTestProxmityC" Content = "Proximity C" Tag="Proximity,FE" Style="{DynamicResource ButtonStyle1}" />
+                                        <TextBox x:Name="tbSysTestProximityC" IsReadOnly="True" Margin="2"/>
+                                    </StackPanel>
 
-                                <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestProxmityD" Content = "Proximity D"  Tag="Proximity,FD" Style="{DynamicResource ButtonStyle1}" />
-                                    <TextBox x:Name="tbSysTestProximityD" IsReadOnly="True" Margin="2"/>
-                                </StackPanel>
+                                    <StackPanel Margin="5,0,0,0">
+                                        <ToggleButton x:Name="btnSysTestProxmityD" Content = "Proximity D"  Tag="Proximity,FD" Style="{DynamicResource ButtonStyle1}" />
+                                        <TextBox x:Name="tbSysTestProximityD" IsReadOnly="True" Margin="2"/>
+                                    </StackPanel>
 
-                                <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestProxmityE" Content = "Proximity E" Tag="Proximity,FC" Style="{DynamicResource ButtonStyle1}"/>
-                                    <TextBox x:Name="tbSysTestProximityE" IsReadOnly="True" Margin="2"/>
-                                </StackPanel>
+                                    <StackPanel Margin="5,0,0,0">
+                                        <ToggleButton x:Name="btnSysTestProxmityE" Content = "Proximity E" Tag="Proximity,FC" Style="{DynamicResource ButtonStyle1}"/>
+                                        <TextBox x:Name="tbSysTestProximityE" IsReadOnly="True" Margin="2"/>
+                                    </StackPanel>
 
-                                <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestProxmityF" Content = "Proximity  F" Tag="Proximity,FB" Style="{DynamicResource ButtonStyle1}"/>
-                                    <TextBox x:Name="tbSysTestProximityF" IsReadOnly="True" Margin="2"/>
-                                </StackPanel>
-                            </WrapPanel>
+                                    <StackPanel Margin="5,0,0,0">
+                                        <ToggleButton x:Name="btnSysTestProxmityF" Content = "Proximity  F" Tag="Proximity,FB" Style="{DynamicResource ButtonStyle1}"/>
+                                        <TextBox x:Name="tbSysTestProximityF" IsReadOnly="True" Margin="2"/>
+                                    </StackPanel>
+                                </WrapPanel>
+                            </Border>
 
                             <WrapPanel>
                                 <StackPanel Margin="5,0,0,0">
@@ -412,12 +413,26 @@
                                     <TextBox x:Name="tbSysTestFastCharge" IsReadOnly="True" Margin="2"/>
                                 </StackPanel>
                                 <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestTWIMux" Content = "TWI Multiplexer" Tag="TWI" Style="{DynamicResource ButtonStyle1}"/>
-                                    <TextBox x:Name="tbSysTestTWIMultiplexer" IsReadOnly="True" Margin="2"/>
-                                </StackPanel>
-                                <StackPanel Margin="5,0,0,0">
                                     <ToggleButton x:Name="btnSysTestCamera" Content = "OnBoard Camera" Tag="Camera" Style="{DynamicResource ButtonStyle1}" />
                                     <TextBox x:Name="tbSysTestOnBoardCamera" IsReadOnly="True" Margin="2"/>
+                                </StackPanel>
+                            </WrapPanel>
+                            <StackPanel>
+                                <WrapPanel>
+                                    <ComboBox/>
+                                    <Button/>
+                                </WrapPanel>
+                            
+                                <WrapPanel>
+                                    <TextBox/>
+                                    <Button/>
+                                </WrapPanel>
+                            </StackPanel>
+                            
+                            <WrapPanel>
+                                <StackPanel Margin="5,0,0,0">
+                                    <ToggleButton x:Name="btnSysTestTWIMux" Content = "TWI Multiplexer" Tag="TWI" Style="{DynamicResource ButtonStyle1}"/>
+                                    <TextBox x:Name="tbSysTestTWIMultiplexer" IsReadOnly="True" Margin="2"/>
                                 </StackPanel>
                             </WrapPanel>
                         </StackPanel>
