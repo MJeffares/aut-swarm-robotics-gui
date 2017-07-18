@@ -341,7 +341,7 @@ public class SerialUARTCommunication
 		newestMessage = new communicated_message() { time_stamp = DateTime.Now, raw_message = indata };
 		communicatedMessages.Add(newestMessage);
 		//window.lvCommunicatedMessages.ItemsSource = communicatedMessages;
-		//window.UpdateListView(communicatedMessages);
+		//window.UpdateListView(communicatedMessages); //XXXXXXXXXXXXXXXXXXXXXXXX
 		
 
 
@@ -434,7 +434,7 @@ namespace SwarmRoboticsGUI
 		{
 			get
 			{
-				return ProtocolClass.GetMessageData(message_type, message_data) + " (" + MJLib.HexToString(message_data, 0, frame_length - 13, true) + ")";
+				return ProtocolClass.GetMessageData(message_type, message_data, true) + " (" + MJLib.HexToString(message_data, 0, frame_length - 13, true) + ")";
 			}
 		}
 	}
