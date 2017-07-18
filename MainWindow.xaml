@@ -25,6 +25,7 @@
                 <MenuItem x:Name="menuViewList" Header="View"/>
                 <MenuItem x:Name="menuFilterList" Header="Camera Filters" MouseEnter="menu_Hover" Click="menu_Hover"/>
                 <MenuItem x:Name="menuOverlayList" Header="Overlays" MouseEnter="menu_Hover" Click="menu_Hover"/>
+                <MenuItem x:Name="menuSourceList" Header="Source" MouseEnter="menu_Hover" Click="menu_Hover"/>
                 <MenuItem x:Name="menuFilterFlipVertical" Header="Flip Vertical" Click="menuFilterFlipVertical_Click"/>
                 <MenuItem x:Name="menuFilterFlipHorizontal" Header="Flip Horizontal" Click="menuFilterFlipHorizontal_Click"/>
                 <MenuItem x:Name="menuDisplayPopOut" Header="Pop Out Window" Click="menuDisplayPopOut_Click"/>
