@@ -177,7 +177,7 @@ namespace SwarmRoboticsGUI
             // Information box position
             Point InfoBoxLocation = new Point(ScaledRobotLocation.X, ScaledRobotLocation.Y - (int)(40 * MaxScale));
             // Box to hold information about current robot
-            CvInvoke.Rectangle(img, new Rectangle(InfoBoxLocation, new Size(RectWidth, (int)(80 * MaxScale))), new MCvScalar(100, 100, 100), -1);
+            CvInvoke.Rectangle(img, new Rectangle(InfoBoxLocation, new Size((int)(RectWidth * widthScale), (int)(80 * MaxScale))), new MCvScalar(100, 100, 100), -1);
 
             // Draw robots as hexagons
             VectorOfVectorOfPoint Contour = GetShapeContour(ScaledRobotLocation, 6, (int)(50 * MaxScale), robot.Heading + Math.PI / 6);
