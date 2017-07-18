@@ -13,32 +13,32 @@ namespace SwarmRoboticsGUI
 {
     public class Camera
     {
-        // Enumerations
-        #region
+        #region Enumerations
         public enum StatusType { PLAYING, PAUSED, STOPPED, REPLAY_ACTIVE, REPLAY_PAUSED, RECORDING };
-        #endregion
+        #endregion 
 
+        #region Public Properties
         // Camera Properties
         public string Name { get; set; }
         public int Index { get; set; }
         public StatusType Status { get; private set; }
         public UMat Frame { get; private set; }
         public int FPS { get; private set; }
-        public int FrameCount { get; private set; }
+        #endregion
 
+        #region Private Properties
+        // Capture Properties
+        private int FrameCount { get; set; }
         private VideoWriter videoWriter { get; set; }
         private VideoCapture videoCapture { get; set; }
         private Timer FpsTimer { get; set; }
+        #endregion
 
+        #region Public Events
         public delegate void FrameHandler(Camera cam, EventArgs e);
         public event FrameHandler FrameUpdate;
+        #endregion
 
-        public override string ToString()
-        {
-            return string.Format("[{0}]{1}", Index, Name);
-        }
-       
-        // Camera
         public Camera()
         {
             Name = null;
@@ -50,13 +50,14 @@ namespace SwarmRoboticsGUI
             FpsTimer.Elapsed += FpsTimer_Tick;
             FpsTimer.Enabled = true;
         }
-        // Timers
-        private void FpsTimer_Tick(object sender, EventArgs e)
+
+        #region Public Methods
+        // ToString Override
+        public override string ToString()
         {
-            FPS = FrameCount;
-            FrameCount = 0;
+            return string.Format("[{0}]{1}", Index, Name);
         }
-        // Methods
+        //Capture Methods
         public void StartCapture()
         {
             try
@@ -123,7 +124,7 @@ namespace SwarmRoboticsGUI
                 MessageBox.Show(excpt.Message);
             }
         }
-
+        // Video Methods
         public void StartReplaying(string path)
         {
             if (videoCapture != null)
@@ -164,20 +165,7 @@ namespace SwarmRoboticsGUI
             videoWriter.Dispose();
             Status = StatusType.PLAYING;
         }
-
-        public void ProcessFrame(object sender, EventArgs arg)
-        {
-            // Check capture exists
-            if (videoCapture != null && videoCapture.Ptr != IntPtr.Zero)
-            {
-                // Get the new frame
-                videoCapture.Retrieve(Frame, 0);
-                FrameUpdate(this, arg);
-                // 
-                FrameCount++;
-            }
-        }
-
+        // Other Methods
         public void FlipVertical()
         {
             if (videoCapture != null)
@@ -192,7 +180,6 @@ namespace SwarmRoboticsGUI
                 videoCapture.FlipHorizontal = !videoCapture.FlipHorizontal;
             }
         }
-
         public void OpenSettings()
         {
             //need try/catch or checks 
@@ -212,12 +199,32 @@ namespace SwarmRoboticsGUI
                 MessageBox.Show("No Currently Connected Camera!");
             }
         }
-
         public void Dispose()
         {
             FpsTimer.Dispose();
             videoCapture.Dispose();
             Frame.Dispose();
         }
+        #endregion
+
+        #region Private Methods
+        private void FpsTimer_Tick(object sender, EventArgs e)
+        {
+            FPS = FrameCount;
+            FrameCount = 0;
+        }
+        private void ProcessFrame(object sender, EventArgs arg)
+        {
+            // Check capture exists
+            if (videoCapture != null && videoCapture.Ptr != IntPtr.Zero)
+            {
+                // Get the new frame
+                videoCapture.Retrieve(Frame, 0);
+                FrameUpdate(this, arg);
+                // 
+                FrameCount++;
+            }
+        }
+        #endregion
     }
 }

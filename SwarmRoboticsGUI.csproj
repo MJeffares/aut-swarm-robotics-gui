@@ -80,9 +80,6 @@
     <Reference Include="Emgu.CV.World">
       <HintPath>EmguCV\Emgu.CV.World.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Windows.Shell">
-      <HintPath>packages\ModernUI.WPF.1.0.9\lib\net40\Microsoft.Windows.Shell.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -108,6 +105,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Brae\Camera.cs" />
+    <Compile Include="Brae\ImageAnimation.cs" />
     <Compile Include="Brae\ImageDisplay.cs" />
     <Compile Include="CameraPopOutWindow.xaml.cs">
       <DependentUpon>CameraPopOutWindow.xaml</DependentUpon>

@@ -139,8 +139,7 @@ namespace SwarmRoboticsGUI
             // TEMP: Default configuration
             overlayWindow.Display.Overlay = ImageDisplay.OverlayType.PRETTY;
             overlayWindow.Display.Source = ImageDisplay.SourceType.CUTOUTS;
-		}
-        
+		}      
 
         // Methods
         #region
@@ -411,7 +410,7 @@ namespace SwarmRoboticsGUI
                     }                   
                     break;
                 case ImageDisplay.SourceType.CUTOUTS:
-                    overlayWindow.imgProc.ProcessFilter(overlayWindow.imgProc.testImage);
+                    overlayWindow.imgProc.ProcessFilter(overlayWindow.imgProc.TestImage);
                     captureImageBox.Image = overlayWindow.imgProc.Image;
                     break;
                 default:

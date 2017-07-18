@@ -11,23 +11,27 @@ namespace SwarmRoboticsGUI
 {
     public class Robot
     {
-        public Robot()
-        {
-            Battery = 0;
-            Location = new Point(0, 0);
-            DirectionMarker = new Point(0, 0);
-            IsTracked = false;
-        }
-
+        #region Public Properties
+        public int ID { get; set; }
         public int Battery { get; set; }
-        // TODO: Create task enum
-        // TEMP: object type
         public object Task { get; set; }
         public Point Location { get; set; }
+        public Point PreviousLocation { get; set; }
         public Point DirectionMarker { get; set; }
         public double Heading { get; set; }
         public Point[] Contour { get; set; }
         public bool IsTracked { get; set; }
         public bool IsSelected { get; set; }
+        #endregion
+
+        public Robot()
+        {
+            Battery = 0;
+            Heading = 0;
+            Location = new Point(0, 0);
+            DirectionMarker = new Point(0, 0);
+            IsTracked = false;
+            IsSelected = false;
+        }
     }
 }
