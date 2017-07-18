@@ -39,9 +39,13 @@ namespace SwarmRoboticsGUI
 
         private void Animation_Tick(object sender, EventArgs e)
         {
-            if (Property <= EndValue)
+            if (Property < EndValue)
             {
                 Property++;
+                if (Property * End / EndValue > 100)
+                {
+                    var test = Property * End / EndValue;
+                }
                 AnimationUpdate(Property * End / EndValue, e);
             }
             else
@@ -55,17 +59,21 @@ namespace SwarmRoboticsGUI
             if (!IsRunning)
             {
                 Property = StartValue;
-                CompositionTarget.Rendering += Animation_Tick;               
                 IsRunning = true;
-            }            
+                CompositionTarget.Rendering += Animation_Tick;               
+            }           
+            else
+            {
+                Property = StartValue;
+            } 
         }
         public void Stop()
         {
             if (IsRunning)
             {
                 Property = StartValue;
-                CompositionTarget.Rendering -= Animation_Tick;
-                IsRunning = false;                
+                IsRunning = false;
+                CompositionTarget.Rendering -= Animation_Tick;                 
             }                    
         }
         public void Reset()
