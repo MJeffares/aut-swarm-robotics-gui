@@ -33,13 +33,13 @@ namespace SwarmRoboticsGUI
         private ImageAnimation IA { get; set; }
         #endregion
 
-        public ImageDisplay()
+        public ImageDisplay(int width, int height)
         {
             Image = new UMat();
             IA = new ImageAnimation(0, 0, 100, 200);
             IA.AnimationUpdate += new ImageAnimation.AnimationHandler(AnimateRectangle);
-            width = 800;
-            height = 600;
+            this.width = width;
+            this.height = height;
             widthScale = 1;
             heightScale = 1;
         }

@@ -46,31 +46,37 @@ namespace SwarmRoboticsGUI
         public OverlayWindow(MainWindow mainWindow)
         {
             InitializeComponent();
+            // Initialize the robot collection
             ClearRobots(RobotList);
-
+            // Create an image processing class for processing the camera frames
             imgProc = new ImageProcessing();
-            Display = new ImageDisplay();
-
+            // Create an image display class for drawing to the image box
+            Display = new ImageDisplay(OverlayImageBox.Width, OverlayImageBox.Height);
+            // Set the window to the data context for data binding
             DataContext = this;
-
+            // Default colour amount
             ColourC = 1000;
+            // Default lower saturation cutoff
             LowerS = 25;
-
+            // Create 100ms timer to drive interface changes
             InterfaceTimer = new Timer(100);
             InterfaceTimer.Elapsed += Interface_Tick;
             InterfaceTimer.Start();
+            // Create event driven by new frames from the camera
             mainWindow.camera1.FrameUpdate += new Camera.FrameHandler(DrawOverlayFrame);
         }
 
         #region Time Events
         private void Interface_Tick(object sender, ElapsedEventArgs e)
         {
+            // Update imgProc values from inputs on UI
             imgProc.ColourC = ColourC;
             imgProc.LowerH = LowerH;
             imgProc.LowerS = LowerS;
             imgProc.UpperH = UpperH;
             //Camera1.imgProc.UpperV = Overlay.UpperV;
 
+            // Update the display with the interface when using the cutouts
             switch (Display.Source)
             {
                 case ImageDisplay.SourceType.NONE:
@@ -91,24 +97,32 @@ namespace SwarmRoboticsGUI
                 case ImageDisplay.SourceType.NONE:
                     break;
                 case ImageDisplay.SourceType.CAMERA:
+                    // Typecast object to get passed camera class
+                    // BRAE: Maybe only pass frame since that is all we need
                     Camera cam = (Camera)sender;
+                    // Make sure there is a frame
                     if (cam.Frame != null)
                     {
+                        // Apply image processing to find the robots
                         RobotList = imgProc.GetRobots(cam.Frame, RobotList);
+                        // Create the overlay image from the robot list
+                        // BRAE: Maybe only pass frame size since its only used for that
                         Display.ProcessOverlay(cam.Frame, RobotList);
+                        // Draw overlay image in window image box
                         OverlayImageBox.Image = Display.Image;
                     }
                     break;
                 case ImageDisplay.SourceType.CUTOUTS:
+                    // Apply image processing to find the robots
                     RobotList = imgProc.GetRobots(imgProc.TestImage, RobotList);
+                    // Create the overlay image from the robot list
                     Display.ProcessOverlay(imgProc.TestImage, RobotList);
+                    // Draw overlay image in window image box
                     OverlayImageBox.Image = Display.Image;
                     break;
                 default:
                     break;
             }
-            //
-
         }
         #endregion
 
@@ -117,6 +131,7 @@ namespace SwarmRoboticsGUI
         {
             for (int i = 0; i < RobotList.Length; i++)
             {
+                // Initialize each robot
                 RobotList[i] = new Robot();
             }
         }
@@ -135,16 +150,23 @@ namespace SwarmRoboticsGUI
 
         private void OverlayImageBox_Click(object sender, EventArgs e)
         {
+            // Capture the mouse inside imagebox
             Mouse.Capture(this);
+            // Get the XY position of the cursor relative to the imagebox
             Point pos = Mouse.GetPosition(this);
+            // Release the mouse
             Mouse.Capture(null);
+            // Notify the display where it was clicked
             Display.Click(pos);
+            // Update the frame
             DrawOverlayFrame(this, new EventArgs());
         }
 
         private void Overlay_SizeChanged(object sender, EventArgs e)
         {
+            // Check if the display has been initialized
             if (Display != null)
+                // Resize the overlay image to fix the resized imagebox
                 Display.Resize(OverlayImageBox.Width, OverlayImageBox.Height);
         }
         #endregion
