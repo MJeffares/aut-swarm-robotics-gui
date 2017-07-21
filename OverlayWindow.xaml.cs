@@ -165,7 +165,7 @@ namespace SwarmRoboticsGUI
         private void Overlay_SizeChanged(object sender, EventArgs e)
         {
             // Check if the display has been initialized
-            if (Display != null)
+            if (Display != null && OverlayImageBox.Image != null)
                 // Resize the overlay image to fix the resized imagebox
                 Display.Resize(OverlayImageBox.Width, OverlayImageBox.Height);
         }
