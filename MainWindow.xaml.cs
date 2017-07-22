@@ -97,7 +97,8 @@ namespace SwarmRoboticsGUI
         {
             InitializeComponent();
             //
-            camera1 = new Camera();
+            //camera1 = new Camera(640, 480);
+            camera1 = new Camera(1280, 720);
 
             xbee = new XbeeHandler(this);
             protocol = new ProtocolClass(this);

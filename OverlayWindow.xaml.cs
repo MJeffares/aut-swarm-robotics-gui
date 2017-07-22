@@ -51,7 +51,7 @@ namespace SwarmRoboticsGUI
             // Create an image processing class for processing the camera frames
             imgProc = new ImageProcessing();
             // Create an image display class for drawing to the image box
-            Display = new ImageDisplay(OverlayImageBox.Width, OverlayImageBox.Height);
+            Display = new ImageDisplay(mainWindow.camera1.Resolution, OverlayImageBox.Size);
             // Set the window to the data context for data binding
             DataContext = this;
             // Default colour amount
@@ -59,11 +59,17 @@ namespace SwarmRoboticsGUI
             // Default lower saturation cutoff
             LowerS = 25;
             // Create 100ms timer to drive interface changes
+            InitializeTimer();
+            // Create event driven by new frames from the camera
+            mainWindow.camera1.FrameUpdate += new Camera.FrameHandler(DrawOverlayFrame);
+        }
+
+        private void InitializeTimer()
+        {
+            // Create 100ms timer to drive interface changes
             InterfaceTimer = new Timer(100);
             InterfaceTimer.Elapsed += Interface_Tick;
             InterfaceTimer.Start();
-            // Create event driven by new frames from the camera
-            mainWindow.camera1.FrameUpdate += new Camera.FrameHandler(DrawOverlayFrame);
         }
 
         #region Time Events
@@ -107,7 +113,7 @@ namespace SwarmRoboticsGUI
                         RobotList = imgProc.GetRobots(cam.Frame, RobotList);
                         // Create the overlay image from the robot list
                         // BRAE: Maybe only pass frame size since its only used for that
-                        Display.ProcessOverlay(cam.Frame, RobotList);
+                        Display.ProcessOverlay(RobotList);
                         // Draw overlay image in window image box
                         OverlayImageBox.Image = Display.Image;
                     }
@@ -116,7 +122,7 @@ namespace SwarmRoboticsGUI
                     // Apply image processing to find the robots
                     RobotList = imgProc.GetRobots(imgProc.TestImage, RobotList);
                     // Create the overlay image from the robot list
-                    Display.ProcessOverlay(imgProc.TestImage, RobotList);
+                    Display.ProcessOverlay(RobotList);
                     // Draw overlay image in window image box
                     OverlayImageBox.Image = Display.Image;
                     break;
@@ -147,30 +153,25 @@ namespace SwarmRoboticsGUI
         {
             ClearRobots(RobotList);
         }
-
-        private void OverlayImageBox_Click(object sender, EventArgs e)
+        private void OverlayImageBox_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            // Capture the mouse inside imagebox
-            Mouse.Capture(this);
-            // Get the XY position of the cursor relative to the imagebox
-            Point pos = Mouse.GetPosition(this);
-            // Release the mouse
-            Mouse.Capture(null);
             // Notify the display where it was clicked
-            Display.Click(pos);
+            Display.Click(e.Location);
             // Update the frame
             DrawOverlayFrame(this, new EventArgs());
         }
-
         private void Overlay_SizeChanged(object sender, EventArgs e)
         {
             // Check if the display has been initialized
-            if (Display != null && OverlayImageBox.Image != null)
+            if (Display != null)
                 // Resize the overlay image to fix the resized imagebox
+                //Display.Resize((int)DisplayGrid.RenderSize.Width, (int)DisplayGrid.RenderSize.Height);
+                //Display.Resize((int)host1.RenderSize.Width, (int)host1.RenderSize.Height);
                 Display.Resize(OverlayImageBox.Width, OverlayImageBox.Height);
         }
+
         #endregion
 
-
+        
     }
 }

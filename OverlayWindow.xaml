@@ -7,11 +7,19 @@
         xmlns:local="clr-namespace:SwarmRoboticsGUI"
         xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
         mc:Ignorable="d"
-        Title="Overlay" Height="610" Width="640" Closing="Overlay_Closing" MinHeight="610" MinWidth="640" SizeChanged="Overlay_SizeChanged">
+        Title="Overlay" Height="730" Width="800" Closing="Overlay_Closing" MinHeight="730" MinWidth="800" SizeChanged="Overlay_SizeChanged">
     <Grid>
-        <Grid VerticalAlignment="Stretch" MinHeight="480" MinWidth="640" Margin="0,0,0,100">
-            <WindowsFormsHost Grid.Column="3" Name="host1" Margin="0,0,0,0" Visibility="Visible">
-                <em:ImageBox x:Name="OverlayImageBox" SizeMode="StretchImage" FunctionalMode="Minimum" Click="OverlayImageBox_Click" MinimumSize="640, 480" Dock="Fill" />
+        <Grid Name="DisplayGrid" Margin="0,0,0,100">
+            <Grid.Background>
+                <RadialGradientBrush Center="0.4,0.4" GradientOrigin="0.4,0.4">
+                    <RadialGradientBrush.GradientStops>
+                        <GradientStop Color="#FFA0A0A0" Offset="0"/>
+                        <GradientStop Color="#FF646464" Offset="1"/>
+                    </RadialGradientBrush.GradientStops>
+                </RadialGradientBrush>
+            </Grid.Background>
+            <WindowsFormsHost Name="host1" Margin="0,0,0,0" Visibility="Visible" Opacity="0">
+                <em:ImageBox x:Name="OverlayImageBox" FunctionalMode="Minimum" Dock="Fill" SizeMode="CenterImage" MouseClick="OverlayImageBox_MouseClick"/>
             </WindowsFormsHost>
         </Grid>
         <Grid Height="100" Width="640" VerticalAlignment="Bottom" Margin="10,0,0,-5">

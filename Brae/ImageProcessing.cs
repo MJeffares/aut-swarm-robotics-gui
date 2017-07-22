@@ -42,7 +42,8 @@ namespace SwarmRoboticsGUI
 
             //UMat image = CvInvoke.Imread("...\\...\\Images\\ColourCodes.png").GetUMat(AccessType.Read);
             UMat image = CvInvoke.Imread("...\\...\\Brae\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
-            CvInvoke.Resize(image, image, new Size(640, 480));
+            //CvInvoke.Resize(image, image, new Size(640, 480));
+            CvInvoke.Resize(image, image, new Size(1280, 720));
             TestImage = image.Clone();
         }
 
@@ -352,7 +353,7 @@ namespace SwarmRoboticsGUI
             {
                 Area = Math.Abs(CvInvoke.ContourArea(Contours[i]));
                 // Remove high/low freq noise contours
-                if (Area > 0 && Area < 500)
+                if (Area > 50 && Area < 10000)
                 {
                     LargeContours.Push(Contours[i]);
                 }
