@@ -35,7 +35,7 @@ namespace SwarmRoboticsGUI
         #endregion
 
         #region Public Events
-        public delegate void FrameHandler(Camera cam, EventArgs e);
+        public delegate void FrameHandler(UMat Frame, EventArgs e);
         public event FrameHandler FrameUpdate;
         #endregion
         public Camera(int Width = 640, int Height = 480)
@@ -184,7 +184,7 @@ namespace SwarmRoboticsGUI
             {
                 // Get the new frame
                 videoCapture.Retrieve(Frame, 0);
-                FrameUpdate(this, arg);
+                FrameUpdate(Frame, arg);
                 // 
                 FrameCount++;
             }

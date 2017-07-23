@@ -17,7 +17,6 @@ namespace SwarmRoboticsGUI
         public object Task { get; set; }
         public Point Location { get; set; }
         public Point PreviousLocation { get; set; }
-        public Point DirectionMarker { get; set; }
         public double Heading { get; set; }
         public Point[] Contour { get; set; }
         public bool IsTracked { get; set; }
@@ -29,7 +28,6 @@ namespace SwarmRoboticsGUI
             Battery = 0;
             Heading = 0;
             Location = new Point(0, 0);
-            DirectionMarker = new Point(0, 0);
             IsTracked = false;
             IsSelected = false;
         }
