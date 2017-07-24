@@ -90,21 +90,22 @@ namespace SwarmRoboticsGUI
         public WindowStatusType WindowStatus { get; set; }
         public TimeDisplayModeType TimeDisplayMode { get; set; }
         public double WindowSize { get; set; }
-        #endregion
+        #endregion    
 
         // Main
         public MainWindow()
         {
             InitializeComponent();
             //
-            camera1 = new Camera();
+            //camera1 = new Camera(640, 480);
+            camera1 = new Camera(1280, 720);
 
             xbee = new XbeeHandler(this);
             protocol = new ProtocolClass(this);
             // MANSEL: Maybe make a struct. Also look at SerialPort class
             serial = new SerialUARTCommunication(this, menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);           
             //
-            overlayWindow = new OverlayWindow(this);
+            overlayWindow = new OverlayWindow(this);            
             //
             CvInvoke.UseOpenCL = true;
             //
@@ -732,7 +733,5 @@ namespace SwarmRoboticsGUI
         }
 
 		#endregion
-
-		
 	}
 }

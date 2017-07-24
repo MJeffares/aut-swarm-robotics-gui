@@ -21,20 +21,34 @@ namespace SwarmRoboticsGUI
         private int EndValue { get; set; }
         private int End { get; set; }
         private double Duration { get; set; }
-        private int FPS { get; set; }
+        private double FPS { get; set; }
+
+        private Timer test { get; set; }
 
         public delegate void AnimationHandler(int Property, EventArgs e);
         public event AnimationHandler AnimationUpdate;
 
         public ImageAnimation(int Property, int Start, int End, double Duration)
         {
-            FPS = 60;
+            //FPS = 60;
+            FPS = 25;
 
             this.Duration = Duration;
             this.End = End;
             
+
             EndValue = (int)(Duration * FPS / 1000);
             StartValue = Start;
+
+            InitializeTimer();
+        }
+
+        private void InitializeTimer()
+        {
+            //
+            test = new Timer(40);
+            test.AutoReset = true;
+            test.Enabled = true;
         }
 
         private void Animation_Tick(object sender, EventArgs e)
@@ -60,7 +74,8 @@ namespace SwarmRoboticsGUI
             {
                 Property = StartValue;
                 IsRunning = true;
-                CompositionTarget.Rendering += Animation_Tick;               
+                //CompositionTarget.Rendering += Animation_Tick;               
+                test.Elapsed += Animation_Tick;
             }           
             else
             {
@@ -73,7 +88,8 @@ namespace SwarmRoboticsGUI
             {
                 Property = StartValue;
                 IsRunning = false;
-                CompositionTarget.Rendering -= Animation_Tick;                 
+                //CompositionTarget.Rendering -= Animation_Tick;
+                test.Elapsed -= Animation_Tick;
             }                    
         }
         public void Reset()

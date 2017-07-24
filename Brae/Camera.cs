@@ -3,11 +3,10 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.UI;
 using Emgu.CV.Util;
-using Microsoft.Win32;
 using System;
 using System.Timers;
 using System.Text;
-using System.Windows;
+using System.Drawing;
 
 namespace SwarmRoboticsGUI
 {
@@ -23,6 +22,7 @@ namespace SwarmRoboticsGUI
         public int Index { get; set; }
         public StatusType Status { get; private set; }
         public UMat Frame { get; private set; }
+        public Size Resolution { get; private set; }
         public int FPS { get; private set; }
         #endregion
 
@@ -35,20 +35,20 @@ namespace SwarmRoboticsGUI
         #endregion
 
         #region Public Events
-        public delegate void FrameHandler(Camera cam, EventArgs e);
+        public delegate void FrameHandler(UMat Frame, EventArgs e);
         public event FrameHandler FrameUpdate;
         #endregion
-
-        public Camera()
+        public Camera(int Width = 640, int Height = 480)
         {
-            Name = null;
-            Index = 0;
             Status = StatusType.STOPPED;
-            //
-            FpsTimer = new Timer(1000);
-            FpsTimer.AutoReset = true;
-            FpsTimer.Elapsed += FpsTimer_Tick;
-            FpsTimer.Enabled = true;
+            Resolution = new Size(Width, Height);
+            InitializeTimer();
+        }
+        public Camera(Size Resolution)
+        {
+            Status = StatusType.STOPPED;
+            this.Resolution = Resolution;
+            InitializeTimer();
         }
 
         #region Public Methods
@@ -58,71 +58,47 @@ namespace SwarmRoboticsGUI
             return string.Format("[{0}]{1}", Index, Name);
         }
         //Capture Methods
+        public void Resize(Size Size)
+        {
+            if (Status == StatusType.PLAYING)
+            {
+                videoCapture.Stop();
+            }
+
+        }
+
         public void StartCapture()
         {
-            try
-            {
-                // update the capture object           
-                videoCapture = new VideoCapture(Index);
-                //videoCapture.SetCaptureProperty(CapProp.FrameHeight, 720);
-                //videoCapture.SetCaptureProperty(CapProp.FrameWidth, 1280);
-                // create a new matrix to hold our image
-                Frame = new UMat();
-                // add event handler for our new capture  
-                videoCapture.ImageGrabbed += ProcessFrame;
-                // update our status
-                Status = StatusType.PLAYING;
-                // start the capture       
-                videoCapture.Start();                           
-            }
-            catch (NullReferenceException excpt)
-            {
-                MessageBox.Show(excpt.Message);
-            }
+            // update the capture object           
+            videoCapture = new VideoCapture(Index);
+            videoCapture.SetCaptureProperty(CapProp.FrameWidth, Resolution.Width);
+            videoCapture.SetCaptureProperty(CapProp.FrameHeight, Resolution.Height);
+            // create a new matrix to hold our image
+            Frame = new UMat();
+            // add event handler for our new capture  
+            videoCapture.ImageGrabbed += ProcessFrame;
+            // update our status
+            Status = StatusType.PLAYING;
+            // start the capture       
+            videoCapture.Start();
         }
         public void StopCapture()
         {
             if (Status == StatusType.PLAYING)
             {
-                try
-                {
-                    videoCapture.Stop();
-                    Status = StatusType.STOPPED;
-                }
-                catch (Exception excpt)
-                {
-                    MessageBox.Show(excpt.Message);
-                }
-            }
-            else
-            {
-                // TODO: we should provide an options/confirmation box
-                MessageBox.Show("stop recording before stopping capture");  
+                videoCapture.Stop();
+                Status = StatusType.STOPPED;
             }
         }
         public void PauseCapture()
         {
-            try
-            {
-                videoCapture.Pause();
-                Status = StatusType.PAUSED;
-            }
-            catch (Exception excpt)
-            {
-                MessageBox.Show(excpt.Message);
-            }
+            videoCapture.Pause();
+            Status = StatusType.PAUSED;
         }
         public void ResumeCapture()
         {
-            try
-            {
-                videoCapture.Start();
-                Status = StatusType.PLAYING;
-            }
-            catch (Exception excpt)
-            {
-                MessageBox.Show(excpt.Message);
-            }
+            videoCapture.Start();
+            Status = StatusType.PLAYING;
         }
         // Video Methods
         public void StartReplaying(string path)
@@ -139,26 +115,17 @@ namespace SwarmRoboticsGUI
         }
         public void StartRecording(string path)
         {
-            try
-            {
-                //recordframewidth = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
-                //recordframeheight = (int)_capture.GetCaptureProperty(CapProp.FrameHeight);
+            //recordframewidth = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
+            //recordframeheight = (int)_capture.GetCaptureProperty(CapProp.FrameHeight);
 
-                //recordsize.Width = recordframewidth;
-                //recordsize.Height = recordframeheight;
-                System.Drawing.Size recordsize = new System.Drawing.Size();
-                recordsize.Width = 1280;
-                recordsize.Height = 720;
+            //recordsize.Width = recordframewidth;
+            //recordsize.Height = recordframeheight;
+            Size recordsize = Resolution;
 
-                // TODO: Fix recording
-                videoWriter = new VideoWriter(path, -1, 30, recordsize, true);
+            // TODO: Fix recording
+            videoWriter = new VideoWriter(path, -1, 30, recordsize, true);
 
-                Status = StatusType.RECORDING;
-            }
-            catch (NullReferenceException excpt)
-            {
-                MessageBox.Show(excpt.Message);
-            }
+            Status = StatusType.RECORDING;
         }
         public void StopRecording()
         {
@@ -185,18 +152,7 @@ namespace SwarmRoboticsGUI
             //need try/catch or checks 
             if (Name != null)
             {
-                try
-                {
-                    videoCapture.SetCaptureProperty(CapProp.Settings, 1);
-                }
-                catch (Exception excpt)
-                {
-                    MessageBox.Show(excpt.Message);
-                }
-            }
-            else
-            {
-                MessageBox.Show("No Currently Connected Camera!");
+                videoCapture.SetCaptureProperty(CapProp.Settings, 1);
             }
         }
         public void Dispose()
@@ -208,6 +164,14 @@ namespace SwarmRoboticsGUI
         #endregion
 
         #region Private Methods
+        private void InitializeTimer()
+        {
+            //
+            FpsTimer = new Timer(1000);
+            FpsTimer.AutoReset = true;
+            FpsTimer.Elapsed += FpsTimer_Tick;
+            FpsTimer.Enabled = true;
+        }
         private void FpsTimer_Tick(object sender, EventArgs e)
         {
             FPS = FrameCount;
@@ -220,7 +184,7 @@ namespace SwarmRoboticsGUI
             {
                 // Get the new frame
                 videoCapture.Retrieve(Frame, 0);
-                FrameUpdate(this, arg);
+                FrameUpdate(Frame, arg);
                 // 
                 FrameCount++;
             }

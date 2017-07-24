@@ -19,10 +19,7 @@ namespace SwarmRoboticsGUI
         public UMat Image { get; private set; }
         public UMat TestImage { get; private set; }
         public FilterType Filter { get; set; }
-        public double LowerC { get; set; }
-        public int ColourC { get; set; }
         public int LowerH { get; set; }
-        public int LowerS { get; set; }
         public int LowerV { get; set; }
         public int UpperH { get; set; }
         public int UpperS { get; set; }
@@ -37,13 +34,20 @@ namespace SwarmRoboticsGUI
 
         public ImageProcessing()
         {
-            
             Filter = FilterType.NONE;
-
-			//UMat image = CvInvoke.Imread("...\\...\\Images\\ColourCodes.png").GetUMat(AccessType.Read);
-			UMat image = CvInvoke.Imread("...\\...\\Brae\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
-			CvInvoke.Resize(image, image, new Size(640, 480));
-            TestImage = image.Clone();
+            try
+            {
+                // Load test image
+                UMat image = CvInvoke.Imread("...\\...\\Brae\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
+                // Resize
+                CvInvoke.Resize(image, image, new Size(1280, 720));
+                TestImage = image.Clone();
+            }
+            catch (Exception)
+            {
+                // If load fails, return black image of default size
+                TestImage = new Image<Gray, byte>(new Size(640, 480)).Mat.GetUMat(AccessType.Read);
+            }          
         }
 
         #region Public Methods
@@ -99,7 +103,7 @@ namespace SwarmRoboticsGUI
                         using (Mat SatIn = new Image<Gray, byte>(Frame.Size).Mat)
                         {
                             CvInvoke.ExtractChannel(In, SatIn, 1);
-                            CvInvoke.Threshold(SatIn, SatIn, LowerS, 255, ThresholdType.Binary);
+                            CvInvoke.Threshold(SatIn, SatIn, 25, 255, ThresholdType.Binary);
                             CvInvoke.BitwiseAnd(Out, SatIn, Out);
                         }
                         CvInvoke.PutText(Out, CvInvoke.CountNonZero(Out).ToString(), new Point(20, 20), FontFace.HersheySimplex, 1, new MCvScalar(128, 128, 128), 2);
@@ -112,87 +116,77 @@ namespace SwarmRoboticsGUI
         }
         public Robot[] GetRobots(UMat Frame, Robot[] RobotList)
         {
-            VectorOfVectorOfPoint Contours = new VectorOfVectorOfPoint();
-            VectorOfVectorOfPoint LargeContours = new VectorOfVectorOfPoint();
-            VectorOfVectorOfPoint ApproxContours = new VectorOfVectorOfPoint();
+            // Find every contour in the image
+            VectorOfVectorOfPoint Contours = GetCountours(Frame, 5, RetrType.External);
+            // Filter out small and large contours
+            VectorOfVectorOfPoint ProcessedContours = FilterContourArea(Contours, 1000, 100000);
 
-            Contours = GetCountours(Frame, 5, RetrType.External);
-            LargeContours = FilterContourArea(Contours, 1000, 100000);
-            ApproxContours.Push(LargeContours);
-            // Debug counters
-            int HexCount = 0;
-            int RobotCount = 0;
-
-            for (int i = 0; i < LargeContours.Size; i++)
+            // DEBUG: Counters
+            int HexCount = 0, RobotCount = 0;
+            // Loop through the filtered contours in the frame
+            for (int i = 0; i < ProcessedContours.Size; i++)
             {
+                VectorOfPoint ProcessedContour = ProcessedContours[i];
                 // Get approximate polygonal shape of contour
-                CvInvoke.ApproxPolyDP(LargeContours[i], ApproxContours[i], 5.0, true);
-                // Check if contour is the right shape (hexagon)
-                if (!IsHexagon(ApproxContours[i]))
-                {
-                    // Check next shape
-                    continue;
-                }
-                // Debug hexagon counter
+                CvInvoke.ApproxPolyDP(ProcessedContour, ProcessedContour, 5.0, true);
+                // If contour is not the right shape (hexagon), check next shape
+                if (!IsHexagon(ProcessedContour)) continue;
+                // DEBUG: Hexagon counter
                 HexCount++;
                 // Rectangular region that encompasses the contour
-                Rectangle RobotBounds = CvInvoke.BoundingRectangle(ApproxContours[i]);
+                Rectangle RobotBounds = CvInvoke.BoundingRectangle(ProcessedContour);
                 // Create an image from the frame cropped down to the contour region
                 using (UMat RobotImage = new UMat(Frame, RobotBounds))
                 {
-                    // Old contour points relative to original frame
-                    Point[] AbsoluteContourPoints = ApproxContours[i].ToArray();
                     // New contour points relative to cropped region
-                    Point[] RelativeContourPoints = AbsoluteContourPoints;
+                    Point[] RelativeContourPoints = ProcessedContour.ToArray();
                     // Get coordinates relative to bounding rectangle
-                    for (int j = 0; j < ApproxContours[i].Size; j++)
+                    for (int j = 0; j < ProcessedContour.Size; j++)
                     {
                         // Subtracting upper-left corner of the bounding box
                         RelativeContourPoints[j].Offset(new Point(-RobotBounds.X, -RobotBounds.Y));
-                    }               
-                    // Check for the colour ID
-                    int RobotID = IdentifyRobot(new VectorOfPoint(RelativeContourPoints), RobotImage);
-                    // Returns (-1) if no robot ID
-                    if (RobotID == -1)
-                    {
-                        // Check next shape
-                        continue;
                     }
+                    // Check for the colour ID, Returns (-1) if no robot ID
+                    int RobotID = IdentifyRobot(new VectorOfPoint(RelativeContourPoints), RobotImage);
+                    // Goto next robot if not true
+                    if (RobotID == -1) continue;
+                    // Robot is tracked by image processing
                     RobotList[RobotID].IsTracked = true;
+                    // Give corresponding ID value to the robot
                     RobotList[RobotID].ID = RobotID;
-                    RobotList[RobotID].Contour = ApproxContours[i].ToArray();
-                    // Debug robot counter
+                    // DEBUG: Store the vertices of the hexagonal shape
+                    RobotList[RobotID].Contour = ProcessedContour.ToArray();
+                    // DEBUG: Robot counter
                     RobotCount++;
                     // Get the robots center
-                    MCvPoint2D64f RelativeCOM = CvInvoke.Moments(new VectorOfPoint(RelativeContourPoints)).GravityCenter;
+                    MCvPoint2D64f AbsoluteCOM = CvInvoke.Moments(ProcessedContour).GravityCenter;
                     // Store the robots location
-                    RobotList[RobotID].Location = new Point((int)RelativeCOM.X + RobotBounds.X, (int)RelativeCOM.Y + RobotBounds.Y);
+                    RobotList[RobotID].Location = new Point((int)AbsoluteCOM.X, (int)AbsoluteCOM.Y);
+                    // Get the robots direction
+                    Point Direction = FindDirection(RobotImage);
+                    // Goto next robot if true
+                    if (Direction == null) continue;
 
-                    Point RelativeDirection = FindDirection(RobotImage);
-                    if (RelativeDirection != null)
+                    Direction = new Point(Direction.X + RobotBounds.X, Direction.Y + RobotBounds.Y);
+                    if (RobotList[RobotID].Location.X > 0 && RobotList[RobotID].Location.Y > 0)
                     {
-                        RobotList[RobotID].DirectionMarker = new Point(RelativeDirection.X + RobotBounds.X, RelativeDirection.Y + RobotBounds.Y);
-
-                        if (RobotList[RobotID].Location.X > 0 && RobotList[RobotID].Location.Y > 0)
-                        {
-                            int dy = RobotList[RobotID].DirectionMarker.Y - RobotList[RobotID].Location.Y;
-                            int dx = RobotList[RobotID].DirectionMarker.X - RobotList[RobotID].Location.X;
-                            RobotList[RobotID].Heading = Math.Atan2(dy, dx);
-                        }
+                        // Get robot heading using Atan function
+                        int dy = Direction.Y - RobotList[RobotID].Location.Y;
+                        int dx = Direction.X - RobotList[RobotID].Location.X;
+                        RobotList[RobotID].Heading = Math.Atan2(dy, dx);
                     }
                 }
-                // Debug values
+                // DEBUG: Store counters
                 this.HexCount = HexCount;
                 this.RobotCount = RobotCount;
-                LargeContourCount = LargeContours.Size;
+                LargeContourCount = ProcessedContours.Size;
             }
             return RobotList;
         }
         #endregion
 
         #region Private Methods
-
-        private VectorOfVectorOfPoint GetCountours(UMat Frame, int BlurSize, RetrType Mode)
+        private static VectorOfVectorOfPoint GetCountours(UMat Frame, int BlurSize, RetrType Mode)
         {
             VectorOfVectorOfPoint Contours = new VectorOfVectorOfPoint();
             using (UMat Input = Frame.Clone())
@@ -205,24 +199,25 @@ namespace SwarmRoboticsGUI
             }
             return Contours;
         }
-
-        private VectorOfVectorOfPoint FilterContourArea(VectorOfVectorOfPoint Contours, double LowerBound, double UpperBound)
+        private static VectorOfVectorOfPoint FilterContourArea(VectorOfVectorOfPoint Contours, double LowerBound, double UpperBound)
         {
             VectorOfVectorOfPoint FilteredContours = new VectorOfVectorOfPoint();
             double Area;
             for (int i = 0; i < Contours.Size; i++)
             {
-                Area = Math.Abs(CvInvoke.ContourArea(Contours[i]));
+                VectorOfPoint Contour = Contours[i];
+                Area = Math.Abs(CvInvoke.ContourArea(Contour));
                 // Remove high/low freq noise contours
                 if (Area > LowerBound && Area <= UpperBound)
                 {
-                    FilteredContours.Push(Contours[i]);
+                    FilteredContours.Push(Contour);
                 }
             }
             return FilteredContours;
         }
 
-        private bool IsHexagon(VectorOfPoint Contour)
+        // BRAE: Make these IsShape(Contour,Shape.Hexagon)?
+        private static bool IsHexagon(VectorOfPoint Contour)
         {
             // Check for 6 vertices
             if (Contour.Size != 6)
@@ -241,7 +236,7 @@ namespace SwarmRoboticsGUI
             }
             return true;
         }
-        private bool IsEquilTriangle(VectorOfPoint Contour)
+        private static bool IsEquilTriangle(VectorOfPoint Contour)
         {
             if (Contour.Size != 3)
             {
@@ -260,7 +255,7 @@ namespace SwarmRoboticsGUI
             return true;
         }
 
-        private Range GetHueRange(KnownColor TargetColour)
+        private static Range GetHueRange(KnownColor TargetColour)
         {
             Range HueRange = new Range();
             switch (TargetColour)
@@ -300,86 +295,72 @@ namespace SwarmRoboticsGUI
             //UpperH = this.UpperH;
             return HueRange;
         }
-        private bool HasHueRange(Mat Frame, Range HueRange)
+        private static bool HasHueRange(IInputArray Frame, Range HueRange)
         {
             int Count;
+            const int LowerS = 25;
+            const int UpperS = 255;
+            const int ColourCount = 1000;
+            Mat Out = new Mat();
+            Mat HOut = new Mat();
 
-            using (Mat Out = Frame.Clone())
-            using (Mat GrayOut = new Image<Gray, byte>(Frame.Size).Mat)
-            {
-                CvInvoke.CvtColor(Out, Out, ColorConversion.Bgr2Hsv);
-                //CvInvoke.Blur(Out, Out, new Size(1, 1), new Point(0, 0));
+            CvInvoke.CvtColor(Frame, Out, ColorConversion.Bgr2Hsv);
+            //CvInvoke.Blur(Out, Out, new Size(1, 1), new Point(0, 0));
 
-                using (ScalarArray lower = new ScalarArray(HueRange.Start))
-                using (ScalarArray upper = new ScalarArray(HueRange.End))
-                using (Mat HOut = new Image<Gray, byte>(Frame.Size).Mat)
-                {
-                    CvInvoke.ExtractChannel(Out, HOut, 0);
-                    CvInvoke.InRange(HOut, lower, upper, GrayOut);
-                }
+            //
+            ScalarArray lower = new ScalarArray(HueRange.Start);
+            ScalarArray upper = new ScalarArray(HueRange.End);
+            //
+            CvInvoke.ExtractChannel(Out, HOut, 0);
+            CvInvoke.InRange(HOut, lower, upper, HOut);
+            //
+            CvInvoke.ExtractChannel(Out, Out, 1);
+            CvInvoke.Threshold(Out, Out, LowerS, UpperS, ThresholdType.Binary);
+            CvInvoke.BitwiseAnd(HOut, Out, HOut);
+            //
+            Count = CvInvoke.CountNonZero(HOut);
 
-                using (Mat SOut = new Image<Gray, byte>(Frame.Size).Mat)
-                {
-                    CvInvoke.ExtractChannel(Out, SOut, 1);
-                    CvInvoke.Threshold(SOut, SOut, LowerS, 255, ThresholdType.Binary);
-                    CvInvoke.BitwiseAnd(GrayOut, SOut, GrayOut);
-                }
-                //
-                Count = CvInvoke.CountNonZero(GrayOut);
-            }
-
-            if (Count > ColourC)
+            //
+            if (Count > ColourCount)
             {
                 return true;
             }
             return false;
         }
-        private Point FindDirection(UMat Frame)
+        private static Point FindDirection(IInputArray Frame)
         {
             VectorOfVectorOfPoint Contours = new VectorOfVectorOfPoint();
-            VectorOfVectorOfPoint LargeContours = new VectorOfVectorOfPoint();
-            VectorOfVectorOfPoint ApproxContours = new VectorOfVectorOfPoint();
-            double Area;
-            using (UMat Input = Frame.Clone())
+            VectorOfVectorOfPoint ProcessedContours = new VectorOfVectorOfPoint();
+            using (Mat Input = new Image<Gray, byte>(Frame.GetInputArray().GetSize()).Mat)
             {
-                CvInvoke.CvtColor(Input, Input, ColorConversion.Bgr2Gray);
-                CvInvoke.BitwiseNot(Input, Input);
+                // Convert to grayscale
+                CvInvoke.CvtColor(Frame, Input, ColorConversion.Bgr2Gray);
+                // Apply binary threshold
                 CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.GaussianC, ThresholdType.Binary, 3, 0);
+                // Find contours
                 CvInvoke.FindContours(Input, Contours, null, RetrType.Ccomp, ChainApproxMethod.ChainApproxSimple);
             }
-            //
-            for (int i = 0; i < Contours.Size; i++)
-            {
-                Area = Math.Abs(CvInvoke.ContourArea(Contours[i]));
-                // Remove high/low freq noise contours
-                if (Area > 0 && Area < 500)
-                {
-                    LargeContours.Push(Contours[i]);
-                }
-            }
-            ApproxContours.Push(LargeContours);
+            ProcessedContours = FilterContourArea(Contours, 50, 10000);
+
             MCvPoint2D64f TriangleCOM = new MCvPoint2D64f();
-            for (int i = 0; i < LargeContours.Size; i++)
+            for (int i = 0; i < ProcessedContours.Size; i++)
             {
                 // Get approximate polygonal shape of contour
-                //CvInvoke.ApproxPolyDP(LargeContours[i], ApproxContours[i], 15.0, true);
-                CvInvoke.ApproxPolyDP(LargeContours[i], ApproxContours[i], 5.0, true);
+                CvInvoke.ApproxPolyDP(ProcessedContours[i], ProcessedContours[i], 5.0, true);
                 // Check if contour is the right shape (triangle)
-                if (IsEquilTriangle(ApproxContours[i]))
-                {
-                    TriangleCOM = CvInvoke.Moments(ApproxContours[i]).GravityCenter;
-                }
+                if (!IsEquilTriangle(ProcessedContours[i])) continue;
+                TriangleCOM = CvInvoke.Moments(ProcessedContours[i]).GravityCenter;
             }
             return new Point((int)TriangleCOM.X, (int)TriangleCOM.Y);
         }
-        private int IdentifyRobot(VectorOfPoint Contour, UMat Frame)
+        private static int IdentifyRobot(VectorOfPoint Contour, IInputArray Frame)
         {
             bool IsOrange = false, IsYellow = false, IsGreen = false, IsDarkBlue = false, IsLightBlue = false, IsPurple = false;
             int RobotID = -1;
 
-            using (Mat Out = new Image<Bgr, byte>(Frame.Size).Mat)
+            using (Mat Out = new Image<Bgr, byte>(Frame.GetInputArray().GetSize()).Mat)
             {
-                using (Mat Mask = new Image<Gray, byte>(Frame.Size).Mat)
+                using (Mat Mask = new Image<Gray, byte>(Frame.GetInputArray().GetSize()).Mat)
                 {
                     using (VectorOfVectorOfPoint ContourVect = new VectorOfVectorOfPoint())
                     {
