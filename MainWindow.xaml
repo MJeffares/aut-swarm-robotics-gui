@@ -136,7 +136,6 @@
                 <RowDefinition x:Name="Row1" Height="1*"/>
             </Grid.RowDefinitions>
 
-
             <Grid  Grid.Column="0" Grid.Row="0" Grid.RowSpan = "2" Margin="5">
 
                 <Grid.RowDefinitions>
@@ -272,8 +271,11 @@
 
                 </StatusBar>
 
-                <TabControl Background="{x:Null}">
-                    <TabItem Header="Robot Control">
+                <TabControl x:Name="tcCenter" Background="{x:Null}">
+                    <TabItem Header="No Connection" x:Name="nc">
+                        <Label HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold"> Please connect to an Xbee module before continuing</Label>
+                    </TabItem>
+                    <TabItem Header="Robot Control" IsEnabled="False" Visibility="Hidden">
                         <WrapPanel Orientation="Vertical">
                             <ToggleButton Content="PlaceHolder"  Margin="10" />
                             <ToggleButton Content="PlaceHolder"  Margin="10" Style="{DynamicResource ButtonStyle1}" Background="#FFFB0000" />
@@ -296,16 +298,16 @@
                         </WrapPanel>
                     </TabItem>
 
-                    <TabItem Header="Tower Control">
+                    <TabItem Header="Tower Control" IsEnabled="False" Visibility="Hidden">
 
                     </TabItem>
 
-                    <TabItem Header = "Systems Test" >
+                    <TabItem Header = "Systems Test" IsEnabled="False" Visibility="Hidden" >
                         <StackPanel Margin = "5">
                             
                             <WrapPanel Margin="0,2">
-                                <Button x:Name="btnSysTestCommunications" Content="Comms Test" Margin="5,5,0,5" />
-                                <Button x:Name="btnSysTestTestMode" Content = "Enter Test Mode" Margin="5,5,0,5" Click="btnSysTestTestMode_Click" Width="95"/>
+                                <Button x:Name="btnSysTestCommunications" Content="Comms Test" Margin="5,5,0,5" Click="btnSysTestCommunications_Click" />
+                                <Button x:Name="btnSysTestTestMode" Content = "Enter Test Mode" Margin="5,5,0,5" IsEnabled = "false"  Click="btnSysTestTestMode_Click" Width="95"/>
                                 <Button x:Name="btnSysTestFullTest" Content = "Begin Full Systems Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestFullTest_Click" Width="130"/>
                                 <Button x:Name="btnSysTestPreviousTest" Content = "Previous Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestPreviousTest_Click"/>
                                 <Button x:Name="btnSysTestNextTest" Content = "Next Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestNextTest_Click"/>
@@ -345,101 +347,151 @@
                                 </WrapPanel>
                             </Border>
 
-                            <WrapPanel>
-                                <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestLightLHS" Content = "Light Sensor LHS" Tag="Light,F9" Style="{DynamicResource ButtonStyle1}"/>
-                                    <TextBox x:Name="tbSysTestLightSensorLHS" IsReadOnly="True" Margin="2"/>
-                                </StackPanel>
-
-                                <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestLightRHS" Content = "Light Sensor RHS" Tag="Light,F8" Style="{DynamicResource ButtonStyle1}"/>
-                                    <TextBox x:Name="tbSysTestLightSensorRHS" IsReadOnly="True" Margin="2"/>
-                                </StackPanel>
-                            </WrapPanel>
-
-                            <WrapPanel>
-                                <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestMouse" Content = "Mouse" Tag="Mouse" Style="{DynamicResource ButtonStyle1}" />
-                                    <WrapPanel>
-                                        <Label Content="DX:"/>
-                                        <TextBox x:Name="tbSysTestMouseDX" IsReadOnly="True" Width="30" Margin="2"/>
-                                        <Label Content="DY:"/>
-                                        <TextBox x:Name="tbSysTestMouseDY" IsReadOnly="True" Width="30" Margin="2"/>
-                                    </WrapPanel>
-                                </StackPanel>
-                            </WrapPanel>
-
-                            <WrapPanel>
-                                <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestIMU" Content = "IMU" Tag = "IMU" Style="{DynamicResource ButtonStyle1}"/>
-                                    <WrapPanel>
-                                        <Label Content="W:" Margin="1,0,0,0"/>
-                                        <TextBox x:Name="tbSysTestIMUW" IsReadOnly="True" Width="30" Margin="2"/>
-                                        <Label Content="X:"/>
-                                        <TextBox x:Name="tbSysTestIMUX" IsReadOnly="True" Width="30" Margin="2"/>
-                                        <Label Content="Y:"/>
-                                        <TextBox x:Name="tbSysTestIMUY" IsReadOnly="True" Width="30" Margin="2"/>
-                                        <Label Content="Z:"/>
-                                        <TextBox x:Name="tbSysTestIMUZ" IsReadOnly="True" Width="30" Margin="2"/>
-                                    </WrapPanel>
-                                </StackPanel>
-                            </WrapPanel>
-
-                            <WrapPanel>
-                                <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestLineFL" Content = "Line Follower Far Left" Tag="Line,01" Style="{DynamicResource ButtonStyle1}"/>
-                                    <TextBox x:Name="tbSysTestLineFollowerFarLeft" IsReadOnly="True" Margin="2"/>
-                                </StackPanel>
-
-                                <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestLineCL" Content = "Line Follower Centre Left" Tag="Line,02" Style="{DynamicResource ButtonStyle1}"/>
-                                    <TextBox x:Name="tbSysTestLineFollowerCentreLeft" IsReadOnly="True" Margin="2"/>
-                                </StackPanel>
-
-                                <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestLineCR" Content = "Line Follower Centre Right" Tag="Line,03" Style="{DynamicResource ButtonStyle1}"/>
-                                    <TextBox x:Name="tbSysTestLineFollowerCentreRight" IsReadOnly="True" Margin="2"/>
-                                </StackPanel>
-
-                                <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestLineFR" Content = "Line Follower Far Right" Tag="Line,04" Style="{DynamicResource ButtonStyle1}"/>
-                                    <TextBox x:Name="tbSysTestLineFollowerFarRight" IsReadOnly="True" Margin="2"/>
-                                </StackPanel>
-                            </WrapPanel>
-
-                            <WrapPanel>
-                                <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestFastCharge" Content = "Fast Charge Chip" Tag="Charge" Style="{DynamicResource ButtonStyle1}"/>
-                                    <TextBox x:Name="tbSysTestFastCharge" IsReadOnly="True" Margin="2"/>
-                                </StackPanel>
-                                <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestCamera" Content = "OnBoard Camera" Tag="Camera" Style="{DynamicResource ButtonStyle1}" />
-                                    <TextBox x:Name="tbSysTestOnBoardCamera" IsReadOnly="True" Margin="2"/>
-                                </StackPanel>
-                            </WrapPanel>
-                            <StackPanel>
+                            <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="2">
                                 <WrapPanel>
-                                    <ComboBox/>
-                                    <Button/>
+                                    <StackPanel Margin="5,0,0,0">
+                                        <ToggleButton x:Name="btnSysTestLightLHS" Content = "Light Sensor LHS" Tag="Light,F9" Style="{DynamicResource ButtonStyle1}"/>
+                                        <TextBox x:Name="tbSysTestLightSensorLHS" IsReadOnly="True" Margin="2"/>
+                                    </StackPanel>
+
+                                    <StackPanel Margin="5,0,0,0">
+                                        <ToggleButton x:Name="btnSysTestLightRHS" Content = "Light Sensor RHS" Tag="Light,F8" Style="{DynamicResource ButtonStyle1}"/>
+                                        <TextBox x:Name="tbSysTestLightSensorRHS" IsReadOnly="True" Margin="2"/>
+                                    </StackPanel>
                                 </WrapPanel>
-                            
+                            </Border>
+
+                            <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="1" >
                                 <WrapPanel>
-                                    <TextBox/>
-                                    <Button/>
+                                    <StackPanel Margin="5,0,0,0">
+                                        <ToggleButton x:Name="btnSysTestMouse" Content = "Mouse" Tag="Mouse" Style="{DynamicResource ButtonStyle1}" />
+                                        <WrapPanel>
+                                            <Label Content="DX:"/>
+                                            <TextBox x:Name="tbSysTestMouseDX" IsReadOnly="True" Width="30" Margin="2"/>
+                                            <Label Content="DY:"/>
+                                            <TextBox x:Name="tbSysTestMouseDY" IsReadOnly="True" Width="30" Margin="2"/>
+                                        </WrapPanel>
+                                    </StackPanel>
+                                    <StackPanel Margin="5,0,0,0">
+                                        <ToggleButton x:Name="btnSysTestIMU" Content = "IMU" Tag = "IMU" Style="{DynamicResource ButtonStyle1}"/>
+                                        <WrapPanel>
+                                            <Label Content="W:" Margin="1,0,0,0"/>
+                                            <TextBox x:Name="tbSysTestIMUW" IsReadOnly="True" Width="30" Margin="2"/>
+                                            <Label Content="X:"/>
+                                            <TextBox x:Name="tbSysTestIMUX" IsReadOnly="True" Width="30" Margin="2"/>
+                                            <Label Content="Y:"/>
+                                            <TextBox x:Name="tbSysTestIMUY" IsReadOnly="True" Width="30" Margin="2"/>
+                                            <Label Content="Z:"/>
+                                            <TextBox x:Name="tbSysTestIMUZ" IsReadOnly="True" Width="30" Margin="2"/>
+                                        </WrapPanel>
+                                    </StackPanel>
                                 </WrapPanel>
-                            </StackPanel>
-                            
+                            </Border>
+
+
+                            <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="1" >
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Label Grid.Row="0" Grid.ColumnSpan="4" HorizontalAlignment="Center">Line Followers</Label>
+
+                                    <ToggleButton Grid.Row="1" x:Name="btnSysTestLineFL" Content = "Far Left" Tag="Line,01" Style="{DynamicResource ButtonStyle1}"/>
+                                    <TextBox Grid.Row="2" x:Name="tbSysTestLineFollowerFarLeft" IsReadOnly="True" Margin="2"/>
+
+                                    <ToggleButton  Grid.Row="1" Grid.Column="1" x:Name="btnSysTestLineCL" Content = "Centre Left" Tag="Line,02" Style="{DynamicResource ButtonStyle1}"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1"  x:Name="tbSysTestLineFollowerCentreLeft" IsReadOnly="True" Margin="2"/>
+
+                                    <ToggleButton Grid.Row="1" Grid.Column="2" x:Name="btnSysTestLineCR" Content = "Centre Right" Tag="Line,03" Style="{DynamicResource ButtonStyle1}"/>
+                                    <TextBox Grid.Row="2" Grid.Column="2" x:Name="tbSysTestLineFollowerCentreRight" IsReadOnly="True" Margin="2"/>
+
+                                    <ToggleButton Grid.Row="1" Grid.Column="3" x:Name="btnSysTestLineFR" Content = "Far Right" Tag="Line,04" Style="{DynamicResource ButtonStyle1}"/>
+                                    <TextBox Grid.Row="2" Grid.Column="3" x:Name="tbSysTestLineFollowerFarRight" IsReadOnly="True" Margin="2"/>
+
+                                </Grid>
+                            </Border>
+
                             <WrapPanel>
-                                <StackPanel Margin="5,0,0,0">
-                                    <ToggleButton x:Name="btnSysTestTWIMux" Content = "TWI Multiplexer" Tag="TWI" Style="{DynamicResource ButtonStyle1}"/>
-                                    <TextBox x:Name="tbSysTestTWIMultiplexer" IsReadOnly="True" Margin="2"/>
-                                </StackPanel>
+                                <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="0" >
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Label Grid.Row="0" Grid.ColumnSpan="3" HorizontalAlignment="Center">MOTORS</Label>
+
+                                        <Label Grid.Column="0" Grid.Row="1"  HorizontalAlignment="Center">M1</Label>
+                                        <Slider Grid.Column="0" Grid.Row="2" x:Name="slMotorOne" Minimum="-100" Maximum="100" Orientation="Vertical" TickFrequency="10" Height="100" Margin="5,0"/>
+                                        <TextBox Grid.Column="0" Grid.Row="3" Text="{Binding ElementName=slMotorOne, Path=Value, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}" MinWidth="35" Margin="5,0,5,5"/>
+
+                                        <Label Grid.Column="1" Grid.Row="1"  HorizontalAlignment="Center">M2</Label>
+                                        <Slider Grid.Column="1" Grid.Row="2" x:Name="slMotorTwo" Minimum="-100" Maximum="100" Orientation="Vertical" TickFrequency="10" Height="100" Margin="5,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding ElementName=slMotorTwo, Path=Value, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}" MinWidth="35" Margin="5,0,5,5"/>
+
+                                        <Label Grid.Column="2" Grid.Row="1"  HorizontalAlignment="Center">M3</Label>
+                                        <Slider Grid.Column="2" Grid.Row="2" x:Name="slMotorThree" Minimum="-100" Maximum="100" Orientation="Vertical" TickFrequency="10" Height="100" Margin="5,0" />
+                                        <TextBox Grid.Column="2" Grid.Row="3" Text="{Binding ElementName=slMotorThree, Path=Value, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}" MinWidth="35" Margin="5,0,5,5" />
+                                    </Grid>
+                                </Border>
+
+                                <Border BorderBrush="Gainsboro" BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Padding="1" Width="169" Height="86" >
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2*" />
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Label Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Center">TWI MUX</Label>
+                                        <ComboBox Grid.Row="1" Grid.Column="0" x:Name="cbSysTestTWISet" Width="100">
+                                            <ComboBoxItem IsSelected="True">Proximity A</ComboBoxItem>
+                                            <ComboBoxItem>Proximity B</ComboBoxItem>
+                                            <ComboBoxItem>Proximity C</ComboBoxItem>
+                                            <ComboBoxItem>Proximity D</ComboBoxItem>
+                                            <ComboBoxItem>Proximity E</ComboBoxItem>
+                                            <ComboBoxItem>Proximity F</ComboBoxItem>
+                                            <ComboBoxItem>Light Sensor RHS</ComboBoxItem>
+                                            <ComboBoxItem>Light Sensor LHS</ComboBoxItem>
+                                        </ComboBox>
+                                        <ToggleButton Grid.Row="1" Grid.Column="1"  x:Name="btnSysTWISet" Content = "Set" Tag="Camera" Style="{DynamicResource ButtonStyle1}" />
+                                        <TextBox Grid.Row="2" Grid.Column="0" x:Name="tbSysTestTWIRead" IsReadOnly="True" Width="100"/>
+                                        <ToggleButton Grid.Row="2" Grid.Column="1" x:Name="btnSysTWIRead" Content = "Read" Tag="Camera" Style="{DynamicResource ButtonStyle1}" />
+                                    </Grid>
+                                </Border>
                             </WrapPanel>
+
+                            <Label>To Add: Camera, Fast Charge Chip</Label>
+
                         </StackPanel>
                     </TabItem>
 
 
-                    <TabItem Header="Debug">
+                    <TabItem Header="Debug" IsEnabled="False" Visibility="Hidden">
                         <TabControl Margin="5" TabStripPlacement="Left">
 
                             <!-- The following code alllows vertical tabs -->

@@ -44,6 +44,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 #endregion
 
@@ -267,6 +268,16 @@ public class SerialUARTCommunication
 			{
 				_serialPort.Open();
 				connectButton.Header = "Disconnect";
+
+				foreach (TabItem item in window.tcCenter.Items)
+				{
+					item.IsEnabled = true;
+					item.Visibility = Visibility.Visible;
+				}
+				window.tcCenter.SelectedIndex++;
+				window.nc.IsEnabled = false;
+				window.nc.Visibility = Visibility.Collapsed;
+
 			}
 			catch (Exception excpt)
 			{
@@ -311,6 +322,15 @@ public class SerialUARTCommunication
 			//updates connect button
 			connectButton.Header = "Connect";
 			connectButton.IsChecked = false;
+
+			foreach (TabItem item in window.tcCenter.Items)
+			{
+				item.IsEnabled = false;
+				item.Visibility = Visibility.Hidden;
+			}
+			window.nc.IsEnabled = true;
+			window.nc.Visibility = Visibility.Visible;
+			window.nc.IsSelected = true;
 		}
 
 	}
