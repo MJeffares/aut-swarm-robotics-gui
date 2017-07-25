@@ -6,7 +6,28 @@
              StartupUri="MainWindow.xaml" ShutdownMode="OnMainWindowClose">
 
     <Application.Resources>
+        <!--Brushes-->
+        <RadialGradientBrush x:Key="RadialBrush" Center="0.5,0.5" GradientOrigin="0.5,0.5">
+            <RadialGradientBrush.GradientStops>
+                <GradientStop Color="#FF505050" Offset="0"/>
+                <GradientStop Color="#FF646464" Offset="1"/>
+            </RadialGradientBrush.GradientStops>
+        </RadialGradientBrush>
+        <RadialGradientBrush x:Key="RadialBrush2" Center="0.5,0.5" GradientOrigin="0.5,0.5">
+            <RadialGradientBrush.GradientStops>
+                <GradientStop Color="#FF909090" Offset="0"/>
+                <GradientStop Color="#FF646464" Offset="1"/>
+            </RadialGradientBrush.GradientStops>
+        </RadialGradientBrush>
+        <LinearGradientBrush x:Key="ButtonNormalBackground" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="#F3F3F3" Offset="0"/>
+            <GradientStop Color="#EBEBEB" Offset="0.5"/>
+            <GradientStop Color="#DDDDDD" Offset="0.5"/>
+            <GradientStop Color="#CDCDCD" Offset="1"/>
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="ButtonNormalBorder" Color="#FF707070"/>
 
+        <!--Styles-->
         <Style x:Key="ButtonFocusVisual">
             <Setter Property="Control.Template">
                 <Setter.Value>
@@ -16,15 +37,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <LinearGradientBrush x:Key="ButtonNormalBackground" EndPoint="0,1" StartPoint="0,0">
-            <GradientStop Color="#F3F3F3" Offset="0"/>
-            <GradientStop Color="#EBEBEB" Offset="0.5"/>
-            <GradientStop Color="#DDDDDD" Offset="0.5"/>
-            <GradientStop Color="#CDCDCD" Offset="1"/>
-        </LinearGradientBrush>
-        <SolidColorBrush x:Key="ButtonNormalBorder" Color="#FF707070"/>
-
-        
         <Style x:Key="ButtonStyle1" TargetType="{x:Type ToggleButton}">
             <!--<Setter Property="FocusVisualStyle" Value="{StaticResource ButtonFocusVisual}"/>
             <Setter Property="Background" Value="AliceBlue"/>
@@ -50,7 +62,7 @@
                         </Border>
 
                         <ControlTemplate.Triggers>
-                            
+
                             <Trigger Property="IsChecked" Value="True">
                                 <Trigger.EnterActions>
                                     <BeginStoryboard x:Name="storyboard">
@@ -112,7 +124,7 @@
                                 <Setter Property="BorderBrush" TargetName="border" Value="#FFADB2B5"/>
                                 <Setter Property="Foreground" Value="#FFADB2B5"/>
                             </Trigger>
-                            
+
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>

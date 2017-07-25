@@ -112,7 +112,7 @@
     </Compile>
     <Compile Include="GeneralUtilities.cs" />
     <Compile Include="Brae\ImageProcessing.cs" />
-    <Compile Include="OverlayWindow.xaml.cs">
+    <Compile Include="Vision Interfaces\OverlayWindow.xaml.cs">
       <DependentUpon>OverlayWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Robot.cs" />
@@ -120,6 +120,9 @@
     <Compile Include="SerialCommunication.cs" />
     <Compile Include="SwarmRoboticsSerialProtocol.cs" />
     <Compile Include="SystemTest.cs" />
+    <Compile Include="Vision Interfaces\RobotGroups.xaml.cs">
+      <DependentUpon>RobotGroups.xaml</DependentUpon>
+    </Compile>
     <Compile Include="XbeeCommunication.cs" />
     <Page Include="CameraPopOutWindow.xaml">
       <SubType>Designer</SubType>
@@ -137,7 +140,11 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="OverlayWindow.xaml">
+    <Page Include="Vision Interfaces\OverlayWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Vision Interfaces\RobotGroups.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
