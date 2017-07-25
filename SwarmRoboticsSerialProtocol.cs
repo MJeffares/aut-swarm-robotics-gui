@@ -29,6 +29,7 @@
 #region
 
 using SwarmRoboticsGUI;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -68,6 +69,39 @@ public class ProtocolClass
 	public void MessageReceived(byte[] message)
 	{
 		string[] tokens;
+
+		if(window.waitingForReply)
+		{
+			if(message[0] == window.waitForReplyType)
+			{
+				if(window.avoidConnected == true)
+				{
+					bool match = false;
+					int i = 0;
+					for (i = 0; i < window.connectedRobots.Count; i++)
+					{
+						if (window.connectedRobots[i] == BitConverter.ToUInt64(window.serial.NewestMessage.source64, 0))
+						{
+							match = true;
+							i = window.connectedRobots.Count;
+						}
+					}
+
+					if(match == false)
+					{
+						window.waitForReplyMessage = window.serial.NewestMessage;
+						window.waitingForReply = false;
+						window.Reply.TrySetResult(true);
+					}
+				}
+				else
+				{
+					window.waitForReplyMessage = window.serial.NewestMessage;
+					window.waitingForReply = false;
+					window.Reply.TrySetResult(true);
+				}				
+			}
+		}
 
 		if (window.testMode)
 		{

@@ -731,6 +731,7 @@ namespace SwarmRoboticsGUI
                 dispSelectRobot.SelectedIndex = 0;
             }
         }
+
 		#endregion
 	}
 }

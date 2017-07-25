@@ -37,6 +37,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -45,6 +46,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using WPFCustomMessageBox;
 
 #endregion
 
@@ -66,16 +68,29 @@ namespace SwarmRoboticsGUI
 	{
 		public List<ToggleButton> togglebtnControls;
 		public List<Button> btnControls;
+		bool communicationsTest = false;
 		public bool testMode = false;
 		bool fullSystemTest = false;
 		int currentTestItem = -1;
 		bool doublecommandlockout = false;
+		public bool waitingForReply = false;
+		public byte waitForReplyType = 0x00;
+		public communicated_message waitForReplyMessage;
+		public UInt64 systemTestDesitination64;
+		public UInt16 systemTestDesitination16;
+		public List<UInt64> connectedRobots;
+		public bool avoidConnected = false;
+		public TaskCompletionSource<bool> Reply = new TaskCompletionSource<bool>();
+
+
 
 		public void setupSystemTest()
 		{
+			connectedRobots = new List<UInt64>();
+
 			togglebtnControls = new List<ToggleButton>()
 			{
-				 btnSysTestProxmityA,btnSysTestProxmityB, btnSysTestProxmityC, btnSysTestProxmityD, btnSysTestProxmityE, btnSysTestProxmityF, btnSysTestLightLHS, btnSysTestLightRHS, btnSysTestMouse, btnSysTestIMU, btnSysTestLineFL, btnSysTestLineCL, btnSysTestLineCR, btnSysTestLineFR, btnSysTestFastCharge, btnSysTestTWIMux, btnSysTestCamera
+				 btnSysTestProxmityA,btnSysTestProxmityB, btnSysTestProxmityC, btnSysTestProxmityD, btnSysTestProxmityE, btnSysTestProxmityF, btnSysTestLightLHS, btnSysTestLightRHS, btnSysTestMouse, btnSysTestIMU, btnSysTestLineFL, btnSysTestLineCL, btnSysTestLineCR, btnSysTestLineFR
 			};
 
 
@@ -89,6 +104,70 @@ namespace SwarmRoboticsGUI
 			}
 
 		}
+
+		private async void btnSysTestCommunications_Click(object sender, RoutedEventArgs e)
+		{
+			Reply = new TaskCompletionSource<bool>();
+
+			byte[] data;
+			data = new byte[2];
+			data[0] = SYSTEM_TEST_MESSAGE.COMMUNICATION;
+			data[1] = 0x00;
+
+			xbee.SendTransmitRequest(XbeeHandler.DESTINATION.BROADCAST, data);
+			waitingForReply = true;
+			waitForReplyType = SYSTEM_TEST_MESSAGE.COMMUNICATION;
+
+
+			//XXXX replace with custom messagebox without buttons
+			new Thread(new ThreadStart(delegate
+			{
+				MessageBox.Show
+				(
+				  "Please wait while communications are tested.",
+				  "Establishing Communications",
+				  MessageBoxButton.OK,
+				  MessageBoxImage.Warning
+				);
+			})).Start();
+
+			if (await Task.WhenAny(Reply.Task, Task.Delay(15000)) == Reply.Task)
+			{
+
+				MJLib.AutoClosingMessageBox.Close("Establishing Communications");
+				systemTestDesitination16 = BitConverter.ToUInt16(waitForReplyMessage.source16, 0);
+				systemTestDesitination64 = BitConverter.ToUInt64(waitForReplyMessage.source64, 0);
+
+				MessageBoxResult sucessfullCommunicationsResult = CustomMessageBox.ShowYesNoCancel("Successfully communicated with: " + waitForReplyMessage.SourceDisplay, "Communications established", "Connect to this robot", "Choose Another Robot", "Cancel");
+
+				switch(sucessfullCommunicationsResult)
+				{
+					case MessageBoxResult.Yes:
+						avoidConnected = false;
+						connectedRobots.Clear();
+						btnSysTestTestMode.IsEnabled = true;
+						break;
+
+					case MessageBoxResult.No:
+						avoidConnected = true;
+						connectedRobots.Add(systemTestDesitination64);
+						btnSysTestCommunications_Click(sender, e);
+						break;
+
+					case MessageBoxResult.Cancel:
+						avoidConnected = false;
+						connectedRobots.Clear();
+						break;
+				}
+			}
+			else
+			{
+				MJLib.AutoClosingMessageBox.Close("Establishing Communications");
+				MessageBox.Show("TIMEOUT", "Communications Timed Out", MessageBoxButton.OK);
+			}			
+		}
+
+		
 
 		private void btnSysTestTestMode_Click(object sender, RoutedEventArgs e)
 		{
@@ -239,6 +318,21 @@ namespace SwarmRoboticsGUI
 			public const byte SINGLE_SAMPLE = 0x01;
 			public const byte START_STREAMING = 0x02;
 			public const byte STOP_STREAMING = 0xFF;
+		}
+		private static class SYSTEM_TEST_MESSAGE
+		{
+			public const byte MODE = 0xE0;
+			public const byte COMMUNICATION = 0xE1;
+			public const byte PROXIMITY = 0xE4;
+			public const byte LIGHT = 0xE5;
+			public const byte MOTORS = 0xE6;
+			public const byte MOUSE = 0xE7;
+			public const byte IMU = 0xE8;
+			public const byte LINE_FOLLOWERS = 0xE9;
+			public const byte FAST_CHARGE = 0xEA;
+			public const byte TWI_MUX = 0xEB;
+			public const byte TWI_EXT = 0xEC;
+			public const byte CAMERA = 0xED;
 		}
 
 
