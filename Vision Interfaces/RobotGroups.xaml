@@ -70,15 +70,25 @@
         <!--Styles-->
         <Style x:Key="ListBoxStyle" TargetType="ListBoxItem">
             <Setter Property="Template" Value="{DynamicResource GroupControlTemplate}"/>
+            <EventSetter Event="PreviewMouseDown" Handler="ToggleGroup"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Type}" Value="RobotItem">
                     <Setter Property="Template" Value="{DynamicResource RobotControlTemplate}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Type}" Value="GroupItem">
+                    <Setter Property="Template" Value="{DynamicResource GroupControlTemplate}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsVisible}" Value="True">
+                    <Setter Property="Visibility" Value="Visible"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
 
-    <Grid>
+    <Grid Background="{StaticResource ListGroupBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition/>
@@ -90,10 +100,11 @@
         </Grid.ColumnDefinitions>
 
         <ListBox x:Name="RobotList" Grid.Column="1" Grid.Row="1" 
+                 Foreground="White" FontSize="20"
                  Background="Transparent" BorderBrush="Transparent"
                  ItemContainerStyle="{StaticResource ListBoxStyle}">
-            <!--<ListBoxItem Background="{StaticResource RadialBrush}" Foreground="White" FontSize="20" HorizontalContentAlignment="Center" >
-                Testing How it looks
+            <!--<ListBoxItem>
+                Testing The Pretty
             </ListBoxItem>-->
         </ListBox>
     </Grid>

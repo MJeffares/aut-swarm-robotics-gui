@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -10,16 +11,19 @@ namespace SwarmRoboticsGUI
     {
         public string Name { get; private set; }
         public string Type { get; set; }
+        public bool IsVisible { get; set; }
 
         public Item(string Name)
         {
             this.Name = Name;
             Type = "Item";
+            IsVisible = true;
         }
     }
     public class RobotItem : Item
     {
         public int ID { get; private set; }
+        public List<Item> Children { get; private set; }
 
         public RobotItem(string Name, int ID) : base(Name)
         {
@@ -36,6 +40,17 @@ namespace SwarmRoboticsGUI
             Children = new List<RobotItem>();
             Type = "GroupItem";
 
+        }
+        public void AddRobot(RobotItem Item)
+        {
+            foreach (Item I in Children)
+            {
+                if (I.Name == Item.Name)
+                {
+                    return;
+                }
+            }
+            Children.Add(Item);
         }
     }
 
@@ -61,15 +76,15 @@ namespace SwarmRoboticsGUI
         {
             AddRobot(Item);
             AddRobotGroup(Group);
+            Group.AddRobot(Item);
             int GroupIndex = _List.IndexOf(Group);
+            RemoveRobot(Item);
             _List.Insert(GroupIndex + 1, Item);
         }
         public void GroupRobot(RobotItem Item, string GroupName)
         {
             var Group = AddRobotGroup(GroupName);
-            int GroupIndex = _List.IndexOf(Group);
-            RemoveRobot(Item);
-            _List.Insert(GroupIndex + 1, Item);
+            GroupRobot(Item, Group);
         }
 
         public void AddRobot(RobotItem Item)
@@ -78,6 +93,9 @@ namespace SwarmRoboticsGUI
             {
                 if (I.Name == Item.Name)
                 {
+                    var index = _List.IndexOf(I);
+                    _List.RemoveAt(index);
+                    _List.Insert(index, Item);
                     return;
                 }
             }
@@ -141,6 +159,25 @@ namespace SwarmRoboticsGUI
             if (_List.Contains(Group))
             {
                 _List.Remove(Group);
+            }
+        }
+
+        private void ToggleGroup(object sender, EventArgs e)
+        {
+            var ListItem = sender as ListBoxItem;
+            var Item = ListItem.DataContext;
+            var type = Item.GetType();
+            if (type == typeof(RobotGroup))
+            {
+                var GroupItem = (RobotGroup)Item;
+                foreach (Item I in GroupItem.Children)
+                {
+                    if (_List.Contains(I))
+                    {
+                        I.IsVisible = I.IsVisible ? false : true;
+                        AddRobot((RobotItem)I);
+                    }
+                }
             }
         }
     }
