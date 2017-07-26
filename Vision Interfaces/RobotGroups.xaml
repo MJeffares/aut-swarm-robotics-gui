@@ -11,89 +11,71 @@
         <SolidColorBrush x:Key="ListSpacerBrush" Color="#FF202020"/>
         <SolidColorBrush x:Key="ListRobotBrush" Color="#FF101010"/>
         <SolidColorBrush x:Key="ListGroupBrush" Color="#FF303030"/>
+        
+        <!--Templates-->
+        <ControlTemplate x:Key="RobotControlTemplate" TargetType="ListBoxItem">
+            <Border Name="border" Grid.Column="1" Height="50"
+                    BorderBrush="{StaticResource ListSpacerBrush}" BorderThickness="0 0 0 1">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Background" Value="{StaticResource ListRobotBrush}"/>
+                    </Style>
+                </Border.Style>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Ellipse Name="check" Height="20" Width="20" Fill="Transparent"/>
+                    <ContentPresenter Grid.Column="1"  VerticalAlignment="Center" Margin="10 0 0 0"/>
+                </Grid>
+            </Border>
+
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" TargetName="border" Value="Gray"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" TargetName="border" Value="Gray"/>
+                    <Setter Property="Fill" TargetName="check" Value="Red"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>       
+        <ControlTemplate x:Key="GroupControlTemplate" TargetType="ListBoxItem">
+            <Border Name="border" Grid.Column="1" Height="50"
+                    BorderBrush="{StaticResource ListSpacerBrush}" BorderThickness="0 0 0 1">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Background" Value="{StaticResource ListGroupBrush}"/>
+                    </Style>
+                </Border.Style>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <ContentPresenter Grid.Column="1" VerticalAlignment="Center" Margin="10 0 0 0"/>
+                </Grid>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" TargetName="border" Value="Gray"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" TargetName="border" Value="Gray"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+        
         <!--Styles-->
-        <Style x:Key="ListBoxGroupItemStyle" TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
-            <Setter Property="Height" Value="50"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontSize" Value="20"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ListBoxItem">
-
-                        <Border Name="border" Grid.Column="1" BorderBrush="{StaticResource ListSpacerBrush}" BorderThickness="0 0 0 1">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="Background" Value="{StaticResource ListGroupBrush}"/>
-                                </Style>
-                            </Border.Style>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="50"/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <ContentPresenter Grid.Column="1" VerticalAlignment="Center" Margin="10 0 0 0"/>
-                            </Grid>
-                        </Border>
-
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" TargetName="border" Value="Gray"/>
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" TargetName="border" Value="Gray"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+        <Style x:Key="ListBoxStyle" TargetType="ListBoxItem">
+            <Setter Property="Template" Value="{DynamicResource GroupControlTemplate}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Type}" Value="RobotItem">
+                    <Setter Property="Template" Value="{DynamicResource RobotControlTemplate}"/>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
-        <Style x:Key="ListBoxRobotItemStyle" TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
-            <Setter Property="Height" Value="50"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontSize" Value="20"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ListBoxItem">
-                        <Border Name="border" Grid.Column="1" BorderBrush="{StaticResource ListSpacerBrush}" BorderThickness="0 0 0 1">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="Background" Value="{StaticResource ListRobotBrush}"/>
-                                </Style>
-                            </Border.Style>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="50"/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <Ellipse Name="check" Height="20" Width="20" Fill="Transparent"/>
-                                <ContentPresenter Grid.Column="1" VerticalAlignment="Center" Margin="10 0 0 0"/>
-                            </Grid>
-                        </Border>
-
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" TargetName="border" Value="Gray"/>
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" TargetName="border" Value="Gray"/>
-                                <Setter Property="Fill" TargetName="check" Value="Red"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <!--Data Templates-->
-        <HierarchicalDataTemplate DataType="local:RobotItem" ItemsSource="{Binding Items}">
-            <TextBlock Text="{Binding Name}" Background="Red"></TextBlock>
-        </HierarchicalDataTemplate>
-        <HierarchicalDataTemplate DataType="local:RobotGroup"  ItemsSource="{Binding Items}">
-            <TextBlock Text="{Binding Name}"/>
-        </HierarchicalDataTemplate>
-        <!--Selectors-->
-        <local:ListBoxItemStyleSelector x:Key="ListBoxItemStyleSelector" RobotStyle="{StaticResource ListBoxRobotItemStyle}" GroupStyle="{StaticResource ListBoxGroupItemStyle}"/>
     </UserControl.Resources>
 
     <Grid>
@@ -109,7 +91,7 @@
 
         <ListBox x:Name="RobotList" Grid.Column="1" Grid.Row="1" 
                  Background="Transparent" BorderBrush="Transparent"
-                 ItemContainerStyleSelector="{StaticResource ListBoxItemStyleSelector}">
+                 ItemContainerStyle="{StaticResource ListBoxStyle}">
             <!--<ListBoxItem Background="{StaticResource RadialBrush}" Foreground="White" FontSize="20" HorizontalContentAlignment="Center" >
                 Testing How it looks
             </ListBoxItem>-->

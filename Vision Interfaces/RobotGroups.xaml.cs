@@ -6,29 +6,15 @@ using System.Windows.Controls;
 
 namespace SwarmRoboticsGUI
 {
-    public class ListBoxItemStyleSelector : StyleSelector
-    {
-        public Style RobotStyle { get; set; }
-        public Style GroupStyle { get; set; }
-
-        public override Style SelectStyle(object Item, DependencyObject Container)
-        {
-            // Get the datatype
-            var Type = Item.GetType();
-            // Is it a robot
-            bool IsRobotItem = (Type == typeof(RobotItem));
-            // Return the style
-            return IsRobotItem ? RobotStyle : GroupStyle;
-        }
-    }
-
     public class Item
     {
         public string Name { get; private set; }
+        public string Type { get; set; }
 
         public Item(string Name)
         {
             this.Name = Name;
+            Type = "Item";
         }
     }
     public class RobotItem : Item
@@ -38,6 +24,8 @@ namespace SwarmRoboticsGUI
         public RobotItem(string Name, int ID) : base(Name)
         {
             this.ID = ID;
+            Type = "RobotItem";
+
         }
     }
     public class RobotGroup : Item
@@ -46,6 +34,8 @@ namespace SwarmRoboticsGUI
         public RobotGroup(string Name) : base(Name)
         {
             Children = new List<RobotItem>();
+            Type = "GroupItem";
+
         }
     }
 
