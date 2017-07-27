@@ -10,6 +10,7 @@ namespace SwarmRoboticsGUI
     public class Item
     {
         public string Name { get; private set; }
+        public string Value { get; private set; }
         public string Type { get; set; }
         public bool IsVisible { get; set; }
 
@@ -17,30 +18,51 @@ namespace SwarmRoboticsGUI
         {
             this.Name = Name;
             Type = "Item";
-            IsVisible = true;
+            IsVisible = false;
+        }
+        public Item(string Name, string Value)
+        {
+            this.Name = Name;
+            this.Value = Value;
+            Type = "Item";
+            IsVisible = false;
         }
     }
     public class RobotItem : Item
     {
         public int ID { get; private set; }
         public List<Item> Children { get; private set; }
+        public bool IsCollapsed { get; set; }
 
         public RobotItem(string Name, int ID) : base(Name)
         {
             this.ID = ID;
             Type = "RobotItem";
+            IsCollapsed = true;
+            IsVisible = true;
 
+            // TEMP: Testing layout
+            Children = new List<Item>();
+            Children.Add(new Item("ID", "1"));
+            Children.Add(new Item("Battery", "100%"));
+            Children.Add(new Item("Task", "None"));
+            Children.Add(new Item("Location", "X Y"));
+            Children.Add(new Item("Heading", " 0 Deg"));
         }
     }
     public class RobotGroup : Item
     {
         public List<RobotItem> Children { get; private set; }
+        public bool IsCollapsed { get; set; }
+
         public RobotGroup(string Name) : base(Name)
         {
-            Children = new List<RobotItem>();
             Type = "GroupItem";
-
+            IsCollapsed = false;
+            IsVisible = true;
+            Children = new List<RobotItem>();
         }
+
         public void AddRobot(RobotItem Item)
         {
             foreach (Item I in Children)
@@ -61,124 +83,94 @@ namespace SwarmRoboticsGUI
         public RobotGroups()
         {
             InitializeComponent();
-            GroupRobot(new RobotItem("Robot 1", 1), "Tower");
-            GroupRobot(new RobotItem("Robot 2", 2), "Tower");
-            GroupRobot(new RobotItem("Robot 3", 3), "Formation");
-            GroupRobot(new RobotItem("Robot 4", 4), "Formation");
-            GroupRobot(new RobotItem("Robot 5", 5), "Tower");
-            GroupRobot(new RobotItem("Robot 6", 6), "Unassigned");
+
+            var Tower = new RobotGroup("Tower");
+            Tower.AddRobot(new RobotItem("Robot 1", 1));
+            Tower.AddRobot(new RobotItem("Robot 2", 2));
+            var Formation = new RobotGroup("Formation");
+            Formation.AddRobot(new RobotItem("Robot 3", 3));
+            Formation.AddRobot(new RobotItem("Robot 4", 4));
+            Formation.AddRobot(new RobotItem("Robot 5", 5));
+            var Unassigned = new RobotGroup("Unassigned");
+            Unassigned.AddRobot(new RobotItem("Robot 6", 6));
+
+            AddRobotGroup(Tower);
+            AddRobotGroup(Formation);
+            AddRobotGroup(Unassigned);
 
             RobotList.DisplayMemberPath = "Name";
             RobotList.ItemsSource = _List;
         }
-
-        public void GroupRobot(RobotItem Item, RobotGroup Group)
+        public void AddRobotGroup(RobotGroup Group)
         {
-            AddRobot(Item);
-            AddRobotGroup(Group);
-            Group.AddRobot(Item);
-            int GroupIndex = _List.IndexOf(Group);
-            RemoveRobot(Item);
-            _List.Insert(GroupIndex + 1, Item);
-        }
-        public void GroupRobot(RobotItem Item, string GroupName)
-        {
-            var Group = AddRobotGroup(GroupName);
-            GroupRobot(Item, Group);
-        }
-
-        public void AddRobot(RobotItem Item)
-        {
-            foreach (Item I in _List)
-            {
-                if (I.Name == Item.Name)
-                {
-                    var index = _List.IndexOf(I);
-                    _List.RemoveAt(index);
-                    _List.Insert(index, Item);
-                    return;
-                }
-            }
-            _List.Add(Item);
-        }
-        public void AddRobot(string Name, int ID)
-        {
-            var Item = new RobotItem(Name, ID);
-            AddRobot(Item);
-        }
-        public void RemoveRobot(RobotItem Item)
-        {
-            foreach (Item I in _List)
-            {
-                if (I.Name == Item.Name)
-                {
-                    _List.Remove(Item);
-                    return;
-                }
-            }
-        }
-        public void RemoveRobot(string Name, int ID)
-        {
-            var Item = new RobotItem(Name, ID);
-            if (_List.Contains(Item))
-            {
-                _List.Remove(Item);
-            }
-        }
-        public RobotGroup AddRobotGroup(RobotGroup Group)
-        {
-            foreach (Item I in _List)
-            {
-                if (I.Name == Group.Name)
-                {
-                    return (RobotGroup)I;
-                }
-            }
             _List.Add(Group);
-            return Group;
-        }
-        public RobotGroup AddRobotGroup(string Name)
-        {
-            var Group = new RobotGroup(Name);
-            return AddRobotGroup(Group);
-        }
-        public void RemoveRobotGroup(RobotGroup Group)
-        {
-            foreach (Item I in _List)
+            foreach (RobotItem I in Group.Children)
             {
-                if (I.Name == Group.Name)
+                _List.Add(I);
+                foreach (Item S in I.Children)
                 {
-                    _List.Remove(Group);
-                    return;
+                    _List.Add(S);
                 }
             }
-        }
-        public void RemoveRobotGroup(string Name)
-        {
-            var Group = new RobotGroup(Name);
-            if (_List.Contains(Group))
-            {
-                _List.Remove(Group);
-            }
+            return;
         }
 
-        private void ToggleGroup(object sender, EventArgs e)
+
+
+        private void ToggleListBoxItem(object sender, EventArgs e)
         {
             var ListItem = sender as ListBoxItem;
             var Item = ListItem.DataContext;
             var type = Item.GetType();
             if (type == typeof(RobotGroup))
             {
-                var GroupItem = (RobotGroup)Item;
-                foreach (Item I in GroupItem.Children)
+                ToggleGroupItem((RobotGroup)Item);
+            }
+            else if (type == typeof(RobotItem))
+            {
+                ToggleRobotItem((RobotItem)Item);
+            }
+        }
+        private void ToggleRobotItem(RobotItem RobotItem)
+        {
+            var RobotIndex = _List.IndexOf(RobotItem);
+            RobotItem.IsCollapsed = RobotItem.IsCollapsed ? false : true;
+            _List.RemoveAt(RobotIndex);
+            _List.Insert(RobotIndex, RobotItem);
+
+            foreach (Item I in RobotItem.Children)
+            {
+                var ItemIndex = _List.IndexOf(I);
+                I.IsVisible = RobotItem.IsCollapsed ? false : true;
+                _List.RemoveAt(ItemIndex);
+                _List.Insert(ItemIndex, I);
+            }
+            
+        }
+        private void ToggleGroupItem(RobotGroup RobotGroup)
+        {
+            var GroupIndex = _List.IndexOf(RobotGroup);
+            RobotGroup.IsCollapsed = RobotGroup.IsCollapsed ? false : true;
+            _List.RemoveAt(GroupIndex);
+            _List.Insert(GroupIndex, RobotGroup);
+            foreach (RobotItem I in RobotGroup.Children)
+            {
+                if (_List.Contains(I))
                 {
-                    if (_List.Contains(I))
+                    var RobotIndex = _List.IndexOf(I);
+                    I.IsVisible = I.IsVisible ? false : true;
+                    _List.RemoveAt(RobotIndex);
+                    _List.Insert(RobotIndex, I);
+                    foreach(Item S in I.Children)
                     {
-                        I.IsVisible = I.IsVisible ? false : true;
-                        AddRobot((RobotItem)I);
+                        var ItemIndex = _List.IndexOf(S);
+                        S.IsVisible = (I.IsVisible && !I.IsCollapsed && !RobotGroup.IsCollapsed) ? true : false;
+                        _List.RemoveAt(ItemIndex);
+                        _List.Insert(ItemIndex, S);
                     }
                 }
             }
+            
         }
     }
 }

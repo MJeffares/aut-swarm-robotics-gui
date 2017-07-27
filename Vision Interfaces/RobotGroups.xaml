@@ -9,24 +9,85 @@
     <UserControl.Resources>
         <!--Brushes-->
         <SolidColorBrush x:Key="ListSpacerBrush" Color="#FF202020"/>
+        <SolidColorBrush x:Key="ListItemBrush" Color="#FF404040"/>
         <SolidColorBrush x:Key="ListRobotBrush" Color="#FF101010"/>
         <SolidColorBrush x:Key="ListGroupBrush" Color="#FF303030"/>
+        <SolidColorBrush x:Key="ListBrush" Color="#FF303030"/>
         
+        <!--Shapes-->
+        <DataTemplate x:Key="Plus">
+            <Polygon Fill="#FF202020" Stretch="Uniform">
+                <Polygon.Points>
+                    <Point X="0" Y="1"/>
+                    <Point X="1" Y="1"/>
+                    <Point X="1" Y="0"/>
+                    <Point X="2" Y="0"/>
+                    <Point X="2" Y="1"/>
+                    <Point X="3" Y="1"/>
+                    <Point X="3" Y="2"/>
+                    <Point X="2" Y="2"/>
+                    <Point X="2" Y="3"/>
+                    <Point X="1" Y="3"/>
+                    <Point X="1" Y="2"/>
+                    <Point X="0" Y="2"/>
+                </Polygon.Points>
+            </Polygon>
+        </DataTemplate>
+        <DataTemplate x:Key="Minus">
+            <Polygon Fill="#FF202020" Stretch="Uniform">
+                <Polygon.Points>
+                    <Point X="0" Y="1"/>
+                    <Point X="3" Y="1"/>
+                    <Point X="3" Y="2"/>
+                    <Point X="0" Y="2"/>
+                </Polygon.Points>
+            </Polygon>
+        </DataTemplate>
+
         <!--Templates-->
+        <ControlTemplate x:Key="ItemControlTemplate" TargetType="ListBoxItem">
+            <Border Name="border" Grid.Column="1" Height="25" BorderThickness="0 0 0 1"
+                    BorderBrush="{StaticResource ListSpacerBrush}"  
+                    Background="{StaticResource ListItemBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <ContentPresenter VerticalAlignment="Center" Margin="20 0 0 0" 
+                                      TextBlock.FontSize="10"/>
+                    <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="5 0 0 0"
+                               FontSize="10" Foreground="White"
+                               Text="{Binding Value}"/>
+                </Grid>
+            </Border>
+
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" TargetName="border" Value="Gray"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" TargetName="border" Value="Gray"/>
+                </Trigger>
+                <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsVisible}" Value="True">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+        
         <ControlTemplate x:Key="RobotControlTemplate" TargetType="ListBoxItem">
-            <Border Name="border" Grid.Column="1" Height="50"
-                    BorderBrush="{StaticResource ListSpacerBrush}" BorderThickness="0 0 0 1">
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Setter Property="Background" Value="{StaticResource ListRobotBrush}"/>
-                    </Style>
-                </Border.Style>
+            <Border Name="border" Grid.Column="1" Height="50" BorderThickness="0 0 0 1"
+                    BorderBrush="{StaticResource ListSpacerBrush}"
+                    Background="{StaticResource ListRobotBrush}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="50"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Ellipse Name="check" Height="20" Width="20" Fill="Transparent"/>
+                    <ContentControl Name="MinMax" Margin="18"/>
                     <ContentPresenter Grid.Column="1"  VerticalAlignment="Center" Margin="10 0 0 0"/>
                 </Grid>
             </Border>
@@ -37,40 +98,49 @@
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
                     <Setter Property="Background" TargetName="border" Value="Gray"/>
-                    <Setter Property="Fill" TargetName="check" Value="Red"/>
                 </Trigger>
+                <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsVisible}" Value="True">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsCollapsed}" Value="True">
+                    <Setter Property="ContentTemplate" TargetName="MinMax" Value="{StaticResource Plus}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsCollapsed}" Value="False">
+                    <Setter Property="ContentTemplate" TargetName="MinMax" Value="{StaticResource Minus}"/>
+                </DataTrigger>
             </ControlTemplate.Triggers>
-        </ControlTemplate>       
+        </ControlTemplate>
+
         <ControlTemplate x:Key="GroupControlTemplate" TargetType="ListBoxItem">
-            <Border Name="border" Grid.Column="1" Height="50"
-                    BorderBrush="{StaticResource ListSpacerBrush}" BorderThickness="0 0 0 1">
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Setter Property="Background" Value="{StaticResource ListGroupBrush}"/>
-                    </Style>
-                </Border.Style>
+            <Border Name="border" Grid.Column="1" Height="50" BorderThickness="0 0 0 1"
+                    BorderBrush="{StaticResource ListSpacerBrush}" 
+                    Background="{StaticResource ListGroupBrush}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="50"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
+                    <ContentControl Name="MinMax" Margin="18"/>
                     <ContentPresenter Grid.Column="1" VerticalAlignment="Center" Margin="10 0 0 0"/>
                 </Grid>
             </Border>
             <ControlTemplate.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" TargetName="border" Value="Gray"/>
-                </Trigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" TargetName="border" Value="Gray"/>
-                </Trigger>
+                <DataTrigger Binding="{Binding IsCollapsed}" Value="True">
+                    <Setter Property="ContentTemplate" TargetName="MinMax" Value="{StaticResource Plus}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsCollapsed}" Value="False">
+                    <Setter Property="ContentTemplate" TargetName="MinMax" Value="{StaticResource Minus}"/>
+                </DataTrigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
-        
+
         <!--Styles-->
-        <Style x:Key="ListBoxStyle" TargetType="ListBoxItem">
-            <Setter Property="Template" Value="{DynamicResource GroupControlTemplate}"/>
-            <EventSetter Event="PreviewMouseDown" Handler="ToggleGroup"/>
+        <Style x:Key="ListBoxItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Template" Value="{DynamicResource ItemControlTemplate}"/>
+            <EventSetter Event="PreviewMouseDown" Handler="ToggleListBoxItem"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Type}" Value="RobotItem">
                     <Setter Property="Template" Value="{DynamicResource RobotControlTemplate}"/>
@@ -78,17 +148,11 @@
                 <DataTrigger Binding="{Binding Type}" Value="GroupItem">
                     <Setter Property="Template" Value="{DynamicResource GroupControlTemplate}"/>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding IsVisible}" Value="False">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding IsVisible}" Value="True">
-                    <Setter Property="Visibility" Value="Visible"/>
-                </DataTrigger>
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
 
-    <Grid Background="{StaticResource ListGroupBrush}">
+    <Grid Background="{StaticResource ListBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition/>
@@ -99,13 +163,11 @@
             <ColumnDefinition Width="250"/>
         </Grid.ColumnDefinitions>
 
-        <ListBox x:Name="RobotList" Grid.Column="1" Grid.Row="1" 
+        <ListBox x:Name="RobotList" Grid.Column="1" Grid.Row="1"
                  Foreground="White" FontSize="20"
                  Background="Transparent" BorderBrush="Transparent"
-                 ItemContainerStyle="{StaticResource ListBoxStyle}">
-            <!--<ListBoxItem>
-                Testing The Pretty
-            </ListBoxItem>-->
+                 ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                 ItemContainerStyle="{StaticResource ListBoxItemStyle}">
         </ListBox>
     </Grid>
 </UserControl>
