@@ -2,8 +2,10 @@
 using Emgu.CV.CvEnum;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -43,10 +45,11 @@ namespace SwarmRoboticsGUI
         #endregion
 
         #region Private Properties
-        private Timer InterfaceTimer { get; set; }
-        
+        private System.Timers.Timer InterfaceTimer { get; set; }
         #endregion
 
+        public ObservableCollection<RobotItem> Robots { get; set; }
+        private SynchronizationContext uiContext { get; set; }
         public OverlayWindow(MainWindow mainWindow)
         {
             InitializeComponent();
@@ -67,9 +70,11 @@ namespace SwarmRoboticsGUI
             // Create event driven by new frames from the camera
             mainWindow.camera1.FrameUpdate += new Camera.FrameHandler(DrawOverlayFrame);
 
-            
+            Robots = new ObservableCollection<RobotItem>();
+            // Stores the UI context to be used to marshal 
+            // code from other threads to the UI thread.
+            uiContext = SynchronizationContext.Current;
         }
-        
 
         #region Public Methods
         public void ClearRobots(Robot[] RobotList)
@@ -86,44 +91,10 @@ namespace SwarmRoboticsGUI
         private void InitializeTimer()
         {
             // Create 100ms timer to drive interface changes
-            InterfaceTimer = new Timer(100);
+            InterfaceTimer = new System.Timers.Timer(100);
             InterfaceTimer.Elapsed += Interface_Tick;
             InterfaceTimer.Start();
         }
-
-
-        // DEBUG: Testing airspace solutions for windowsFormHost
-        #region Debugging Airspace
-        Point tester { get; set; }
-        private void InitializeMouseTrack()
-        {
-            OverlayImageBox.MouseDown += (s, e) =>
-            {
-                tester = new Point(e.X, e.Y);
-                OverlayImageBox.Capture = true;
-            };
-            OverlayImageBox.MouseMove += (s, e) =>
-            {
-                if (e.Button == System.Windows.Forms.MouseButtons.Left)
-                {
-                    tester = new Point(tester.X - e.X, tester.Y - e.Y);
-                }
-            };
-            OverlayImageBox.MouseUp += (s, e) =>
-            {
-                OverlayImageBox.Capture = false;
-            };
-        }
-        private void ReDraw()
-        {
-            DispatcherFrame frame = new DispatcherFrame();
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(delegate (object parameter) {
-                frame.Continue = false;
-                return null;
-            }), null);
-            Dispatcher.PushFrame(frame);
-        }
-        #endregion
 
         #region Time Events
         
@@ -159,6 +130,8 @@ namespace SwarmRoboticsGUI
                 default:
                     break;
             }
+
+            Update(uiContext);
         }
         #endregion
 
@@ -168,7 +141,6 @@ namespace SwarmRoboticsGUI
             // Update imgProc values from inputs on UI
             imgProc.LowerH = LowerH;
             imgProc.UpperH = UpperH;
-
             // Update the display with the interface when using the cutouts
             switch (Display.Source)
             {
@@ -206,5 +178,35 @@ namespace SwarmRoboticsGUI
                 Display.Resize(OverlayImageBox.Width, OverlayImageBox.Height);
         }
         #endregion
+
+        private void Update(object state)
+        {
+            // Get the UI context from state
+            SynchronizationContext uiContext = state as SynchronizationContext;
+            // Execute the UpdateRobots function on the UI thread
+            uiContext.Post(UpdateRobots, null);
+        }
+        private void UpdateRobots(object data)
+        {
+            foreach (Robot R in RobotList)
+            {
+                // The robot has been initiallized
+                if (R != null)
+                {
+                    bool IsItem = false;
+                    // Check if the robot ID matches with an item in the collection
+                    foreach (RobotItem I in Robots)
+                    {
+                        if (I.ID == R.ID)
+                        {
+                            IsItem = true;
+                        }
+                    }
+                    // Add the robot if it doesn't already exist
+                    if (!IsItem)
+                        Robots.Add(new RobotItem(R));
+                }
+            }
+        }
     }
 }

@@ -46,12 +46,13 @@
         </Grid.ColumnDefinitions>
 
         <local:RobotGroups Grid.Row="1" Grid.Column="2"/>
+        <local:Display Grid.Row="1" Grid.Column="1" Items="{Binding Robots}"/>
 
         <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Height="40" VerticalAlignment="Top" Background="{StaticResource AccentBrush}"/>
         <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Height="20" VerticalAlignment="Bottom" Background="{StaticResource AccentBrush}"/>
 
         
-        <Grid Grid.Row="1" Grid.Column="1" MinHeight="480" MinWidth="640" Background="{StaticResource RadialBrush2}">
+        <Grid Grid.Row="2" Grid.Column="3" MinHeight="480" MinWidth="640" Background="{StaticResource RadialBrush2}">
             <WindowsFormsHost Name="host1" Visibility="Visible">
                 <em:ImageBox x:Name="OverlayImageBox" FunctionalMode="Minimum" Dock="Fill" SizeMode="CenterImage" 
                              MouseClick="OverlayImageBox_MouseClick"/>

@@ -110,6 +110,9 @@
     <Compile Include="Brae\Camera.cs" />
     <Compile Include="Brae\ImageAnimation.cs" />
     <Compile Include="Brae\ImageDisplay.cs" />
+    <Compile Include="Vision Interfaces\Display.xaml.cs">
+      <DependentUpon>Display.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CameraPopOutWindow.xaml.cs">
       <DependentUpon>CameraPopOutWindow.xaml</DependentUpon>
     </Compile>
@@ -127,6 +130,10 @@
       <DependentUpon>RobotGroups.xaml</DependentUpon>
     </Compile>
     <Compile Include="XbeeCommunication.cs" />
+    <Page Include="Vision Interfaces\Display.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CameraPopOutWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

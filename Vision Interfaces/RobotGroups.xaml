@@ -139,9 +139,11 @@
 
         <!--Styles-->
         <Style x:Key="ListBoxItemStyle" TargetType="ListBoxItem">
-            <Setter Property="Template" Value="{DynamicResource ItemControlTemplate}"/>
             <EventSetter Event="PreviewMouseDown" Handler="ToggleListBoxItem"/>
             <Style.Triggers>
+                <DataTrigger Binding="{Binding Type}" Value="Item">
+                    <Setter Property="Template" Value="{DynamicResource ItemControlTemplate}"/>
+                </DataTrigger>
                 <DataTrigger Binding="{Binding Type}" Value="RobotItem">
                     <Setter Property="Template" Value="{DynamicResource RobotControlTemplate}"/>
                 </DataTrigger>
@@ -169,5 +171,30 @@
                  ScrollViewer.VerticalScrollBarVisibility="Hidden"
                  ItemContainerStyle="{StaticResource ListBoxItemStyle}">
         </ListBox>
+
+        <!--<TreeView x:Name="RobotTree" Grid.Column="1" Grid.Row="1"
+                  Foreground="White" FontSize="20"
+                  Background="Red" BorderBrush="Transparent"
+                  ScrollViewer.VerticalScrollBarVisibility="Hidden">
+            <TreeView.Resources>
+                <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type local:RobotGroup}">
+                    <TextBlock Text="{Binding Name}"></TextBlock>
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type local:RobotItem}">
+                    <Border Name="border" Grid.Column="1" Height="50" BorderThickness="0 0 0 1"
+                            BorderBrush="{StaticResource ListSpacerBrush}"
+                            Background="{StaticResource ListRobotBrush}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <ContentControl Name="MinMax" Margin="18"/>
+                            <TextBlock Text="{Binding Name}"></TextBlock>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </TreeView.Resources>
+        </TreeView>-->
     </Grid>
 </UserControl>
