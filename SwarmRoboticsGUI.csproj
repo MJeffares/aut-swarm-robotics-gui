@@ -113,6 +113,16 @@
     <Compile Include="CameraPopOutWindow.xaml.cs">
       <DependentUpon>CameraPopOutWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Communication\Communications.cs" />
+    <Compile Include="Communication\CommunicationsDisplayWindow.xaml.cs">
+      <DependentUpon>CommunicationsDisplayWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Communication\CommunicationManager.cs" />
+    <Compile Include="Communication\SerialCommunications.cs" />
+    <Compile Include="Communication\SwarmRoboticsHandler.cs" />
+    <Compile Include="Communication\SwarmRoboticsMessages.cs" />
+    <Compile Include="Communication\XbeeFrames.cs" />
+    <Compile Include="Communication\XbeeHandler.cs" />
     <Compile Include="GeneralUtilities.cs" />
     <Compile Include="Brae\ImageProcessing.cs" />
     <Compile Include="OverlayWindow.xaml.cs">
@@ -120,11 +130,12 @@
     </Compile>
     <Compile Include="Robot.cs" />
     <Compile Include="SelectFolder.cs" />
-    <Compile Include="SerialCommunication.cs" />
-    <Compile Include="SwarmRoboticsSerialProtocol.cs" />
     <Compile Include="SystemTest.cs" />
-    <Compile Include="XbeeCommunication.cs" />
     <Page Include="CameraPopOutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Communication\CommunicationsDisplayWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -207,5 +218,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -75,7 +75,7 @@ namespace SwarmRoboticsGUI
 		bool doublecommandlockout = false;
 		public bool waitingForReply = false;
 		public byte waitForReplyType = 0x00;
-		public communicated_message waitForReplyMessage;
+		//public communicated_message waitForReplyMessage;
 		public UInt64 systemTestDesitination64;
 		public UInt16 systemTestDesitination16;
 		public List<UInt64> connectedRobots;
@@ -90,7 +90,7 @@ namespace SwarmRoboticsGUI
 
 			togglebtnControls = new List<ToggleButton>()
 			{
-				 btnSysTestProxmityA,btnSysTestProxmityB, btnSysTestProxmityC, btnSysTestProxmityD, btnSysTestProxmityE, btnSysTestProxmityF, btnSysTestLightLHS, btnSysTestLightRHS, btnSysTestMouse, btnSysTestIMU, btnSysTestLineFL, btnSysTestLineCL, btnSysTestLineCR, btnSysTestLineFR
+				 btnSysTestProxmityA,btnSysTestProxmityB, btnSysTestProxmityC, btnSysTestProxmityD, btnSysTestProxmityE, btnSysTestProxmityF, btnSysTestLightLHS, btnSysTestLightRHS, btnSysTestLineFL, btnSysTestLineCL, btnSysTestLineCR, btnSysTestLineFR, btnSysTestMouse, btnSysTestIMU, btnSysTestMotor1, btnSysTestMotor2, btnSysTestMotor3, btnSysTestTWISet, btnSysTestTWIRead
 			};
 
 
@@ -102,24 +102,142 @@ namespace SwarmRoboticsGUI
 				toggleButton.Checked += new RoutedEventHandler(sysTestCheck);
 				toggleButton.Unchecked += new RoutedEventHandler(sysTestCheck);
 			}
-
 		}
 
-		private async void btnSysTestCommunications_Click(object sender, RoutedEventArgs e)
+
+		public int MyHandler(object s, CommunicationManager.RequestedMessageReceivedArgs e)
+		{
+			MJLib.AutoClosingMessageBox.Close("Establishing Communications");
+
+			if (e.msg != null)
+			{
+				//MJLib.AutoClosingMessageBox.Close("Establishing Communications");
+
+				//systemTestDesitination16 = BitConverter.ToUInt16(msg.source16, 0);
+				//systemTestDesitination64 = BitConverter.ToUInt64(msg.source64, 0);
+
+				Application.Current.Dispatcher.Invoke((Action)delegate
+				{
+					MessageBoxResult sucessfullCommunicationsResult = CustomMessageBox.ShowYesNoCancel("Successfully communicated with: " + e.msg.SourceDisplay, "Communications established", "Connect to this robot", "Choose Another Robot", "Cancel");
+
+
+
+
+					switch (sucessfullCommunicationsResult)
+					{
+						case MessageBoxResult.Yes:
+							avoidConnected = false;
+							connectedRobots.Clear();
+							btnSysTestTestMode.IsEnabled = true;
+							break;
+
+						case MessageBoxResult.No:
+							avoidConnected = true;
+							connectedRobots.Add(systemTestDesitination64);
+							//btnSysTestCommunications_Click(s, );
+							CommunicationManager.WaitForMessage tada = new CommunicationManager.WaitForMessage(0xE1, 5000, MyHandler);
+							break;
+
+						case MessageBoxResult.Cancel:
+							avoidConnected = false;
+							connectedRobots.Clear();
+							break;
+					}
+				});
+			}
+			else
+			{
+				//MJLib.AutoClosingMessageBox.Close("Establishing Communications");
+				MessageBox.Show("TIMEOUT", "Communications Timed Out", MessageBoxButton.OK);
+			}
+
+
+
+
+
+			return 1;
+		}
+
+
+		private void btnSysTestCommunications_Click(object sender, RoutedEventArgs e)
 		{
 			Reply = new TaskCompletionSource<bool>();
 
 			byte[] data;
-			data = new byte[2];
-			data[0] = SYSTEM_TEST_MESSAGE.COMMUNICATION;
-			data[1] = 0x00;
+			data = new byte[3];
+			//data[0] = SYSTEM_TEST_MESSAGE.COMMUNICATION;
+			//data[1] = 0x01;
+            
+            data[0] = 0xE4;
+            data[1] = 0x02;
+            data[2] = 0xFA;
+                         
 
-			xbee.SendTransmitRequest(XbeeHandler.DESTINATION.BROADCAST, data);
-			waitingForReply = true;
-			waitForReplyType = SYSTEM_TEST_MESSAGE.COMMUNICATION;
+			xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
+
+			new Thread(new ThreadStart(delegate
+			{
+				MessageBox.Show
+				(
+				  "Please wait while communications are tested.",
+				  "Establishing Communications",
+				  MessageBoxButton.OK,
+				  MessageBoxImage.Warning
+
+				);
+			})).Start();
+
+
+
+			CommunicationManager.WaitForMessage tada = new CommunicationManager.WaitForMessage(0xE1, 15000, MyHandler);
+
+			
+
+			//ProtocolClass.SwarmProtocolMessage msg = protocol.waitForMessage(0xE1, 5000).Result;
+
+			/*
+			if (msg != null)
+			{
+				MJLib.AutoClosingMessageBox.Close("Establishing Communications");
+
+				//systemTestDesitination16 = BitConverter.ToUInt16(msg.source16, 0);
+				//systemTestDesitination64 = BitConverter.ToUInt64(msg.source64, 0);
+
+				MessageBoxResult sucessfullCommunicationsResult = CustomMessageBox.ShowYesNoCancel("Successfully communicated with: " + msg.SourceDisplay, "Communications established", "Connect to this robot", "Choose Another Robot", "Cancel");
+
+				switch (sucessfullCommunicationsResult)
+				{
+					case MessageBoxResult.Yes:
+						avoidConnected = false;
+						connectedRobots.Clear();
+						btnSysTestTestMode.IsEnabled = true;
+						break;
+
+					case MessageBoxResult.No:
+						avoidConnected = true;
+						connectedRobots.Add(systemTestDesitination64);
+						btnSysTestCommunications_Click(sender, e);
+						break;
+
+					case MessageBoxResult.Cancel:
+						avoidConnected = false;
+						connectedRobots.Clear();
+						break;
+				}
+			}
+			else
+			{
+				MJLib.AutoClosingMessageBox.Close("Establishing Communications");
+				MessageBox.Show("TIMEOUT", "Communications Timed Out", MessageBoxButton.OK);
+			}
+			*/
+
+			//waitingForReply = true;
+			//waitForReplyType = SYSTEM_TEST_MESSAGE.COMMUNICATION;
 
 
 			//XXXX replace with custom messagebox without buttons
+            /*
 			new Thread(new ThreadStart(delegate
 			{
 				MessageBox.Show
@@ -130,8 +248,11 @@ namespace SwarmRoboticsGUI
 				  MessageBoxImage.Warning
 				);
 			})).Start();
-
-			if (await Task.WhenAny(Reply.Task, Task.Delay(15000)) == Reply.Task)
+            */
+             
+			//if (await Task.WhenAny(Reply.Task, Task.Delay(15000)) == Reply.Task)
+            /*
+            if (await Reply.Task)
 			{
 
 				MJLib.AutoClosingMessageBox.Close("Establishing Communications");
@@ -165,6 +286,8 @@ namespace SwarmRoboticsGUI
 				MJLib.AutoClosingMessageBox.Close("Establishing Communications");
 				MessageBox.Show("TIMEOUT", "Communications Timed Out", MessageBoxButton.OK);
 			}			
+			*/
+             
 		}
 
 		
@@ -349,7 +472,7 @@ namespace SwarmRoboticsGUI
 					data[0] = 0xE4;
 					data[1] = proximitySensor[0];
 					data[2] = request;
-					xbee.SendTransmitRequest(XbeeHandler.DESTINATION.BROADCAST, data);
+					xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
 					break;
 
 				case "Light":
@@ -358,21 +481,21 @@ namespace SwarmRoboticsGUI
 					data[0] = 0xE5;
 					data[1] = lightSensor[0];
 					data[2] = request;
-					xbee.SendTransmitRequest(XbeeHandler.DESTINATION.BROADCAST, data);
+					xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
 					break;
 
 				case "Mouse":
 					data = new byte[2];
 					data[0] = 0xE7;
 					data[1] = request;
-					xbee.SendTransmitRequest(XbeeHandler.DESTINATION.BROADCAST, data);
+					xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
 					break;
 
 				case "IMU":
 					data = new byte[2];
 					data[0] = 0xE8;
 					data[1] = request;
-					xbee.SendTransmitRequest(XbeeHandler.DESTINATION.BROADCAST, data);
+					xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
 					break;
 
 				case "Line":
@@ -381,7 +504,7 @@ namespace SwarmRoboticsGUI
 					data[0] = 0xE9;
 					data[1] = lineSensor[0];
 					data[2] = request;
-					xbee.SendTransmitRequest(XbeeHandler.DESTINATION.BROADCAST, data);
+					xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
 					break;
 
 				case "Charge":
