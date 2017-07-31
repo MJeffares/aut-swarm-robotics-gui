@@ -317,6 +317,7 @@ namespace SwarmRoboticsGUI
         #region
         private void Interface_Tick(object sender, EventArgs arg)
         {
+            // MANSEL: I hate this block of code. Does it belong here? Does it even work?
             //serial._serialPort.Write("Test");
 
             /// Error message for zero frames
@@ -364,9 +365,6 @@ namespace SwarmRoboticsGUI
             ///	_fpscount = 0;
             ///}
 
-            //updates FPS counter
-            statusFPS.Text = "FPS: " + camera1.FPS;
-
             switch (TimeDisplayMode)
             {
                 case TimeDisplayModeType.CURRENT:
@@ -409,17 +407,25 @@ namespace SwarmRoboticsGUI
             switch (overlayWindow.Display.Source)
             {
                 case ImageDisplay.SourceType.NONE:
+                    // Do nothing
                     break;
                 case ImageDisplay.SourceType.CAMERA:
-                    Camera cam = (Camera)sender;
-                    if (cam.Frame != null)
+                    // Sender is a camera
+                    Camera Camera = (Camera)sender;
+                    if (Camera.Frame != null)
                     {
-                        overlayWindow.imgProc.ProcessFilter(cam.Frame);
+                        //updates FPS counter
+                        statusFPS.Text = "FPS: " + Camera.FPS;
+                        // Apply the currently selected filter
+                        overlayWindow.imgProc.ProcessFilter(Camera.Frame);
+                        // Draw the frame to the overlay imagebox
                         captureImageBox.Image = overlayWindow.imgProc.Image;
                     }                   
                     break;
                 case ImageDisplay.SourceType.CUTOUTS:
+                    // Apply the currently selected filter
                     overlayWindow.imgProc.ProcessFilter(overlayWindow.imgProc.TestImage);
+                    // Draw the frame to the overlay imagebox
                     captureImageBox.Image = overlayWindow.imgProc.Image;
                     break;
                 default:

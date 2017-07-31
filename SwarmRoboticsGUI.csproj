@@ -110,32 +110,31 @@
     <Compile Include="Brae\Camera.cs" />
     <Compile Include="Brae\ImageAnimation.cs" />
     <Compile Include="Brae\ImageDisplay.cs" />
+    <Compile Include="Vision Interfaces\Display.xaml.cs">
+      <DependentUpon>Display.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CameraPopOutWindow.xaml.cs">
       <DependentUpon>CameraPopOutWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Communication\Communications.cs" />
-    <Compile Include="Communication\CommunicationsDisplayWindow.xaml.cs">
-      <DependentUpon>CommunicationsDisplayWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Communication\CommunicationManager.cs" />
-    <Compile Include="Communication\SerialCommunications.cs" />
-    <Compile Include="Communication\SwarmRoboticsHandler.cs" />
-    <Compile Include="Communication\SwarmRoboticsMessages.cs" />
-    <Compile Include="Communication\XbeeFrames.cs" />
-    <Compile Include="Communication\XbeeHandler.cs" />
     <Compile Include="GeneralUtilities.cs" />
     <Compile Include="Brae\ImageProcessing.cs" />
-    <Compile Include="OverlayWindow.xaml.cs">
+    <Compile Include="Vision Interfaces\OverlayWindow.xaml.cs">
       <DependentUpon>OverlayWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Robot.cs" />
     <Compile Include="SelectFolder.cs" />
+    <Compile Include="SerialCommunication.cs" />
+    <Compile Include="SwarmRoboticsSerialProtocol.cs" />
     <Compile Include="SystemTest.cs" />
-    <Page Include="CameraPopOutWindow.xaml">
+    <Compile Include="Vision Interfaces\RobotGroups.xaml.cs">
+      <DependentUpon>RobotGroups.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XbeeCommunication.cs" />
+    <Page Include="Vision Interfaces\Display.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Communication\CommunicationsDisplayWindow.xaml">
+    <Page Include="CameraPopOutWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -151,7 +150,11 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="OverlayWindow.xaml">
+    <Page Include="Vision Interfaces\OverlayWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Vision Interfaces\RobotGroups.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -218,6 +221,5 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
