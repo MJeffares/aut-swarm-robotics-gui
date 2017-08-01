@@ -71,8 +71,9 @@ namespace SwarmRoboticsGUI
         // TODO: comment declarations
         public Camera camera1;
         public SerialUARTCommunication serial;
-        public XbeeHandler xbee;
+        public XbeeAPI xbee;
         public ProtocolClass protocol;
+		public CommunicationManager commManger;
         public CameraPopOutWindow popoutWindow;
         public OverlayWindow overlayWindow;
         // one second timer to calculate and update the fps count
@@ -100,12 +101,19 @@ namespace SwarmRoboticsGUI
             //camera1 = new Camera(640, 480);
             camera1 = new Camera(1280, 720);
 
-            xbee = new XbeeHandler(this);
+            xbee = new XbeeAPI(this);
             protocol = new ProtocolClass(this);
+			
+
             // MANSEL: Maybe make a struct. Also look at SerialPort class
-            serial = new SerialUARTCommunication(this, menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);           
-            //
-            overlayWindow = new OverlayWindow(this);            
+            serial = new SerialUARTCommunication(this, menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);
+			//
+
+			commManger = new CommunicationManager(this,serial, xbee, protocol);
+
+
+
+			overlayWindow = new OverlayWindow(this);            
             //
             CvInvoke.UseOpenCL = true;
             //
@@ -739,5 +747,15 @@ namespace SwarmRoboticsGUI
         }
 
 		#endregion
+
+        private void ToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+            byte[] data;
+            data = new byte[2];
+            data[0] = SYSTEM_TEST_MESSAGE.COMMUNICATION;
+            data[1] = 0x01;
+
+            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
+        }
 	}
 }

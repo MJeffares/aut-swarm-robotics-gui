@@ -127,13 +127,119 @@ static class MJLib
 		}
 	}
 
-	
-    public static byte[] StringToByteArrayFastest(string hex)
-    {
-        if (hex.Length % 2 == 1)
-            throw new Exception("The binary key cannot have an odd number of digits");
+	/// <summary>
+	/// Converts a byte array to UInt64
+	/// </summary>
+	/// <param name="array">Array to get the bytes from</param>
+	/// <param name="index">Index of byte array to start at</param>
+	/// <param name="endianess">Endianess of the input, false for MSB first, true for LSB first</param>
+	/// <returns>A string</returns>
+	public static UInt64 ByteArrayToUInt64(byte[] array, int index, bool endianess = false)
+	{
+		UInt64 output = 0;
 
-        byte[] arr = new byte[hex.Length >> 1];
+		if(endianess)
+		{
+			for (int i = 0; i < index + 8; i++)
+			{
+				output += array[index + i] * (UInt64)Math.Pow(16, i*2);
+			}
+		}
+		else
+		{
+			
+			for (int i = 0; i < index + 8; i++)
+			{
+				output += array[index + i] * (UInt64)Math.Pow(16, 14 - i*2);
+			}
+		}
+		return output;
+	}
+
+	/// <summary>
+	/// Converts a byte array to UInt16
+	/// </summary>
+	/// <param name="array">Array to get the bytes from</param>
+	/// <param name="index">Index of byte array to start at</param>
+	/// <param name="endianess">Endianess of the input, false for MSB first, true for LSB first</param>
+	/// <returns>A string</returns>
+	public static UInt16 ByteArrayToUInt16(byte[] array, int index, bool endianess = false)
+	{
+		UInt16 output = 0;
+
+		if (endianess)
+		{
+			output += (UInt16)(array[index + 0] * (UInt16)Math.Pow(16, 0));
+			output += (UInt16)(array[index + 1] * (UInt16)Math.Pow(16, 2));
+		}
+		else
+		{
+			output += (UInt16)(array[index + 0] * (UInt16)Math.Pow(16, 2));
+			output += (UInt16)(array[index + 1] * (UInt16)Math.Pow(16, 0));
+		}
+		return output;
+	}
+
+
+	//MANSEL: document this
+	public static class TypeSwitch
+	{
+		public class CaseInfo
+		{
+			public bool IsDefault { get; set; }
+			public Type Target { get; set; }
+			public Action<object> Action { get; set; }
+		}
+
+		public static void Do(object source, params CaseInfo[] cases)
+		{
+			var type = source.GetType();
+			foreach (var entry in cases)
+			{
+				if (entry.IsDefault || entry.Target.IsAssignableFrom(type))
+				{
+					entry.Action(source);
+					break;
+				}
+			}
+		}
+
+		public static CaseInfo Case<T>(Action action)
+		{
+			return new CaseInfo()
+			{
+				Action = x => action(),
+				Target = typeof(T)
+			};
+		}
+
+		public static CaseInfo Case<T>(Action<T> action)
+		{
+			return new CaseInfo()
+			{
+				Action = (x) => action((T)x),
+				Target = typeof(T)
+			};
+		}
+
+		public static CaseInfo Default(Action action)
+		{
+			return new CaseInfo()
+			{
+				Action = x => action(),
+				IsDefault = true
+			};
+		}
+	}
+
+
+	//MANSEL: document this
+	public static byte[] StringToByteArrayFastest(string hex)
+    {
+		if (hex.Length % 2 == 1)
+           throw new Exception("The binary key cannot have an odd number of digits");
+
+       byte[] arr = new byte[hex.Length >> 1];
 
         for (int i = 0; i < (hex.Length >> 1); ++i)
         {
@@ -154,7 +260,7 @@ static class MJLib
         //return val - (val < 58 ? 48 : (val < 97 ? 55 : 87));
     }
 
-
+	//MANSEL: document this
 	public class AutoClosingMessageBox
 	{
 		System.Threading.Timer _timeoutTimer;
