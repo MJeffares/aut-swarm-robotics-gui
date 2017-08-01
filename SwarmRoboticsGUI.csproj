@@ -108,8 +108,16 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Brae\Camera.cs" />
-    <Compile Include="Brae\ImageAnimation.cs" />
-    <Compile Include="Brae\ImageDisplay.cs" />
+    <Compile Include="Communication\CommunicationManager.cs" />
+    <Compile Include="Communication\Communications.cs" />
+    <Compile Include="Communication\CommunicationsDisplayWindow.xaml.cs">
+      <DependentUpon>CommunicationsDisplayWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Communication\SerialCommunications.cs" />
+    <Compile Include="Communication\SwarmRoboticsHandler.cs" />
+    <Compile Include="Communication\SwarmRoboticsMessages.cs" />
+    <Compile Include="Communication\XbeeFrames.cs" />
+    <Compile Include="Communication\XbeeHandler.cs" />
     <Compile Include="Vision Interfaces\Display.xaml.cs">
       <DependentUpon>Display.xaml</DependentUpon>
     </Compile>
@@ -123,13 +131,14 @@
     </Compile>
     <Compile Include="Robot.cs" />
     <Compile Include="SelectFolder.cs" />
-    <Compile Include="SerialCommunication.cs" />
-    <Compile Include="SwarmRoboticsSerialProtocol.cs" />
     <Compile Include="SystemTest.cs" />
     <Compile Include="Vision Interfaces\RobotGroups.xaml.cs">
       <DependentUpon>RobotGroups.xaml</DependentUpon>
     </Compile>
-    <Compile Include="XbeeCommunication.cs" />
+    <Page Include="Communication\CommunicationsDisplayWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Vision Interfaces\Display.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

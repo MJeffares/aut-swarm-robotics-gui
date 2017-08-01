@@ -5,6 +5,7 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace SwarmRoboticsGUI
@@ -114,7 +115,7 @@ namespace SwarmRoboticsGUI
                     break;
             }
         }
-        public Robot[] GetRobots(UMat Frame, Robot[] RobotList)
+        public List<RobotItem> GetRobots(UMat Frame, List<RobotItem> RobotList)
         {
             // Find every contour in the image
             VectorOfVectorOfPoint Contours = GetCountours(Frame, 5, RetrType.External);
@@ -151,29 +152,39 @@ namespace SwarmRoboticsGUI
                     // Goto next robot if not true
                     if (RobotID == -1) continue;
                     // Robot is tracked by image processing
-                    RobotList[RobotID].IsTracked = true;
-                    // Give corresponding ID value to the robot
-                    RobotList[RobotID].ID = RobotID;
+
+                    // Look for the robot in the collection
+                    Predicate<RobotItem> TrackedID = (RobotItem Robot) => { return Robot.ID == RobotID; };
+                    // Look for robot in collection
+                    int index = RobotList.FindIndex(TrackedID);
+                    // If the index is negative, create a new robot
+                    if (index < 0)
+                    {
+                        RobotItem Robot = new RobotItem("Robot " + RobotID.ToString(), RobotID);
+                        RobotList.Add(Robot);
+                        index = RobotList.IndexOf(Robot);
+                    }
+                    RobotList[index].IsTracked = true;
                     // DEBUG: Store the vertices of the hexagonal shape
-                    RobotList[RobotID].Contour = ProcessedContour.ToArray();
+                    RobotList[index].Contour = ProcessedContour.ToArray();
                     // DEBUG: Robot counter
                     RobotCount++;
                     // Get the robots center
                     MCvPoint2D64f AbsoluteCOM = CvInvoke.Moments(ProcessedContour).GravityCenter;
                     // Store the robots location
-                    RobotList[RobotID].Location = new Point((int)AbsoluteCOM.X, (int)AbsoluteCOM.Y);
+                    RobotList[index].Location = new Point((int)AbsoluteCOM.X, (int)AbsoluteCOM.Y);
                     // Get the robots direction
                     Point Direction = FindDirection(RobotImage);
                     // Goto next robot if true
                     if (Direction == null) continue;
 
                     Direction = new Point(Direction.X + RobotBounds.X, Direction.Y + RobotBounds.Y);
-                    if (RobotList[RobotID].Location.X > 0 && RobotList[RobotID].Location.Y > 0)
+                    if (RobotList[index].Location.X > 0 && RobotList[index].Location.Y > 0)
                     {
                         // Get robot heading using Atan function
-                        int dy = Direction.Y - RobotList[RobotID].Location.Y;
-                        int dx = Direction.X - RobotList[RobotID].Location.X;
-                        RobotList[RobotID].Heading = Math.Atan2(dy, dx);
+                        int dy = Direction.Y - RobotList[index].Location.Y;
+                        int dx = Direction.X - RobotList[index].Location.X;
+                        RobotList[index].Heading = Math.Atan2(dy, dx);
                     }
                 }
                 // DEBUG: Store counters

@@ -38,9 +38,8 @@ namespace SwarmRoboticsGUI
         #endregion
 
         #region Public Properties
-        public Robot[] RobotList = new Robot[6];
         public ImageProcessing imgProc { get; set; }
-        public ImageDisplay Display { get; set; }
+        //public ImageDisplay Display { get; set; }
 
         #endregion
 
@@ -48,17 +47,14 @@ namespace SwarmRoboticsGUI
         private System.Timers.Timer InterfaceTimer { get; set; }
         #endregion
 
-        public ObservableCollection<RobotItem> Robots { get; set; }
+        public ObservableCollection<RobotItem> RobotList { get; set; }
         private SynchronizationContext uiContext { get; set; }
         public OverlayWindow(MainWindow mainWindow)
         {
             InitializeComponent();
-            // Initialize the robot collection
-            ClearRobots(RobotList);
             // Create an image processing class for processing the camera frames
             imgProc = new ImageProcessing();
             // Create an image display class for drawing to the image box
-            Display = new ImageDisplay(mainWindow.camera1.Resolution, OverlayImageBox.Size);
             // Set the window to the data context for data binding
             DataContext = this;
             // Default colour amount
@@ -70,20 +66,16 @@ namespace SwarmRoboticsGUI
             // Create event driven by new frames from the camera
             mainWindow.camera1.FrameUpdate += new Camera.FrameHandler(DrawOverlayFrame);
 
-            Robots = new ObservableCollection<RobotItem>();
+            RobotList = new ObservableCollection<RobotItem>();
             // Stores the UI context to be used to marshal 
             // code from other threads to the UI thread.
             uiContext = SynchronizationContext.Current;
         }
 
         #region Public Methods
-        public void ClearRobots(Robot[] RobotList)
+        public void ClearRobots(ObservableCollection<RobotItem> RobotList)
         {
-            for (int i = 0; i < RobotList.Length; i++)
-            {
-                // Initialize each robot
-                RobotList[i] = new Robot();
-            }
+            RobotList.Clear();
         }
         #endregion
 
@@ -100,38 +92,42 @@ namespace SwarmRoboticsGUI
         
         private void DrawOverlayFrame(object sender, EventArgs e)
         {
-            switch (Display.Source)
-            {
-                case ImageDisplay.SourceType.NONE:
-                    break;
-                case ImageDisplay.SourceType.CAMERA:
-                    // Typecast object to get passed UMat class
-                    UMat Frame = (UMat)sender;
-                    // Make sure there is a frame
-                    if (Frame != null)
-                    {
-                        // Apply image processing to find the robots
-                        RobotList = imgProc.GetRobots(Frame, RobotList);
-                        // Create the overlay image from the robot list
-                        // BRAE: Maybe only pass frame size since its only used for that
-                        Display.ProcessOverlay(RobotList);
-                        // Draw overlay image in window image box
-                        OverlayImageBox.Image = Display.Image;
-                    }
-                    break;
-                case ImageDisplay.SourceType.CUTOUTS:
-                    // Apply image processing to find the robots
-                    RobotList = imgProc.GetRobots(imgProc.TestImage, RobotList);
-                    // Create the overlay image from the robot list
-                    Display.ProcessOverlay(RobotList);
-                    // Draw overlay image in window image box
-                    OverlayImageBox.Image = Display.Image;
-                    break;
-                default:
-                    break;
-            }
+            //switch (Display.Source)
+            //{
+            //    case ImageDisplay.SourceType.NONE:
+            //        break;
+            //    case ImageDisplay.SourceType.CAMERA:
+            //        // Typecast object to get passed UMat class
+            //        UMat Frame = (UMat)sender;
+            //        // Make sure there is a frame
+            //        if (Frame != null)
+            //        {
+            //            // Apply image processing to find the robots
+            //            RobotList = imgProc.GetRobots(Frame, RobotList);
+            //            // Create the overlay image from the robot list
+            //            // BRAE: Maybe only pass frame size since its only used for that
+            //            Display.ProcessOverlay(RobotList);
+            //            // Draw overlay image in window image box
+            //            OverlayImageBox.Image = Display.Image;
+            //        }
+            //        break;
+            //    case ImageDisplay.SourceType.CUTOUTS:
+            //        // Apply image processing to find the robots
+            //        RobotList = imgProc.GetRobots(imgProc.TestImage, RobotList);
+            //        // Create the overlay image from the robot list
+            //        Display.ProcessOverlay(RobotList);
+            //        // Draw overlay image in window image box
+            //        OverlayImageBox.Image = Display.Image;
+            //        break;
+            //    default:
+            //        break;
+            //}
 
-            Update(uiContext);
+            var List = RobotList.ToList();
+            // Apply image processing to find the robots
+            List = imgProc.GetRobots(imgProc.TestImage, List);
+            // Create the overlay image from the robot list
+            Update(uiContext, List);
         }
         #endregion
 
@@ -142,18 +138,19 @@ namespace SwarmRoboticsGUI
             imgProc.LowerH = LowerH;
             imgProc.UpperH = UpperH;
             // Update the display with the interface when using the cutouts
-            switch (Display.Source)
-            {
-                case ImageDisplay.SourceType.NONE:
-                    break;
-                case ImageDisplay.SourceType.CAMERA:
-                    break;
-                case ImageDisplay.SourceType.CUTOUTS:
-                    DrawOverlayFrame(this, new EventArgs());
-                    break;
-                default:
-                    break;
-            }
+            //switch (Display.Source)
+            //{
+            //    case ImageDisplay.SourceType.NONE:
+            //        break;
+            //    case ImageDisplay.SourceType.CAMERA:
+            //        break;
+            //    case ImageDisplay.SourceType.CUTOUTS:
+            //        DrawOverlayFrame(this, new EventArgs());
+            //        break;
+            //    default:
+            //        break;
+            //}
+            DrawOverlayFrame(this, new EventArgs());
         }
         private void Overlay_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -166,47 +163,23 @@ namespace SwarmRoboticsGUI
         private void OverlayImageBox_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             // Notify the display where it was clicked
-            Display.Click(e.Location);
+            //Display.Click(e.Location);
             // Update the frame
             DrawOverlayFrame(this, new EventArgs());
         }
-        private void Overlay_SizeChanged(object sender, EventArgs e)
-        {
-            // Check if the display has been initialized
-            if (Display != null)
-                // Resize the overlay image to fix the resized imagebox
-                Display.Resize(OverlayImageBox.Width, OverlayImageBox.Height);
-        }
         #endregion
 
-        private void Update(object state)
+        private void Update(object state, object data)
         {
             // Get the UI context from state
             SynchronizationContext uiContext = state as SynchronizationContext;
             // Execute the UpdateRobots function on the UI thread
-            uiContext.Post(UpdateRobots, null);
+            uiContext.Post(UpdateRobots, data);
         }
         private void UpdateRobots(object data)
         {
-            foreach (Robot R in RobotList)
-            {
-                // The robot has been initiallized
-                if (R != null)
-                {
-                    bool IsItem = false;
-                    // Check if the robot ID matches with an item in the collection
-                    foreach (RobotItem I in Robots)
-                    {
-                        if (I.ID == R.ID)
-                        {
-                            IsItem = true;
-                        }
-                    }
-                    // Add the robot if it doesn't already exist
-                    if (!IsItem)
-                        Robots.Add(new RobotItem(R));
-                }
-            }
+            RobotList = new ObservableCollection<RobotItem>((List<RobotItem>)data);
+            Display1.Items = RobotList;
         }
     }
 }

@@ -118,9 +118,11 @@ namespace SwarmRoboticsGUI
             CvInvoke.UseOpenCL = true;
             //
             PopulateFilters();
-            PopulateOverlays();
+            // TEMP: Don't bother populating right now
+            // BRAE: Sort out the overlays and sources
+            //PopulateOverlays();
             PopulateCameras();
-            PopulateSources();
+            //PopulateSources();
             //
             openvideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
             savevideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
@@ -145,9 +147,8 @@ namespace SwarmRoboticsGUI
 			//serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
 
 			setupSystemTest();
-            // TEMP: Default configuration
-            overlayWindow.Display.Overlay = ImageDisplay.OverlayType.PRETTY;
-            overlayWindow.Display.Source = ImageDisplay.SourceType.CUTOUTS;
+
+
 		}      
 
         // Methods
@@ -224,53 +225,57 @@ namespace SwarmRoboticsGUI
             settingsmenuitem.Click += menuPlaceHolder_Click;
         }
 
-        private void PopulateOverlays()
-        {
-            //loops through our filters and adds them to our menu
-            for (int i = 0; i < (int)ImageDisplay.OverlayType.NUM_OVERLAYS; i++)
-            {
-                MenuItem item = new MenuItem { Header = ImageDisplay.ToString((ImageDisplay.OverlayType)i) };
-                item.Click += new RoutedEventHandler(menuOverlayListItem_Click);
-                item.IsCheckable = true;
-                //by default select our first filter (no filter)
-                if (i == 0)
-                {
-                    item.IsChecked = true;
-                }
-                menuOverlayList.Items.Add(item);
-            }
-            // add our seperator and settings menu items
-            Separator sep = new Separator();
-            menuOverlayList.Items.Add(sep);
+        // TEMP: One overlay option for now
+        // BRAE: Put this in the display window as list of buttons
+        //private void PopulateOverlays()
+        //{
+        //    //loops through our filters and adds them to our menu
+        //    for (int i = 0; i < (int)ImageDisplay.OverlayType.NUM_OVERLAYS; i++)
+        //    {
+        //        MenuItem item = new MenuItem { Header = ImageDisplay.ToString((ImageDisplay.OverlayType)i) };
+        //        item.Click += new RoutedEventHandler(menuOverlayListItem_Click);
+        //        item.IsCheckable = true;
+        //        //by default select our first filter (no filter)
+        //        if (i == 0)
+        //        {
+        //            item.IsChecked = true;
+        //        }
+        //        menuOverlayList.Items.Add(item);
+        //    }
+        //    // add our seperator and settings menu items
+        //    Separator sep = new Separator();
+        //    menuOverlayList.Items.Add(sep);
 
-            MenuItem settingsmenuitem = new MenuItem { Header = "Settings" };
-            menuOverlayList.Items.Add(settingsmenuitem);
-            settingsmenuitem.Click += menuPlaceHolder_Click;
-        }
+        //    MenuItem settingsmenuitem = new MenuItem { Header = "Settings" };
+        //    menuOverlayList.Items.Add(settingsmenuitem);
+        //    settingsmenuitem.Click += menuPlaceHolder_Click;
+        //}
 
-        private void PopulateSources()
-        {
-            //loops through our filters and adds them to our menu
-            for (int i = 0; i < (int)ImageDisplay.SourceType.NUM_SOURCES; i++)
-            {
-                MenuItem item = new MenuItem { Header = ImageDisplay.ToString((ImageDisplay.SourceType)i) };
-                item.Click += new RoutedEventHandler(menuSourceListItem_Click);
-                item.IsCheckable = true;
-                //by default select our first filter (no filter)
-                if (i == 0)
-                {
-                    item.IsChecked = true;
-                }
-                menuSourceList.Items.Add(item);
-            }
-            // add our seperator and settings menu items
-            Separator sep = new Separator();
-            menuSourceList.Items.Add(sep);
+        // TEMP: default source as cutouts
+        // BRAE: Sort your shit out. populate the sources and get on with it
+        //private void PopulateSources()
+        //{
+        //    //loops through our filters and adds them to our menu
+        //    for (int i = 0; i < (int)ImageDisplay.SourceType.NUM_SOURCES; i++)
+        //    {
+        //        MenuItem item = new MenuItem { Header = ImageDisplay.ToString((ImageDisplay.SourceType)i) };
+        //        item.Click += new RoutedEventHandler(menuSourceListItem_Click);
+        //        item.IsCheckable = true;
+        //        //by default select our first filter (no filter)
+        //        if (i == 0)
+        //        {
+        //            item.IsChecked = true;
+        //        }
+        //        menuSourceList.Items.Add(item);
+        //    }
+        //    // add our seperator and settings menu items
+        //    Separator sep = new Separator();
+        //    menuSourceList.Items.Add(sep);
 
-            MenuItem settingsmenuitem = new MenuItem { Header = "Settings" };
-            menuSourceList.Items.Add(settingsmenuitem);
-            settingsmenuitem.Click += menuPlaceHolder_Click;
-        }
+        //    MenuItem settingsmenuitem = new MenuItem { Header = "Settings" };
+        //    menuSourceList.Items.Add(settingsmenuitem);
+        //    settingsmenuitem.Click += menuPlaceHolder_Click;
+        //}
 
         public void ToggleCameraWindow()
         {
@@ -387,50 +392,61 @@ namespace SwarmRoboticsGUI
                     break;
             }
 
-            switch (overlayWindow.Display.Source)
-            {
-                case ImageDisplay.SourceType.NONE:
-                    break;
-                case ImageDisplay.SourceType.CAMERA:
-                    break;
-                case ImageDisplay.SourceType.CUTOUTS:
-                    DrawCameraFrame(this, new EventArgs());
-                    break;
-                default:
-                    break;
-            }
+
+            // TEMP: Default to cutouts
+            // BRAE: You can't live you life like this
+            //switch (overlayWindow.Display.Source)
+            //{
+            //    case ImageDisplay.SourceType.NONE:
+            //        break;
+            //    case ImageDisplay.SourceType.CAMERA:
+            //        break;
+            //    case ImageDisplay.SourceType.CUTOUTS:
+            //        DrawCameraFrame(this, new EventArgs());
+            //        break;
+            //    default:
+            //        break;
+            //}
+            DrawCameraFrame(this, new EventArgs());
         }
 
 
         private void DrawCameraFrame(object sender, EventArgs e)
         {
-            switch (overlayWindow.Display.Source)
-            {
-                case ImageDisplay.SourceType.NONE:
-                    // Do nothing
-                    break;
-                case ImageDisplay.SourceType.CAMERA:
-                    // Sender is a camera
-                    Camera Camera = (Camera)sender;
-                    if (Camera.Frame != null)
-                    {
-                        //updates FPS counter
-                        statusFPS.Text = "FPS: " + Camera.FPS;
-                        // Apply the currently selected filter
-                        overlayWindow.imgProc.ProcessFilter(Camera.Frame);
-                        // Draw the frame to the overlay imagebox
-                        captureImageBox.Image = overlayWindow.imgProc.Image;
-                    }                   
-                    break;
-                case ImageDisplay.SourceType.CUTOUTS:
-                    // Apply the currently selected filter
-                    overlayWindow.imgProc.ProcessFilter(overlayWindow.imgProc.TestImage);
-                    // Draw the frame to the overlay imagebox
-                    captureImageBox.Image = overlayWindow.imgProc.Image;
-                    break;
-                default:
-                    break;
-            }
+            // TEMP: Default to cutouts
+            // BRAE: THINK OF THE CHILDREN
+            //switch (overlayWindow.Display.Source)
+            //{
+            //    case ImageDisplay.SourceType.NONE:
+            //        // Do nothing
+            //        break;
+            //    case ImageDisplay.SourceType.CAMERA:
+            //        // Sender is a camera
+            //        Camera Camera = (Camera)sender;
+            //        if (Camera.Frame != null)
+            //        {
+            //            //updates FPS counter
+            //            statusFPS.Text = "FPS: " + Camera.FPS;
+            //            // Apply the currently selected filter
+            //            overlayWindow.imgProc.ProcessFilter(Camera.Frame);
+            //            // Draw the frame to the overlay imagebox
+            //            captureImageBox.Image = overlayWindow.imgProc.Image;
+            //        }                   
+            //        break;
+            //    case ImageDisplay.SourceType.CUTOUTS:
+            //        // Apply the currently selected filter
+            //        overlayWindow.imgProc.ProcessFilter(overlayWindow.imgProc.TestImage);
+            //        // Draw the frame to the overlay imagebox
+            //        captureImageBox.Image = overlayWindow.imgProc.Image;
+            //        break;
+            //    default:
+            //        break;
+            //}
+
+            //Apply the currently selected filter
+            overlayWindow.imgProc.ProcessFilter(overlayWindow.imgProc.TestImage);
+            // Draw the frame to the overlay imagebox
+            captureImageBox.Image = overlayWindow.imgProc.Image;
         }
 
 
@@ -470,42 +486,46 @@ namespace SwarmRoboticsGUI
         }
         private void menuOverlayListItem_Click(object sender, RoutedEventArgs e)
         {
-            MenuItem menusender = (MenuItem)sender;
-            string menusenderstring = menusender.ToString();
+            // TEMP: Overlay shown on startup
+            // BRAE: OverlayList deserves better than this
+            //MenuItem menusender = (MenuItem)sender;
+            //string menusenderstring = menusender.ToString();
 
-            if (menusenderstring != ImageDisplay.ToString(overlayWindow.Display.Overlay))
-            {
-                MenuItem[] allitems = menuOverlayList.Items.OfType<MenuItem>().ToArray();
+            //if (menusenderstring != ImageDisplay.ToString(overlayWindow.Display.Overlay))
+            //{
+            //    MenuItem[] allitems = menuOverlayList.Items.OfType<MenuItem>().ToArray();
 
-                foreach (var item in allitems)
-                {
-                    item.IsChecked = false;
-                }
-                menusender.IsChecked = true;
-                overlayWindow.Display.Overlay = (ImageDisplay.OverlayType)menuOverlayList.Items.IndexOf(menusender);
-                // TODO: Not sure where to display this right now
-                //statusDisplayFilter.Text = ImageDisplay.ToString(overlayWindow.Display.Overlay);
-            }
+            //    foreach (var item in allitems)
+            //    {
+            //        item.IsChecked = false;
+            //    }
+            //    menusender.IsChecked = true;
+            //    overlayWindow.Display.Overlay = (ImageDisplay.OverlayType)menuOverlayList.Items.IndexOf(menusender);
+            //    // TODO: Not sure where to display this right now
+            //    //statusDisplayFilter.Text = ImageDisplay.ToString(overlayWindow.Display.Overlay);
+            //}
         }
 
         private void menuSourceListItem_Click(object sender, RoutedEventArgs e)
         {
-            MenuItem menusender = (MenuItem)sender;
-            string menusenderstring = menusender.ToString();
+            // TEMP: Default source to cutouts
+            // BRAE: Mansel is going to see all this bullshit since you showed him the tasklist
+            //MenuItem menusender = (MenuItem)sender;
+            //string menusenderstring = menusender.ToString();
 
-            if (menusenderstring != ImageDisplay.ToString(overlayWindow.Display.Source))
-            {
-                MenuItem[] allitems = menuSourceList.Items.OfType<MenuItem>().ToArray();
+            //if (menusenderstring != ImageDisplay.ToString(overlayWindow.Display.Source))
+            //{
+            //    MenuItem[] allitems = menuSourceList.Items.OfType<MenuItem>().ToArray();
 
-                foreach (var item in allitems)
-                {
-                    item.IsChecked = false;
-                }
-                menusender.IsChecked = true;
-                overlayWindow.Display.Source = (ImageDisplay.SourceType)menuSourceList.Items.IndexOf(menusender);
-                // TODO: Not sure where to display this right now
-                //statusDisplayFilter.Text = ImageDisplay.ToString(overlayWindow.Display.Overlay);
-            }
+            //    foreach (var item in allitems)
+            //    {
+            //        item.IsChecked = false;
+            //    }
+            //    menusender.IsChecked = true;
+            //    overlayWindow.Display.Source = (ImageDisplay.SourceType)menuSourceList.Items.IndexOf(menusender);
+            //    // TODO: Not sure where to display this right now
+            //    //statusDisplayFilter.Text = ImageDisplay.ToString(overlayWindow.Display.Overlay);
+            //}
         }
 
         private void menuDisplayPopOut_Click(object sender, RoutedEventArgs e)

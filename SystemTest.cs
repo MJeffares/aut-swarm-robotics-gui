@@ -68,7 +68,7 @@ namespace SwarmRoboticsGUI
 	{
 		public List<ToggleButton> togglebtnControls;
 		public List<Button> btnControls;
-		bool communicationsTest = false;
+		//bool communicationsTest = false;
 		public bool testMode = false;
 		bool fullSystemTest = false;
 		int currentTestItem = -1;

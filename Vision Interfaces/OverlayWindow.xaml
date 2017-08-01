@@ -8,8 +8,7 @@
         xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
         mc:Ignorable="d"
         Title="Overlay" Height="740" Width="1280" MinHeight="740" MinWidth="800" 
-        Closing="Overlay_Closing" 
-        SizeChanged="Overlay_SizeChanged">
+        Closing="Overlay_Closing">
     <Window.Resources>
         <!--Solid Brushes-->
         <SolidColorBrush x:Key="ListSpacerBrush" Color="#FF202020"/>
@@ -46,18 +45,10 @@
         </Grid.ColumnDefinitions>
 
         <local:RobotGroups Grid.Row="1" Grid.Column="2"/>
-        <local:Display Grid.Row="1" Grid.Column="1" Items="{Binding Robots}"/>
+        <local:Display x:Name="Display1" Grid.Row="1" Grid.Column="1" Items="{Binding RobotList}"/>
 
         <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Height="40" VerticalAlignment="Top" Background="{StaticResource AccentBrush}"/>
         <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Height="20" VerticalAlignment="Bottom" Background="{StaticResource AccentBrush}"/>
-
-        
-        <Grid Grid.Row="2" Grid.Column="3" MinHeight="480" MinWidth="640" Background="{StaticResource RadialBrush2}">
-            <WindowsFormsHost Name="host1" Visibility="Visible">
-                <em:ImageBox x:Name="OverlayImageBox" FunctionalMode="Minimum" Dock="Fill" SizeMode="CenterImage" 
-                             MouseClick="OverlayImageBox_MouseClick"/>
-            </WindowsFormsHost>
-        </Grid>
 
         <!--<Grid Grid.Row="2" Grid.Column="1" Height="80" Width="600" VerticalAlignment="Bottom" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>

@@ -58,6 +58,8 @@ namespace SwarmRoboticsGUI
     public class RobotItem : Item, INotifyPropertyChanged
     {
         public int ID { get; private set; }
+        public int Battery { get; set; }
+        public string Task { get; set; }
         private Point _Location { get; set; }
         public Point Location
         {
@@ -71,12 +73,16 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
+        public Point PreviousLocation { get; set; }
         public Point Direction { get; set; }
+        public Point[] Contour { get; set; }
         public int Height { get; set; }
         public int Width { get; set; }
         public double Heading { get; set; }
         public double HeadingDeg { get; set; }
         public bool IsCollapsed { get; set; }
+        public bool IsTracked { get; set; }
+        public bool IsSelected { get; set; }
         public ObservableCollection<Item> Children { get; set; }
         public RobotItem(string Name, int ID) : base(Name)
         {
