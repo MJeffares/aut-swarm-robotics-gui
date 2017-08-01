@@ -180,6 +180,7 @@ namespace SwarmRoboticsGUI
         {
             RobotList = new ObservableCollection<RobotItem>((List<RobotItem>)data);
             Display1.Items = RobotList;
+            RobotGroups1.Items = RobotList;
         }
     }
 }

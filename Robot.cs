@@ -37,6 +37,7 @@ namespace SwarmRoboticsGUI
     public class Item
     {
         public string Name { get; private set; }
+        public int ID { get; private set; }
         public string Value { get; private set; }
         public string Type { get; set; }
         public bool IsVisible { get; set; }
@@ -54,10 +55,16 @@ namespace SwarmRoboticsGUI
             Type = "Item";
             IsVisible = false;
         }
+        public Item(string Name, int ID)
+        {
+            this.Name = Name;
+            this.ID = ID;
+            Type = "Item";
+            IsVisible = false;
+        }
     }
     public class RobotItem : Item, INotifyPropertyChanged
     {
-        public int ID { get; private set; }
         public int Battery { get; set; }
         public string Task { get; set; }
         private Point _Location { get; set; }
@@ -84,10 +91,9 @@ namespace SwarmRoboticsGUI
         public bool IsTracked { get; set; }
         public bool IsSelected { get; set; }
         public ObservableCollection<Item> Children { get; set; }
-        public RobotItem(string Name, int ID) : base(Name)
+        public RobotItem(string Name, int ID) : base(Name, ID)
         {
             InitializeRobotItem();
-            this.ID = ID;
 
             // TEMP: Testing layout
             Children.Add(new Item("ID", "1"));
@@ -96,24 +102,7 @@ namespace SwarmRoboticsGUI
             Children.Add(new Item("Location", "X Y"));
             Children.Add(new Item("Heading", " 90 Deg"));
         }
-        public RobotItem(Robot Robot):base("Robot " + Robot.ID.ToString())
-        {
-            InitializeRobotItem();
 
-            ID = Robot.ID;
-            Location = Robot.Location;
-            Heading = Robot.Heading;
-            HeadingDeg = Robot.Heading * 180/Math.PI;
-            // TEMP: Size of the robots is fixed
-            Direction = new Point((int)(80 * Math.Cos(Robot.Heading)),
-                                  (int)(80 * Math.Sin(Robot.Heading)));
-            // Property list
-            Children.Add(new Item("ID", Robot.ID.ToString()));
-            Children.Add(new Item("Battery", Robot.Battery.ToString()));
-            Children.Add(new Item("Task", Robot.Task));
-            Children.Add(new Item("Location", Robot.Location.ToString()));
-            Children.Add(new Item("Heading", Robot.Heading.ToString()));
-        }
         private void InitializeRobotItem()
         {
             Type = "RobotItem";

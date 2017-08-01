@@ -10,7 +10,20 @@ namespace SwarmRoboticsGUI
 {
     public partial class RobotGroups : UserControl
     {
-        private IList<Item> _List = new ObservableCollection<Item>();
+        public static readonly DependencyProperty ItemsProperty =
+                 DependencyProperty.Register("Items",
+                     typeof(ObservableCollection<RobotItem>),
+                     typeof(RobotGroups),
+                     new PropertyMetadata(new ObservableCollection<RobotItem>(), OnChanged));
+        public ObservableCollection<RobotItem> Items
+        {
+            get { return (ObservableCollection<RobotItem>)GetValue(ItemsProperty); }
+            set { SetValue(ItemsProperty, value); }
+        }
+
+
+        private ObservableCollection<RobotGroup> Groups { get; set; }
+        private List<Item> _List = new List<Item>();
         public RobotGroups()
         {
             InitializeComponent();
@@ -26,24 +39,19 @@ namespace SwarmRoboticsGUI
             var Unassigned = new RobotGroup("Unassigned");
             Unassigned.AddRobot(new RobotItem("Robot 6", 6));
 
-            AddRobotGroup(Tower);
-            AddRobotGroup(Formation);
-            AddRobotGroup(Unassigned);
+            _List.Add(Tower);
+            _List.Add(Formation);
+            _List.Add(Unassigned);
+
 
             RobotList.DisplayMemberPath = "Name";
-            RobotList.ItemsSource = _List;
-        }
-        public void AddRobotGroup(RobotGroup Group)
-        {
-            _List.Add(Group);
-            foreach (RobotItem I in Group.Children)
-            {
-                _List.Add(I);
-                foreach (Item S in I.Children)
-                {
-                    _List.Add(S);
-                }
-            }
+            //RobotList.ItemsSource = _List;
+
+            Groups = new ObservableCollection<RobotGroup>();
+            Groups.Add(Tower);
+            Groups.Add(Formation);
+            Groups.Add(Unassigned);
+            RobotTree.ItemsSource = Groups;
         }
 
         private void ToggleListBoxItem(object sender, EventArgs e)
@@ -64,17 +72,17 @@ namespace SwarmRoboticsGUI
         {
             var RobotIndex = _List.IndexOf(RobotItem);
             RobotItem.IsCollapsed = RobotItem.IsCollapsed ? false : true;
-            _List.RemoveAt(RobotIndex);
-            _List.Insert(RobotIndex, RobotItem);
-
-            foreach (Item I in RobotItem.Children)
+            if (RobotIndex > 0)
             {
-                var ItemIndex = _List.IndexOf(I);
-                I.IsVisible = RobotItem.IsCollapsed ? false : true;
-                _List.RemoveAt(ItemIndex);
-                _List.Insert(ItemIndex, I);
+                _List[RobotIndex] = RobotItem;
+
+                foreach (Item I in RobotItem.Children)
+                {
+                    var ItemIndex = _List.IndexOf(I);
+                    I.IsVisible = RobotItem.IsCollapsed ? false : true;
+                    _List[ItemIndex] = I;
+                }
             }
-            
         }
         private void ToggleGroupItem(RobotGroup RobotGroup)
         {
@@ -88,17 +96,42 @@ namespace SwarmRoboticsGUI
                 {
                     var RobotIndex = _List.IndexOf(I);
                     I.IsVisible = I.IsVisible ? false : true;
-                    _List.RemoveAt(RobotIndex);
-                    _List.Insert(RobotIndex, I);
-                    foreach(Item S in I.Children)
+                    //_List.RemoveAt(RobotIndex);
+                    //_List.Insert(RobotIndex, I);
+                    _List[RobotIndex] = I;
+                    foreach (Item S in I.Children)
                     {
                         var ItemIndex = _List.IndexOf(S);
                         S.IsVisible = (I.IsVisible && !I.IsCollapsed && !RobotGroup.IsCollapsed) ? true : false;
-                        _List.RemoveAt(ItemIndex);
-                        _List.Insert(ItemIndex, S);
+                        _List[ItemIndex] = S;
+                        //_List.RemoveAt(ItemIndex);
+                        //_List.Insert(ItemIndex, S);
                     }
                 }
-            }  
+            }
+        }
+
+
+        static void OnChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            (sender as RobotGroups).OnChanged();
+        }
+        void OnChanged()
+        {
+            UpdateList();
+        }
+
+        void UpdateList()
+        {
+            foreach (RobotItem R in Items)
+            {
+                Predicate<Item> MatchingID = (Item Item) => { return Item.ID == R.ID; };
+                int index = _List.FindIndex(MatchingID);
+                if (index > 0)
+                {
+                    _List[index] = R;
+                }
+            }
         }
     }
 }
