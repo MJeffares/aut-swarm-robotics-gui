@@ -757,5 +757,8 @@ namespace SwarmRoboticsGUI
 
             xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
         }
+
+        
+        
 	}
 }

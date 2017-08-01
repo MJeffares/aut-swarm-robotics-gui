@@ -122,7 +122,9 @@ namespace SwarmRoboticsGUI
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string propName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+            //MANSEL: Uncomment this
+            //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+            //PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propName));
         }
     }
     public class RobotGroup : Item
