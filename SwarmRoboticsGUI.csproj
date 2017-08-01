@@ -110,13 +110,17 @@
     <Compile Include="Brae\Camera.cs" />
     <Compile Include="Brae\ImageAnimation.cs" />
     <Compile Include="Brae\ImageDisplay.cs" />
-    <Compile Include="CommunicationManager.cs" />
-    <Compile Include="Communications.cs" />
-    <Compile Include="CommunicationsDisplayWindow.xaml.cs" />
+    <Compile Include="Communication\CommunicationManager.cs" />
+    <Compile Include="Communication\Communications.cs" />
+    <Compile Include="Communication\CommunicationsDisplayWindow.xaml.cs">
+      <DependentUpon>CommunicationsDisplayWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Communication\SerialCommunications.cs" />
+    <Compile Include="Communication\SwarmRoboticsHandler.cs" />
+    <Compile Include="Communication\SwarmRoboticsMessages.cs" />
+    <Compile Include="Communication\XbeeFrames.cs" />
+    <Compile Include="Communication\XbeeHandler.cs" />
     <Compile Include="ManualMode.cs" />
-    <Compile Include="SerialCommunications.cs" />
-    <Compile Include="SwarmRoboticsHandler.cs" />
-    <Compile Include="SwarmRoboticsMessages.cs" />
     <Compile Include="Vision Interfaces\Display.xaml.cs">
       <DependentUpon>Display.xaml</DependentUpon>
     </Compile>
@@ -134,8 +138,10 @@
     <Compile Include="Vision Interfaces\RobotGroups.xaml.cs">
       <DependentUpon>RobotGroups.xaml</DependentUpon>
     </Compile>
-    <Compile Include="XbeeFrames.cs" />
-    <Compile Include="XbeeHandler.cs" />
+    <Page Include="Communication\CommunicationsDisplayWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Vision Interfaces\Display.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
