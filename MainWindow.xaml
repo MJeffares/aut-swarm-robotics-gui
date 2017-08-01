@@ -273,10 +273,30 @@
 
                 <TabControl x:Name="tcCenter" Background="{x:Null}">
                     <TabItem Header="No Connection" x:Name="nc">
-                        <Label HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold"> Please connect to an Xbee module before continuing</Label>
+                        <Label HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold">Please connect to an Xbee module before continuing</Label>
                     </TabItem>
-                    <TabItem Header="Robot Control" IsEnabled="False" Visibility="Hidden">
+                    <TabItem Header="Robot Control" IsEnabled="True" Visibility="Visible">
+                        <Canvas Height="200" Width="200" Background="AliceBlue" VerticalAlignment="Top" HorizontalAlignment="Left">
+                            <CheckBox x:Name="checkboxManualModeEnable" Width="160" Canvas.Left="20" Canvas.Top="5">Enable Manual Movement</CheckBox>
+
+                            <Button x:Name="btManualModeNorth" Content="N" Height="20" Width="30" Canvas.Left="90" Canvas.Top="30" IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                            <Button x:Name="btManualModeNorthEast" Content="NE" Height="20" Width="30" Canvas.Left="120" Canvas.Top="50" IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}"  MouseEnter="ManualModeMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                            <Button x:Name="btManualModeEast" Content="E" Height="20" Width="30" Canvas.Left="150" Canvas.Top="70" IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                            <Button x:Name="btManualModeSouthEast" Content="SE" Height="20" Width="30" Canvas.Left="120" Canvas.Top="90" IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                            <Button x:Name="btManualModeSouth" Content="S" Height="20" Width="30" Canvas.Left="90" Canvas.Top="110" IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                            <Button x:Name="btManualModeSouthWest" Content="SW" Height="20" Width="30" Canvas.Left="60" Canvas.Top="90" IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                            <Button x:Name="btManualModeWest" Content="W" Height="20" Width="30" Canvas.Left="30" Canvas.Top="70" IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                            <Button x:Name="btManualModeNorthWest" Content="NW" Height="20" Width="30" Canvas.Left="60" Canvas.Top="50" IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                            <WrapPanel Orientation="Horizontal" Width="80" Canvas.Left="60" Canvas.Top="150">
+                                <Label Content="Speed"/>
+                                <TextBox x:Name="tbManualModeSpeed" Width="35" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" TextChanged="tbManualModeSpeed_TextChanged" PreviewTextInput="tbManualModeSpeed_PreviewTextInput">50</TextBox>
+                            </WrapPanel>
+
+
+                        </Canvas>
+                        <!--
                         <WrapPanel Orientation="Vertical">
+                            
                             <ToggleButton Content="PlaceHolder"  Margin="10" Click="ToggleButton_Click" />
                             <ToggleButton Content="PlaceHolder"  Margin="10" Style="{DynamicResource ButtonStyle1}" Background="#FFFB0000" />
                             <Button Name="button1" Margin="10" Content="Animate Button2!">
@@ -296,6 +316,7 @@
                             <Button Name="button2" Margin="10" Content="I will get animated!"></Button>
 
                         </WrapPanel>
+                        -->
                     </TabItem>
 
                     <TabItem Header="Tower Control" IsEnabled="False" Visibility="Hidden">
@@ -304,7 +325,7 @@
 
                     <TabItem Header = "Systems Test" IsEnabled="False" Visibility="Hidden" >
                         <StackPanel Margin = "5">
-                            
+
                             <WrapPanel Margin="0,2">
                                 <Button x:Name="btnSysTestCommunications" Content="Comms Test" Margin="5,5,0,5" Click="btnSysTestCommunications_Click" />
                                 <Button x:Name="btnSysTestTestMode" Content = "Enter Test Mode" Margin="5,5,0,5" IsEnabled = "false"  Click="btnSysTestTestMode_Click" Width="95"/>
@@ -448,7 +469,7 @@
                                         </Grid.RowDefinitions>
 
                                         <Label Grid.Row="0" Grid.ColumnSpan="3" HorizontalAlignment="Center">MOTORS</Label>
-                                        
+
                                         <ToggleButton Grid.Column="0"  Grid.Row="1" x:Name="btnSysTestMotor1" Content = "M1" Tag="M,01" Style="{DynamicResource ButtonStyle1}"/>
                                         <Slider Grid.Column="0" Grid.Row="2" x:Name="slMotorOne" Minimum="-100" Maximum="100" Orientation="Vertical" TickFrequency="10" Height="100" Margin="5,0"/>
                                         <TextBox Grid.Column="0" Grid.Row="3" x:Name="tbSysTestMotor1" Text="{Binding ElementName=slMotorOne, Path=Value, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}" MinWidth="35" Margin="5,0,5,5"/>
@@ -587,7 +608,7 @@
             <GridSplitter x:Name="cameraGridSplitter" Grid.Column="2" Width="5" HorizontalAlignment="Center">
             </GridSplitter>
 
-            <WindowsFormsHost Grid.Column="3" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,0,0,0" Visibility="Visible">
+            <WindowsFormsHost Grid.Column="3" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,5,0,201" Visibility="Visible" Grid.RowSpan="2">
                 <em:ImageBox x:Name="captureImageBox" Height="240" Width="320" SizeMode="StretchImage" FunctionalMode="Minimum"/>
             </WindowsFormsHost>
 
