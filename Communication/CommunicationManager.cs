@@ -93,7 +93,8 @@ namespace SwarmRoboticsGUI
 
 			public virtual void CompletionHandler(object sender, RequestedMessageReceivedArgs e)
 			{
-				completedEvent?.Invoke(this, e);
+                // MANSEL: invalid expression
+				//completedEvent?.Invoke(this, e);
 				timeoutWorkerThread.Abort();
 			}
 		}
