@@ -87,13 +87,23 @@ namespace SwarmRoboticsGUI
 				if (ran != true)
 				{
 					ran = true;
+                    MessagesToWaitFor.Remove(this);
 					completedEvent.Invoke(new OnCompletionCallback(CompletionHandler), e);
+                    
 				}
+                else
+                {
+                    //THIS IS AN ERROR
+                    MessagesToWaitFor.Remove(this);
+                }
 			}
 
 			public virtual void CompletionHandler(object sender, RequestedMessageReceivedArgs e)
 			{
-				completedEvent?.Invoke(this, e);
+                if (completedEvent != null)
+                {
+                    completedEvent.Invoke(this, e);
+                }
 				timeoutWorkerThread.Abort();
 			}
 		}
@@ -174,6 +184,7 @@ namespace SwarmRoboticsGUI
 				message = ProtocolClass.ParseSwarmProtocolMessage(message);
 				//InterperateSwarmProtocolMessage(message);
 				swarmRoboticsProtocolHandler.InterperateSwarmRoboticsMessage(message as ProtocolClass.SwarmProtocolMessage);
+                
 			}
 			else
 			{
@@ -332,6 +343,8 @@ namespace SwarmRoboticsGUI
 
 					//t.sender.onMyTempHander(this, args);
 					//t.sender.OnCompletion(this, args);
+                    CommunicationManager.WaitForMessage.MessagesToWaitFor.Remove(matches as CommunicationManager.WaitForMessage);
+
 					t.OnCompletion(this, args);
 					//window.comm
 					//CommunicationManager.setup.onMyTempHander( t.handler, args);
