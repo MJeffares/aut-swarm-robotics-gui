@@ -25,10 +25,10 @@ namespace SwarmRoboticsGUI
     public partial class Display : UserControl
     {
         public static readonly DependencyProperty ItemsProperty =
-                 DependencyProperty.Register("Items",
-                     typeof(ObservableCollection<RobotItem>),
-                     typeof(Display),
-                     new PropertyMetadata(new ObservableCollection<RobotItem>(), OnChanged));
+            DependencyProperty.Register("Items",
+            typeof(ObservableCollection<RobotItem>),
+            typeof(Display),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
         public ObservableCollection<RobotItem> Items
         {
             get { return (ObservableCollection<RobotItem>)GetValue(ItemsProperty); }
@@ -38,8 +38,8 @@ namespace SwarmRoboticsGUI
         public Display()
         {
             InitializeComponent();
-            Items = new ObservableCollection<RobotItem>();
-            Arena.ItemsSource = Items;
+            //Items = new ObservableCollection<RobotItem>();
+            //Arena.ItemsSource = Items;
         }
 
         #region Enumerations
@@ -81,15 +81,22 @@ namespace SwarmRoboticsGUI
             }
         }
 
-
-
-        static void OnChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        private void Robot_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            (sender as Display).OnChanged();
-        }
-        void OnChanged()
-        {
-            Arena.ItemsSource = Items;
+            var Target = sender as Grid;
+            if (Target != null)
+            {
+                var Robot = Target.DataContext as RobotItem;
+                if (Robot != null)
+                {
+                    for (int i = 0; i < Items.Count; i++)
+                    {
+                        Items[i].IsSelected = false;
+                    }
+                    int index = Items.IndexOf(Robot);
+                    Items[index].IsSelected = true;
+                }
+            }
         }
     }
 }
