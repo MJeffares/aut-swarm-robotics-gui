@@ -178,9 +178,28 @@ namespace SwarmRoboticsGUI
         }
         private void UpdateRobots(object data)
         {
+            // Updates from another thread
             RobotList = new ObservableCollection<RobotItem>((List<RobotItem>)data);
             Display1.Items = RobotList;
             RobotGroups1.Items = RobotList;
+        }
+
+        private void UpdateRobots()
+        {
+            // Updates from UI
+            Display1.Items = RobotList;
+            RobotGroups1.Items = RobotList;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            // Find robot with ID of 1
+            var Robot = RobotList.Where(f => f.ID == 1).SingleOrDefault();
+            // Get the robot index inside the group
+            int RobotIndex = RobotList.IndexOf(Robot);
+            RobotList[RobotIndex].Group = "Formation 1";
+
+            UpdateRobots();
         }
     }
 }

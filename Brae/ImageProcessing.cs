@@ -177,14 +177,17 @@ namespace SwarmRoboticsGUI
                     Point Direction = FindDirection(RobotImage);
                     // Goto next robot if true
                     if (Direction == null) continue;
-
+                    
                     Direction = new Point(Direction.X + RobotBounds.X, Direction.Y + RobotBounds.Y);
                     if (RobotList[index].Location.X > 0 && RobotList[index].Location.Y > 0)
                     {
                         // Get robot heading using Atan function
                         int dy = Direction.Y - RobotList[index].Location.Y;
-                        int dx = Direction.X - RobotList[index].Location.X;
+                        int dx = Direction.X - RobotList[index].Location.X;                       
                         RobotList[index].Heading = Math.Atan2(dy, dx);
+                        RobotList[index].HeadingDeg = Math.Atan2(dy, dx) * 180 / Math.PI;
+                        RobotList[index].Direction = new Point((int)(50 * Math.Cos(RobotList[index].Heading)), 
+                                                               (int)(50 * Math.Sin(RobotList[index].Heading)));
                     }
                 }
                 // DEBUG: Store counters

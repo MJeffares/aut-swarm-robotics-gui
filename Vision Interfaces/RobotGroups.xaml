@@ -13,7 +13,7 @@
         <SolidColorBrush x:Key="ListRobotBrush" Color="#FF101010"/>
         <SolidColorBrush x:Key="ListGroupBrush" Color="#FF303030"/>
         <SolidColorBrush x:Key="ListBrush" Color="#FF303030"/>
-        
+
         <!--Shapes-->
         <DataTemplate x:Key="Plus">
             <Polygon Fill="#FF202020" Stretch="Uniform">
@@ -44,142 +44,205 @@
             </Polygon>
         </DataTemplate>
 
-        <!--Templates-->
-        <ControlTemplate x:Key="ItemControlTemplate" TargetType="ListBoxItem">
-            <Border Name="border" Grid.Column="1" Height="25" BorderThickness="0 0 0 1"
-                    BorderBrush="{StaticResource ListSpacerBrush}"  
-                    Background="{StaticResource ListItemBrush}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <ContentPresenter VerticalAlignment="Center" Margin="20 0 0 0" 
-                                      TextBlock.FontSize="10"/>
-                    <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="5 0 0 0"
-                               FontSize="10" Foreground="White"
-                               Text="{Binding Value}"/>
-                </Grid>
-            </Border>
-
-            <ControlTemplate.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" TargetName="border" Value="Gray"/>
-                </Trigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" TargetName="border" Value="Gray"/>
-                </Trigger>
-                <DataTrigger Binding="{Binding IsVisible}" Value="False">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding IsVisible}" Value="True">
-                    <Setter Property="Visibility" Value="Visible"/>
-                </DataTrigger>
-            </ControlTemplate.Triggers>
-        </ControlTemplate>
-        
-        <ControlTemplate x:Key="RobotControlTemplate" TargetType="ListBoxItem">
-            <Border Name="border" Grid.Column="1" Height="50" BorderThickness="0 0 0 1"
-                    BorderBrush="{StaticResource ListSpacerBrush}"
-                    Background="{StaticResource ListRobotBrush}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="50"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <ContentControl Name="MinMax" Margin="18"/>
-                    <ContentPresenter Grid.Column="1"  VerticalAlignment="Center" Margin="10 0 0 0"/>
-                </Grid>
-            </Border>
-
-            <ControlTemplate.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" TargetName="border" Value="Gray"/>
-                </Trigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" TargetName="border" Value="Gray"/>
-                </Trigger>
-                <DataTrigger Binding="{Binding IsVisible}" Value="False">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding IsVisible}" Value="True">
-                    <Setter Property="Visibility" Value="Visible"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding IsCollapsed}" Value="True">
-                    <Setter Property="ContentTemplate" TargetName="MinMax" Value="{StaticResource Plus}"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding IsCollapsed}" Value="False">
-                    <Setter Property="ContentTemplate" TargetName="MinMax" Value="{StaticResource Minus}"/>
-                </DataTrigger>
-            </ControlTemplate.Triggers>
-        </ControlTemplate>
-
-        <ControlTemplate x:Key="GroupControlTemplate" TargetType="ListBoxItem">
-            <Border Name="border" Grid.Column="1" Height="50" BorderThickness="0 0 0 1"
-                    BorderBrush="{StaticResource ListSpacerBrush}" 
-                    Background="{StaticResource ListGroupBrush}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="50"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <ContentControl Name="MinMax" Margin="18"/>
-                    <ContentPresenter Grid.Column="1" VerticalAlignment="Center" Margin="10 0 0 0"/>
-                </Grid>
-            </Border>
-            <ControlTemplate.Triggers>
-                <DataTrigger Binding="{Binding IsCollapsed}" Value="True">
-                    <Setter Property="ContentTemplate" TargetName="MinMax" Value="{StaticResource Plus}"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding IsCollapsed}" Value="False">
-                    <Setter Property="ContentTemplate" TargetName="MinMax" Value="{StaticResource Minus}"/>
-                </DataTrigger>
-            </ControlTemplate.Triggers>
-        </ControlTemplate>
-
-        <!--Styles-->
-        <Style x:Key="ListBoxItemStyle" TargetType="ListBoxItem">
-            <EventSetter Event="PreviewMouseDown" Handler="ToggleListBoxItem"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Type}" Value="Item">
-                    <Setter Property="Template" Value="{DynamicResource ItemControlTemplate}"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Type}" Value="RobotItem">
-                    <Setter Property="Template" Value="{DynamicResource RobotControlTemplate}"/>
-                    <Setter Property="DataContext" Value="{Binding}"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Type}" Value="GroupItem">
-                    <Setter Property="Template" Value="{DynamicResource GroupControlTemplate}"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="TreeViewItemStyle" TargetType="TreeViewItem">
-            <Setter Property="Template">
+        <Style x:Key="TreeViewItemFocusVisual">
+            <Setter Property="Control.Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="TreeViewItem">
-                        <StackPanel>
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup x:Name="ExpansionStates">
-                                    <VisualState x:Name="Expanded">
-                                        <Storyboard>
-                                            <ObjectAnimationUsingKeyFrames
-                                        Storyboard.TargetProperty="(UIElement.Visibility)"
-                                        Storyboard.TargetName="ItemsHost">
-                                                <DiscreteObjectKeyFrame KeyTime="0"
-                                            Value="{x:Static Visibility.Visible}" />
-                                            </ObjectAnimationUsingKeyFrames>
-                                        </Storyboard>
-                                    </VisualState>
-                                    <VisualState x:Name="Collapsed" />
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
-                            <ContentPresenter ContentSource="Header" />
-                            <ItemsPresenter Name="ItemsHost" Visibility="Collapsed" />
-                        </StackPanel>
+                    <ControlTemplate>
+                        <Rectangle/>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
+        <Style x:Key="ExpandCollapseToggleStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border BorderThickness="0" Background="Transparent" Height="50" Width="50">
+                            <ContentControl Name="MinMax" Margin="18"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="ContentTemplate" TargetName="MinMax" Value="{StaticResource Minus}"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter Property="ContentTemplate" TargetName="MinMax" Value="{StaticResource Plus}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ItemStyle" TargetType="{x:Type TreeViewItem}">
+            <Setter Property="Background" Value="{StaticResource ListItemBrush}"/>
+            <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="25"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Border x:Name="Bd" Grid.Column="1" Padding="0"
+                                    BorderBrush="{StaticResource ListSpacerBrush}" 
+                                    Background="{TemplateBinding Background}" >
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <ToggleButton x:Name="Expander" ClickMode="Press" Grid.ColumnSpan="2" 
+                                                  IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" 
+                                                  Style="{StaticResource ExpandCollapseToggleStyle}"/>
+                                    <ContentPresenter x:Name="PART_Header" Grid.Column="1" ContentSource="Header" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                </Grid>
+                            </Border>
+                            <ItemsPresenter x:Name="ItemsHost" Grid.Row="1" Margin="0"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="false">
+                                <Setter Property="Visibility" TargetName="ItemsHost" Value="Collapsed"/>
+                            </Trigger>
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="VirtualizingStackPanel.IsVirtualizing" Value="true">
+                    <Setter Property="ItemsPanel">
+                        <Setter.Value>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel/>
+                            </ItemsPanelTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="RobotStyle" TargetType="TreeViewItem">
+            <Setter Property="Background" Value="{StaticResource ListRobotBrush}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                        <Grid >
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Border x:Name="Bd" Grid.Column="1" Padding="0"
+                                    BorderBrush="{StaticResource ListSpacerBrush}" 
+                                    Background="{TemplateBinding Background}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <ToggleButton x:Name="Expander" ClickMode="Press"
+                                                  IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" 
+                                                  Style="{StaticResource ExpandCollapseToggleStyle}"/>
+                                    <ContentPresenter x:Name="PART_Header" Grid.Column="1" 
+                                                      ContentSource="Header" VerticalAlignment="Center" 
+                                                      HorizontalAlignment="Left"
+                                                      MouseLeftButtonDown="CP_MouseLeftButtonDown"/>
+                                </Grid>
+                            </Border>
+                            <ItemsPresenter x:Name="ItemsHost" Grid.Row="1" Margin="0"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="false">
+                                <Setter Property="Visibility" TargetName="ItemsHost" Value="Collapsed"/>
+                            </Trigger>
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
+                            </Trigger>
+                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="Background" TargetName="Bd" Value="Silver"/>
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="VirtualizingStackPanel.IsVirtualizing" Value="true">
+                    <Setter Property="ItemsPanel">
+                        <Setter.Value>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel/>
+                            </ItemsPanelTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="GroupStyle" TargetType="TreeViewItem">
+            <Setter Property="Background" Value="{StaticResource ListGroupBrush}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Border x:Name="Bd" Grid.Column="1" Padding="0"
+                                    BorderBrush="{StaticResource ListSpacerBrush}" 
+                                    Background="{TemplateBinding Background}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <ToggleButton x:Name="Expander" ClickMode="Press" Grid.ColumnSpan="2" 
+                                                  IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" 
+                                                  Style="{StaticResource ExpandCollapseToggleStyle}"/>
+                                    <ContentPresenter x:Name="PART_Header" Grid.Column="1" ContentSource="Header" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                </Grid>
+                            </Border>
+                            <ItemsPresenter x:Name="ItemsHost" Grid.Row="1" Margin="0"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="false">
+                                <Setter Property="Visibility" TargetName="ItemsHost" Value="Collapsed"/>
+                            </Trigger>
+                            <!--<Trigger Property="HasItems" Value="false">
+                                <Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
+                            </Trigger>-->
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="VirtualizingStackPanel.IsVirtualizing" Value="true">
+                    <Setter Property="ItemsPanel">
+                        <Setter.Value>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel/>
+                            </ItemsPanelTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
     </UserControl.Resources>
@@ -195,59 +258,29 @@
             <ColumnDefinition Width="250"/>
         </Grid.ColumnDefinitions>
 
-        <ListBox x:Name="RobotList" Grid.Column="0" Grid.Row="1"
-                 Foreground="White" FontSize="20"
-                 Background="Transparent" BorderBrush="Transparent"
-                 ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                 ItemContainerStyle="{StaticResource ListBoxItemStyle}">
-        </ListBox>
-
         <TreeView x:Name="RobotTree" Grid.Column="1" Grid.Row="1"
-                  Foreground="White" FontSize="20"
-                  Background="Red" BorderBrush="Transparent"
-                  ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                  Foreground="White" FontSize="20" Padding="0" BorderThickness="0"
+                  Background="Transparent"
+                  ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                  ItemsSource="{Binding Groups, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                  ItemContainerStyle="{StaticResource GroupStyle}">
             <TreeView.Resources>
                 <DataTemplate DataType="{x:Type local:Item}">
-                    <Border Name="border" Grid.Column="1" Height="25" BorderThickness="0 0 0 1"
-                    BorderBrush="{StaticResource ListSpacerBrush}"  
-                    Background="{StaticResource ListItemBrush}">
                     <Grid>
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
                             <ColumnDefinition/>
-                            <ColumnDefinition/>                        
                         </Grid.ColumnDefinitions>
-                        <TextBlock VerticalAlignment="Center" Margin="5 0 0 0"
-                               FontSize="10" Foreground="White"
-                               Text="{Binding Name}"/>
-                        <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5 0 0 0"
-                               FontSize="10" Foreground="White"
-                               Text="{Binding Value}"/>
+                        <TextBlock FontSize="10" Foreground="White" Text="{Binding Name}"/>
+                        <TextBlock Grid.Column="1" FontSize="10" Foreground="White" Text="{Binding Value}"/>
                     </Grid>
-                    </Border>
                 </DataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type local:RobotItem}" ItemsSource="{Binding Children}">
-                    <TextBlock Text="{Binding Name}" />
+                <HierarchicalDataTemplate DataType="{x:Type local:RobotItem}" ItemsSource="{Binding Children}" ItemContainerStyle="{StaticResource ItemStyle}">
+                    <TextBlock FontSize="20" Foreground="White" Text="{Binding Name}"/>
                 </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type local:RobotGroup}" ItemsSource="{Binding Children}">
-                    <TextBlock Text="{Binding Name}" />
+                <HierarchicalDataTemplate DataType="{x:Type local:RobotGroup}" ItemsSource="{Binding Children}" ItemContainerStyle="{StaticResource RobotStyle}">
+                    <TextBlock FontSize="20" Foreground="White" Text="{Binding Name}"/>
                 </HierarchicalDataTemplate>
-                <!--<HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type local:RobotGroup}">
-                    <TextBlock Text="{Binding Name}"></TextBlock>
-                </HierarchicalDataTemplate>
-                <DataTemplate DataType="{x:Type local:RobotItem}">
-                    <Border Name="border" Grid.Column="1" Height="50" BorderThickness="0 0 0 1"
-                            BorderBrush="{StaticResource ListSpacerBrush}"
-                            Background="{StaticResource ListRobotBrush}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="50"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <ContentControl Name="MinMax" Margin="18"/>
-                            <TextBlock Text="{Binding Name}"></TextBlock>
-                        </Grid>
-                    </Border>
-                </DataTemplate>-->
             </TreeView.Resources>
         </TreeView>
     </Grid>

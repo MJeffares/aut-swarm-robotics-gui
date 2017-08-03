@@ -40,32 +40,29 @@ namespace SwarmRoboticsGUI
         public int ID { get; private set; }
         public string Value { get; private set; }
         public string Type { get; set; }
-        public bool IsVisible { get; set; }
 
         public Item(string Name)
         {
             this.Name = Name;
             Type = "Item";
-            IsVisible = false;
         }
         public Item(string Name, string Value)
         {
             this.Name = Name;
             this.Value = Value;
             Type = "Item";
-            IsVisible = false;
         }
         public Item(string Name, int ID)
         {
             this.Name = Name;
             this.ID = ID;
             Type = "Item";
-            IsVisible = false;
         }
     }
     public class RobotItem : Item, INotifyPropertyChanged
     {
         public int Battery { get; set; }
+        public string Group { get; set; }
         public string Task { get; set; }
         private Point _Location { get; set; }
         public Point Location
@@ -87,8 +84,8 @@ namespace SwarmRoboticsGUI
         public int Width { get; set; }
         public double Heading { get; set; }
         public double HeadingDeg { get; set; }
-        public bool IsCollapsed { get; set; }
         public bool IsTracked { get; set; }
+
         public bool IsSelected { get; set; }
         public ObservableCollection<Item> Children { get; set; }
         public RobotItem(string Name, int ID) : base(Name, ID)
@@ -100,14 +97,15 @@ namespace SwarmRoboticsGUI
             Children.Add(new Item("Battery", "100%"));
             Children.Add(new Item("Task", "None"));
             Children.Add(new Item("Location", "X Y"));
-            Children.Add(new Item("Heading", " 90 Deg"));
+            Children.Add(new Item("Heading", "90 Deg"));
         }
 
         private void InitializeRobotItem()
         {
             Type = "RobotItem";
-            IsCollapsed = true;
-            IsVisible = true;
+            Group = "Unassigned";
+            IsSelected = false;
+            IsTracked = false;
             // TEMP: Size of the robots is fixed
             Height = 200;
             Width = 200;
@@ -125,20 +123,19 @@ namespace SwarmRoboticsGUI
     }
     public class RobotGroup : Item
     {
-        public ObservableCollection<Item> Children { get; set; }
+        public ObservableCollection<RobotItem> Children { get; set; }
         public bool IsCollapsed { get; set; }
 
         public RobotGroup(string Name) : base(Name)
         {
             Type = "GroupItem";
             IsCollapsed = false;
-            IsVisible = true;
-            Children = new ObservableCollection<Item>();
+            Children = new ObservableCollection<RobotItem>();
         }
 
         public void AddRobot(RobotItem Item)
         {
-            foreach (Item I in Children)
+            foreach (RobotItem I in Children)
             {
                 if (I.Name == Item.Name)
                 {
