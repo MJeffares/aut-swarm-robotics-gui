@@ -46,8 +46,8 @@
 
         <Button Click="Button_Click">Change Group</Button>
 
-        <local:RobotGroups x:Name="RobotGroups1" Grid.Row="1" Grid.Column="2"/>
-        <local:Display x:Name="Display1" Grid.Row="1" Grid.Column="1"/>
+        <local:RobotGroups x:Name="RobotGroups1" Grid.Row="1" Grid.Column="2" Items="{Binding RobotList, RelativeSource={RelativeSource AncestorType=Window}}"/>
+        <local:Display x:Name="Display1" Grid.Row="1" Grid.Column="1" Items="{Binding RobotList, RelativeSource={RelativeSource AncestorType=Window}}"/>
 
         <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Height="40" VerticalAlignment="Top" Background="{StaticResource AccentBrush}"/>
         <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Height="20" VerticalAlignment="Bottom" Background="{StaticResource AccentBrush}"/>

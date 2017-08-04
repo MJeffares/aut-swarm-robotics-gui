@@ -137,11 +137,14 @@
             <Setter Property="Background" Value="{StaticResource ListRobotBrush}"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Focusable" Value="False"/>
             <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}"/>
+            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+            <EventSetter Event="MouseLeftButtonDown" Handler="TV_MouseLeftButtonDown"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TreeViewItem}">
-                        <Grid >
+                        <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition/>
@@ -159,8 +162,7 @@
                                                   Style="{StaticResource ExpandCollapseToggleStyle}"/>
                                     <ContentPresenter x:Name="PART_Header" Grid.Column="1" 
                                                       ContentSource="Header" VerticalAlignment="Center" 
-                                                      HorizontalAlignment="Left"
-                                                      MouseLeftButtonDown="CP_MouseLeftButtonDown"/>
+                                                      HorizontalAlignment="Left"/>
                                 </Grid>
                             </Border>
                             <ItemsPresenter x:Name="ItemsHost" Grid.Row="1" Margin="0"/>

@@ -51,8 +51,8 @@ namespace SwarmRoboticsGUI
 
         private void InitializeTimer()
         {
-            // Create 500ms timer to drive interface changes
-            InterfaceTimer = new System.Timers.Timer(500);
+            // Create 100ms timer to drive interface changes
+            InterfaceTimer = new System.Timers.Timer(300);
             InterfaceTimer.Elapsed += Interface_Tick;
             InterfaceTimer.Start();
         }
@@ -68,14 +68,14 @@ namespace SwarmRoboticsGUI
             SynchronizationContext uiContext = state as SynchronizationContext;
             uiContext.Post(UpdateList, null);
         }
-        void UpdateList(object data)
+        private void UpdateList(object data)
         {
             if (Items != null)
             {
                 foreach (RobotItem R in Items)
                 {
                     // Find the group the robot is assigned to.
-                    var G = Groups.Where(f => f.Name == R.Group).SingleOrDefault();
+                    var G = Groups.Where(f => f.Name == R.Group).FirstOrDefault();
                     // Find the group the robot is currently in
                     var Gprev = Groups.Where(f => f.Children.Where(g => g.Name == R.Name).Any()).FirstOrDefault();
                     // If the group exists
@@ -85,14 +85,16 @@ namespace SwarmRoboticsGUI
                         int GroupIndex = Groups.IndexOf(G);
 
                         // Find the robot inside the group
-                        var Robot = G.Children.Where(f => f.ID == R.ID).SingleOrDefault();
+                        var Robot = G.Children.Where(f => f.ID == R.ID).FirstOrDefault();
                         // Get the robot index inside the group
                         int RobotIndex = G.Children.IndexOf(Robot);
                         // Robot was found in the group
                         if (RobotIndex != -1)
                         {
                             // Replace the robot
-                            Groups[GroupIndex].Children[RobotIndex] = R;
+                            //Groups[GroupIndex].Children[RobotIndex] = R;
+                            Groups[GroupIndex].Children.RemoveAt(RobotIndex);
+                            Groups[GroupIndex].Children.Insert(RobotIndex, R);
                         }
                         else
                         {
@@ -109,7 +111,7 @@ namespace SwarmRoboticsGUI
                                 // Find previous group index
                                 GroupIndex = Groups.IndexOf(Gprev);
                                 // Find the robot inside the group
-                                Robot = Gprev.Children.Where(f => f.ID == R.ID).SingleOrDefault();
+                                Robot = Gprev.Children.Where(f => f.ID == R.ID).FirstOrDefault();
                                 // Get the robot index inside the group
                                 RobotIndex = Gprev.Children.IndexOf(Robot);
                                 // Replace the robot
@@ -135,24 +137,25 @@ namespace SwarmRoboticsGUI
             }          
         }
 
-        private void CP_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void TV_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            var Target = sender as ContentPresenter;
+            var Target = sender as TreeViewItem;
 
             if (Target != null)
             {
                 var Robot = Target.DataContext as RobotItem;
                 if (Robot != null)
                 {
+                    int index = Items.IndexOf(Robot);
                     for (int i = 0; i < Items.Count; i++)
                     {
-                        Items[i].IsSelected = false;
+                        if (i != index)
+                            Items[i].IsSelected = false;
                     }
-                    int index = Items.IndexOf(Robot);
+
                     Items[index].IsSelected = true;
                 }
             }
-            Target.UpdateLayout();
         }
     }
 }

@@ -109,7 +109,6 @@
     </ApplicationDefinition>
     <Compile Include="Brae\Camera.cs" />
     <Compile Include="Brae\ImageAnimation.cs" />
-    <Compile Include="Brae\ImageDisplay.cs" />
     <Compile Include="Communication\CommunicationManager.cs" />
     <Compile Include="Communication\Communications.cs" />
     <Compile Include="Communication\CommunicationsDisplayWindow.xaml.cs">
