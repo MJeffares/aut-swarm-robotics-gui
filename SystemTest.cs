@@ -164,13 +164,13 @@ namespace SwarmRoboticsGUI
 			Reply = new TaskCompletionSource<bool>();
 
 			byte[] data;
-			data = new byte[3];
-			//data[0] = SYSTEM_TEST_MESSAGE.COMMUNICATION;
-			//data[1] = 0x01;
+			data = new byte[2];
+			data[0] = SYSTEM_TEST_MESSAGE.COMMUNICATION;
+			data[1] = 0x01;
             
-            data[0] = 0xE4;
-            data[1] = 0x02;
-            data[2] = 0xFA;
+            //data[0] = 0xE4;
+           // data[1] = 0x02;
+            //data[2] = 0xFA;
                          
 
 			xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
@@ -470,8 +470,9 @@ namespace SwarmRoboticsGUI
 					byte [] proximitySensor = MJLib.StringToByteArrayFastest(tokens[1]);
 					data = new byte[3];
 					data[0] = 0xE4;
-					data[1] = proximitySensor[0];
-					data[2] = request;
+                    data[1] = request;
+					data[2] = proximitySensor[0];
+					
 					xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
 					break;
 
@@ -479,8 +480,9 @@ namespace SwarmRoboticsGUI
 					byte[] lightSensor = MJLib.StringToByteArrayFastest(tokens[1]);
 					data = new byte[3];
 					data[0] = 0xE5;
-					data[1] = lightSensor[0];
-					data[2] = request;
+                    data[1] = request;
+					data[2] = lightSensor[0];
+					
 					xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
 					break;
 

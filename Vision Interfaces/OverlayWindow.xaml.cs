@@ -49,6 +49,8 @@ namespace SwarmRoboticsGUI
 
         public ObservableCollection<RobotItem> RobotList { get; set; }
         private SynchronizationContext uiContext { get; set; }
+
+
         public OverlayWindow(MainWindow mainWindow)
         {
             InitializeComponent();
@@ -71,6 +73,7 @@ namespace SwarmRoboticsGUI
             // code from other threads to the UI thread.
             uiContext = SynchronizationContext.Current;
         }
+
 
         #region Public Methods
         public void ClearRobots(ObservableCollection<RobotItem> RobotList)

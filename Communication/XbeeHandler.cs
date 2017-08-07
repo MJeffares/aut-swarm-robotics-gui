@@ -55,7 +55,11 @@ namespace SwarmRoboticsGUI
 		{
 			public const UInt64 COORDINATOR = 0x0000000000000000;
 			public const UInt64 BROADCAST = 0x000000000000FFFF;
-			public const UInt64 ROBOT_ONE = 0x0013A20041065FB3;
+			//public const UInt64 ROBOT_ONE = 0x0013A20041065FB3;
+
+            public const UInt64 ROBOT_TWO = 0x0013A2004147F9DD;
+            public const UInt64 ROBOT_FOUR = 0x0013A2004147F9D8;
+            //MANSEL: get robot xbee ID's
 
 			public static string ToString(UInt64 location)
 			{
@@ -67,8 +71,8 @@ namespace SwarmRoboticsGUI
 					case BROADCAST:
 						return "Broadcast Message";
 
-					case ROBOT_ONE:
-						return "Robot 1";
+					//case ROBOT_ONE:
+						//return "Robot 1";
 
 					/*
 					case ROBOT_TWO:

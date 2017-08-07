@@ -87,13 +87,23 @@ namespace SwarmRoboticsGUI
 				if (ran != true)
 				{
 					ran = true;
+                    MessagesToWaitFor.Remove(this);
 					completedEvent.Invoke(new OnCompletionCallback(CompletionHandler), e);
+                    
 				}
+                else
+                {
+                    //THIS IS AN ERROR
+                    MessagesToWaitFor.Remove(this);
+                }
 			}
 
 			public virtual void CompletionHandler(object sender, RequestedMessageReceivedArgs e)
 			{
-				completedEvent?.Invoke(this, e);
+                if (completedEvent != null)
+                {
+                    completedEvent.Invoke(this, e);
+                }
 				timeoutWorkerThread.Abort();
 			}
 		}
@@ -174,6 +184,7 @@ namespace SwarmRoboticsGUI
 				message = ProtocolClass.ParseSwarmProtocolMessage(message);
 				//InterperateSwarmProtocolMessage(message);
 				swarmRoboticsProtocolHandler.InterperateSwarmRoboticsMessage(message as ProtocolClass.SwarmProtocolMessage);
+                
 			}
 			else
 			{
@@ -315,79 +326,18 @@ namespace SwarmRoboticsGUI
 		{
 			//string[] tokens;
 
-
-			//if (CommunicationManager.templist.Any())
 			if(CommunicationManager.WaitForMessage.MessagesToWaitFor.Any())
 			{
-
-				//var matches = CommunicationManager.templist.Where(p => p.messageID == message.messageID);
 				var matches = CommunicationManager.WaitForMessage.MessagesToWaitFor.Where(p => p.messageID == message.messageID);
 
 				if (matches.Any())
 				{
-					//CommunicationManager.WaitForMessage.MyTempClass t = matches.First();
-					CommunicationManager.WaitForMessage t = matches.First();
-
+					CommunicationManager.WaitForMessage messageWaitedOn = matches.First();
 					CommunicationManager.RequestedMessageReceivedArgs args = new CommunicationManager.RequestedMessageReceivedArgs(message);
-
-					//t.sender.onMyTempHander(this, args);
-					//t.sender.OnCompletion(this, args);
-					t.OnCompletion(this, args);
-					//window.comm
-					//CommunicationManager.setup.onMyTempHander( t.handler, args);
-
+                    CommunicationManager.WaitForMessage.MessagesToWaitFor.Remove(matches as CommunicationManager.WaitForMessage);
+					messageWaitedOn.OnCompletion(this, args);
 				}
 			}
-
-			/*
-			if (waitingForMessageFlag == true)
-			{
-				if(waitingForMessageType == message.messageID)
-				{
-					MessageReceivedTask.TrySetResult(message);
-					waitingForMessageFlag = false;
-				}
-			}
-			*/
-
-
-
-			/*
-			 
-			if (window.waitingForReply)
-			{
-				if (messageType == window.waitForReplyType)
-				{
-					if (window.avoidConnected == true)
-					{
-						bool match = false;
-						int i = 0;
-						for (i = 0; i < window.connectedRobots.Count; i++)
-						{
-							if (window.connectedRobots[i] == BitConverter.ToUInt64(window.serial.NewestMessage.source64, 0))
-							{
-								match = true;
-								i = window.connectedRobots.Count;
-							}
-						}
-
-						if (match == false)
-						{
-							window.waitForReplyMessage = window.serial.NewestMessage;
-							window.waitingForReply = false;
-							window.Reply.TrySetResult(true);
-						}
-					}
-					else
-					{
-						window.waitForReplyMessage = window.serial.NewestMessage;
-						window.waitingForReply = false;
-						window.Reply.TrySetResult(true);
-					}
-				}
-			}
-
-			*/
 
 			if (window.testMode)
 			{
@@ -395,7 +345,7 @@ namespace SwarmRoboticsGUI
 				(
 					message.GetType(),
 
-					MJLib.TypeSwitch.Case<ProximitySensorTestData>(()=> myFunction(message as ProximitySensorTestData))
+					MJLib.TypeSwitch.Case<ProximitySensorTestData>(()=> DisplayRoximityData(message as ProximitySensorTestData))
 
 					//MJLib.TypeSwitch.Case<LineSensorTestData>()
 				);
@@ -540,7 +490,7 @@ namespace SwarmRoboticsGUI
 
 		}
 
-		public void myFunction(ProximitySensorTestData message)
+		public void DisplayRoximityData(ProximitySensorTestData message)
 		{
 			switch(message.sensor)
 			{
@@ -570,77 +520,6 @@ namespace SwarmRoboticsGUI
 
 			}
 		}
-
-
-		/*
-		public async Task<SwarmProtocolMessage> waitForMessage(byte type, int timeoutMilliSeconds)
-		{
-			SwarmProtocolMessage result;
-
-			waitingForMessageType = type;
-			waitingForMessageFlag = true;
-
-			
-			new Thread(() =>
-			{
-				Thread.CurrentThread.Name = "Wait For Message Working Thread";
-				Thread.CurrentThread.IsBackground = true;
-				
-				//this.MessageReceived += new ProtocolClass.RequestedMessageReceivedHandler(setMessageReceived);
-
-				result = waitForMessageAction(timeoutMilliSeconds).Result;
-				//MessageReceivedTask.Task.Dispose();
-				//MessageReceivedTask.TrySetResult(result);
-			}).Start();
-			
-
-			await waitForMessageAction(timeoutMilliSeconds);
-			//Thread thread = new Thread(() => waitForMessageAction(timeoutMilliSeconds));
-			//thread.Start();
-
-			//result =  waitForMessageAction(timeoutMilliSeconds).Result;
-			//result.Dispose();
-			//OnDataReceived(EventArgs.Empty);
-
-			//result = waitForMessageAction(timeoutMilliSeconds).Result;
-			result = MessageReceivedTask.Task.Result;
-
-
-			
-
-			await Task.WhenAny(MessageReceivedTask.Task, Task.Delay(timeoutMilliSeconds));
-
-			if (await Task.WhenAny(MessageReceivedTask.Task, Task.Delay(timeoutMilliSeconds)) == MessageReceivedTask.Task)
-			{
-				//MessageReceivedTask.Task.Dispose();
-				return MessageReceivedTask.Task.Result;
-			}
-			else
-			{
-				//MessageReceivedTask.Task.Dispose();
-				return null;
-			}
-			
-
-
-			if (result != null)
-			{
-				return result;
-			}
-			else
-			{
-				return null;
-			}
-		}
-		
-		public void setMessageReceived(object sender, EventArgs e)
-		{
-			MessageReceivedTask.TrySetResult(true);
-
-		}
-		*/
-
-
 	
 
 		public class SwarmProtocolMessage: XbeeAPI.ZigbeeReceivePacket

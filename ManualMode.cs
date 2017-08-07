@@ -25,15 +25,14 @@ namespace SwarmRoboticsGUI
         }
         private static class MANUAL_MODE_MESSAGE
         {
-            public const byte MoveStop = 0xD0;
+            public const byte Stop = 0xD0;
             public const byte MoveDirection = 0xD1;
-            public const byte MoveRotate = 0xD2;
+            public const byte RotateClockWise = 0xD2;
+            public const byte RotateCounterClockWise = 0xD3;
         }
 
-
-
-
-        private void ManualModeMouseEnter(object sender, MouseEventArgs e)
+        
+        private void ManualModeDirectionMouseEnter(object sender, MouseEventArgs e)
         {
             Button control = sender as Button;
             byte[] data = new byte[4];
@@ -41,120 +40,87 @@ namespace SwarmRoboticsGUI
 
             switch(control.Name)
             {
-                case "btManualModeNorth":
+                case "btManualModeN":
                     Array.Copy(DIRECTION.NORTH, 0, data, 1, 2);
                     break;
 
-                case "btManualModeNorthEast":
+                case "btManualModeNE":
                     Array.Copy(DIRECTION.NORTHEAST, 0, data, 1, 2);
                     break;
 
-                case "btManualModeEast":
+                case "btManualModeE":
                     Array.Copy(DIRECTION.EAST, 0, data, 1, 2);
                     break;
 
-                case "btManualModeSouthEast":
+                case "btManualModeSE":
                     Array.Copy(DIRECTION.SOUTHEAST, 0, data, 1, 2);
                     break;
 
-                case "btManualModeSouth":
+                case "btManualModeS":
                     Array.Copy(DIRECTION.SOUTH, 0, data, 1, 2);
                     break;
 
-                case "btManualModeSouthWest":
+                case "btManualModeSW":
                     Array.Copy(DIRECTION.SOUTHWEST, 0, data, 1, 2);
                     break;
 
-                case "btManualModeWest":
+                case "btManualModeW":
                     Array.Copy(DIRECTION.WEST, 0, data, 1, 2);
                     break;
 
-                case "btManualModeNorthWest":
+                case "btManualModeNW":
                     Array.Copy(DIRECTION.NORTHWEST, 0, data, 1, 2);
-                    break;
+                    break;  
             }
             data[3] = (byte) Convert.ToInt16(tbManualModeSpeed.Text);
-            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
+            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.ROBOT_TWO, data);
         }
 
         private void ManualModeMouseLeave(object sender, MouseEventArgs e)
         {
-            byte[] data = new byte[1] { MANUAL_MODE_MESSAGE.MoveStop };
-            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
+            byte[] data = new byte[1] { MANUAL_MODE_MESSAGE.Stop };
+            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.ROBOT_TWO, data);
         }
 
-
-        private void tbManualModeSpeed_TextChanged(object sender, TextChangedEventArgs e)
+        private void ManualModeRotateMouseEnter(object sender, MouseEventArgs e)
         {
+            Button control = sender as Button;
+            byte[] data = new byte[2];
 
+            switch(control.Name)
+            {
+                case "btManualModeCW":
+                    data[0] = MANUAL_MODE_MESSAGE.RotateClockWise;
+                    break;
+
+                case "btManualModeCCW":
+                    data[0] = MANUAL_MODE_MESSAGE.RotateCounterClockWise;
+                    break;
+            }
+            data[1] = (byte) Convert.ToInt16(tbManualModeSpeed.Text);
+            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.ROBOT_TWO, data);
         }
+
+       
+
+
 
         private void tbManualModeSpeed_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            //e.Handled = !IsTextAllowed(e.Text);
-            int num = IsValid(((TextBox)sender).Text + e.Text);
-            if (num != -1)
-            {
-                ((TextBox)sender).Text = num.ToString();
-                e.Handled = true;
-            }
-            else
-            {
-                e.Handled = true;
-            }
-
-            //e.Handled = !IsValid(((TextBox)sender).Text + e.Text);
-        }
-
-
-        public static int IsValid(string str)
-        {
             int num;
-            if (int.TryParse(str, out num))
+
+            if (int.TryParse(((TextBox)sender).Text + e.Text, out num))
             {
                 if (num >= 0)
                 {
-                    if (num <= 100)
+                    if (num > 100)
                     {
-                        return num;
+                        num = 100;
                     }
-                    else
-                    {
-                        return 100;
-                    }
+                    ((TextBox)sender).Text = num.ToString();   
                 }
-                else
-                {
-                    return 0;
-                }
+                e.Handled = true;
             }
-            return -1;
-
-            //return int.TryParse(str, out i) && i >= 0 && i <= 100;
         }
-
-        private static bool IsTextAllowed(string text)
-        {
-            /*
-            int num;
-            if(int.TryParse(text,out num))
-            {
-                if(num >= 0)
-                {
-                    if (num <= 100)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-             * */
-
-           // Regex regex = new Regex("[^0-9.-]+"); //regex that matches disallowed text
-            Regex regex = new Regex("(\b[0-1][0-9][0-9]\b)");
-            return !regex.IsMatch(text);
-        }
-
-
     }
 }
