@@ -25,7 +25,7 @@ namespace SwarmRoboticsGUI
     /// </summary>
     public partial class OverlayWindow : Window
     {
-        #region Variables
+        #region HSV Variables
         public double UpperC { get; set; }
         public double LowerC { get; set; }
         public int ColourC { get; set; }
@@ -37,15 +37,8 @@ namespace SwarmRoboticsGUI
         public int UpperV { get; set; }
         #endregion
 
-        #region Public Properties
         public ImageProcessing imgProc { get; set; }
-        //public ImageDisplay Display { get; set; }
-
-        #endregion
-
-        #region Private Properties
         private System.Timers.Timer InterfaceTimer { get; set; }
-        #endregion
 
         public ObservableCollection<RobotItem> RobotList { get; set; }
         private SynchronizationContext uiContext { get; set; }
@@ -128,8 +121,8 @@ namespace SwarmRoboticsGUI
 
             var List = RobotList.ToList();
             // Apply image processing to find the robots
-            List = imgProc.GetRobots(imgProc.TestImage, List);
-            // Create the overlay image from the robot list
+            imgProc.GetRobots(imgProc.TestImage, List);
+            // Update the robotlist on the UI thread
             Update(uiContext, List);
         }
         #endregion
@@ -181,8 +174,45 @@ namespace SwarmRoboticsGUI
         }
         private void UpdateRobots(object data)
         {
-            RobotList = new ObservableCollection<RobotItem>((List<RobotItem>)data);
-            Display1.Items = RobotList;
+            // Updates from another thread
+            var RobotList1 = new ObservableCollection<RobotItem>((List<RobotItem>)data);
+            foreach(RobotItem R in RobotList1)
+            {
+                // Robot with the same ID
+                var Robot = RobotList.Where(f => f.ID == R.ID).FirstOrDefault();
+                // Robot exist in list
+                if (Robot != null)
+                {
+                    var index = RobotList.IndexOf(Robot);
+                    if (Robot.IsSelected)
+                    {
+                        R.IsSelected = true;
+                    }
+                    RobotList.RemoveAt(index);
+                    RobotList.Insert(index, R);
+                }
+                else
+                {
+                    RobotList.Add(R);
+                }
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            // Find robot with ID of 1
+            var Robot = RobotList.Where(f => f.ID == 1).SingleOrDefault();
+            // Get the robot index inside the group
+            int RobotIndex = RobotList.IndexOf(Robot);
+            // Move to a new group
+            RobotList[RobotIndex].Group = "Formation 1";
+
+            // Find robot with ID of 2
+            Robot = RobotList.Where(f => f.ID == 2).SingleOrDefault();
+            // Get the robot index inside the group
+            RobotIndex = RobotList.IndexOf(Robot);
+            // Set the battery to 50%
+            RobotList[RobotIndex].Battery = 50;
         }
     }
 }

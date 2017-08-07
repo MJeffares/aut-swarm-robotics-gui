@@ -11,55 +11,166 @@ using System.ComponentModel;
 
 namespace SwarmRoboticsGUI
 {
-    public class Robot
-    {
-        #region Public Properties
-        public int ID { get; set; }
-        public int Battery { get; set; }
-        public string Task { get; set; }
-        public Point Location { get; set; }
-        public Point PreviousLocation { get; set; }
-        public double Heading { get; set; }
-        public Point[] Contour { get; set; }
-        public bool IsTracked { get; set; }
-        public bool IsSelected { get; set; }
-        #endregion
-
-        public Robot()
-        {
-            Battery = 0;
-            Heading = 0;
-            Location = new Point(0, 0);
-            IsTracked = false;
-            IsSelected = false;
-        }
-    }
     public class Item
     {
-        public string Name { get; private set; }
-        public string Value { get; private set; }
-        public string Type { get; set; }
-        public bool IsVisible { get; set; }
+        private string _Name { get; set; }
+        public string Name
+        {
+            get { return _Name; }
+            set
+            {
+                if (_Name != value)
+                {
+                    _Name = value;
+                    NotifyPropertyChanged("Name");
+                }
+            }
+        }
+        private int _ID { get; set; }
+        public int ID
+        {
+            get { return _ID; }
+            set
+            {
+                if (_ID != value)
+                {
+                    _ID = value;
+                    NotifyPropertyChanged("ID");
+                }
+            }
+        }
+        private string _Value { get; set; }
+        public string Value
+        {
+            get { return _Value; }
+            set
+            {
+                if (_Value != value)
+                {
+                    _Value = value;
+                    NotifyPropertyChanged("Value");
+                }
+            }
+        }
 
         public Item(string Name)
         {
             this.Name = Name;
-            Type = "Item";
-            IsVisible = false;
         }
         public Item(string Name, string Value)
         {
             this.Name = Name;
             this.Value = Value;
-            Type = "Item";
-            IsVisible = false;
+        }
+        public Item(string Name, int ID)
+        {
+            this.Name = Name;
+            this.ID = ID;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void NotifyPropertyChanged(string PropertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
+            }
         }
     }
     public class RobotItem : Item, INotifyPropertyChanged
     {
-        public int ID { get; private set; }
-        public int Battery { get; set; }
-        public string Task { get; set; }
+        private int _Battery { get; set; }
+        public int Battery
+        {
+            get { return _Battery; }
+            set
+            {
+                if (_Battery != value)
+                {
+                    _Battery = value;
+                    NotifyPropertyChanged("Battery");
+                }
+            }
+        }
+        private string _Group { get; set; }
+        public string Group
+        {
+            get { return _Group; }
+            set
+            {
+                if (_Group != value)
+                {
+                    _Group = value;
+                    NotifyPropertyChanged("Group");
+                }
+            }
+        }
+        private string _Task { get; set; }
+        public string Task
+        {
+            get { return _Task; }
+            set
+            {
+                if (_Task != value)
+                {
+                    _Task = value;
+                    NotifyPropertyChanged("Task");
+                }
+            }
+        }
+        private int _Height { get; set; }
+        public int Height
+        {
+            get { return _Height; }
+            set
+            {
+                if (_Height != value)
+                {
+                    _Height = value;
+                    NotifyPropertyChanged("Height");
+                }
+            }
+        }
+        private int _Width { get; set; }
+        public int Width
+        {
+            get { return _Width; }
+            set
+            {
+                if (_Width != value)
+                {
+                    _Width = value;
+                    NotifyPropertyChanged("Width");
+                }
+            }
+        }
+        private double _Heading { get; set; }
+        public double Heading
+        {
+            get { return _Heading; }
+            set
+            {
+                if (_Heading != value)
+                {
+                    _Heading = value;
+                    NotifyPropertyChanged("Heading");
+                }
+            }
+        }
+        private double _HeadingDeg { get; set; }
+        public double HeadingDeg
+        {
+            get { return _HeadingDeg; }
+            set
+            {
+                if (_HeadingDeg != value)
+                {
+                    _HeadingDeg = value;
+                    NotifyPropertyChanged("HeadingDeg");
+                }
+            }
+        }
+
         private Point _Location { get; set; }
         public Point Location
         {
@@ -76,87 +187,96 @@ namespace SwarmRoboticsGUI
         public Point PreviousLocation { get; set; }
         public Point Direction { get; set; }
         public Point[] Contour { get; set; }
-        public int Height { get; set; }
-        public int Width { get; set; }
-        public double Heading { get; set; }
-        public double HeadingDeg { get; set; }
-        public bool IsCollapsed { get; set; }
-        public bool IsTracked { get; set; }
-        public bool IsSelected { get; set; }
-        public ObservableCollection<Item> Children { get; set; }
-        public RobotItem(string Name, int ID) : base(Name)
+        
+        private bool _IsTracked { get; set; }
+        public bool IsTracked
         {
-            InitializeRobotItem();
-            this.ID = ID;
-
-            // TEMP: Testing layout
-            Children.Add(new Item("ID", "1"));
-            Children.Add(new Item("Battery", "100%"));
-            Children.Add(new Item("Task", "None"));
-            Children.Add(new Item("Location", "X Y"));
-            Children.Add(new Item("Heading", " 90 Deg"));
+            get { return _IsTracked; }
+            set
+            {
+                if (_IsTracked != value)
+                {
+                    _IsTracked = value;
+                    NotifyPropertyChanged("IsTracked");
+                }
+            }
         }
-        public RobotItem(Robot Robot):base("Robot " + Robot.ID.ToString())
+        private bool _IsExpanded { get; set; }
+        public bool IsExpanded
         {
-            InitializeRobotItem();
-
-            ID = Robot.ID;
-            Location = Robot.Location;
-            Heading = Robot.Heading;
-            HeadingDeg = Robot.Heading * 180/Math.PI;
-            // TEMP: Size of the robots is fixed
-            Direction = new Point((int)(80 * Math.Cos(Robot.Heading)),
-                                  (int)(80 * Math.Sin(Robot.Heading)));
-            // Property list
-            Children.Add(new Item("ID", Robot.ID.ToString()));
-            Children.Add(new Item("Battery", Robot.Battery.ToString()));
-            Children.Add(new Item("Task", Robot.Task));
-            Children.Add(new Item("Location", Robot.Location.ToString()));
-            Children.Add(new Item("Heading", Robot.Heading.ToString()));
+            get { return _IsExpanded; }
+            set
+            {
+                if (_IsExpanded != value)
+                {
+                    _IsExpanded = value;
+                    NotifyPropertyChanged("IsExpanded");
+                }
+            }
         }
-        private void InitializeRobotItem()
+        private bool _IsSelected { get; set; }
+        public bool IsSelected
         {
-            Type = "RobotItem";
-            IsCollapsed = true;
-            IsVisible = true;
+            get { return _IsSelected; }
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    NotifyPropertyChanged("IsSelected");
+                }
+            }
+        }
+
+        private ObservableCollection<Item> _Children { get; set; }
+        public ObservableCollection<Item> Children
+        {
+            get { return _Children; }
+            set
+            {
+                if (_Children != value)
+                {
+                    _Children = value;
+                    NotifyPropertyChanged("Children");
+                }
+            }
+        }
+
+        public RobotItem(string Name, int ID) : base(Name, ID)
+        {
+            Group = "Unassigned";
             // TEMP: Size of the robots is fixed
             Height = 200;
             Width = 200;
             Children = new ObservableCollection<Item>();
-        }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void NotifyPropertyChanged(string propName)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propName));
-            }
+            // TEMP: Testing layout
+            Children.Add(new Item("ID", ""));
+            Children.Add(new Item("Battery", ""));
+            Children.Add(new Item("Task", ""));
+            Children.Add(new Item("Location", ""));
+            Children.Add(new Item("Heading", ""));
         }
     }
-    public class RobotGroup : Item
+    public class RobotGroup : Item, INotifyPropertyChanged
     {
-        public ObservableCollection<Item> Children { get; set; }
-        public bool IsCollapsed { get; set; }
+        private ObservableCollection<RobotItem> _Children { get; set; }
+        public ObservableCollection<RobotItem> Children
+        {
+            get { return _Children; }
+            set
+            {
+                if (_Children != value)
+                {
+                    _Children = value;
+                    NotifyPropertyChanged("Children");
+                }
+            }
+        }
 
         public RobotGroup(string Name) : base(Name)
         {
-            Type = "GroupItem";
-            IsCollapsed = false;
-            IsVisible = true;
-            Children = new ObservableCollection<Item>();
-        }
-
-        public void AddRobot(RobotItem Item)
-        {
-            foreach (Item I in Children)
-            {
-                if (I.Name == Item.Name)
-                {
-                    return;
-                }
-            }
-            Children.Add(Item);
+            Children = new ObservableCollection<RobotItem>();
         }
     }
 }
