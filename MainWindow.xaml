@@ -172,7 +172,7 @@
                                 <GridViewColumnHeader Tag = "frame_length" Click="GridViewColumnHeader_Click" Content="Xbee Frame Length      "/>
                             </GridViewColumn>
 
-                            <GridViewColumn  x:Name = "gvcXbeeFrameID" DisplayMemberBinding="{Binding FrameIDDisplay}">
+                            <GridViewColumn  x:Name = "gvcXbeeFrameID" DisplayMemberBinding="{Binding FrameCommandDisplay}">
                                 <GridViewColumnHeader Tag = "frame_ID" Click="GridViewColumnHeader_Click" Content="Xbee Frame ID     "/>
                             </GridViewColumn>
 
@@ -274,7 +274,7 @@
                                 </Canvas>
                             </Border>
                             
-                            <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="0" >
+                            <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="0" Background="Aquamarine">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
@@ -289,18 +289,22 @@
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
 
+                                    <CheckBox Grid.Row="0" Grid.ColumnSpan="3" x:Name="checkboxManualMotorEnable" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" >Manual Motor Control</CheckBox>
+                                    
+                                    <!--
                                     <Label Grid.Row="0" Grid.ColumnSpan="3" HorizontalAlignment="Center">MOTORS</Label>
+                                    -->
 
-                                    <ToggleButton Grid.Column="0"  Grid.Row="1" x:Name="btnSysTestMotor1" Content = "M1" Tag="M,01" Style="{DynamicResource ButtonStyle1}"/>
-                                    <Slider Grid.Column="0" Grid.Row="2" x:Name="slMotorOne" Minimum="-100" Maximum="100" Orientation="Vertical" TickFrequency="10" Height="120" Margin="10,0"/>
+                                    <ToggleButton Grid.Column="0"  Grid.Row="1" x:Name="btnSysTestMotor1" Content = "M1" Tag="M,01" Style="{DynamicResource ButtonStyle1}" IsEnabled="{Binding ElementName=checkboxManualMotorEnable, Path=IsChecked}"/>
+                                    <Slider Grid.Column="0" Grid.Row="2" x:Name="slMotorOne" Minimum="-100" Maximum="100" Orientation="Vertical" TickFrequency="10" Height="120" Margin="10,0" IsEnabled="{Binding ElementName=btnSysTestMotor1, Path=IsChecked}"/>
                                     <TextBox Grid.Column="0" Grid.Row="3" x:Name="tbSysTestMotor1" Text="{Binding ElementName=slMotorOne, Path=Value, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}" MinWidth="35" Margin="5,0,5,5"/>
 
-                                    <ToggleButton Grid.Column="1"  Grid.Row="1" x:Name="btnSysTestMotor2" Content = "M2" Tag="M,02" Style="{DynamicResource ButtonStyle1}"/>
-                                    <Slider Grid.Column="1" Grid.Row="2" x:Name="slMotorTwo" Minimum="-100" Maximum="100" Orientation="Vertical" TickFrequency="10" Height="120" Margin="10,0" />
+                                    <ToggleButton Grid.Column="1"  Grid.Row="1" x:Name="btnSysTestMotor2" Content = "M2" Tag="M,02" Style="{DynamicResource ButtonStyle1}" IsEnabled="{Binding ElementName=checkboxManualMotorEnable, Path=IsChecked}"/>
+                                    <Slider Grid.Column="1" Grid.Row="2" x:Name="slMotorTwo" Minimum="-100" Maximum="100" Orientation="Vertical" TickFrequency="10" Height="120" Margin="10,0" IsEnabled="{Binding ElementName=btnSysTestMotor2, Path=IsChecked}"/>
                                     <TextBox Grid.Column="1" Grid.Row="3" x:Name="tbSysTestMotor2" Text="{Binding ElementName=slMotorTwo, Path=Value, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}" MinWidth="35" Margin="5,0,5,5"/>
 
-                                    <ToggleButton Grid.Column="2"  Grid.Row="1" x:Name="btnSysTestMotor3" Content = "M3" Tag="M,03" Style="{DynamicResource ButtonStyle1}"/>
-                                    <Slider Grid.Column="2" Grid.Row="2" x:Name="slMotorThree" Minimum="-100" Maximum="100" Orientation="Vertical" TickFrequency="10" Height="120" Margin="10,0" />
+                                    <ToggleButton Grid.Column="2"  Grid.Row="1" x:Name="btnSysTestMotor3" Content = "M3" Tag="M,03" Style="{DynamicResource ButtonStyle1}" IsEnabled="{Binding ElementName=checkboxManualMotorEnable, Path=IsChecked}"/>
+                                    <Slider Grid.Column="2" Grid.Row="2" x:Name="slMotorThree" Minimum="-100" Maximum="100" Orientation="Vertical" TickFrequency="10" Height="120" Margin="10,0" IsEnabled="{Binding ElementName=btnSysTestMotor3, Path=IsChecked}" />
                                     <TextBox Grid.Column="2" Grid.Row="3" x:Name="tbSysTestMotor3" Text="{Binding ElementName=slMotorThree, Path=Value, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}" MinWidth="35" Margin="5,0,5,5" />
                                 </Grid>
                             </Border>
@@ -321,7 +325,7 @@
                                 <Button x:Name="btnSysTestPreviousTest" Content = "Previous Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestPreviousTest_Click"/>
                                 <Button x:Name="btnSysTestNextTest" Content = "Next Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestNextTest_Click"/>
                             </WrapPanel>
-
+                            
                             <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" >
                                 <WrapPanel Margin="5">
                                     <StackPanel Margin="0,0,0,0">
@@ -379,7 +383,7 @@
                                         <TextBox Grid.Row="2" Grid.Column="1" x:Name="tbSysTestLightSensorRHS" IsReadOnly="True" Margin="2"/>
                                     </Grid>
                                 </Border>
-                                <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="1" Background="Red" >
+                                <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="1" >
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
@@ -454,7 +458,7 @@
 
 
                             <WrapPanel>
-                                <Border BorderBrush="Gainsboro" BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Padding="1" Width="169" Height="86" >
+                                <Border BorderBrush="Gainsboro" BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Padding="2" Width="169" Height="86" Background="Red">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="2*" />
@@ -478,9 +482,9 @@
                                             <ComboBoxItem>Light Sensor RHS</ComboBoxItem>
                                             <ComboBoxItem>Light Sensor LHS</ComboBoxItem>
                                         </ComboBox>
-                                        <ToggleButton Grid.Row="1" Grid.Column="1"  x:Name="btnSysTestTWISet" Content = "Set" Tag="Camera" Style="{DynamicResource ButtonStyle1}" />
+                                        <Button Grid.Row="1" Grid.Column="1"  x:Name="btnSysTestTWISet" Content = "Set" Tag="Camera" IsEnabled="{Binding Path=btnSysTestTestMode}"/>
                                         <TextBox Grid.Row="2" Grid.Column="0" x:Name="tbSysTestTWIRead" IsReadOnly="True" Width="100"/>
-                                        <ToggleButton Grid.Row="2" Grid.Column="1" x:Name="btnSysTestTWIRead" Content = "Read" Tag="Camera" Style="{DynamicResource ButtonStyle1}" />
+                                        <Button Grid.Row="2" Grid.Column="1" x:Name="btnSysTestTWIRead" Content = "Read" Tag="Camera" />
                                     </Grid>
                                 </Border>
                             </WrapPanel>

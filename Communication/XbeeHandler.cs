@@ -58,6 +58,7 @@ namespace SwarmRoboticsGUI
 			//public const UInt64 ROBOT_ONE = 0x0013A20041065FB3;
 
             public const UInt64 ROBOT_TWO = 0x0013A2004147F9DD;
+            public const UInt64 ROBOT_THREE = 0x0013A2004152F256;
             public const UInt64 ROBOT_FOUR = 0x0013A2004147F9D8;
             //MANSEL: get robot xbee ID's
 
@@ -214,6 +215,7 @@ namespace SwarmRoboticsGUI
 				{
 					i++;
 					temp.Enqueue((byte)(byteArrayToEscape[i] ^ 0x20));
+                    //MANSEL: OUT OF RANGE ERROR
 				}
 				else
 				{

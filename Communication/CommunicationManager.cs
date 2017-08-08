@@ -196,12 +196,7 @@ namespace SwarmRoboticsGUI
 			return 0;
 		}
 	}
-
-
-
-
-
-
+    
 
 
 	/*
@@ -339,91 +334,53 @@ namespace SwarmRoboticsGUI
 				}
 			}
 
-			if (window.testMode)
-			{
-				MJLib.TypeSwitch.Do
-				(
-					message.GetType(),
+            if(window.testMode)
+            {
+                switch(message.messageID)
+                {
+                    case MESSAGE_TYPES.SYSTEM_TEST_PROXIMITY_SENSORS:
+                        DisplayProximityData(message as ProximitySensorTestData);
+                        break;
+                    
+                    case MESSAGE_TYPES.SYSTEM_TEST_LIGHT_SENSORS:
+                        DisplayLightSensorData(message as LightSensorTestData);
+                        break;
 
-					MJLib.TypeSwitch.Case<ProximitySensorTestData>(()=> DisplayRoximityData(message as ProximitySensorTestData))
+                    case MESSAGE_TYPES.SYSTEM_TEST_LINE_FOLLOWERS:
+                        DisplayLineSensorData(message as LineSensorTestData);
+                        break;
 
-					//MJLib.TypeSwitch.Case<LineSensorTestData>()
-				);
+                    case MESSAGE_TYPES.SYSTEM_TEST_MOUSE:
+                        DisplayMouseSensorData(message as MouseSensorTestData);
+                        break;
+
+                    case MESSAGE_TYPES.SYSTEM_TEST_IMU:
+                        DisplayIMUSensorData(message as IMUSensorTestData);
+                        break;
 
 
-				/*
+                    case MESSAGE_TYPES.SYSTEM_TEST_TWI_MUX:
+
+                        break;
+
+                    case MESSAGE_TYPES.SYSTEM_TEST_FAST_CHARGE_CHIP:
+
+                        break;
+                    case MESSAGE_TYPES.SYSTEM_TEST_TWI_EXTERNAL:
+                           
+                        break;
+
+                    case MESSAGE_TYPES.SYSTEM_TEST_CAMERA:
+                        
+                        break;
+                    
+                }
+            }
+
+            /*
 				switch(message.messageID)
 				{
-					case MESSAGE_TYPES.SYSTEM_TEST_PROXIMITY_SENSORS:
-						string proximityData = GetMessageData(messageType, messageData, false);
-						tokens = proximityData.Split(',');
-
-						switch (message)
-						{
-							case "A":
-								window.UpdateTextBox(window.tbSysTestProximityA, tokens[1]);
-								break;
-
-							case "B":
-								window.UpdateTextBox(window.tbSysTestProximityB, tokens[1]);
-								break;
-
-							case "C":
-								window.UpdateTextBox(window.tbSysTestProximityC, tokens[1]);
-								break;
-
-							case "D":
-								window.UpdateTextBox(window.tbSysTestProximityD, tokens[1]);
-								break;
-
-							case "E":
-								window.UpdateTextBox(window.tbSysTestProximityE, tokens[1]);
-								break;
-
-							case "F":
-								window.UpdateTextBox(window.tbSysTestProximityF, tokens[1]);
-								break;
-						}
-						break;
-
-					case MESSAGE_TYPES.SYSTEM_TEST_LIGHT_SENSORS:
-						string lineData = GetMessageData(messageType, messageData, false);
-						tokens = lineData.Split(',');
-
-						switch (tokens[0])
-						{
-							case "R":
-								window.UpdateTextBox(window.tbSysTestLightSensorRHS, tokens[1]);
-
-								break;
-
-							case "L":
-								window.UpdateTextBox(window.tbSysTestLightSensorLHS, tokens[1]);
-								break;
-						}
-						break;
-
-					case MESSAGE_TYPES.SYSTEM_TEST_LINE_FOLLOWERS:
-						//return "System Test Line Followers";
-						//XXXX neeed to know what kind of data
-						break;
-
-					case MESSAGE_TYPES.SYSTEM_TEST_MOUSE:
-						string mouseData = GetMessageData(messageType, messageData, false);
-						tokens = mouseData.Split(',');
-						window.UpdateTextBox(window.tbSysTestMouseDX, tokens[0]);
-						window.UpdateTextBox(window.tbSysTestMouseDY, tokens[1]);
-						break;
-
-					case MESSAGE_TYPES.SYSTEM_TEST_IMU:
-						string imuData = GetMessageData(messageType, messageData, false);
-						tokens = imuData.Split(',');
-						window.UpdateTextBox(window.tbSysTestIMUW, tokens[0]);
-						window.UpdateTextBox(window.tbSysTestIMUX, tokens[1]);
-						window.UpdateTextBox(window.tbSysTestIMUY, tokens[2]);
-						window.UpdateTextBox(window.tbSysTestIMUZ, tokens[3]);
-						//return "System Test IMU";
-						break;
+				
 
 					case MESSAGE_TYPES.SYSTEM_TEST_MOTORS:
 						string motorData = GetMessageData(messageType, messageData, false);
@@ -447,50 +404,12 @@ namespace SwarmRoboticsGUI
 
 						//return "System Test Motor";
 						break;
-
-					case MESSAGE_TYPES.SYSTEM_TEST_TWI_MUX:
-						//return "System Test TWI Mux";
-						break;
-
-					case MESSAGE_TYPES.SYSTEM_TEST_FAST_CHARGE_CHIP:
-						//return "System Test Fast Charge Chip";
-						break;
-					case MESSAGE_TYPES.SYSTEM_TEST_TWI_EXTERNAL:
-						//return "System Test TWI External";
-						break;
-
-					case MESSAGE_TYPES.SYSTEM_TEST_CAMERA:
-						//return "System Test Camera";
-						break;
 				}
-			}
-			else
-			{
-				switch (messageType)
-				{
-
-
-					case MESSAGE_TYPES.COMMUNICATION_TEST:
-
-						//window.UpdateSerialReceivedTextBox("\rCommunication Test Successful");
-						//XXX
-						//display the data here
-						break;
-
-					case MESSAGE_TYPES.BATTERY_VOLTAGE:
-						float voltage = messageData[1] * 256 + messageData[2];
-						voltage = voltage * 5 / 1000;
-						//window.UpdateSerialReceivedTextBox("\rBattery Voltage:");
-						//window.UpdateSerialReceivedTextBox(voltage.ToString());
-						break;
-
-				}
-				*/
-			}
+            */
 
 		}
 
-		public void DisplayRoximityData(ProximitySensorTestData message)
+		public void DisplayProximityData(ProximitySensorTestData message)
 		{
 			switch(message.sensor)
 			{
@@ -517,10 +436,58 @@ namespace SwarmRoboticsGUI
 				case ProximitySensorTestData.Sensors.proximityF:
 					window.UpdateTextBox(window.tbSysTestProximityF, message.MessageDataDisplay);
 					break;
-
 			}
 		}
+
+        public void DisplayLightSensorData(LightSensorTestData message)
+        {
+            switch(message.sensor)
+            {	
+                case LightSensorTestData.Sensors.leftHandSide:
+                    window.UpdateTextBox(window.tbSysTestLightSensorLHS, message.MessageDataDisplay);
+                    break;
+
+                case LightSensorTestData.Sensors.rightHandSide:
+                    window.UpdateTextBox(window.tbSysTestLightSensorRHS, message.MessageDataDisplay);
+                    break;
+            }
+        }
+
+        public void DisplayMouseSensorData(MouseSensorTestData message)
+        {
+            window.UpdateTextBox(window.tbSysTestMouseDX, message.dXDisplay);
+            window.UpdateTextBox(window.tbSysTestMouseDY, message.dYDisplay);
+        }
+
+        public void DisplayIMUSensorData(IMUSensorTestData message)
+        {
+            window.UpdateTextBox(window.tbSysTestIMUW, message.wDisplay);
+            window.UpdateTextBox(window.tbSysTestIMUX, message.xDisplay);
+            window.UpdateTextBox(window.tbSysTestIMUY, message.yDisplay);
+            window.UpdateTextBox(window.tbSysTestIMUZ, message.zDisplay);
+        }
 	
+        public void DisplayLineSensorData(LineSensorTestData message)
+        {
+            switch(message.sensor)
+            {
+                case LineSensorTestData.Sensors.farLeft:
+                    window.UpdateTextBox(window.tbSysTestLineFollowerFarLeft, message.MessageDataDisplay);
+                    break;
+
+                case LineSensorTestData.Sensors.centreLeft:
+                    window.UpdateTextBox(window.tbSysTestLineFollowerCentreLeft, message.MessageDataDisplay);
+                    break;
+
+                case LineSensorTestData.Sensors.centreRight:
+                    window.UpdateTextBox(window.tbSysTestLineFollowerCentreRight, message.MessageDataDisplay);
+                    break;
+
+                case LineSensorTestData.Sensors.farRight:
+                    window.UpdateTextBox(window.tbSysTestLineFollowerFarRight, message.MessageDataDisplay);
+                    break;
+            }
+        }
 
 		public class SwarmProtocolMessage: XbeeAPI.ZigbeeReceivePacket
 		{
@@ -604,29 +571,72 @@ namespace SwarmRoboticsGUI
 
 		public class LightSensorTestData : SystemTestMessage
 		{
+            public static class Sensors
+            {
+                public const byte leftHandSide = 0xF8;
+                public const byte rightHandSide = 0xF9;
+            }
+            
 			public byte sensor;
 			public byte[] sensorData = new byte[2];
+
+            //public override string MessageDataDisplay;
 
 			public LightSensorTestData(byte[] frame) : base(frame)
 			{
 				sensor = testMessage[0];
 				sensorData[0] = testMessage[1];
 				sensorData[1] = testMessage[2];
+
+                //MessageDataDisplay = (256 * sensorData[0] + sensorData[1]).ToString();
 			}
+
+
+            public override string MessageDataDisplay
+            {
+                get
+                {
+                    //MANSEL: Improve this
+                    return (256 * sensorData[0] + sensorData[1]).ToString();
+                }
+            }
+
 		}
 
 		public class LineSensorTestData : SystemTestMessage
 		{
+            public static class Sensors
+            {
+                public const byte farLeft = 0x01;
+                public const byte centreLeft = 0x02;
+                public const byte centreRight = 0x03;
+                public const byte farRight = 0x04;
+            }
+
+
 			public byte sensor;
-			//MANSEL: need to findout what data comes from line sensors
-			//protected byte[] sensorData = new byte[2];
+			public byte[] sensorData = new byte[2];
+
+            //public override string MessageDataDisplay;
 
 			public LineSensorTestData(byte[] frame) : base(frame)
 			{
 				sensor = testMessage[0];
-				//sensorData[0] = testMessage[1];
-				//sensorData[1] = testMessage[2];
+				sensorData[0] = testMessage[1];
+				sensorData[1] = testMessage[2];
+
+                //MessageDataDisplay = (256 * sensorData[0] + sensorData[1]).ToString();
 			}
+
+            public override string MessageDataDisplay
+            {
+                get
+                {
+                    //MANSEL: Improve this
+                    return (256 * sensorData[0] + sensorData[1]).ToString();
+                }
+            }
+
 		}
 		
 		public class MouseSensorTestData : SystemTestMessage
@@ -634,11 +644,30 @@ namespace SwarmRoboticsGUI
 			public int dX;
 			public int dY;
 
+            public string dXDisplay;
+            public string dYDisplay;
+            //public override string MessageDataDisplay;
+
 			public MouseSensorTestData(byte[] frame) : base(frame)
 			{
 				dX = 256*testMessage[0] + testMessage[1];
 				dY = 256 * testMessage[2] + testMessage[3];
+
+                dXDisplay = dX.ToString();
+                dYDisplay = dY.ToString();
+                //MessageDataDisplay = "dX: " + dXDisplay + " dY: " + dYDisplay;
 			}
+
+
+            public override string MessageDataDisplay
+            {
+                get
+                {
+                    //MANSEL: Improve this
+                    return "dX: " + dXDisplay + " dY: " + dYDisplay;
+                }
+            }
+
 		}
 
 		public class IMUSensorTestData : SystemTestMessage
@@ -648,13 +677,37 @@ namespace SwarmRoboticsGUI
 			public byte y;
 			public byte z;
 
+            public string wDisplay;
+            public string xDisplay;
+            public string yDisplay;
+            public string zDisplay;
+
+            //public override string MessageDataDisplay;
+
 			public IMUSensorTestData(byte[] frame) : base(frame)
 			{
 				w = testMessage[0];
 				x = testMessage[1];
 				y = testMessage[2];
 				z = testMessage[3];
+
+                wDisplay = w.ToString();
+                xDisplay = x.ToString();
+                yDisplay = y.ToString();
+                zDisplay = z.ToString();
+
+                //MessageDataDisplay = "W: " + wDisplay + " X: " + xDisplay + " Y: " + yDisplay + " Z: " + zDisplay;
 			}
+
+            public override string MessageDataDisplay
+            {
+                get
+                {
+                    //MANSEL: Improve this
+                    return "W: " + wDisplay + " X: " + xDisplay + " Y: " + yDisplay + " Z: " + zDisplay;
+                }
+            }
+
 		}
 
 
@@ -699,28 +752,7 @@ namespace SwarmRoboticsGUI
 			return swarmMessage;
 		}
 
-
-
-		
-
-		public void SendMessage(byte type)
-		{
-			switch (type)
-			{
-				case MESSAGE_TYPES.COMMUNICATION_TEST:
-
-					window.xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, MESSAGE_TYPES.COMMUNICATION_TEST);
-
-					break;
-
-				case MESSAGE_TYPES.BATTERY_VOLTAGE:
-
-					window.xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, MESSAGE_TYPES.BATTERY_VOLTAGE);
-
-					break;
-
-			}
-		}
+        
 
 		/*
 		 * //MANSEL: remove this add to classes

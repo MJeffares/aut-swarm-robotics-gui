@@ -688,9 +688,10 @@ namespace SwarmRoboticsGUI
             statusRecordingDot.Foreground = Brushes.Black;
         }
         // Communications menu
+
         private void btnCommunicationTest_Click(object sender, RoutedEventArgs e)
         {
-            protocol.SendMessage(ProtocolClass.MESSAGE_TYPES.COMMUNICATION_TEST);
+            //protocol.SendMessage(ProtocolClass.MESSAGE_TYPES.COMMUNICATION_TEST);
         }
         // Other
         private void menu_Hover(object sender, RoutedEventArgs e)
@@ -739,7 +740,7 @@ namespace SwarmRoboticsGUI
 
         private void btnBatteryVoltage_Click(object sender, RoutedEventArgs e)
         {
-            protocol.SendMessage(ProtocolClass.MESSAGE_TYPES.BATTERY_VOLTAGE);
+            //protocol.SendMessage(ProtocolClass.MESSAGE_TYPES.BATTERY_VOLTAGE);
         }
 
 

@@ -90,7 +90,7 @@ namespace SwarmRoboticsGUI
 
 			togglebtnControls = new List<ToggleButton>()
 			{
-				 btnSysTestProxmityA,btnSysTestProxmityB, btnSysTestProxmityC, btnSysTestProxmityD, btnSysTestProxmityE, btnSysTestProxmityF, btnSysTestLightLHS, btnSysTestLightRHS, btnSysTestLineFL, btnSysTestLineCL, btnSysTestLineCR, btnSysTestLineFR, btnSysTestMouse, btnSysTestIMU, btnSysTestMotor1, btnSysTestMotor2, btnSysTestMotor3, btnSysTestTWISet, btnSysTestTWIRead
+				 btnSysTestProxmityA,btnSysTestProxmityB, btnSysTestProxmityC, btnSysTestProxmityD, btnSysTestProxmityE, btnSysTestProxmityF, btnSysTestLightLHS, btnSysTestLightRHS, btnSysTestLineFL, btnSysTestLineCL, btnSysTestLineCR, btnSysTestLineFR, btnSysTestMouse, btnSysTestIMU
 			};
 
 

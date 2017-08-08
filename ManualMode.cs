@@ -73,13 +73,13 @@ namespace SwarmRoboticsGUI
                     break;  
             }
             data[3] = (byte) Convert.ToInt16(tbManualModeSpeed.Text);
-            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.ROBOT_TWO, data);
+            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.ROBOT_THREE, data);
         }
 
         private void ManualModeMouseLeave(object sender, MouseEventArgs e)
         {
             byte[] data = new byte[1] { MANUAL_MODE_MESSAGE.Stop };
-            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.ROBOT_TWO, data);
+            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.ROBOT_THREE, data);
         }
 
         private void ManualModeRotateMouseEnter(object sender, MouseEventArgs e)
@@ -98,7 +98,7 @@ namespace SwarmRoboticsGUI
                     break;
             }
             data[1] = (byte) Convert.ToInt16(tbManualModeSpeed.Text);
-            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.ROBOT_TWO, data);
+            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.ROBOT_THREE, data);
         }
 
        
