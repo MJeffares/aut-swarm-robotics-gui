@@ -1,168 +1,591 @@
 ﻿<Window x:Class="SwarmRoboticsGUI.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SwarmRoboticsGUI"
-        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
-        xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
-        mc:Ignorable="d"
-        Title="Swarm Robotics Graphics User Interface" Height="900" Width="1600" >
-    <Grid>
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:SwarmRoboticsGUI"
+    xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+    xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
+    
+    mc:Ignorable="d"
+    Title="Swarm Robotics Graphics User Interface" Height="900" Width="1600" MinHeight="300" MinWidth="500" WindowStartupLocation="CenterScreen">
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition x:Name="Column0" Width="*"/>
-            <ColumnDefinition x:Name="Column1" Width="5"/>
-            <ColumnDefinition x:Name="Column2" Width="*"/>
-        </Grid.ColumnDefinitions>
+    <DockPanel x:Name="innerWin">
+        <Menu DockPanel.Dock="Top" MouseEnter="menu_Hover" Height="21" MinWidth="300">
 
-        <DockPanel Grid.Column="0">
-            <StatusBar DockPanel.Dock="Right" Background="Transparent">
-                <StatusBar.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                        </Grid>
-                    </ItemsPanelTemplate>
-                </StatusBar.ItemsPanel>
+            <MenuItem Header="File" MouseEnter="menu_Hover" Click="menu_Hover">
+                <MenuItem x:Name="menuRecordNew" Header="New Recording" IsEnabled="False" Click="menuRecordNew_Click" />
+                <MenuItem x:Name="menuRecordPause" Header="Pause Recording" IsCheckable="True" IsEnabled="False"/>
+                <MenuItem x:Name="menuRecordStop" Header="Stop Recording" IsEnabled="False" Click="menuRecordStop_Click" />
+                <Separator/>
+                <MenuItem x:Name="menuRecordingSettings" Header="Recording Settings" />
+            </MenuItem>
 
+            <MenuItem Header="Display" MouseEnter="menu_Hover" Click="menu_Hover">
+                <MenuItem x:Name="menuViewList" Header="View"/>
+                <MenuItem x:Name="menuFilterList" Header="Camera Filters" MouseEnter="menu_Hover" Click="menu_Hover"/>
+                <MenuItem x:Name="menuOverlayList" Header="Overlays" MouseEnter="menu_Hover" Click="menu_Hover"/>
+                <MenuItem x:Name="menuSourceList" Header="Source" MouseEnter="menu_Hover" Click="menu_Hover"/>
+                <MenuItem x:Name="menuFilterFlipVertical" Header="Flip Vertical" Click="menuFilterFlipVertical_Click"/>
+                <MenuItem x:Name="menuFilterFlipHorizontal" Header="Flip Horizontal" Click="menuFilterFlipHorizontal_Click"/>
+                <MenuItem x:Name="menuDisplayPopOut" Header="Pop Out Window" Click="menuDisplayPopOut_Click"/>
 
-                <StatusBarItem Grid.Row="1" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0">
-                    <Label Content="   >" Padding="0"/>
-                </StatusBarItem>
+            </MenuItem>
 
-                <StatusBarItem Grid.Row="2" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0">
+            <MenuItem Header="Camera" MouseEnter="MenuItem_MouseEnter" Click="menu_Hover">
+                <MenuItem x:Name="menuCameraList" Header="Connected Cameras" MouseEnter="menu_Hover"/>
+                <MenuItem x:Name="menuCameraConnect" Header="Start Capture" IsEnabled="False" IsCheckable="True"  Click="menuCameraConnect_Click"/>
+                <MenuItem x:Name="menuCameraFreeze" Header="Freeze Frame" IsEnabled="False" IsCheckable="True" Click="menuCameraFreeze_Click" />
+                <Separator/>
+                <MenuItem x:Name="menuCameraOptions" Header="Camera Options" Click="menuCameraOptions_Click"/>
+            </MenuItem>
 
-                    <Label Content="Camera" Padding="3">
-                        <Label.LayoutTransform>
-                            <RotateTransform Angle="270" />
-                        </Label.LayoutTransform>
-                    </Label>
+            <MenuItem Header="Serial Comms" MouseEnter="MenuItem_MouseEnter" Click="menu_Hover">
+                <MenuItem x:Name="menuCommunicationPortList" Header="Communication Port" MouseEnter="menu_Hover"/>
+                <MenuItem x:Name="menuCommunicationBaudList" Header="Baud Rate" MouseEnter="menu_Hover"/>
+                <MenuItem x:Name="menuCommunicationParityList" Header="Parity" MouseEnter="menu_Hover"/>
+                <MenuItem x:Name="menuCommunicationDataList" Header="Data Bits" MouseEnter="menu_Hover"/>
+                <MenuItem x:Name="menuCommunicationStopBitsList" Header="Stop Bits" MouseEnter="menu_Hover"/>
+                <MenuItem x:Name="menuCommunicationHandshakeList" Header="Handshaking" MouseEnter="menu_Hover"/>
+                <MenuItem x:Name="menuCommunicationConnect" Header="Connect" IsEnabled="False" IsCheckable="True" />
+                <Separator/>
+                <MenuItem x:Name="menuCommunicationoptions" Header="Options" Click="menuCameraOptions_Click"/>
+            </MenuItem>
 
-                </StatusBarItem>
+            <MenuItem Header="Replay" MouseEnter="menu_Hover" Click="menu_Hover">
+                <MenuItem x:Name="menuReplayOpen" Header="Open Replay" Click="menuReplayOpen_Click"/>
+                <MenuItem x:Name="menuReplayPause" Header="Pause Replay" IsCheckable="True" IsEnabled="False"/>
+                <Separator/>
+                <MenuItem x:Name="menuReplaySettings" Header="Video Settings" Click="menuPlaceHolder_Click" />
+            </MenuItem>
+        </Menu>
 
-                <StatusBarItem Grid.Row="3" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0">
-                    <Label Content="   >" Padding="0"/>
-                </StatusBarItem>
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="51"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
 
-            </StatusBar>
-            <Grid>
-                <!--fills space in left space-->
+            <StatusBarItem>
+                <TextBlock Name="statusFPS" Text="FPS: "/>
+            </StatusBarItem>
+
+            <Separator Grid.Column="1"/>
+
+            <StatusBarItem Grid.Column="2">
+                <TextBlock Name="statusRecordingDot" Foreground="Black" Text="●"/>
+            </StatusBarItem>
+
+            <StatusBarItem Grid.Column="3">
+                <TextBlock Name="statusRecordingText" Text="Not Recording"/>
+            </StatusBarItem>
+
+            <Separator Grid.Column="4"/>
+
+            <StatusBarItem Grid.Column="5">
+                <TextBlock Name="statusCameraName" Text="No Camera Selected"/>
+            </StatusBarItem>
+
+            <Separator Grid.Column="6"/>
+
+            <StatusBarItem Grid.Column="7">
+                <TextBlock Name="statusDisplayFilter" Text="No Filter"/>
+            </StatusBarItem>
+
+            <Separator Grid.Column="8"/>
+
+            <StatusBarItem Grid.Column="9">
+                <TextBlock Name="statusTime" Text="00:00:00:00">
+                    <TextBlock.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Current Time"/>
+                            <MenuItem Header="Recording Time"/>
+                        </ContextMenu>
+                    </TextBlock.ContextMenu>
+                </TextBlock>
+            </StatusBarItem>
+
+        </StatusBar>
+
+        <Grid x:Name="mainGrid">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="Column0" Width="*" MinWidth="150"/>
+                <ColumnDefinition x:Name="Column1" Width="2*" MinWidth="300"/>
+                <ColumnDefinition x:Name="Column2" Width="5"/>
+                <ColumnDefinition x:Name="Column3" Width="2*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition x:Name="Row0" Height="3*"/>
+            </Grid.RowDefinitions>
+
+            <Grid  Grid.Column="0" Grid.Row="0" Grid.RowSpan = "2" Margin="5">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Received Data" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10,10,10,0"/>
+                <WrapPanel Grid.Row="1">
+                    <!--<Button x:Name="receivedDataNewline" Content="/n" Margin="10" Click="receivedDataNewline_Click"/>-->
+                    <!--<Button x:Name="receivedDataClear" Content="clear" Margin="5" Click="receivedDataClear_Click"/>-->
+                    <Button x:Name="receivedDataClear" Content="clear" Margin="5"/>
+                    <!--<Button x:Name="receivedDataRemove" Content="Add" Margin="5" Click="receivedDataAdd_Click"/>
+                    <Button x:Name="receivedDataAdd" Content="Remove" Margin="5" Click="receivedDataRemove_Click"/>-->
+                </WrapPanel>
+
+                <ListView Name="lvCommunicatedMessages" Grid.Column="0" Grid.Row="2" Grid.RowSpan = "1" Margin="5" ScrollViewer.HorizontalScrollBarVisibility="Visible">
+                    <ListView.Resources>
+                        <Style TargetType="{x:Type GridViewColumnHeader}">
+                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                        </Style>
+                    </ListView.Resources>
+                    <ListView.View>
+                        <GridView x:Name = "gvCommunicatedMessages">
+                            <GridViewColumn x:Name = "gvcTimeStamp" DisplayMemberBinding="{Binding TimeStampDisplay}">
+                                <GridViewColumnHeader Tag="time_stamp" Click="GridViewColumnHeader_Click" Content="TimeStamp      "/>
+                            </GridViewColumn>
+
+                            <GridViewColumn  x:Name = "gvcRawData" DisplayMemberBinding="{Binding RawMessageDisplay}">
+                                <GridViewColumnHeader Tag = "RawMessageDisplay" Click="GridViewColumnHeader_Click" Content="Raw Data      "/>
+                            </GridViewColumn>
+
+                            <GridViewColumn  x:Name = "gvcXbeeFrameLength" DisplayMemberBinding="{Binding FrameLengthDisplay}">
+                                <GridViewColumnHeader Tag = "frame_length" Click="GridViewColumnHeader_Click" Content="Xbee Frame Length      "/>
+                            </GridViewColumn>
+
+                            <GridViewColumn  x:Name = "gvcXbeeFrameID" DisplayMemberBinding="{Binding FrameCommandDisplay}">
+                                <GridViewColumnHeader Tag = "frame_ID" Click="GridViewColumnHeader_Click" Content="Xbee Frame ID     "/>
+                            </GridViewColumn>
+
+                            <!--<GridViewColumn Header="Xbee Frame Data"  x:Name = "gvcXbeeFrameData" DisplayMemberBinding="{Binding CommandDataDisplay}"/>-->
+
+                            <GridViewColumn x:Name = "gvcSourceAddress" DisplayMemberBinding="{Binding SourceDisplay}">
+                                <GridViewColumnHeader Tag = "SourceDisplay" Click="GridViewColumnHeader_Click" Content="Source Address     "/>
+                            </GridViewColumn>
+
+                            <GridViewColumn x:Name = "gvcMessageType" DisplayMemberBinding="{Binding MessageTypeDisplay}">
+                                <GridViewColumnHeader Tag = "message_type" Click="GridViewColumnHeader_Click" Content="Message Type     "/>
+                            </GridViewColumn>
+
+                            <GridViewColumn x:Name = "gvcMessageData" DisplayMemberBinding="{Binding MessageDataDisplay}">
+                                <GridViewColumnHeader Tag = "MessageDataDisplay" Click="GridViewColumnHeader_Click" Content="Message Data     "/>
+                            </GridViewColumn>
+
+                        </GridView>
+                    </ListView.View>
+                </ListView>
             </Grid>
-        </DockPanel>
 
-        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
+            <DockPanel Grid.Column="1">
+                <StatusBar DockPanel.Dock="Right" Background="Transparent" Margin="10,0,0,0">
+                    <StatusBar.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                            </Grid>
+                        </ItemsPanelTemplate>
+                    </StatusBar.ItemsPanel>
 
-        <DockPanel Grid.Column="2">
+                    <StatusBarItem Grid.Row="1" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0" MouseDown="btnCameraMinimise_Click" Width="22" Height="16">
+                        <Label x:Name="displayArrowTop" Content="   >" Padding="0"/>
+                    </StatusBarItem>
 
-            <Menu DockPanel.Dock="Top" MouseEnter="menu_hover">
-                <MenuItem Header="_File" MouseEnter="menu_hover">
-                    <MenuItem Header="_New" />
-                    <MenuItem Header="_Open" />
-                    <MenuItem Header="_Save" />
-                </MenuItem>
+                    <StatusBarItem Grid.Row="2" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0" MouseDown="btnCameraMinimise_Click"  Width="22" Height="46">
 
-                <MenuItem Header="Camera" MouseEnter="MenuItem_MouseEnter">
-                    <MenuItem x:Name="menuCameraList" Header="Connected Cameras" MouseEnter="menu_hover"/>
-                    <MenuItem x:Name="menuCameraConnect" Header="Start Capture" IsEnabled="False" IsCheckable="True"  Click="menuCameraConnect_Click"/>
-                    <MenuItem x:Name="menuCameraFreeze" Header="Freeze Frame" IsEnabled="False" IsCheckable="True" Click="menuCameraFreeze_Click" />
-                    <Separator/>
-                    <MenuItem x:Name="menuCameraOptions" Header="Camera Options" Click="menuCameraOptions_Click"/>
-                </MenuItem>
+                        <Label Content="Display" Padding="3">
+                            <Label.LayoutTransform>
+                                <RotateTransform Angle="270" />
+                            </Label.LayoutTransform>
+                        </Label>
 
-                <MenuItem Header="Display" MouseEnter="menu_hover">
+                    </StatusBarItem>
 
-                    <MenuItem x:Name="menuFilterList" Header="Filters" MouseEnter="menu_hover">
-                   
-                    </MenuItem>
+                    <StatusBarItem Grid.Row="3" Margin="0,0,0,0" Background="#FFF1EDED" Padding="0,0,0,0" MouseDown="btnCameraMinimise_Click" Width="22" Height="16">
+                        <Label x:Name="displayArrowBottom" Content="   >" Padding="0"/>
+                    </StatusBarItem>
 
-                    <MenuItem x:Name="menuOverlayList" Header="Overlays" MouseEnter="menu_hover">
-                        <MenuItem x:Name="menuOverlayNone" Header="No Overlay" IsCheckable="True" IsChecked="True"/>
-                        <MenuItem x:Name="menuOverlayPlaceHolderOne" Header="PlaceHolder" IsCheckable="True"/>
-                        <MenuItem x:Name="menuFilterPlaceHolderTwo" Header="PlaceHolder" IsCheckable="True"/>
-                        <Separator/>
-                        <MenuItem x:Name="menuOverlaySettings" Header="Settings" />
-                    </MenuItem>
 
-                    <MenuItem x:Name="menuFilterFlipVertical" Header="Flip Vertical" Click="menuFilterFlipVertical_Click"/>
-                    <MenuItem x:Name="menuFilterFlipHorizontal" Header="Flip Horizontal" Click="menuFilterFlipHorizontal_Click"/>
-                    <!--<MenuItem x:Name="menuFilterSmooth" Header="Smooth" IsCheckable="True" Click="menuFilterSmooth_Click"/> -->
-                </MenuItem>
+                </StatusBar>
 
-                <MenuItem Header="Record" MouseEnter="menu_hover">
-                    <MenuItem x:Name="menuRecordNew" Header="New Recording"/>
-                    <MenuItem x:Name="menuRecordPause" Header="Pause Recording" IsCheckable="True" IsEnabled="False"/>
-                    <Separator/>
-                    <MenuItem x:Name="menuRecordingSettings" Header="Settings" />
-                </MenuItem>
-            </Menu>
+                <StackPanel DockPanel.Dock="Top" Margin="5">
+                    <StackPanel Height="90"  Width="220" HorizontalAlignment="Left" >
+                        <Label Content="Communication" HorizontalAlignment="Center" Margin="0,0,0,0"/>
+                        <ComboBox x:Name = "dispSelectRobot"  MinHeight = "24" Width = "195" Margin = "0,0,0,8" HorizontalAlignment="Center" SelectedIndex = "0"/>
+                        <WrapPanel HorizontalAlignment="Center"> 
+                            <Button Name="dispSelectBtnPrevious" Margin="5,0" Width="60" Click="dispSelectBtnPrevious_Click">Previous</Button>
+                            <Button Name="dispSelectBtnNext" Margin="5,0" Width="60" Click="dispSelectBtnNext_Click">Next</Button>
+                            <Button Name="dispSelectBtnBlue" Margin="5,0" Width="60">Groups</Button>
+                        </WrapPanel>
+                    </StackPanel>
+                </StackPanel>
+                
+                
+                <TabControl x:Name="tcCenter" Background="{x:Null}">
+                    <TabItem Header="No Connection" x:Name="nc">
+                        <Label HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold">Please connect to an Xbee module before continuing</Label>
+                    </TabItem>
+                    <TabItem Header="Robot Control" IsEnabled="False">
+                        <WrapPanel>
+                            <Border BorderBrush="Gainsboro" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5">
+                                <Canvas Height="200" Width="260" Background="AliceBlue" VerticalAlignment="Top" HorizontalAlignment="Left">
+                                    <CheckBox x:Name="checkboxManualModeEnable" Width="160" Canvas.Left="50" Canvas.Top="5">Enable Manual Movement</CheckBox>
 
-            <StatusBar DockPanel.Dock="Bottom">
-                <StatusBar.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="51"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                        </Grid>
-                    </ItemsPanelTemplate>
-                </StatusBar.ItemsPanel>
+                                    <Button x:Name="btManualModeN"  Content="N"     Height="20" Width="40" Canvas.Left="80"     Canvas.Top="30"     IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <Button x:Name="btManualModeNE" Content="NE"    Height="20" Width="40" Canvas.Left="115"    Canvas.Top="55"     IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <Button x:Name="btManualModeE"  Content="E"     Height="20" Width="40" Canvas.Left="140"    Canvas.Top="80"     IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <Button x:Name="btManualModeSE" Content="SE"    Height="20" Width="40" Canvas.Left="115"    Canvas.Top="105"    IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <Button x:Name="btManualModeS"  Content="S"     Height="20" Width="40" Canvas.Left="80"     Canvas.Top="130"    IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <Button x:Name="btManualModeSW" Content="SW"    Height="20" Width="40" Canvas.Left="45"     Canvas.Top="105"    IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <Button x:Name="btManualModeW"  Content="W"     Height="20" Width="40" Canvas.Left="20"     Canvas.Top="80"     IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <Button x:Name="btManualModeNW" Content="NW"    Height="20" Width="40" Canvas.Left="45"     Canvas.Top="55"     IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
 
-                <StatusBarItem>
-                    <TextBlock Name="cameraStatusFPS" Text="FPS: "/>
-                </StatusBarItem>
+                                    <WrapPanel Orientation="Horizontal" Width="80" Canvas.Left="90" Canvas.Top="160">
+                                        <Label Content="Speed"/>
+                                        <TextBox x:Name="tbManualModeSpeed" Width="35" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" PreviewTextInput="tbManualModeSpeed_PreviewTextInput">50</TextBox>
+                                    </WrapPanel>
 
-                <Separator Grid.Column="1"/>
+                                    <Button x:Name="btManualModeCW"     Content="CW"     Height="20" Width="40" Canvas.Left="200" Canvas.Top="60" IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeRotateMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <Button x:Name="btManualModeCCW"    Content="CCW"    Height="20" Width="40" Canvas.Left="200" Canvas.Top="100" IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeRotateMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                </Canvas>
+                            </Border>
+                            
+                            <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="0" Background="Aquamarine">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
 
-                <StatusBarItem Grid.Column="2">
-                    <TextBlock Name="cameraStatusName" Text="No Camera Selected"/>
-                </StatusBarItem>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="5*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
 
-                <Separator Grid.Column="3"/>
+                                    <CheckBox Grid.Row="0" Grid.ColumnSpan="3" x:Name="checkboxManualMotorEnable" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" >Manual Motor Control</CheckBox>
+                                    
+                                    <!--
+                                    <Label Grid.Row="0" Grid.ColumnSpan="3" HorizontalAlignment="Center">MOTORS</Label>
+                                    -->
 
-                <StatusBarItem Grid.Column="4">
-                    <TextBlock Name="cameraStatusRecordingText" Text="Not Recording"/>
-                </StatusBarItem>
+                                    <ToggleButton Grid.Column="0"  Grid.Row="1" x:Name="btnSysTestMotor1" Content = "M1" Tag="M,01" Style="{DynamicResource ButtonStyle1}" IsEnabled="{Binding ElementName=checkboxManualMotorEnable, Path=IsChecked}"/>
+                                    <Slider Grid.Column="0" Grid.Row="2" x:Name="slMotorOne" Minimum="-100" Maximum="100" Orientation="Vertical" TickFrequency="10" Height="120" Margin="10,0" IsEnabled="{Binding ElementName=btnSysTestMotor1, Path=IsChecked}"/>
+                                    <TextBox Grid.Column="0" Grid.Row="3" x:Name="tbSysTestMotor1" Text="{Binding ElementName=slMotorOne, Path=Value, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}" MinWidth="35" Margin="5,0,5,5"/>
 
-                <StatusBarItem Grid.Column="5">
-                    <PasswordBox Name="cameraStatusRecording" Password="1" Background="Transparent"  BorderBrush="Transparent" IsEnabled="False" SelectionBrush="{x:Null}"/>
-                </StatusBarItem>
+                                    <ToggleButton Grid.Column="1"  Grid.Row="1" x:Name="btnSysTestMotor2" Content = "M2" Tag="M,02" Style="{DynamicResource ButtonStyle1}" IsEnabled="{Binding ElementName=checkboxManualMotorEnable, Path=IsChecked}"/>
+                                    <Slider Grid.Column="1" Grid.Row="2" x:Name="slMotorTwo" Minimum="-100" Maximum="100" Orientation="Vertical" TickFrequency="10" Height="120" Margin="10,0" IsEnabled="{Binding ElementName=btnSysTestMotor2, Path=IsChecked}"/>
+                                    <TextBox Grid.Column="1" Grid.Row="3" x:Name="tbSysTestMotor2" Text="{Binding ElementName=slMotorTwo, Path=Value, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}" MinWidth="35" Margin="5,0,5,5"/>
 
-                <Separator Grid.Column="6"/>
+                                    <ToggleButton Grid.Column="2"  Grid.Row="1" x:Name="btnSysTestMotor3" Content = "M3" Tag="M,03" Style="{DynamicResource ButtonStyle1}" IsEnabled="{Binding ElementName=checkboxManualMotorEnable, Path=IsChecked}"/>
+                                    <Slider Grid.Column="2" Grid.Row="2" x:Name="slMotorThree" Minimum="-100" Maximum="100" Orientation="Vertical" TickFrequency="10" Height="120" Margin="10,0" IsEnabled="{Binding ElementName=btnSysTestMotor3, Path=IsChecked}" />
+                                    <TextBox Grid.Column="2" Grid.Row="3" x:Name="tbSysTestMotor3" Text="{Binding ElementName=slMotorThree, Path=Value, UpdateSourceTrigger=PropertyChanged, StringFormat=F0}" MinWidth="35" Margin="5,0,5,5" />
+                                </Grid>
+                            </Border>
+                        </WrapPanel>
+                    </TabItem>
 
-                <StatusBarItem Grid.Column="7">
-                    <TextBlock Name="cameraStatusFilter" Text="No Filter"/>
-                </StatusBarItem>
+                    <TabItem Header="Tower Control" IsEnabled="False" >
+                        
+                    </TabItem>
 
-                <Separator Grid.Column="8"/>
+                    <TabItem Header = "Systems Test" IsEnabled="False"  >
+                        <StackPanel Margin = "5">
 
-                <StatusBarItem Grid.Column="9">
-                    <TextBlock Name="cameraStatusTime" Text="00:00:00:00"/>
-                </StatusBarItem>
+                            <WrapPanel Margin="0,2">
+                                <Button x:Name="btnSysTestCommunications" Content="Comms Test" Margin="5,5,0,5" Click="btnSysTestCommunications_Click" />
+                                <Button x:Name="btnSysTestTestMode" Content = "Enter Test Mode" Margin="5,5,0,5" IsEnabled = "false"  Click="btnSysTestTestMode_Click" Width="95"/>
+                                <Button x:Name="btnSysTestFullTest" Content = "Begin Full Systems Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestFullTest_Click" Width="130"/>
+                                <Button x:Name="btnSysTestPreviousTest" Content = "Previous Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestPreviousTest_Click"/>
+                                <Button x:Name="btnSysTestNextTest" Content = "Next Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestNextTest_Click"/>
+                            </WrapPanel>
+                            
+                            <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" >
+                                <WrapPanel Margin="5">
+                                    <StackPanel Margin="0,0,0,0">
+                                        <ToggleButton x:Name="btnSysTestProxmityA" Content = "Proximity A" Tag="Proximity,FA" Style="{DynamicResource ButtonStyle1}" />
+                                        <TextBox x:Name="tbSysTestProximityA" IsReadOnly="True" Margin="2"/>
+                                    </StackPanel>
 
-            </StatusBar>
+                                    <StackPanel Margin="5,0,0,0">
+                                        <ToggleButton x:Name="btnSysTestProxmityB" Content = "Proximity B" Tag="Proximity,FF" Style="{DynamicResource ButtonStyle1}" />
+                                        <TextBox x:Name="tbSysTestProximityB" IsReadOnly="True" Margin="2"/>
+                                    </StackPanel>
 
-            <WindowsFormsHost Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,0,0,0" Visibility="Hidden">
-                <em:ImageBox x:Name="captureImageBox" Height="320" Width="256" SizeMode="StretchImage" FunctionalMode="Minimum"/>
+                                    <StackPanel Margin="5,0,0,0">
+                                        <ToggleButton x:Name="btnSysTestProxmityC" Content = "Proximity C" Tag="Proximity,FE" Style="{DynamicResource ButtonStyle1}" />
+                                        <TextBox x:Name="tbSysTestProximityC" IsReadOnly="True" Margin="2"/>
+                                    </StackPanel>
+
+                                    <StackPanel Margin="5,0,0,0">
+                                        <ToggleButton x:Name="btnSysTestProxmityD" Content = "Proximity D"  Tag="Proximity,FD" Style="{DynamicResource ButtonStyle1}" />
+                                        <TextBox x:Name="tbSysTestProximityD" IsReadOnly="True" Margin="2"/>
+                                    </StackPanel>
+
+                                    <StackPanel Margin="5,0,0,0">
+                                        <ToggleButton x:Name="btnSysTestProxmityE" Content = "Proximity E" Tag="Proximity,FC" Style="{DynamicResource ButtonStyle1}"/>
+                                        <TextBox x:Name="tbSysTestProximityE" IsReadOnly="True" Margin="2"/>
+                                    </StackPanel>
+
+                                    <StackPanel Margin="5,0,0,0">
+                                        <ToggleButton x:Name="btnSysTestProxmityF" Content = "Proximity  F" Tag="Proximity,FB" Style="{DynamicResource ButtonStyle1}"/>
+                                        <TextBox x:Name="tbSysTestProximityF" IsReadOnly="True" Margin="2"/>
+                                    </StackPanel>
+                                </WrapPanel>
+                            </Border>
+
+                            <WrapPanel>
+                                <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="2" Width="210" Height="86">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Label Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" >Light Sensors</Label>
+
+                                        <ToggleButton Grid.Row="1"  x:Name="btnSysTestLightLHS" Content = "Left Hand Side" Tag="Light,F9" Style="{DynamicResource ButtonStyle1}"/>
+                                        <TextBox Grid.Row="2" x:Name="tbSysTestLightSensorLHS" IsReadOnly="True" Margin="2"/>
+
+                                        <ToggleButton Grid.Row="1" Grid.Column="1" x:Name="btnSysTestLightRHS" Content = "Right Hand Side" Tag="Light,F8" Style="{DynamicResource ButtonStyle1}"/>
+                                        <TextBox Grid.Row="2" Grid.Column="1" x:Name="tbSysTestLightSensorRHS" IsReadOnly="True" Margin="2"/>
+                                    </Grid>
+                                </Border>
+                                <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="1" >
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Label Grid.Row="0" Grid.ColumnSpan="4" HorizontalAlignment="Center">Line Followers</Label>
+
+                                        <ToggleButton Grid.Row="1" x:Name="btnSysTestLineFL" Content = "Far Left" Tag="Line,01" Style="{DynamicResource ButtonStyle1}"/>
+                                        <TextBox Grid.Row="2" x:Name="tbSysTestLineFollowerFarLeft" IsReadOnly="True" Margin="2"/>
+
+                                        <ToggleButton  Grid.Row="1" Grid.Column="1" x:Name="btnSysTestLineCL" Content = "Centre Left" Tag="Line,02" Style="{DynamicResource ButtonStyle1}"/>
+                                        <TextBox Grid.Row="2" Grid.Column="1"  x:Name="tbSysTestLineFollowerCentreLeft" IsReadOnly="True" Margin="2"/>
+
+                                        <ToggleButton Grid.Row="1" Grid.Column="2" x:Name="btnSysTestLineCR" Content = "Centre Right" Tag="Line,03" Style="{DynamicResource ButtonStyle1}"/>
+                                        <TextBox Grid.Row="2" Grid.Column="2" x:Name="tbSysTestLineFollowerCentreRight" IsReadOnly="True" Margin="2"/>
+
+                                        <ToggleButton Grid.Row="1" Grid.Column="3" x:Name="btnSysTestLineFR" Content = "Far Right" Tag="Line,04" Style="{DynamicResource ButtonStyle1}"/>
+                                        <TextBox Grid.Row="2" Grid.Column="3" x:Name="tbSysTestLineFollowerFarRight" IsReadOnly="True" Margin="2"/>
+
+                                    </Grid>
+                                </Border>
+                            </WrapPanel>
+
+                            <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="1" >
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Label Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Center">Navigation</Label>
+
+                                    <ToggleButton Grid.Row="1" Grid.Column="0" x:Name="btnSysTestMouse" Content = "Mouse" Tag="Mouse" Style="{DynamicResource ButtonStyle1}" />
+                                    <WrapPanel Grid.Row="2" Grid.Column="0">
+                                        <Label Content="DX:"/>
+                                        <TextBox x:Name="tbSysTestMouseDX" IsReadOnly="True" Width="30" Margin="2"/>
+                                        <Label Content="DY:"/>
+                                        <TextBox x:Name="tbSysTestMouseDY" IsReadOnly="True" Width="30" Margin="2"/>
+                                    </WrapPanel>
+
+
+                                    <ToggleButton Grid.Row="1" Grid.Column="1" x:Name="btnSysTestIMU" Content = "IMU" Tag = "IMU" Style="{DynamicResource ButtonStyle1}"/>
+                                    <WrapPanel Grid.Row="2" Grid.Column="1">
+                                       <Label Content="W:" Margin="1,0,0,0"/>
+                                       <TextBox x:Name="tbSysTestIMUW" IsReadOnly="True" Width="30" Margin="2"/>
+                                       <Label Content="X:"/>
+                                       <TextBox x:Name="tbSysTestIMUX" IsReadOnly="True" Width="30" Margin="2"/>
+                                       <Label Content="Y:"/>
+                                       <TextBox x:Name="tbSysTestIMUY" IsReadOnly="True" Width="30" Margin="2"/>
+                                       <Label Content="Z:"/>
+                                       <TextBox x:Name="tbSysTestIMUZ" IsReadOnly="True" Width="30" Margin="2"/>
+                                    </WrapPanel>
+                                    
+                                </Grid>
+                            </Border>
+
+
+                            <WrapPanel>
+                                <Border BorderBrush="Gainsboro" BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Padding="2" Width="169" Height="86" Background="Red">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2*" />
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Label Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Center">TWI MUX</Label>
+                                        <ComboBox Grid.Row="1" Grid.Column="0" x:Name="cbSysTestTWISet" Width="100">
+                                            <ComboBoxItem IsSelected="True">Proximity A</ComboBoxItem>
+                                            <ComboBoxItem>Proximity B</ComboBoxItem>
+                                            <ComboBoxItem>Proximity C</ComboBoxItem>
+                                            <ComboBoxItem>Proximity D</ComboBoxItem>
+                                            <ComboBoxItem>Proximity E</ComboBoxItem>
+                                            <ComboBoxItem>Proximity F</ComboBoxItem>
+                                            <ComboBoxItem>Light Sensor RHS</ComboBoxItem>
+                                            <ComboBoxItem>Light Sensor LHS</ComboBoxItem>
+                                        </ComboBox>
+                                        <Button Grid.Row="1" Grid.Column="1"  x:Name="btnSysTestTWISet" Content = "Set" Tag="Camera" IsEnabled="{Binding Path=btnSysTestTestMode}"/>
+                                        <TextBox Grid.Row="2" Grid.Column="0" x:Name="tbSysTestTWIRead" IsReadOnly="True" Width="100"/>
+                                        <Button Grid.Row="2" Grid.Column="1" x:Name="btnSysTestTWIRead" Content = "Read" Tag="Camera" />
+                                    </Grid>
+                                </Border>
+                            </WrapPanel>
+
+                            <Label Background="Red">To Add: Camera, Fast Charge Chip, External/Robot->Robot TWI</Label>
+
+                        </StackPanel>
+                    </TabItem>
+
+
+                    <TabItem Header="Debug" IsEnabled="False" >
+                        <TabControl Margin="5" TabStripPlacement="Left">
+
+                            <!-- The following code alllows vertical tabs -->
+                            <TabControl.Resources>
+                                <Style TargetType="{x:Type TabItem}">
+                                    <Setter Property="HeaderTemplate">
+                                        <Setter.Value>
+                                            <DataTemplate>
+                                                <ContentPresenter Content="{TemplateBinding Content}">
+                                                    <ContentPresenter.LayoutTransform>
+                                                        <RotateTransform Angle="270" />
+                                                    </ContentPresenter.LayoutTransform>
+                                                </ContentPresenter>
+                                            </DataTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="Padding" Value="5" />
+                                </Style>
+                            </TabControl.Resources>
+                            <!--********-->
+
+                            <TabItem Header="Serial Communication">
+                                <Grid>
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Column="0" Text="Data to Send:" HorizontalAlignment="Left" Margin="10"/>
+                                    <RichTextBox Grid.Column="1" x:Name="rtbSendBuffer" Margin="10" HorizontalAlignment="Stretch" Width="Auto"/>
+                                    <Button Grid.Column="2" Content="Send" x:Name="btnSerialSend" Margin="10" Click="Button_Click" HorizontalAlignment="Right"/>
+                                    <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Text="Sent Data" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10,00,10,0"/>
+                                    <RichTextBox Grid.Row="2" Grid.ColumnSpan="3" x:Name="rtbSerialSent" Margin="30,10,30,30" IsReadOnly="True" Height="Auto"/>
+
+                                </Grid>
+                            </TabItem>
+
+                            <TabItem Header="Xbee Communication">
+                                <Grid>
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Column="0" Text="Message Data:" HorizontalAlignment="Left" Margin="10"/>
+                                    <RichTextBox Grid.Column="1" x:Name="rtbXbeeSendBuffer" Margin="10" HorizontalAlignment="Stretch" Width="Auto"/>
+                                    <Button Grid.Column="2" Content="Send" x:Name="btnXbeeSend" Margin="10"  HorizontalAlignment="Right" Click="btnXbeeSend_Click"/>
+                                    <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Text="Sent Data" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10,00,10,0"/>
+                                    <RichTextBox Grid.Row="2" Grid.ColumnSpan="3" x:Name="rtbXbeeSent" Margin="30,10,30,30" IsReadOnly="True" Height="Auto"/>
+
+                                </Grid>
+                            </TabItem>
+
+                            <TabItem Header="Robot Commands">
+                                <WrapPanel Orientation="Vertical">
+                                    <Button Grid.Column="2" Content="Communication Test" x:Name="btnCommunicationTest" Margin="10" Click="btnCommunicationTest_Click" />
+                                    <Button Grid.Column="2" Content="Battery Voltage" x:Name="btnBatteryVoltage" Margin="10" Click="btnBatteryVoltage_Click" />
+                                </WrapPanel>
+                            </TabItem>
+
+                            <TabItem Header="Robot Sensors"/>
+                            <!--<TabItem Header="Placeholder"/>-->
+                        </TabControl>
+                    </TabItem>
+                </TabControl>
+            </DockPanel>
+
+            <GridSplitter x:Name="cameraGridSplitter" Grid.Column="2" Width="5" HorizontalAlignment="Center">
+            </GridSplitter>
+
+            <WindowsFormsHost Grid.Column="3" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,5,0,201" Visibility="Visible" Grid.RowSpan="2">
+                <em:ImageBox x:Name="captureImageBox" Height="240" Width="320" SizeMode="StretchImage" FunctionalMode="Minimum"/>
             </WindowsFormsHost>
-
-        </DockPanel>
-    </Grid>
+        </Grid>
+    </DockPanel>
 </Window>
 

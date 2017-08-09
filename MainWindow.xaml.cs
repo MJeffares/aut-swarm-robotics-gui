@@ -1,630 +1,762 @@
-﻿/**********************************************************************************************************************************************
-*	File: MainWindow.xaml.cs
-*
-*	Developed By: Mansel Jeffares
-*	First Build: 7 March 2017
-*	Current Build:  19 March 2017
-*
-*	Description :
-*		Graphics User Interface for Swarm Robotics Project
-*		Built for x64, .NET 4.5.2
-*
-*	Limitations :
-*		Build for x64, will only detect Cameras with x64 drivers
-*   
-*		Naming Conventions:
-*			CamelCase
-*			Variables start lower case, if another object goes by the same name, then also with an underscore
-*			Methods start upper case
-*			Constants, all upper case, unscores for seperation
-* 
-**********************************************************************************************************************************************/
+﻿///	File: MainWindow.xaml.cs
+///
+/// Developed By: Mansel Jeffares
+/// First Build: 7 March 2017
+/// Current Build:  27 April 2017
+///
+/// Description :
+///     Graphics User Interface for Swarm Robotics Project
+///     Built for x64, .NET 4.5.2
+///
+/// Limitations :
+///     Build for x64, will only detect Cameras with x64 drivers
+///
+/// Naming Conventions:
+///     CamelCase
+///     Variables start lower case, if another object goes by the same name, then also with an underscore
+///     Methods start upper case
+///     Constants, all upper case, unscores for seperation
+///
 
+// MANSEL: This is an example of a Mansel task
+// BRAE: Use this to get Brae to do something for once
+// TODO: This is for general things that need doing
+// UNDONE: This is life
 
-
-/**********************************************************************************************************************************************
-* Namespaces
-**********************************************************************************************************************************************/
-#region 
-
+// Namespaces
 using DirectShowLib;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
+using Emgu.CV.UI;
+using Emgu.CV.Util;
+using folderHack;
+using Microsoft.Win32;
 using System;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Ports;
 using System.Linq;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 
-#endregion
-
-
-
-/**********************************************************************************************************************************************
-* Structures and Classes
-**********************************************************************************************************************************************/
-#region
-
+// Structures
 struct Video_Device
 {
 	public string deviceName;
 	public int deviceId;
-	public Guid identifier;
-
+    public Guid identifier;
 	public Video_Device(int id, string name, Guid identity = new Guid())
 	{
 		deviceId = id;
 		deviceName = name;
 		identifier = identity;
 	}
-
-	///<summary>
-	///Represent the Device as a string
-	/// </summary>
-	/// <returns>The string representation of this Device</returns>
-	public override string ToString()
-	{
-		return String.Format("[{0}]{1}", deviceId, deviceName);
-	}
+    public override string ToString()
+    {
+        return String.Format("[{0}]{1}", deviceId, deviceName);
+    }
 }
-
-
-
-static class CaptureStatuses
-{
-	public const int PLAYING = 0;
-	public const int PAUSED = 1;
-	public const int STOPPED = 2;
-}
-
-
-
-static public class CaptureFilters
-{
-	//static public Mat outputframe;
-
-	public const int NUM_FILTERS = 4;
-
-	public const int NO_FILTER = 0;
-	public const int GREYSCALE = 1;
-	public const int CANNY_EDGES = 2;
-	public const int BRAE_EDGES = 3;
-
-	// HSV ranges.
-	private const int LowerH = 0;
-	private const int UpperH = 255;
-	private const int LowerS = 0;
-	private const int UpperS = 255;
-	private const int LowerV = 0;
-	private const int UpperV = 255;
-	// Blur, Canny, and Threshold values.
-	private const int BlurC = 1;
-	private const int LowerC = 128;
-	private const int UpperC = 255;
-
-	///<summary>
-	///Calculates the output for the current filter
-	/// </summary>
-	/// <returns>The proccessed frame matrix</returns>
-	static public Mat Process(int filter, Mat inputframe, Mat outputframe)
-	{
-		
-		switch (filter)
-		{
-			case CaptureFilters.NO_FILTER:
-				return inputframe;
-				
-
-			case CaptureFilters.GREYSCALE:
-				CvInvoke.CvtColor(inputframe, outputframe, ColorConversion.Bgr2Gray);
-				return outputframe;
-
-			case CaptureFilters.CANNY_EDGES:
-				CvInvoke.CvtColor(inputframe, outputframe, ColorConversion.Bgr2Gray);
-				CvInvoke.PyrDown(outputframe, outputframe);
-				CvInvoke.PyrUp(outputframe, outputframe);
-				CvInvoke.Canny(outputframe, outputframe, 80, 40);
-				return outputframe;
-
-			case CaptureFilters.BRAE_EDGES:
-				CvInvoke.CvtColor(inputframe, outputframe, ColorConversion.Bgr2Gray);
-				CvInvoke.Threshold(outputframe, outputframe, LowerC, UpperC, ThresholdType.Binary);
-				CvInvoke.AdaptiveThreshold(outputframe, outputframe, UpperC, AdaptiveThresholdType.GaussianC, ThresholdType.Binary, 3, 0);
-
-				return outputframe;
-
-
-
-			default:
-				return inputframe;
-				
-		}
-	}
-
-
-	///<summary>
-	///Represent the Filter as a string
-	/// </summary>
-	/// <returns>The string representation of this Filter</returns>
-	static public string ToString(int filter)
-	{
-		switch (filter)
-		{
-			case CaptureFilters.NO_FILTER:
-				return String.Format("No Filter");
-
-			case CaptureFilters.GREYSCALE:
-				return String.Format("Greyscale");
-
-			case CaptureFilters.CANNY_EDGES:
-				return String.Format("Canny Edges");
-
-			case CaptureFilters.BRAE_EDGES:
-				return String.Format("Brae Edges");
-
-			default:
-				return String.Format("Filter Text Error");
-
-		}
-	}
-}
-
-#endregion
-
-
 
 namespace SwarmRoboticsGUI
 {
-	/// <summary>
-	/// Interaction logic for MainWindow.xaml
-	/// </summary>
-
-	public partial class MainWindow : Window
-	{
-		//camera capture variables
-		private VideoCapture _capture = null;
-		private int cameradevice = 0;
-		private Video_Device[] webcams;
-
-		private int filter = CaptureFilters.NO_FILTER;
-		private bool smoothed = false;
-
-		private Mat _frame;
-		private string currentlyconnectedcamera = null;
-		private int _capturestatus = CaptureStatuses.STOPPED;
-
-		//fps timer variables
-		private int _fpscount = 0;
-		private DispatcherTimer FpsTimer = new DispatcherTimer();
-
-		bool captureblocked = false;
-		int captureblockedframes = 0;
-
-		public Mat outputframe = new Mat();
-
-
-		public MainWindow()
-		{
-			InitializeComponent();
-			CvInvoke.UseOpenCL = false;
-			PopulateFilters();
-			PopulateCameras();
-
-
-			FpsTimer.Tick += FpsTimerTick;
-			FpsTimer.Interval = new TimeSpan(0, 0, 1);
-		}
-
-
-
-		/**********************************************************************************************************************************************
-		* Programmably Activated Methods
-		**********************************************************************************************************************************************/
-		#region
-
-		//Find Connected Cameras by using Directshow.net dll library by carles iloret
-		//As the project is build for x64, only cameras with x64 drivers will be found/displayed
-		private void PopulateCameras()
-		{
-
-			if (_capturestatus == CaptureStatuses.STOPPED)
-			{
-				DsDevice[] _SystemCameras = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);      //gets currently connected devices
-				webcams = new Video_Device[_SystemCameras.Length];                                          //creates a new array of devices
-				menuCameraList.Items.Clear();                                                               //clears cameras from menu
-
-				//loops through devices and adds them to menu
-				for (int i = 0; i < _SystemCameras.Length; i++)
-				{
-					webcams[i] = new Video_Device(i, _SystemCameras[i].Name); ;
-					MenuItem item = new MenuItem { Header = webcams[i].ToString() };
-					item.Click += new RoutedEventHandler(menuCameraListItem_Click);
-					item.IsCheckable = true;
-					menuCameraList.Items.Add(item);
-
-					//restores currently connect camera selection
-					if (item.ToString() == currentlyconnectedcamera)
-					{
-						item.IsEnabled = true;
-						item.IsChecked = true;
-						cameradevice = menuCameraList.Items.IndexOf(item);
-						menuCameraConnect.IsEnabled = true;
-					}
-
-				}
-				//displays helpful message if no cameras found
-				if (menuCameraList.Items.Count == 0)
-				{
-					MenuItem nonefound = new MenuItem { Header = "No Cameras Found" };
-					menuCameraList.Items.Add(nonefound);
-					nonefound.IsEnabled = false;
-				}
-			}
-		}
-
-
-
-		private void StartCapture()
-		{
-			if (_capture != null)
-			{
-				_capture.Dispose();
-			}
-
-			try
-			{
-				//Set up capture device
-				host1.Visibility = Visibility.Visible;
-				_capture = new VideoCapture(cameradevice);
-				_capture.ImageGrabbed += ProcessFrame;
-				_frame = new Mat();
-
-				menuCameraConnect.Header = "Stop Capture";
-				menuCameraFreeze.IsEnabled = true;
-
-				_capture.Start();
-				FpsTimer.Start();
-				_capturestatus = CaptureStatuses.PLAYING;
-			}
-			catch (NullReferenceException excpt)
-			{
-				MessageBox.Show(excpt.Message);
-			}
-		}
-
-
-
-		private void StopCapture()
-		{
-			try
-			{
-				_capture.Stop();
-				FpsTimer.Stop();
-				cameraStatusFPS.Text = "FPS: ";
-				_capture.Dispose();
-				host1.Visibility = Visibility.Hidden;
-				_capturestatus = CaptureStatuses.STOPPED;
-				menuCameraConnect.Header = "Start Capture";
-				menuCameraFreeze.Header = "Freeze";
-				menuCameraFreeze.IsChecked = false;
-				menuCameraFreeze.IsEnabled = false;
-			}
-			catch (Exception excpt)
-			{
-				MessageBox.Show(excpt.Message);
-			}
-		}
-
-
-
-		private void PauseCapture()
-		{
-			try
-			{
-				_capture.Pause();
-				FpsTimer.Stop();
-				cameraStatusFPS.Text = "FPS: ";
-				_capturestatus = CaptureStatuses.PAUSED;
-				menuCameraFreeze.Header = "Un-Freeze";
-				menuCameraFreeze.IsChecked = true;
-			}
-			catch (Exception excpt)
-			{
-				MessageBox.Show(excpt.Message);
-			}
-		}
-
-
-
-		private void ResumeCapture()
-		{
-			try
-			{
-				_capture.Start();
-				FpsTimer.Start();
-				//_captureInProgress = true;
-				_capturestatus = CaptureStatuses.PLAYING;
-				menuCameraFreeze.Header = "Freeze";
-				menuCameraFreeze.IsChecked = false;
-			}
-			catch (Exception excpt)
-			{
-				MessageBox.Show(excpt.Message);
-			}
-		}
-
-
-
-		private void PopulateFilters()
-		{
-
-			for(int i =0; i < CaptureFilters.NUM_FILTERS; i++)
-			{
-				MenuItem item = new MenuItem { Header = CaptureFilters.ToString(i) };
-				item.Click += new RoutedEventHandler(menuFilterListItem_Click);
-				item.IsCheckable = true;
-
-				if(i == 0)
-				{
-					item.IsChecked = true;
-				}
-
-				menuFilterList.Items.Add(item);
-			}
-
-			Separator sep = new Separator();
-			menuFilterList.Items.Add(sep);
-
-			MenuItem settingsmenuitem = new MenuItem { Header = "Settings" };
-			menuFilterList.Items.Add(settingsmenuitem);
-		}
-
-		#endregion
-
-
-
-		/**********************************************************************************************************************************************
-		* Repeated/Time Activated Methods
-		**********************************************************************************************************************************************/
-			#region
-
-			private void ProcessFrame(object sender, EventArgs arg)
-		{
-			if (_capture != null && _capture.Ptr != IntPtr.Zero)
-			{
-				_capture.Retrieve(_frame, 0);
-
-				
-				/*
-				if (smoothed)
-				{
-					CvInvoke.PyrDown(_frame, _frame);
-					CvInvoke.PyrUp(_frame, _frame);
-				}
-				*/
-				
-
-				if (!captureblocked)
-				{
-					_fpscount++;
-					//captureImageBox.Image = _frame;
-					captureImageBox.Image = CaptureFilters.Process(filter, _frame, outputframe);
-				}
-				else
-				{
-					captureblockedframes++;
-				}
-
-				if(captureblockedframes > 2)
-				{
-					captureblocked = false;
-					captureblockedframes = 0;
-				}
-			}
-		}
-
-
-
-		private void FpsTimerTick(object sender, EventArgs arg)
-		{
-			cameraStatusFPS.Text = "FPS: " + _fpscount.ToString();
-			_fpscount = 0;
-		}
-
-		#endregion
-
-
-
-		/**********************************************************************************************************************************************
-		* User Control Activated Methods
-		**********************************************************************************************************************************************/
-		#region
-
-		public void menuCameraListItem_Click(Object sender, RoutedEventArgs e)
-		{
-			MenuItem menusender = (MenuItem)sender;
-			String menusenderstring = menusender.ToString();
-
-			if (_capturestatus == CaptureStatuses.STOPPED && currentlyconnectedcamera != menusenderstring) //also check if the same menu option is clicked twice
-			{
-				//var allitems = menuCameraList.Items.Cast<System.Windows.Controls.MenuItem>().ToArray();
-				var allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
-
-				foreach (var item in allitems)
-				{
-					item.IsChecked = false;
-					item.IsEnabled = false;
-				}
-
-				menusender.IsEnabled = true;
-				menusender.IsChecked = true;
-				currentlyconnectedcamera = menusender.ToString();
-				cameraStatusName.Text = menusender.Header.ToString();
-				cameradevice = menuCameraList.Items.IndexOf(menusender);
-				menuCameraConnect.IsEnabled = true;
-
-			}
-			else if (currentlyconnectedcamera == menusenderstring)
-			{
-				//var allitems = menuCameraList.Items.Cast<System.Windows.Controls.MenuItem>().ToArray();
-				var allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
-
-				foreach (var item in allitems)
-				{
-					item.IsChecked = false;
-					item.IsEnabled = true;
-				}
-				currentlyconnectedcamera = "No Camera Selected";
-				cameraStatusName.Text = null;
-				cameradevice = -1;
-				menuCameraConnect.IsEnabled = false;
-			}
-		}
-
-
-		private void menuFilterListItem_Click(object sender, RoutedEventArgs e)
-		{
+    public partial class MainWindow : Window
+    {
+        // Declarations
+        #region
+        // TODO: comment declarations
+        public Camera camera1;
+        public SerialUARTCommunication serial;
+        public XbeeAPI xbee;
+        public ProtocolClass protocol;
+		public CommunicationManager commManger;
+        public CameraPopOutWindow popoutWindow;
+        public OverlayWindow overlayWindow;
+        // one second timer to calculate and update the fps count
+        private DispatcherTimer InterfaceTimer;
+        // 
+        private DateTime startTime;
+        //
+        private OpenFileDialog openvideodialog = new OpenFileDialog();
+        private SaveFileDialog savevideodialog = new SaveFileDialog();
+        // 
+        private Video_Device[] webcams;
+
+        public enum WindowStatusType { MAXIMISED, MINIMISED, POPPED_OUT };
+        public enum TimeDisplayModeType { CURRENT, FROM_START, START };
+        public WindowStatusType WindowStatus { get; set; }
+        public TimeDisplayModeType TimeDisplayMode { get; set; }
+        public double WindowSize { get; set; }
+        #endregion    
+
+        // Main
+        public MainWindow()
+        {
+            InitializeComponent();
+            //
+            //camera1 = new Camera(640, 480);
+            camera1 = new Camera(1280, 720);
+
+            xbee = new XbeeAPI(this);
+            protocol = new ProtocolClass(this);
 			
-			MenuItem menusender = (MenuItem)sender;
-			String menusenderstring = menusender.ToString();
 
-			if(menusenderstring != CaptureFilters.ToString(filter))
-			{
-				var allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
+            // MANSEL: Maybe make a struct. Also look at SerialPort class
+            serial = new SerialUARTCommunication(this, menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);
+			//
 
-				foreach (var item in allitems)
-				{
-					item.IsChecked = false;
-				}
-
-				menusender.IsChecked = true;
-
-				filter = menuFilterList.Items.IndexOf(menusender);
-
-				//
-				cameraStatusFilter.Text = CaptureFilters.ToString(filter);
-			}
-			else if (menusenderstring == CaptureFilters.ToString(filter) && CaptureFilters.ToString(filter) != CaptureFilters.ToString(CaptureFilters.NO_FILTER))
-			{
-				var allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
-
-				foreach (var item in allitems)
-				{
-					item.IsChecked = false;
-					item.IsEnabled = true;
-				}
-			}
-		}
+			commManger = new CommunicationManager(this,serial, xbee, protocol);
 
 
 
-		private void MenuItem_MouseEnter(object sender, MouseEventArgs e)
-		{
-			captureblocked = true;
-			PopulateCameras();
-		}
+			overlayWindow = new OverlayWindow(this);            
+            //
+            CvInvoke.UseOpenCL = true;
+            //
+            PopulateFilters();
+            // TEMP: Don't bother populating right now
+            // BRAE: Sort out the overlays and sources
+            //PopulateOverlays();
+            PopulateCameras();
+            //PopulateSources();
+            //
+            openvideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
+            savevideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
+            savevideodialog.Title = "Record: Save As";
+            //
+            startTime = new DateTime();
+            startTime = DateTime.Now;
+            //
+            InterfaceTimer = new DispatcherTimer();
+            InterfaceTimer.Tick += Interface_Tick;
+            InterfaceTimer.Interval = new TimeSpan(0, 0, 1);
+            InterfaceTimer.Start();
+            //
+            TimeDisplayMode = TimeDisplayModeType.CURRENT;
+            WindowStatus = WindowStatusType.MAXIMISED;
+            
+            // TEMP: display overlay on starup for debugging
+            overlayWindow.Show();
+
+            camera1.FrameUpdate += new Camera.FrameHandler(DrawCameraFrame);
+            
+			//serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+
+			setupSystemTest();
+
+
+		}      
+
+        // Methods
+        #region
+        /// <summary>
+        /// Finds the Connected Cameras by using Directshow.net dll library by carles iloret.
+        /// As the project is build for x64, only cameras with x64 drivers will be found/displayed.
+        /// </summary>
+        private void PopulateCameras()
+        {
+            // we dont want to update this if we are connected to a camera
+            if (camera1.Status != Camera.StatusType.PLAYING && camera1.Status != Camera.StatusType.RECORDING)
+            {
+                // gets currently connected devices
+                DsDevice[] _SystemCameras = DsDevice.GetDevicesOfCat(DirectShowLib.FilterCategory.VideoInputDevice);
+                // creates a new array of devices    
+                webcams = new Video_Device[_SystemCameras.Length];
+                // clears cameras from menu                                      
+                menuCameraList.Items.Clear();
+                menuCameraConnect.IsEnabled = false;
+
+                // loops through cameras and adds them to menu
+                for (int i = 0; i < _SystemCameras.Length; i++)
+                {
+                    webcams[i] = new Video_Device(i, _SystemCameras[i].Name);
+                    MenuItem item = new MenuItem { Header = webcams[i].ToString() };
+                    item.Click += new RoutedEventHandler(menuCameraListItem_Click);
+                    item.IsCheckable = true;
+                    menuCameraList.Items.Add(item);
+
+                    // restores currently connect camera selection
+                    if (item.ToString() == camera1.Name)
+                    {
+                        item.IsEnabled = true;
+                        item.IsChecked = true;
+                        camera1.Index = menuCameraList.Items.IndexOf(item);
+                        menuCameraConnect.IsEnabled = true;
+                    }
+                }
+
+                // displays helpful message if no cameras found
+                if (menuCameraList.Items.Count == 0)
+                {
+                    MenuItem nonefound = new MenuItem { Header = "No Cameras Found" };
+                    menuCameraList.Items.Add(nonefound);
+                    nonefound.IsEnabled = false;
+                }
+            }
+        }
+        /// <summary>
+        /// Automatically adds the filters defined in the class into our menu for selecting filters.
+        /// </summary>
+        private void PopulateFilters()
+        {
+            //loops through our filters and adds them to our menu
+            for (int i = 0; i < (int)ImageProcessing.FilterType.NUM_FILTERS; i++)
+            {
+                MenuItem item = new MenuItem { Header = ImageProcessing.ToString((ImageProcessing.FilterType)i) };
+                item.Click += new RoutedEventHandler(menuFilterListItem_Click);
+                item.IsCheckable = true;
+                //by default select our first filter (no filter)
+                if (i == 0)
+                {
+                    item.IsChecked = true;
+                }
+                menuFilterList.Items.Add(item);
+            }
+            // add our seperator and settings menu items
+            Separator sep = new Separator();
+            menuFilterList.Items.Add(sep);
+
+            MenuItem settingsmenuitem = new MenuItem { Header = "Settings" };
+            menuFilterList.Items.Add(settingsmenuitem);
+            settingsmenuitem.Click += menuPlaceHolder_Click;
+        }
+
+        // TEMP: One overlay option for now
+        // BRAE: Put this in the display window as list of buttons
+        //private void PopulateOverlays()
+        //{
+        //    //loops through our filters and adds them to our menu
+        //    for (int i = 0; i < (int)ImageDisplay.OverlayType.NUM_OVERLAYS; i++)
+        //    {
+        //        MenuItem item = new MenuItem { Header = ImageDisplay.ToString((ImageDisplay.OverlayType)i) };
+        //        item.Click += new RoutedEventHandler(menuOverlayListItem_Click);
+        //        item.IsCheckable = true;
+        //        //by default select our first filter (no filter)
+        //        if (i == 0)
+        //        {
+        //            item.IsChecked = true;
+        //        }
+        //        menuOverlayList.Items.Add(item);
+        //    }
+        //    // add our seperator and settings menu items
+        //    Separator sep = new Separator();
+        //    menuOverlayList.Items.Add(sep);
+
+        //    MenuItem settingsmenuitem = new MenuItem { Header = "Settings" };
+        //    menuOverlayList.Items.Add(settingsmenuitem);
+        //    settingsmenuitem.Click += menuPlaceHolder_Click;
+        //}
+
+        // TEMP: default source as cutouts
+        // BRAE: Sort your shit out. populate the sources and get on with it
+        //private void PopulateSources()
+        //{
+        //    //loops through our filters and adds them to our menu
+        //    for (int i = 0; i < (int)ImageDisplay.SourceType.NUM_SOURCES; i++)
+        //    {
+        //        MenuItem item = new MenuItem { Header = ImageDisplay.ToString((ImageDisplay.SourceType)i) };
+        //        item.Click += new RoutedEventHandler(menuSourceListItem_Click);
+        //        item.IsCheckable = true;
+        //        //by default select our first filter (no filter)
+        //        if (i == 0)
+        //        {
+        //            item.IsChecked = true;
+        //        }
+        //        menuSourceList.Items.Add(item);
+        //    }
+        //    // add our seperator and settings menu items
+        //    Separator sep = new Separator();
+        //    menuSourceList.Items.Add(sep);
+
+        //    MenuItem settingsmenuitem = new MenuItem { Header = "Settings" };
+        //    menuSourceList.Items.Add(settingsmenuitem);
+        //    settingsmenuitem.Click += menuPlaceHolder_Click;
+        //}
+
+        public void ToggleCameraWindow()
+        {
+            switch (WindowStatus)
+            {
+                case WindowStatusType.POPPED_OUT:
+                    popoutWindow.Close();
+                    //set window to the size it had been before it was minimised
+                    mainGrid.ColumnDefinitions[3].Width = new GridLength(WindowSize);
+                    //set variable/flag
+                    WindowStatus = WindowStatusType.MAXIMISED;
+                    //re-enable the grid splitter so its size can be changed
+                    cameraGridSplitter.IsEnabled = true;
+                    // update arrow direction
+                    displayArrowTop.Content = "   >";
+                    displayArrowBottom.Content = "   >";
+                    // TEMP: toggles the name of the button
+                    menuDisplayPopOut.Header = "Pop Out Window";
+
+                    break;
+                default:
+                    // set size of window to original
+                    WindowSize = mainGrid.ColumnDefinitions[3].ActualWidth;
+                    // minimise window (make width = 0)     
+                    mainGrid.ColumnDefinitions[3].Width = new GridLength((double)0);
+                    // change camera window status to popped out
+                    WindowStatus = WindowStatusType.POPPED_OUT;
+                    // disable the grid splitter so window cannont be changed size until it is expanded               
+                    cameraGridSplitter.IsEnabled = false;
+                    // update arrow direction
+                    displayArrowTop.Content = "  < ";
+                    displayArrowBottom.Content = "  <  ";
+                    // TEMP: toggles the name of the button
+                    menuDisplayPopOut.Header = "Pop In Window";
+                    // create and show the window
+                    popoutWindow = new CameraPopOutWindow(this);
+                    popoutWindow.Show();
+                    break;
+            }
+        }
+        #endregion
+
+        // Time events
+        #region
+        private void Interface_Tick(object sender, EventArgs arg)
+        {
+            // MANSEL: I hate this block of code. Does it belong here? Does it even work?
+            //serial._serialPort.Write("Test");
+
+            /// Error message for zero frames
+            ///if (camera.Status == Camera.StatusType.PLAYING || camera.Status == Camera.StatusType.RECORDING)
+            ///{
+            ///	if(camera.Status == Camera.StatusType.PLAYING)
+            ///	{
+            ///		if (_fpscount == 0)
+            ///		{
+            ///			MessageBoxResult result = CustomMessageBox.ShowYesNo(
+            ///				"Warning Camera disconnected or significant failure, Please reconnect camera and press continue or stop capturing now",
+            ///				"Camera Error",
+            ///				"Continue",
+            ///				"Stop Capture",
+            ///				MessageBoxImage.Error
+            ///				);
+            ///			//check result do things based on it, add to seperate function
+            ///		}
+            ///	}
+            ///	else if (camera.Status == Camera.StatusType.RECORDING)
+            ///	{
+            ///		if (_fpscount == 0)
+            ///		{
+            ///			MessageBoxResult result = CustomMessageBox.ShowYesNo(
+            ///				"Warning Camera disconnected or significant failure, Please reconnect camera and press continue or end the recording now",
+            ///				"Camera Error",
+            ///				"Continue",
+            ///				"End Recording",
+            ///				MessageBoxImage.Error
+            ///				);
+            ///			//check result do things based on it, add to seperate function
+            ///		}
+            ///		//flashes recording dot red/black if recroding is in progress 
+            ///		if (statusRecordingDot.Foreground.Equals(Brushes.Red))
+            ///		{
+            ///			statusRecordingDot.Foreground = Brushes.Black;
+            ///		}
+            ///		else
+            ///		{
+            ///			statusRecordingDot.Foreground = Brushes.Red;
+            ///		}
+            ///	}
+            ///	//updates FPS counter
+            ///	statusFPS.Text = "FPS: " + _fpscount.ToString();
+            ///	_fpscount = 0;
+            ///}
+
+            switch (TimeDisplayMode)
+            {
+                case TimeDisplayModeType.CURRENT:
+                    statusTime.Text = DateTime.Now.ToString("t");
+                    ///statusTime.Text = DateTime.Now.ToString();
+                    ///statusTime.Text = String.Format("{0:d dd HH:mm:ss}" ,DateTime.Now);
+                    ///statusTime.Text = String.Format("{0:T}", DateTime.Now.ToString());
+                    break;
+
+
+                case TimeDisplayModeType.FROM_START:
+                    if (camera1.Status == Camera.StatusType.RECORDING)
+                    {
+                        statusTime.Text = (DateTime.Now - startTime).ToString(@"dd\.hh\:mm\:ss");
+                        ///TimeSpan displayTime = (DateTime.Now - startTime);
+                        ///statusTime.Text = displayTime.ToString(@"dd\.hh\:mm\:ss");
+                        ///displayTime = displayTime.Add(-((TimeSpan)displayTime.Ticks % TimeSpan.TicksPerSecond));
+                        ///statusTime.Text = (DateTime.Now - startTime).ToString("t");
+                    }
+                    break;
+            }
+
+
+            // TEMP: Default to cutouts
+            // BRAE: You can't live you life like this
+            //switch (overlayWindow.Display.Source)
+            //{
+            //    case ImageDisplay.SourceType.NONE:
+            //        break;
+            //    case ImageDisplay.SourceType.CAMERA:
+            //        break;
+            //    case ImageDisplay.SourceType.CUTOUTS:
+            //        DrawCameraFrame(this, new EventArgs());
+            //        break;
+            //    default:
+            //        break;
+            //}
+            DrawCameraFrame(this, new EventArgs());
+        }
+
+
+        private void DrawCameraFrame(object sender, EventArgs e)
+        {
+            // TEMP: Default to cutouts
+            // BRAE: THINK OF THE CHILDREN
+            //switch (overlayWindow.Display.Source)
+            //{
+            //    case ImageDisplay.SourceType.NONE:
+            //        // Do nothing
+            //        break;
+            //    case ImageDisplay.SourceType.CAMERA:
+            //        // Sender is a camera
+            //        Camera Camera = (Camera)sender;
+            //        if (Camera.Frame != null)
+            //        {
+            //            //updates FPS counter
+            //            statusFPS.Text = "FPS: " + Camera.FPS;
+            //            // Apply the currently selected filter
+            //            overlayWindow.imgProc.ProcessFilter(Camera.Frame);
+            //            // Draw the frame to the overlay imagebox
+            //            captureImageBox.Image = overlayWindow.imgProc.Image;
+            //        }                   
+            //        break;
+            //    case ImageDisplay.SourceType.CUTOUTS:
+            //        // Apply the currently selected filter
+            //        overlayWindow.imgProc.ProcessFilter(overlayWindow.imgProc.TestImage);
+            //        // Draw the frame to the overlay imagebox
+            //        captureImageBox.Image = overlayWindow.imgProc.Image;
+            //        break;
+            //    default:
+            //        break;
+            //}
+
+            //Apply the currently selected filter
+            overlayWindow.imgProc.ProcessFilter(overlayWindow.imgProc.TestImage);
+            // Draw the frame to the overlay imagebox
+            captureImageBox.Image = overlayWindow.imgProc.Image;
+        }
+
+
+        #endregion
+
+        // Input events
+        #region       
+        // Display menu
+        private void menuFilterListItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem menusender = (MenuItem)sender;
+            string menusenderstring = menusender.ToString();
+
+            if (menusenderstring != ImageProcessing.ToString(overlayWindow.imgProc.Filter))
+            {
+                MenuItem[] allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
+
+                foreach (var item in allitems)
+                {
+                    item.IsChecked = false;
+                }
+                menusender.IsChecked = true;
+                overlayWindow.imgProc.Filter = (ImageProcessing.FilterType)menuFilterList.Items.IndexOf(menusender);
+                //
+                statusDisplayFilter.Text = ImageProcessing.ToString(overlayWindow.imgProc.Filter);
+            }
+            else if (overlayWindow.imgProc.Filter != ImageProcessing.FilterType.NONE)
+            {
+                MenuItem[] allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
+
+                foreach (var item in allitems)
+                {
+                    item.IsChecked = false;
+                    item.IsEnabled = true;
+                }
+            }
+        }
+        private void menuOverlayListItem_Click(object sender, RoutedEventArgs e)
+        {
+            // TEMP: Overlay shown on startup
+            // BRAE: OverlayList deserves better than this
+            //MenuItem menusender = (MenuItem)sender;
+            //string menusenderstring = menusender.ToString();
+
+            //if (menusenderstring != ImageDisplay.ToString(overlayWindow.Display.Overlay))
+            //{
+            //    MenuItem[] allitems = menuOverlayList.Items.OfType<MenuItem>().ToArray();
+
+            //    foreach (var item in allitems)
+            //    {
+            //        item.IsChecked = false;
+            //    }
+            //    menusender.IsChecked = true;
+            //    overlayWindow.Display.Overlay = (ImageDisplay.OverlayType)menuOverlayList.Items.IndexOf(menusender);
+            //    // TODO: Not sure where to display this right now
+            //    //statusDisplayFilter.Text = ImageDisplay.ToString(overlayWindow.Display.Overlay);
+            //}
+        }
+
+        private void menuSourceListItem_Click(object sender, RoutedEventArgs e)
+        {
+            // TEMP: Default source to cutouts
+            // BRAE: Mansel is going to see all this bullshit since you showed him the tasklist
+            //MenuItem menusender = (MenuItem)sender;
+            //string menusenderstring = menusender.ToString();
+
+            //if (menusenderstring != ImageDisplay.ToString(overlayWindow.Display.Source))
+            //{
+            //    MenuItem[] allitems = menuSourceList.Items.OfType<MenuItem>().ToArray();
+
+            //    foreach (var item in allitems)
+            //    {
+            //        item.IsChecked = false;
+            //    }
+            //    menusender.IsChecked = true;
+            //    overlayWindow.Display.Source = (ImageDisplay.SourceType)menuSourceList.Items.IndexOf(menusender);
+            //    // TODO: Not sure where to display this right now
+            //    //statusDisplayFilter.Text = ImageDisplay.ToString(overlayWindow.Display.Overlay);
+            //}
+        }
+
+        private void menuDisplayPopOut_Click(object sender, RoutedEventArgs e)
+        {
+            ToggleCameraWindow();
+        }
+        // Camera menu
+        private void menuCameraListItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem menusender = (MenuItem)sender;
+            string menusenderstring = menusender.ToString();
+
+            if (camera1.Status == Camera.StatusType.STOPPED && camera1.Name != menusenderstring) //also check if the same menu option is clicked twice
+            {
+                //var allitems = menuCameraList.Items.Cast<System.Windows.Controls.MenuItem>().ToArray();
+                MenuItem[] allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
+
+                foreach (var item in allitems)
+                {
+                    item.IsChecked = false;
+                    item.IsEnabled = false;
+                }
+                menusender.IsEnabled = true;
+                menusender.IsChecked = true;
+                menuCameraConnect.IsEnabled = true;
+                statusCameraName.Text = menusender.Header.ToString();
+
+                camera1.Name = menusender.ToString();
+                camera1.Index = menuCameraList.Items.IndexOf(menusender);
+            }
+            else if (camera1.Name == menusenderstring)
+            {
+                //var allitems = menuCameraList.Items.Cast<System.Windows.Controls.MenuItem>().ToArray();
+                MenuItem[] allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
+
+                foreach (var item in allitems)
+                {
+                    item.IsChecked = false;
+                    item.IsEnabled = true;
+                }
+                camera1.Name = "No Camera Selected";
+                statusCameraName.Text = null;
+                camera1.Index = -1;
+                menuCameraConnect.IsEnabled = false;
+            }
+        }
+        private void MenuItem_MouseEnter(object sender, MouseEventArgs e)
+        {
+            // TODO: What is this and why does it populate the cameras?
+            PopulateCameras();
+        }
+        private void menuCameraConnect_Click(object sender, RoutedEventArgs e)
+        {
+            if (camera1.Status == Camera.StatusType.PLAYING || camera1.Status == Camera.StatusType.PAUSED)
+            {
+                // Stop capturing
+                camera1.StopCapture();
+                //
+                menuCameraConnect.Header = "Start Capture";
+                menuCameraFreeze.Header = "Freeze";
+                menuCameraFreeze.IsChecked = false;
+                menuCameraFreeze.IsEnabled = false;
+                menuRecordNew.IsEnabled = false;
+                //
+                MenuItem[] allitems = menuCameraList.Items.Cast<MenuItem>().ToArray();
+                foreach (var item in allitems)
+                {
+                    item.IsEnabled = true;
+                }
+                //
+                overlayWindow.Close();
+            }
+            else if (camera1.Status == Camera.StatusType.STOPPED)
+            {
+                // Start capturing
+                camera1.StartCapture();
+                //
+                menuCameraConnect.Header = "Stop Capture";          // Update the header on our connect/disconnect button
+                // TODO: What should this say?
+                menuCameraFreeze.Header = "Freeze";
+                menuCameraFreeze.IsEnabled = true;                  // enable the freeze frame button
+                menuRecordNew.IsEnabled = true;
+                //
+                MenuItem[] allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
+                foreach (var item in allitems)
+                {
+                    item.IsEnabled = false;
+                }
+                //set start date time as a variable 
+                startTime = DateTime.Now;
+            }
+        }
+        private void menuCameraOptions_Click(object sender, RoutedEventArgs e)
+        {
+            camera1.OpenSettings();
+        }
+        private void menuCameraFreeze_Click(object sender, RoutedEventArgs e)
+        {
+            if (camera1.Status == Camera.StatusType.PLAYING)
+            {
+                camera1.PauseCapture();
+            }
+            else if (camera1.Status == Camera.StatusType.PAUSED)
+            {
+                camera1.ResumeCapture();
+            }
+        }
+        private void menuFilterFlipVertical_Click(object sender, RoutedEventArgs e)
+        {
+            camera1.FlipVertical();
+        }
+        private void menuFilterFlipHorizontal_Click(object sender, RoutedEventArgs e)
+        {
+            camera1.FlipHorizontal();
+        }
+        // Replay menu
+        private void menuReplayOpen_Click(object sender, RoutedEventArgs e)
+        {
+            if (camera1.Status == Camera.StatusType.STOPPED)
+            {
+                if (openvideodialog.ShowDialog() == true)
+                {
+                    try
+                    {
+                        statusRecordingText.Text = "Replaying Video: " + openvideodialog.FileName;
+                        camera1.StartReplaying(openvideodialog.FileName);
+                    }
+                    catch (NullReferenceException excpt)
+                    {
+                        MessageBox.Show(excpt.Message);
+                    }
+                }
+            }
+        }
+        private void menuRecordNew_Click(object sender, RoutedEventArgs e)
+        {
+            if (camera1.Status == Camera.StatusType.PLAYING)
+            {
+                if (savevideodialog.ShowDialog() == true)
+                {
+                    //
+                    camera1.StartRecording(savevideodialog.FileName);
+                    //
+                    statusRecordingText.Text = "Recording Video: " + savevideodialog.FileName;
+                    menuRecordStop.IsEnabled = true;
+                    menuCameraConnect.IsEnabled = false;
+                    menuCameraFreeze.IsEnabled = false;
+                }
+            }
+        }
+        private void menuRecordStop_Click(object sender, RoutedEventArgs e)
+        {
+            //
+            camera1.StopRecording();
+            //
+            menuCameraConnect.IsEnabled = true;
+            menuCameraFreeze.IsEnabled = true;
+            menuRecordStop.IsEnabled = false;
+            statusRecordingText.Text = "Not Recording";
+            statusRecordingDot.Foreground = Brushes.Black;
+        }
+        // Communications menu
+
+        private void btnCommunicationTest_Click(object sender, RoutedEventArgs e)
+        {
+            //protocol.SendMessage(ProtocolClass.MESSAGE_TYPES.COMMUNICATION_TEST);
+        }
+        // Other
+        private void menu_Hover(object sender, RoutedEventArgs e)
+        {
+            // TODO: Work out why this was here
+        }
+        private void btnCameraMinimise_Click(object sender, MouseButtonEventArgs e)
+        {
+            // TODO: Will probably move window status out of camera class
+            switch (WindowStatus)
+            {
+                case WindowStatusType.MAXIMISED:
+                    // set size of window when it was minimised
+                    WindowSize = mainGrid.ColumnDefinitions[3].ActualWidth;
+                    //minimise window (make width = 0)
+                    mainGrid.ColumnDefinitions[3].Width = new GridLength((double)0);
+                    //set variable/flag
+                    WindowStatus = WindowStatusType.MINIMISED;
+                    //disable the grid splitter so window cannont be changed size until it is expanded         
+                    cameraGridSplitter.IsEnabled = false;
+                    //update arrow direction
+                    displayArrowTop.Content = "  < ";
+                    displayArrowBottom.Content = "  <  ";
+                    break;
+                case WindowStatusType.MINIMISED:
+                    //set window to the size it had been before it was minimised
+                    mainGrid.ColumnDefinitions[3].Width = new GridLength(WindowSize);
+                    //set variable/flag
+                    WindowStatus = WindowStatusType.MAXIMISED;
+                    //re-enable the grid splitter so its size can be changed                
+                    cameraGridSplitter.IsEnabled = true;
+                    //update arrow direction
+                    displayArrowTop.Content = "   >";
+                    displayArrowBottom.Content = "   >";
+                    break;
+                default:
+                    break;
+            }
+        }
+        private void menuPlaceHolder_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Sorry Placeholder");
+        }
 
 
 
-		private void menuCameraConnect_Click(object sender, RoutedEventArgs e)
-		{
-			if (_capturestatus == CaptureStatuses.PLAYING || _capturestatus == CaptureStatuses.PAUSED)
-			{
-				StopCapture();
-
-				var allitems = menuCameraList.Items.Cast<MenuItem>().ToArray();
-
-				foreach (var item in allitems)
-				{
-					item.IsEnabled = true;
-				}
-			}
-			else if (_capturestatus == CaptureStatuses.STOPPED)
-			{
-				StartCapture();
-
-				var allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
-
-				foreach (var item in allitems)
-				{
-					item.IsEnabled = false;
-				}
-			}
-		}
-
-
-
-		private void menuCameraOptions_Click(object sender, RoutedEventArgs e)
-		{
-			//need try/catch or checks 
-			try
-			{
-				_capture.SetCaptureProperty(CapProp.Settings, 1);
-			}
-			catch (Exception excpt)
-			{
-				MessageBox.Show(excpt.Message);
-			}
-		}
-
-
-
-		private void menuCameraFreeze_Click(object sender, RoutedEventArgs e)
-		{
-			if (_capturestatus == CaptureStatuses.PLAYING)
-			{
-				PauseCapture();
-			}
-			else if (_capturestatus == CaptureStatuses.PAUSED)
-			{
-				ResumeCapture();
-			}
-		}
-
-		/*
-		private void menuFilterSmooth_Click(object sender, RoutedEventArgs e)
-		{
-			if (smoothed)
-			{
-				menuFilterSmooth.IsChecked = false;
-				smoothed = false;
-			}
-			else
-			{
-				menuFilterSmooth.IsChecked = true;
-				smoothed = true;
-			}
-		}
-		*/
-
-
-		private void menuFilterFlipVertical_Click(object sender, RoutedEventArgs e)
-		{
-			if (_capture != null)
-			{
-				_capture.FlipVertical = !_capture.FlipVertical;
-			}
-		}
-
-
-
-		private void menuFilterFlipHorizontal_Click(object sender, RoutedEventArgs e)
-		{
-			if (_capture != null)
-			{
-				_capture.FlipHorizontal = !_capture.FlipHorizontal;
-			}
-		}
-
-
-
-		private void menu_hover(object sender, RoutedEventArgs e)
-		{
-			captureblocked = true;
-		}
+        private void btnBatteryVoltage_Click(object sender, RoutedEventArgs e)
+        {
+            //protocol.SendMessage(ProtocolClass.MESSAGE_TYPES.BATTERY_VOLTAGE);
+        }
 
 
 		#endregion
+
+        private void ToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+            byte[] data;
+            data = new byte[2];
+            data[0] = SYSTEM_TEST_MESSAGE.COMMUNICATION;
+            data[1] = 0x01;
+
+            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
+        }
+
+        
+        
 	}
 }
