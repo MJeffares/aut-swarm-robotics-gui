@@ -14,14 +14,13 @@ namespace SwarmRoboticsGUI
         {            
             public static byte[] NORTH = { 0x00, 0x00 };
             
-            public static byte[] NORTHEAST = { 0x00, 0x2D };
-            public static byte[] EAST = { 0x00, 0x5A };
-            public static byte[] SOUTHEAST = { 0x00, 0x87 };
+            public static byte[] NORTHEAST = { 0x01, 0x3B };
+            public static byte[] EAST = { 0x01, 0x0E };
+            public static byte[] SOUTHEAST = { 0x00, 0xE1 };
             public static byte[] SOUTH =  { 0x00, 0xB4 };
-            public static byte[] SOUTHWEST = { 0x00, 0xE1 };
-            public static byte[] WEST = { 0x01, 0x0E };
-            public static byte[] NORTHWEST = { 0x01, 0x3B };
-
+            public static byte[] SOUTHWEST = { 0x00, 0x87 };
+            public static byte[] WEST = { 0x00, 0x5A };
+            public static byte[] NORTHWEST = { 0x00, 0x2D };
         }
         private static class MANUAL_MODE_MESSAGE
         {
@@ -73,13 +72,13 @@ namespace SwarmRoboticsGUI
                     break;  
             }
             data[3] = (byte) Convert.ToInt16(tbManualModeSpeed.Text);
-            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.ROBOT_THREE, data);
+            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.ROBOT_TWO, data);
         }
 
         private void ManualModeMouseLeave(object sender, MouseEventArgs e)
         {
             byte[] data = new byte[1] { MANUAL_MODE_MESSAGE.Stop };
-            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.ROBOT_THREE, data);
+            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.ROBOT_TWO, data);
         }
 
         private void ManualModeRotateMouseEnter(object sender, MouseEventArgs e)
@@ -98,7 +97,7 @@ namespace SwarmRoboticsGUI
                     break;
             }
             data[1] = (byte) Convert.ToInt16(tbManualModeSpeed.Text);
-            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.ROBOT_THREE, data);
+            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.ROBOT_TWO, data);
         }
 
        

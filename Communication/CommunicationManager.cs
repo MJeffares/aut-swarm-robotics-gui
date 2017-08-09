@@ -573,8 +573,8 @@ namespace SwarmRoboticsGUI
 		{
             public static class Sensors
             {
-                public const byte leftHandSide = 0xF8;
-                public const byte rightHandSide = 0xF9;
+                public const byte leftHandSide = 0xF9;
+                public const byte rightHandSide = 0xF8;
             }
             
 			public byte sensor;
@@ -738,11 +738,11 @@ namespace SwarmRoboticsGUI
 					break;
 
 				case MESSAGE_TYPES.SYSTEM_TEST_LIGHT_SENSORS:
-
+                    swarmMessage = new LightSensorTestData(swarmMessage.rawMessage);
 					break;
 
 				case MESSAGE_TYPES.SYSTEM_TEST_LINE_FOLLOWERS:
-
+                    swarmMessage = new LineSensorTestData(swarmMessage.rawMessage);
 					break;
 
 				default:

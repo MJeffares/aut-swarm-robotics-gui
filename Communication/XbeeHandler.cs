@@ -213,9 +213,10 @@ namespace SwarmRoboticsGUI
 			{
 				if (byteArrayToEscape[i] == 0x7D)
 				{
-					i++;
+                    //MANSEL: OUT OF RANGE ERROR (i think fixed by commenting out the below line)
+					//i++;
 					temp.Enqueue((byte)(byteArrayToEscape[i] ^ 0x20));
-                    //MANSEL: OUT OF RANGE ERROR
+                    
 				}
 				else
 				{
@@ -981,7 +982,20 @@ namespace SwarmRoboticsGUI
 			frame_data[1] = 200;
 
 			//byte[] destination_address_64 = BitConverter.GetBytes(destination);
-			byte[] destination_address_64 = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF };
+            byte[] destination_address_64 = new byte[8];
+
+            destination_address_64[0] = BitConverter.GetBytes(destination)[7];
+            destination_address_64[1] = BitConverter.GetBytes(destination)[6];
+            destination_address_64[2] = BitConverter.GetBytes(destination)[5];
+            destination_address_64[3] = BitConverter.GetBytes(destination)[4];
+            destination_address_64[4] = BitConverter.GetBytes(destination)[3];
+            destination_address_64[5] = BitConverter.GetBytes(destination)[2];
+            destination_address_64[6] = BitConverter.GetBytes(destination)[1];
+            destination_address_64[7] = BitConverter.GetBytes(destination)[0]; 
+
+
+            //MANSEL: YOU TWAT FIX THIS
+			//byte[] destination_address_64 = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF };
 			destination_address_64.CopyTo(frame_data, 2);
 			byte[] destination_address_16 = { 0xFF, 0xFE };
 			destination_address_16.CopyTo(frame_data, 10);
