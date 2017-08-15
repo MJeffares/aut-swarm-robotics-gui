@@ -88,40 +88,29 @@ namespace SwarmRoboticsGUI
         
         private void DrawOverlayFrame(object sender, EventArgs e)
         {
-            //switch (Display.Source)
-            //{
-            //    case ImageDisplay.SourceType.NONE:
-            //        break;
-            //    case ImageDisplay.SourceType.CAMERA:
-            //        // Typecast object to get passed UMat class
-            //        UMat Frame = (UMat)sender;
-            //        // Make sure there is a frame
-            //        if (Frame != null)
-            //        {
-            //            // Apply image processing to find the robots
-            //            RobotList = imgProc.GetRobots(Frame, RobotList);
-            //            // Create the overlay image from the robot list
-            //            // BRAE: Maybe only pass frame size since its only used for that
-            //            Display.ProcessOverlay(RobotList);
-            //            // Draw overlay image in window image box
-            //            OverlayImageBox.Image = Display.Image;
-            //        }
-            //        break;
-            //    case ImageDisplay.SourceType.CUTOUTS:
-            //        // Apply image processing to find the robots
-            //        RobotList = imgProc.GetRobots(imgProc.TestImage, RobotList);
-            //        // Create the overlay image from the robot list
-            //        Display.ProcessOverlay(RobotList);
-            //        // Draw overlay image in window image box
-            //        OverlayImageBox.Image = Display.Image;
-            //        break;
-            //    default:
-            //        break;
-            //}
-
             var List = RobotList.ToList();
-            // Apply image processing to find the robots
-            imgProc.GetRobots(imgProc.TestImage, List);
+
+            switch (Display1.Source)
+            {
+                case Display.SourceType.NONE:
+                    break;
+                case Display.SourceType.CAMERA:
+                    // Typecast object to get passed UMat class
+                    UMat Frame = sender as UMat;
+                    // Make sure there is a frame
+                    if (Frame != null)
+                    {
+                        // Apply image processing to find the robots
+                        imgProc.GetRobots(Frame, List);
+                    }
+                    break;
+                case Display.SourceType.CUTOUTS:
+                    // Apply image processing to find the robots
+                    imgProc.GetRobots(imgProc.TestImage, List);
+                    break;
+                default:
+                    break;
+            }
             // Update the robotlist on the UI thread
             Update(uiContext, List);
         }
@@ -134,19 +123,18 @@ namespace SwarmRoboticsGUI
             imgProc.LowerH = LowerH;
             imgProc.UpperH = UpperH;
             // Update the display with the interface when using the cutouts
-            //switch (Display.Source)
-            //{
-            //    case ImageDisplay.SourceType.NONE:
-            //        break;
-            //    case ImageDisplay.SourceType.CAMERA:
-            //        break;
-            //    case ImageDisplay.SourceType.CUTOUTS:
-            //        DrawOverlayFrame(this, new EventArgs());
-            //        break;
-            //    default:
-            //        break;
-            //}
-            DrawOverlayFrame(this, new EventArgs());
+            switch (Display1.Source)
+            {
+                case Display.SourceType.NONE:
+                    break;
+                case Display.SourceType.CAMERA:
+                    break;
+                case Display.SourceType.CUTOUTS:
+                    DrawOverlayFrame(this, new EventArgs());
+                    break;
+                default:
+                    break;
+            }
         }
         private void Overlay_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {

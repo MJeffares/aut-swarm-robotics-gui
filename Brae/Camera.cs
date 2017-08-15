@@ -3,6 +3,7 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.UI;
 using Emgu.CV.Util;
+using Emgu.CV.Cuda;
 using System;
 using System.Timers;
 using System.Text;
@@ -21,7 +22,6 @@ namespace SwarmRoboticsGUI
         public string Name { get; set; }
         public int Index { get; set; }
         public StatusType Status { get; private set; }
-        public UMat Frame { get; private set; }
         public Size Resolution { get; private set; }
         public int FPS { get; private set; }
         #endregion
@@ -71,10 +71,9 @@ namespace SwarmRoboticsGUI
         {
             // update the capture object           
             videoCapture = new VideoCapture(Index);
+            videoCapture.SetCaptureProperty(CapProp.Fps, 30);
             videoCapture.SetCaptureProperty(CapProp.FrameWidth, Resolution.Width);
             videoCapture.SetCaptureProperty(CapProp.FrameHeight, Resolution.Height);
-            // create a new matrix to hold our image
-            Frame = new UMat();
             // add event handler for our new capture  
             videoCapture.ImageGrabbed += ProcessFrame;
             // update our status
@@ -108,7 +107,6 @@ namespace SwarmRoboticsGUI
                 videoCapture.Dispose();
             }
             videoCapture = new VideoCapture(path);
-            Frame = new UMat();
             videoCapture.ImageGrabbed += ProcessFrame;
             Status = StatusType.REPLAY_ACTIVE;
             videoCapture.Start();
@@ -159,7 +157,6 @@ namespace SwarmRoboticsGUI
         {
             FpsTimer.Dispose();
             videoCapture.Dispose();
-            Frame.Dispose();
         }
         #endregion
 
@@ -182,10 +179,12 @@ namespace SwarmRoboticsGUI
             // Check capture exists
             if (videoCapture != null && videoCapture.Ptr != IntPtr.Zero)
             {
-                // Get the new frame
-                videoCapture.Retrieve(Frame, 0);
-                FrameUpdate(Frame, arg);
-                // 
+                using (UMat Frame = new UMat())
+                {
+                    // Get the new frame
+                    videoCapture.Retrieve(Frame);
+                    //FrameUpdate(Frame.Clone(), arg);
+                }
                 FrameCount++;
             }
         }

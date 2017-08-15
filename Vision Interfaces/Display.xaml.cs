@@ -35,17 +35,13 @@ namespace SwarmRoboticsGUI
             set { SetValue(ItemsProperty, value); }
         }
 
-        public Display()
-        {
-            InitializeComponent();
-            //Items = new ObservableCollection<RobotItem>();
-            //Arena.ItemsSource = Items;
-        }
-
         #region Enumerations
         public enum OverlayType { NONE, DEBUG, PRETTY, INFO, GRID, TEST, NUM_OVERLAYS };
         public enum SourceType { NONE, CAMERA, CUTOUTS, NUM_SOURCES };
         #endregion
+
+        public OverlayType Overlay { get; set; }
+        public SourceType Source { get; set; }
         public static string ToString(OverlayType Overlay)
         {
             switch (Overlay)
@@ -80,6 +76,14 @@ namespace SwarmRoboticsGUI
                     return string.Format("Source Text Error");
             }
         }
+
+        public Display()
+        {
+            InitializeComponent();
+            //Items = new ObservableCollection<RobotItem>();
+            //Arena.ItemsSource = Items;
+        }
+
 
         private void Robot_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
