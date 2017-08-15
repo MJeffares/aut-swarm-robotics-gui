@@ -389,20 +389,6 @@ namespace SwarmRoboticsGUI
             }
 
             statusFPS.Text = camera1.FPS.ToString();
-
-            switch (overlayWindow.Display1.Source)
-            {
-                case Display.SourceType.NONE:
-                    break;
-                case Display.SourceType.CAMERA:
-                    
-                    break;
-                case Display.SourceType.CUTOUTS:
-                    //DrawCameraFrame(this, new NewFrameEventArgs());
-                    break;
-                default:
-                    break;
-            }
         }
 
 
@@ -415,22 +401,19 @@ namespace SwarmRoboticsGUI
                     break;
                 case Display.SourceType.CAMERA:
                     // Sender is a frame
-
+                    UMat Frame = new Image<Bgr, byte>((Bitmap)e.Frame.Clone()).Mat.GetUMat(AccessType.ReadWrite);
                     if (e.Frame != null)
                     {
                         // Apply the currently selected filter
-                        //overlayWindow.imgProc.ProcessFilter(Frame);
+                        overlayWindow.imgProc.ProcessFilter(Frame);
                         // Draw the frame to the overlay imagebox
-                        //captureImageBox.Image = overlayWindow.imgProc.Image;
-                        captureImageBox.Image = new Image<Bgr, byte>((Bitmap)e.Frame.Clone());
+                        captureImageBox.Image = overlayWindow.imgProc.Image;
                     }
                     
                     break;
                 case Display.SourceType.CUTOUTS:
-                    // Apply the currently selected filter
-                    overlayWindow.imgProc.ProcessFilter(overlayWindow.imgProc.TestImage);
-                    // Draw the frame to the overlay imagebox
-                    captureImageBox.Image = overlayWindow.imgProc.Image;
+                    // Draw the testimage to the overlay imagebox
+                    captureImageBox.Image = overlayWindow.imgProc.TestImage;
                     break;
                 default:
                     break;
@@ -754,5 +737,12 @@ namespace SwarmRoboticsGUI
 
             xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
         }
-	}
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            camera1.FrameUpdate -= new Camera.FrameHandler(DrawCameraFrame);
+            camera1.Dispose();
+            camera1 = null;
+        }
+    }
 }

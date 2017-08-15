@@ -103,7 +103,7 @@ namespace SwarmRoboticsGUI
                     if (Frame != null)
                     {
                         // Apply image processing to find the robots
-                        imgProc.GetRobots(new Image<Bgr, byte>((Bitmap)Frame).Mat.GetUMat(AccessType.Read), List);
+                        imgProc.GetRobots(new Image<Bgr, byte>(Frame).Mat.GetUMat(AccessType.Read), List);
                         // Update the robotlist on the UI thread
                         Update(uiContext, List);
                     }

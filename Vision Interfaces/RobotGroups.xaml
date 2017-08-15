@@ -260,7 +260,9 @@
             <ColumnDefinition Width="250"/>
         </Grid.ColumnDefinitions>
 
-        <TreeView x:Name="RobotTree" Grid.Column="1" Grid.Row="1"
+        <TreeView x:Name="RobotTree" Grid.Column="1" Grid.Row="1" 
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.VirtualizationMode="Recycling"
                   Foreground="White" FontSize="20" Padding="0" BorderThickness="0"
                   Background="Transparent"
                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
