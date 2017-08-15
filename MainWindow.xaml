@@ -32,15 +32,16 @@
 
             </MenuItem>
 
-            <MenuItem Header="Camera" MouseEnter="MenuItem_MouseEnter" Click="menu_Hover">
+            <MenuItem Header="Camera" Click="menu_Hover">
                 <MenuItem x:Name="menuCameraList" Header="Connected Cameras" MouseEnter="menu_Hover"/>
+                <MenuItem x:Name="menuCameraCapabilityList" Header="Camera Resolution" MouseEnter="menu_Hover"/>
                 <MenuItem x:Name="menuCameraConnect" Header="Start Capture" IsEnabled="False" IsCheckable="True"  Click="menuCameraConnect_Click"/>
                 <MenuItem x:Name="menuCameraFreeze" Header="Freeze Frame" IsEnabled="False" IsCheckable="True" Click="menuCameraFreeze_Click" />
                 <Separator/>
                 <MenuItem x:Name="menuCameraOptions" Header="Camera Options" Click="menuCameraOptions_Click"/>
             </MenuItem>
 
-            <MenuItem Header="Serial Comms" MouseEnter="MenuItem_MouseEnter" Click="menu_Hover">
+            <MenuItem Header="Serial Comms" Click="menu_Hover">
                 <MenuItem x:Name="menuCommunicationPortList" Header="Communication Port" MouseEnter="menu_Hover"/>
                 <MenuItem x:Name="menuCommunicationBaudList" Header="Baud Rate" MouseEnter="menu_Hover"/>
                 <MenuItem x:Name="menuCommunicationParityList" Header="Parity" MouseEnter="menu_Hover"/>

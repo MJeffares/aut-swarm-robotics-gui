@@ -1,4 +1,12 @@
-﻿///	File: MainWindow.xaml.cs
+﻿
+// MANSEL: This is an example of a Mansel task
+// BRAE: Use this to get Brae to do something for once
+// TODO: This is for general things that need doing
+// UNDONE: This is life
+
+// Namespaces
+using AForge.Video;
+///	File: MainWindow.xaml.cs
 ///
 /// Developed By: Mansel Jeffares
 /// First Build: 7 March 2017
@@ -17,14 +25,7 @@
 ///     Methods start upper case
 ///     Constants, all upper case, unscores for seperation
 ///
-
-// MANSEL: This is an example of a Mansel task
-// BRAE: Use this to get Brae to do something for once
-// TODO: This is for general things that need doing
-// UNDONE: This is life
-
-// Namespaces
-using DirectShowLib;
+using AForge.Video.DirectShow;
 using Emgu.CV;
 using Emgu.CV.Cuda;
 using Emgu.CV.CvEnum;
@@ -35,6 +36,7 @@ using folderHack;
 using Microsoft.Win32;
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
@@ -44,24 +46,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-
-// Structures
-struct Video_Device
-{
-	public string deviceName;
-	public int deviceId;
-    public Guid identifier;
-	public Video_Device(int id, string name, Guid identity = new Guid())
-	{
-		deviceId = id;
-		deviceName = name;
-		identifier = identity;
-	}
-    public override string ToString()
-    {
-        return String.Format("[{0}]{1}", deviceId, deviceName);
-    }
-}
 
 namespace SwarmRoboticsGUI
 {
@@ -84,8 +68,9 @@ namespace SwarmRoboticsGUI
         //
         private OpenFileDialog openvideodialog = new OpenFileDialog();
         private SaveFileDialog savevideodialog = new SaveFileDialog();
-        // 
-        private Video_Device[] webcams;
+
+        private FilterInfoCollection VideoDevices { get; set; }
+        private VideoCaptureDevice VideoDevice { get; set; }
 
         public enum WindowStatusType { MAXIMISED, MINIMISED, POPPED_OUT };
         public enum TimeDisplayModeType { CURRENT, FROM_START, START };
@@ -103,7 +88,7 @@ namespace SwarmRoboticsGUI
             //
             //camera1 = new Camera(640, 480);
             //camera1 = new Camera(1280, 720);
-            camera1 = new Camera(1920, 1080);
+            camera1 = new Camera();
 
             xbee = new XbeeAPI(this);
             protocol = new ProtocolClass(this);
@@ -149,28 +134,23 @@ namespace SwarmRoboticsGUI
 
         // Methods
         #region
-        /// <summary>
-        /// Finds the Connected Cameras by using Directshow.net dll library by carles iloret.
-        /// As the project is build for x64, only cameras with x64 drivers will be found/displayed.
-        /// </summary>
         private void PopulateCameras()
         {
             // we dont want to update this if we are connected to a camera
             if (camera1.Status != Camera.StatusType.PLAYING && camera1.Status != Camera.StatusType.RECORDING)
             {
                 // gets currently connected devices
-                DsDevice[] _SystemCameras = DsDevice.GetDevicesOfCat(DirectShowLib.FilterCategory.VideoInputDevice);
-                // creates a new array of devices    
-                webcams = new Video_Device[_SystemCameras.Length];
+                VideoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+
                 // clears cameras from menu                                      
                 menuCameraList.Items.Clear();
                 menuCameraConnect.IsEnabled = false;
+                menuCameraCapabilityList.IsEnabled = false;
 
                 // loops through cameras and adds them to menu
-                for (int i = 0; i < _SystemCameras.Length; i++)
+                for (int i = 0; i < VideoDevices.Count; i++)
                 {
-                    webcams[i] = new Video_Device(i, _SystemCameras[i].Name);
-                    MenuItem item = new MenuItem { Header = webcams[i].ToString() };
+                    MenuItem item = new MenuItem { Header = VideoDevices[i].Name };
                     item.Click += new RoutedEventHandler(menuCameraListItem_Click);
                     item.IsCheckable = true;
                     menuCameraList.Items.Add(item);
@@ -194,6 +174,38 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
+        private void PopulateCameraCapabilities()
+        {
+            // we dont want to update this if we are connected to a camera
+            if (camera1.Status == Camera.StatusType.STOPPED)
+            {
+                // clears cameras from menu                                      
+                menuCameraCapabilityList.Items.Clear();
+                // loops through cameras video options and adds them to menu
+                foreach (VideoCapabilities capabilityInfo in VideoDevice.VideoCapabilities)
+                {
+                    MenuItem item = new MenuItem {
+                        Header = string.Format("{0} by {1} @ {2} FPS", 
+                        capabilityInfo.FrameSize.Width,
+                        capabilityInfo.FrameSize.Height,
+                        capabilityInfo.AverageFrameRate) };
+                    item.Click += new RoutedEventHandler(menuCameraCapabilityListItem_Click);
+                    item.IsCheckable = true;
+                    menuCameraCapabilityList.Items.Add(item);
+                }
+
+                // displays "helpful" message if no options are found
+                if (menuCameraCapabilityList.Items.Count == 0)
+                {
+                    MenuItem nonefound = new MenuItem { Header = "No" };
+                    menuCameraCapabilityList.Items.Add(nonefound);
+                    nonefound.IsEnabled = false;
+                }
+                else
+                    (menuCameraCapabilityList.Items[camera1.CapabilityIndex] as MenuItem).IsChecked = true;
+            }
+        }
+
         /// <summary>
         /// Automatically adds the filters defined in the class into our menu for selecting filters.
         /// </summary>
@@ -386,7 +398,7 @@ namespace SwarmRoboticsGUI
                     
                     break;
                 case Display.SourceType.CUTOUTS:
-                    DrawCameraFrame(this, new EventArgs());
+                    //DrawCameraFrame(this, new NewFrameEventArgs());
                     break;
                 default:
                     break;
@@ -394,7 +406,7 @@ namespace SwarmRoboticsGUI
         }
 
 
-        private void DrawCameraFrame(object sender, EventArgs e)
+        private void DrawCameraFrame(object sender, NewFrameEventArgs e)
         {
             switch (overlayWindow.Display1.Source)
             {
@@ -403,14 +415,16 @@ namespace SwarmRoboticsGUI
                     break;
                 case Display.SourceType.CAMERA:
                     // Sender is a frame
-                    UMat Frame = sender as UMat;
-                    if (Frame != null)
+
+                    if (e.Frame != null)
                     {
                         // Apply the currently selected filter
-                        overlayWindow.imgProc.ProcessFilter(Frame);
+                        //overlayWindow.imgProc.ProcessFilter(Frame);
                         // Draw the frame to the overlay imagebox
-                        captureImageBox.Image = overlayWindow.imgProc.Image;
+                        //captureImageBox.Image = overlayWindow.imgProc.Image;
+                        captureImageBox.Image = new Image<Bgr, byte>((Bitmap)e.Frame.Clone());
                     }
+                    
                     break;
                 case Display.SourceType.CUTOUTS:
                     // Apply the currently selected filter
@@ -505,48 +519,56 @@ namespace SwarmRoboticsGUI
         // Camera menu
         private void menuCameraListItem_Click(object sender, RoutedEventArgs e)
         {
-            MenuItem menusender = (MenuItem)sender;
+            var menusender = sender as MenuItem;
             string menusenderstring = menusender.ToString();
-
-            if (camera1.Status == Camera.StatusType.STOPPED && camera1.Name != menusenderstring) //also check if the same menu option is clicked twice
+            // Make sure a capture isn't running.
+            if (camera1.Status == Camera.StatusType.STOPPED)
             {
-                //var allitems = menuCameraList.Items.Cast<System.Windows.Controls.MenuItem>().ToArray();
-                MenuItem[] allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
-
-                foreach (var item in allitems)
+                // If it isn't already selected
+                if (camera1.Name != menusenderstring)
                 {
-                    item.IsChecked = false;
-                    item.IsEnabled = false;
-                }
-                menusender.IsEnabled = true;
-                menusender.IsChecked = true;
-                menuCameraConnect.IsEnabled = true;
-                statusCameraName.Text = menusender.Header.ToString();
+                    MenuItem[] allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
 
-                camera1.Name = menusender.ToString();
-                camera1.Index = menuCameraList.Items.IndexOf(menusender);
-            }
-            else if (camera1.Name == menusenderstring)
-            {
-                //var allitems = menuCameraList.Items.Cast<System.Windows.Controls.MenuItem>().ToArray();
-                MenuItem[] allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
+                    foreach (var item in allitems) item.IsChecked = false;
+                    // Display feedback to user
+                    menusender.IsChecked = true;
+                    statusCameraName.Text = menusender.Header.ToString();
+                    // Capture can be started
+                    menuCameraConnect.IsEnabled = true;
+                    // Resolution can be selected
+                    menuCameraCapabilityList.IsEnabled = true;
+                    // Update camera
+                    camera1.Name = menusender.ToString();
+                    camera1.Index = menuCameraList.Items.IndexOf(menusender);
+                    VideoDevice = new VideoCaptureDevice(VideoDevices[camera1.Index].MonikerString);
 
-                foreach (var item in allitems)
-                {
-                    item.IsChecked = false;
-                    item.IsEnabled = true;
+                    camera1.CapabilityIndex = VideoDevice.VideoCapabilities.Length - 1;
+
+                    // Populate resolution options
+                    PopulateCameraCapabilities();
                 }
-                camera1.Name = "No Camera Selected";
-                statusCameraName.Text = null;
-                camera1.Index = -1;
-                menuCameraConnect.IsEnabled = false;
             }
         }
-        private void MenuItem_MouseEnter(object sender, MouseEventArgs e)
+        private void menuCameraCapabilityListItem_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: What is this and why does it populate the cameras?
-            PopulateCameras();
+            var menusender = sender as MenuItem;
+
+            if (camera1.Status == Camera.StatusType.STOPPED)
+            {
+                // If it isn't already selected
+                if (camera1.CapabilityIndex != menuCameraCapabilityList.Items.IndexOf(menusender))
+                {
+                    // Uncheck all options
+                    MenuItem[] allitems = menuCameraCapabilityList.Items.OfType<MenuItem>().ToArray();
+                    foreach (var item in allitems) item.IsChecked = false;
+                    // Display feedback to user
+                    menusender.IsChecked = true;
+                    // BRAE: Set selected resolution here
+                    camera1.CapabilityIndex = menuCameraCapabilityList.Items.IndexOf(menusender);
+                }
+            }
         }
+
         private void menuCameraConnect_Click(object sender, RoutedEventArgs e)
         {
             if (camera1.Status == Camera.StatusType.PLAYING || camera1.Status == Camera.StatusType.PAUSED)
@@ -565,8 +587,11 @@ namespace SwarmRoboticsGUI
                 {
                     item.IsEnabled = true;
                 }
-                //
-                overlayWindow.Close();
+                MenuItem[] allitems2 = menuCameraCapabilityList.Items.Cast<MenuItem>().ToArray();
+                foreach (var item in allitems2)
+                {
+                    item.IsEnabled = true;
+                }
             }
             else if (camera1.Status == Camera.StatusType.STOPPED)
             {
@@ -581,6 +606,11 @@ namespace SwarmRoboticsGUI
                 //
                 MenuItem[] allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
                 foreach (var item in allitems)
+                {
+                    item.IsEnabled = false;
+                }
+                MenuItem[] allitems2 = menuCameraCapabilityList.Items.Cast<MenuItem>().ToArray();
+                foreach (var item in allitems2)
                 {
                     item.IsEnabled = false;
                 }
@@ -655,7 +685,7 @@ namespace SwarmRoboticsGUI
             menuCameraFreeze.IsEnabled = true;
             menuRecordStop.IsEnabled = false;
             statusRecordingText.Text = "Not Recording";
-            statusRecordingDot.Foreground = Brushes.Black;
+            statusRecordingDot.Foreground = System.Windows.Media.Brushes.Black;
         }
         // Communications menu
 

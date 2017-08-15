@@ -73,8 +73,17 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DirectShowLib-2005">
-      <HintPath>DirectShow\DirectShowLib-2005.dll</HintPath>
+    <Reference Include="AForge, Version=2.2.5.0, Culture=neutral, PublicKeyToken=c1db6ff4eaa06aeb, processorArchitecture=MSIL">
+      <HintPath>packages\AForge.2.2.5\lib\AForge.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AForge.Video, Version=2.2.5.0, Culture=neutral, PublicKeyToken=cbfb6e07d173c401, processorArchitecture=MSIL">
+      <HintPath>packages\AForge.Video.2.2.5\lib\AForge.Video.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AForge.Video.DirectShow, Version=2.2.5.0, Culture=neutral, PublicKeyToken=61ea4348d43881b7, processorArchitecture=MSIL">
+      <HintPath>packages\AForge.Video.DirectShow.2.2.5\lib\AForge.Video.DirectShow.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Emgu.CV.UI, Version=3.2.0.2721, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>packages\Emgu.CV.3.2.0.2721\lib\net35\Emgu.CV.UI.dll</HintPath>
@@ -88,6 +97,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />

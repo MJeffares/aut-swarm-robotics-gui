@@ -1,8 +1,10 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -96,23 +98,26 @@ namespace SwarmRoboticsGUI
                     break;
                 case Display.SourceType.CAMERA:
                     // Typecast object to get passed UMat class
-                    UMat Frame = sender as UMat;
+                    var Frame = sender as Bitmap;
                     // Make sure there is a frame
                     if (Frame != null)
                     {
                         // Apply image processing to find the robots
-                        imgProc.GetRobots(Frame, List);
+                        imgProc.GetRobots(new Image<Bgr, byte>((Bitmap)Frame).Mat.GetUMat(AccessType.Read), List);
+                        // Update the robotlist on the UI thread
+                        Update(uiContext, List);
                     }
                     break;
                 case Display.SourceType.CUTOUTS:
                     // Apply image processing to find the robots
                     imgProc.GetRobots(imgProc.TestImage, List);
+                    // Update the robotlist on the UI thread
+                    Update(uiContext, List);
                     break;
                 default:
                     break;
             }
-            // Update the robotlist on the UI thread
-            Update(uiContext, List);
+            
         }
         #endregion
 
