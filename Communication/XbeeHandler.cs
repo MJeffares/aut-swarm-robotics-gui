@@ -50,13 +50,17 @@ namespace SwarmRoboticsGUI
 		}
 
 
+        
+
+        
+
 		//MANSEL: make a seperate source and destination class
 		public static class DESTINATION
 		{
 			public const UInt64 COORDINATOR = 0x0000000000000000;
 			public const UInt64 BROADCAST = 0x000000000000FFFF;
-			//public const UInt64 ROBOT_ONE = 0x0013A20041065FB3;
 
+			public const UInt64 ROBOT_ONE = 0x0013A20041065FB3;
             public const UInt64 ROBOT_TWO = 0x0013A2004147F9DD;
             public const UInt64 ROBOT_THREE = 0x0013A2004152F256;
             public const UInt64 ROBOT_FOUR = 0x0013A2004147F9D8;
@@ -72,10 +76,10 @@ namespace SwarmRoboticsGUI
 					case BROADCAST:
 						return "Broadcast Message";
 
-					//case ROBOT_ONE:
-						//return "Robot 1";
+					case ROBOT_ONE:
+					    return "Robot 1";
 
-					/*
+					
 					case ROBOT_TWO:
 						return "Robot 2";
 
@@ -84,7 +88,7 @@ namespace SwarmRoboticsGUI
 
 					case ROBOT_FOUR:
 						return "Robot 4";
-					*/
+					
 
 					default:
 						return "Warning: Unknown Desstination";
@@ -101,11 +105,14 @@ namespace SwarmRoboticsGUI
 		private const byte XON = 0x11;
 		private const byte XOFF = 0x13;
 
+        
 		private static readonly IList<byte> BYTES_TO_ESCAPE = new List<byte> { 0x7E, 0x7D, 0x11, 0x13 }.AsReadOnly();
 
 		public XbeeAPI(MainWindow main)
 		{
 			window = main;
+
+            
 		}
 
 
