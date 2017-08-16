@@ -33,8 +33,6 @@ namespace SwarmRoboticsGUI
 	public class CommunicationManager
 	{
 
-		
-
 		public class RequestedMessageReceivedArgs : EventArgs
 		{
 			public XbeeAPI.XbeeAPIFrame msg;
@@ -124,6 +122,7 @@ namespace SwarmRoboticsGUI
 		private XbeeAPI xbeeHandler;
 		public MainWindow window;
 		private ProtocolClass swarmRoboticsProtocolHandler;
+        public UInt64 currentTargetRobot;
 
 		private List<byte[]> rxMessageBuffer;
 		private List<XbeeAPI.XbeeAPIFrame> rxXbeeMessageBuffer;

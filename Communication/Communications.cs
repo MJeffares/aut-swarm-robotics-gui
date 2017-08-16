@@ -1,5 +1,8 @@
 ﻿
+using System;
+using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace SwarmRoboticsGUI
 {
@@ -28,5 +31,12 @@ namespace SwarmRoboticsGUI
 				dispSelectRobot.SelectedIndex = 0;
 			}
 		}
+
+        private void dispSelectRobot_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox CBsender = sender as ComboBox;
+            KeyValuePair<string, UInt64> selected = (KeyValuePair<string, UInt64>)CBsender.SelectedItem;
+            commManger.currentTargetRobot = selected.Value;
+        }
 	}
 }

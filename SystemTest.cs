@@ -472,8 +472,8 @@ namespace SwarmRoboticsGUI
 					data[0] = 0xE4;
                     data[1] = request;
 					data[2] = proximitySensor[0];
-					
-					xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
+
+                    xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
 					break;
 
 				case "Light":
@@ -482,22 +482,22 @@ namespace SwarmRoboticsGUI
 					data[0] = 0xE5;
                     data[1] = request;
 					data[2] = lightSensor[0];
-					
-					xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
+
+                    xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
 					break;
 
 				case "Mouse":
 					data = new byte[2];
 					data[0] = 0xE7;
 					data[1] = request;
-					xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
+                    xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
 					break;
 
 				case "IMU":
 					data = new byte[2];
 					data[0] = 0xE8;
 					data[1] = request;
-					xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
+                    xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
 					break;
 
 				case "Line":
@@ -506,7 +506,7 @@ namespace SwarmRoboticsGUI
 					data[0] = 0xE9;
 					data[1] = lineSensor[0];
 					data[2] = request;
-					xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
+                    xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
 					break;
 
 				case "Charge":

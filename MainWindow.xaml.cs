@@ -33,6 +33,7 @@ using Emgu.CV.Util;
 using folderHack;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Ports;
@@ -93,6 +94,11 @@ namespace SwarmRoboticsGUI
         public double WindowSize { get; set; }
         #endregion    
 
+
+
+        public Dictionary<string, UInt64> robotsDictionary;
+            
+
         // Main
         public MainWindow()
         {
@@ -109,11 +115,20 @@ namespace SwarmRoboticsGUI
             serial = new SerialUARTCommunication(this, menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);
 			//
 
+            this.DataContext = this;
+
 			commManger = new CommunicationManager(this,serial, xbee, protocol);
 
+            robotsDictionary = new Dictionary<string, UInt64>()
+            {
+                {"Robot One", 0x0013A20041065FB3},
+                {"Robot Two",0x0013A2004147F9DD},
+                {"Robot Three",0x0013A2004152F256},
+                {"Robot Four",0x0013A2004147F9D8}
+            };
 
-
-			overlayWindow = new OverlayWindow(this);            
+			overlayWindow = new OverlayWindow(this);
+            dispSelectRobot.ItemsSource = robotsDictionary;
             //
             CvInvoke.UseOpenCL = true;
             //
@@ -755,6 +770,8 @@ namespace SwarmRoboticsGUI
 
             xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
         }
+
+        
 
         
         
