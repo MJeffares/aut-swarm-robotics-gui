@@ -401,15 +401,17 @@ namespace SwarmRoboticsGUI
                     break;
                 case Display.SourceType.CAMERA:
                     // Sender is a frame
-                    UMat Frame = new Image<Bgr, byte>((Bitmap)e.Frame.Clone()).Mat.GetUMat(AccessType.ReadWrite);
-                    if (e.Frame != null)
+                    using (UMat Frame = new Image<Bgr, byte>((Bitmap)e.Frame).Mat.GetUMat(AccessType.Read))
                     {
-                        // Apply the currently selected filter
-                        overlayWindow.imgProc.ProcessFilter(Frame);
-                        // Draw the frame to the overlay imagebox
-                        captureImageBox.Image = overlayWindow.imgProc.Image;
+                        if (Frame != null)
+                        {
+                            CvInvoke.Resize(Frame, Frame, new System.Drawing.Size(1280, 720));
+                            // Apply the currently selected filter
+                            overlayWindow.imgProc.ProcessFilter(Frame);
+                            // Draw the frame to the overlay imagebox
+                            captureImageBox.Image = overlayWindow.imgProc.Image;
+                        }
                     }
-                    
                     break;
                 case Display.SourceType.CUTOUTS:
                     // Draw the testimage to the overlay imagebox
