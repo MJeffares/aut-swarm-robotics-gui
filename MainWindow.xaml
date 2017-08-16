@@ -235,7 +235,6 @@
                 <StackPanel DockPanel.Dock="Top" Margin="5">
                     <StackPanel Height="90"  Width="220" HorizontalAlignment="Left" >
                         <Label Content="Communication" HorizontalAlignment="Center" Margin="0,0,0,0"/>
-                        <!--<ComboBox x:Name = "dispSelectRobot"  MinHeight = "24" Width = "195" Margin = "0,0,0,8" HorizontalAlignment="Center" SelectedIndex = "0" SelectionChanged="dispSelectRobot_SelectionChanged" ItemsSource="{Binding robotsDictionary}" DisplayMemberPath="Key" SelectedValuePath="Value"/>-->
                         <ComboBox x:Name = "dispSelectRobot"  MinHeight = "24" Width = "195" Margin = "0,0,0,8" HorizontalAlignment="Center" SelectedIndex = "0" SelectionChanged="dispSelectRobot_SelectionChanged">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
@@ -318,11 +317,7 @@
                         </WrapPanel>
                     </TabItem>
 
-                    <TabItem Header="Tower Control" IsEnabled="False" >
-                        
-                    </TabItem>
-
-                    <TabItem Header = "Systems Test" IsEnabled="False"  >
+                    <TabItem Header = "Systems Test" IsEnabled="False">
                         <StackPanel Margin = "5">
 
                             <WrapPanel Margin="0,2">
@@ -332,40 +327,50 @@
                                 <Button x:Name="btnSysTestPreviousTest" Content = "Previous Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestPreviousTest_Click"/>
                                 <Button x:Name="btnSysTestNextTest" Content = "Next Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestNextTest_Click"/>
                             </WrapPanel>
-                            
-                            <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" >
-                                <WrapPanel Margin="5">
-                                    <StackPanel Margin="0,0,0,0">
-                                        <ToggleButton x:Name="btnSysTestProxmityA" Content = "Proximity A" Tag="Proximity,FA" Style="{DynamicResource ButtonStyle1}" />
-                                        <TextBox x:Name="tbSysTestProximityA" IsReadOnly="True" Margin="2"/>
-                                    </StackPanel>
 
-                                    <StackPanel Margin="5,0,0,0">
-                                        <ToggleButton x:Name="btnSysTestProxmityB" Content = "Proximity B" Tag="Proximity,FF" Style="{DynamicResource ButtonStyle1}" />
-                                        <TextBox x:Name="tbSysTestProximityB" IsReadOnly="True" Margin="2"/>
-                                    </StackPanel>
 
-                                    <StackPanel Margin="5,0,0,0">
-                                        <ToggleButton x:Name="btnSysTestProxmityC" Content = "Proximity C" Tag="Proximity,FE" Style="{DynamicResource ButtonStyle1}" />
-                                        <TextBox x:Name="tbSysTestProximityC" IsReadOnly="True" Margin="2"/>
-                                    </StackPanel>
+                            <WrapPanel>
+                                <Border BorderBrush="Gainsboro" BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Padding="2" Width="500" Height="86">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
-                                    <StackPanel Margin="5,0,0,0">
-                                        <ToggleButton x:Name="btnSysTestProxmityD" Content = "Proximity D"  Tag="Proximity,FD" Style="{DynamicResource ButtonStyle1}" />
-                                        <TextBox x:Name="tbSysTestProximityD" IsReadOnly="True" Margin="2"/>
-                                    </StackPanel>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
 
-                                    <StackPanel Margin="5,0,0,0">
-                                        <ToggleButton x:Name="btnSysTestProxmityE" Content = "Proximity E" Tag="Proximity,FC" Style="{DynamicResource ButtonStyle1}"/>
-                                        <TextBox x:Name="tbSysTestProximityE" IsReadOnly="True" Margin="2"/>
-                                    </StackPanel>
+                                        <Label Grid.Row="0" Grid.ColumnSpan="6" HorizontalAlignment="Center" >Proximity Sensors</Label>
 
-                                    <StackPanel Margin="5,0,0,0">
-                                        <ToggleButton x:Name="btnSysTestProxmityF" Content = "Proximity  F" Tag="Proximity,FB" Style="{DynamicResource ButtonStyle1}"/>
-                                        <TextBox x:Name="tbSysTestProximityF" IsReadOnly="True" Margin="2"/>
-                                    </StackPanel>
-                                </WrapPanel>
-                            </Border>
+                                        <ToggleButton Grid.Row="1" x:Name="btnSysTestProxmityA" Content = "Front" Tag="Proximity,FA" Style="{DynamicResource ButtonStyle1}" />
+                                        <TextBox Grid.Row="2" x:Name="tbSysTestProximityA" IsReadOnly="True" Margin="2"/>
+
+                                        <ToggleButton Grid.Row="1" Grid.Column="1" x:Name="btnSysTestProxmityB" Content = "Front Right" Tag="Proximity,FF" Style="{DynamicResource ButtonStyle1}" />
+                                        <TextBox Grid.Row="2" Grid.Column="1" x:Name="tbSysTestProximityB" IsReadOnly="True" Margin="2"/>
+
+                                        <ToggleButton Grid.Row="1" Grid.Column="2" x:Name="btnSysTestProxmityC" Content = "Rear Right" Tag="Proximity,FE" Style="{DynamicResource ButtonStyle1}" />
+                                        <TextBox Grid.Row="2" Grid.Column="2" x:Name="tbSysTestProximityC" IsReadOnly="True" Margin="2"/>
+
+                                        <ToggleButton Grid.Row="1" Grid.Column="3" x:Name="btnSysTestProxmityD" Content = "Rear"  Tag="Proximity,FD" Style="{DynamicResource ButtonStyle1}" />
+                                        <TextBox Grid.Row="2" Grid.Column="3" x:Name="tbSysTestProximityD" IsReadOnly="True" Margin="2"/>
+
+                                        <ToggleButton Grid.Row="1" Grid.Column="4" x:Name="btnSysTestProxmityE" Content = "Rear Left" Tag="Proximity,FC" Style="{DynamicResource ButtonStyle1}"/>
+                                        <TextBox Grid.Row="2" Grid.Column="4" x:Name="tbSysTestProximityE" IsReadOnly="True" Margin="2"/>
+
+                                        <ToggleButton Grid.Row="1" Grid.Column="5" x:Name="btnSysTestProxmityF" Content = "Front Left" Tag="Proximity,FB" Style="{DynamicResource ButtonStyle1}"/>
+                                        <TextBox Grid.Row="2" Grid.Column="5" x:Name="tbSysTestProximityF" IsReadOnly="True" Margin="2"/>
+
+
+                                    </Grid>
+                                </Border>
+                            </WrapPanel>
 
                             <WrapPanel>
                                 <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="2" Width="210" Height="86">
