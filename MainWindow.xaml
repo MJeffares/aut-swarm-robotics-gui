@@ -323,10 +323,12 @@
 
                             <WrapPanel Margin="0,2">
                                 <Button x:Name="btnSysTestCommunications" Content="Comms Test" Margin="5,5,0,5" Click="btnSysTestCommunications_Click" />
+                                <!--
                                 <Button x:Name="btnSysTestTestMode" Content = "Enter Test Mode" Margin="5,5,0,5" IsEnabled = "false"  Click="btnSysTestTestMode_Click" Width="95"/>
                                 <Button x:Name="btnSysTestFullTest" Content = "Begin Full Systems Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestFullTest_Click" Width="130"/>
-                                <Button x:Name="btnSysTestPreviousTest" Content = "Previous Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestPreviousTest_Click"/>
-                                <Button x:Name="btnSysTestNextTest" Content = "Next Test" Margin="5,5,0,5" IsEnabled="False" Click="btnSysTestNextTest_Click"/>
+                                -->
+                                <Button x:Name="btnSysTestPreviousTest" Content = "Previous Test" Margin="5,5,0,5" Click="btnSysTestPreviousTest_Click"/>
+                                <Button x:Name="btnSysTestNextTest" Content = "Next Test" Margin="5,5,0,5" Click="btnSysTestNextTest_Click"/>
                             </WrapPanel>
 
 
