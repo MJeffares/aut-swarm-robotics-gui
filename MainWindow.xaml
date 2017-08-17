@@ -600,6 +600,7 @@
             <WindowsFormsHost Grid.Column="3" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,5,0,201" Visibility="Visible" Grid.RowSpan="2">
                 <em:ImageBox x:Name="captureImageBox" Height="240" Width="320" SizeMode="StretchImage" FunctionalMode="Minimum"/>
             </WindowsFormsHost>
+
         </Grid>
     </DockPanel>
 </Window>
