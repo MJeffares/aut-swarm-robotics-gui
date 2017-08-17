@@ -1,0 +1,23 @@
+﻿<Window x:Class="SwarmRoboticsGUI.ProgressWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SwarmRoboticsGUI"
+        mc:Ignorable="d"
+        Title="ProgressWindow" Height="100" Width="300" Loaded="Window_Loaded" ResizeMode="NoResize" Topmost="True">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Name="DisplayText" Text="Text" TextAlignment="Center" VerticalAlignment="Center"/>
+        <ProgressBar Grid.Row="1" Minimum="0" Maximum="1000" IsIndeterminate="True" Margin="20,5"/>
+
+        </Grid>
+</Window>

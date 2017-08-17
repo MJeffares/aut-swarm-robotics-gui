@@ -13,5 +13,7 @@ namespace SwarmRoboticsGUI
     /// </summary>
     public partial class App : Application
     {
-    }
+
+	}
+
 }

@@ -35,6 +35,8 @@ using Emgu.CV.Util;
 using folderHack;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -49,6 +51,9 @@ using System.Windows.Threading;
 
 namespace SwarmRoboticsGUI
 {
+	
+
+
     public partial class MainWindow : Window
     {
         // Declarations
@@ -61,8 +66,9 @@ namespace SwarmRoboticsGUI
 		public CommunicationManager commManger;
         public CameraPopOutWindow popoutWindow;
         public OverlayWindow overlayWindow;
-        // one second timer to calculate and update the fps count
-        private DispatcherTimer InterfaceTimer;
+		public Dictionary<string, UInt64> robotsDictionary;
+		// one second timer to calculate and update the fps count
+		private DispatcherTimer InterfaceTimer;
         // 
         private DateTime startTime;
         //
@@ -83,8 +89,10 @@ namespace SwarmRoboticsGUI
         public MainWindow()
         {
             InitializeComponent();
-            //
-            CvInvoke.UseOpenCL = true;
+			this.DataContext = this;
+
+			//
+			CvInvoke.UseOpenCL = true;
             //
             //camera1 = new Camera(640, 480);
             //camera1 = new Camera(1280, 720);
@@ -92,13 +100,20 @@ namespace SwarmRoboticsGUI
 
             xbee = new XbeeAPI(this);
             protocol = new ProtocolClass(this);
-			
-
-            // MANSEL: Maybe make a struct. Also look at SerialPort class
+            // MANSEL: Maybe make a struct.
             serial = new SerialUARTCommunication(this, menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);
-			//
-
 			commManger = new CommunicationManager(this,serial, xbee, protocol);
+
+			
+			robotsDictionary = new Dictionary<string, UInt64>()
+			{
+				{"Robot One", 0x0013A20041065FB3},
+				{"Robot Two",0x0013A2004147F9DD},
+				{"Robot Three",0x0013A2004152F256},
+				{"Robot Four",0x0013A2004147F9D8}
+			};
+
+			dispSelectRobot.ItemsSource = robotsDictionary;
 
 			overlayWindow = new OverlayWindow(this);                      
             //
@@ -130,11 +145,11 @@ namespace SwarmRoboticsGUI
 			//serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
 
 			setupSystemTest();
-		}      
+		}
 
-        // Methods
-        #region
-        private void PopulateCameras()
+		// Methods
+		#region
+		private void PopulateCameras()
         {
             // we dont want to update this if we are connected to a camera
             if (camera1.Status != Camera.StatusType.PLAYING && camera1.Status != Camera.StatusType.RECORDING)
