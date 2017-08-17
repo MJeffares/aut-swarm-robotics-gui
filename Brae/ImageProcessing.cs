@@ -4,6 +4,7 @@ using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
+using Emgu.CV.Cuda;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -17,7 +18,7 @@ namespace SwarmRoboticsGUI
         #endregion
 
         #region Public Properties
-        public UMat Image { get; private set; }
+        //public UMat Image { get; private set; }
         public UMat TestImage { get; private set; }
         public FilterType Filter { get; set; }
         public int LowerH { get; set; }
@@ -68,47 +69,41 @@ namespace SwarmRoboticsGUI
                     return string.Format("Filter Text Error");
             }
         }
-        public void ProcessFilter(UMat Frame)
+        public void ProcessFilter(IInputArray Input, IOutputArray Output)
         {
             switch (Filter)
             {
                 case FilterType.NONE:
-                    Image = Frame;
+                    Input.GetInputArray().CopyTo(Output);
                     break;
                 case FilterType.GREYSCALE:
-                    CvInvoke.CvtColor(Frame, Image, ColorConversion.Bgr2Gray);
+                    CvInvoke.CvtColor(Input, Output, ColorConversion.Bgr2Gray);
                     break;
                 case FilterType.CANNY_EDGES:
-                    using (UMat In = Frame.Clone())
-                    using (UMat Out = Frame.Clone())
+                    using (var Out = new UMat())
                     {
-                        CvInvoke.CvtColor(In, In, ColorConversion.Bgr2Gray);
-                        CvInvoke.PyrDown(In, In);
-                        CvInvoke.PyrUp(In, In);
-                        CvInvoke.Canny(In, Out, 80, 40);
-                        Image = Out.Clone();
+                        CvInvoke.CvtColor(Input, Out, ColorConversion.Bgr2Gray);
+                        CvInvoke.PyrDown(Out, Out);
+                        CvInvoke.PyrUp(Out, Out);
+                        CvInvoke.Canny(Out, Output, 80, 40);
                     }
                     break;
                 case FilterType.COLOUR:
-                    using (UMat In = Frame.Clone())
-                    using (UMat Out = Frame.Clone())
+                    using (var Out = new Mat())
+                    using (var HOut = new Mat())
+                    using (ScalarArray lower = new ScalarArray(LowerH))
+                    using (ScalarArray upper = new ScalarArray(UpperH))
                     {
-                        CvInvoke.CvtColor(In, In, ColorConversion.Bgr2Hsv);
-                        using (ScalarArray lower = new ScalarArray(LowerH))
-                        using (ScalarArray upper = new ScalarArray(UpperH))
-                        using (Mat HueIn = new Image<Gray, byte>(Frame.Size).Mat)
-                        {
-                            CvInvoke.ExtractChannel(In, HueIn, 0);
-                            CvInvoke.InRange(HueIn, lower, upper, Out);
-                        }
-                        using (Mat SatIn = new Image<Gray, byte>(Frame.Size).Mat)
-                        {
-                            CvInvoke.ExtractChannel(In, SatIn, 1);
-                            CvInvoke.Threshold(SatIn, SatIn, 25, 255, ThresholdType.Binary);
-                            CvInvoke.BitwiseAnd(Out, SatIn, Out);
-                        }
-                        CvInvoke.PutText(Out, CvInvoke.CountNonZero(Out).ToString(), new Point(20, 20), FontFace.HersheySimplex, 1, new MCvScalar(128, 128, 128), 2);
-                        Image = Out.Clone();
+                        //
+                        CvInvoke.CvtColor(Input, Out, ColorConversion.Bgr2Hsv);
+                        //
+                        CvInvoke.ExtractChannel(Out, HOut, 0);
+                        CvInvoke.InRange(HOut, lower, upper, HOut);
+                        //
+                        CvInvoke.ExtractChannel(Out, Out, 1);
+                        CvInvoke.Threshold(Out, Out, 0, 25, ThresholdType.Binary);
+                        CvInvoke.BitwiseAnd(HOut, Out, Output);
+                        //CvInvoke.PutText(Out, CvInvoke.CountNonZero(Out).ToString(), new Point(20, 20), FontFace.HersheySimplex, 1, new MCvScalar(128, 128, 128), 2);
                     }
                     break;
                 default:

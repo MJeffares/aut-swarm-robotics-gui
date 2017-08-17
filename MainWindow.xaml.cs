@@ -45,6 +45,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace SwarmRoboticsGUI
@@ -391,6 +392,7 @@ namespace SwarmRoboticsGUI
             statusFPS.Text = camera1.FPS.ToString();
         }
 
+        ImageSource imageSource { get; set; }
 
         private void DrawCameraFrame(object sender, NewFrameEventArgs e)
         {
@@ -401,15 +403,16 @@ namespace SwarmRoboticsGUI
                     break;
                 case Display.SourceType.CAMERA:
                     // Sender is a frame
-                    using (UMat Frame = new Image<Bgr, byte>((Bitmap)e.Frame).Mat.GetUMat(AccessType.Read))
+                    using (var Frame = new Image<Bgr, byte>(e.Frame).Mat)
+                    using (var Image = new Mat())
                     {
                         if (Frame != null)
                         {
-                            CvInvoke.Resize(Frame, Frame, new System.Drawing.Size(1280, 720));
                             // Apply the currently selected filter
-                            overlayWindow.imgProc.ProcessFilter(Frame);
+                            overlayWindow.imgProc.ProcessFilter(Frame, Image);
                             // Draw the frame to the overlay imagebox
-                            captureImageBox.Image = overlayWindow.imgProc.Image;
+                            if (Image != null)
+                                captureImageBox.Image = Image.Clone();
                         }
                     }
                     break;

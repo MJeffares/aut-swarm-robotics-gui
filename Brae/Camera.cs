@@ -39,13 +39,14 @@ namespace SwarmRoboticsGUI
         #endregion
 
         #region Public Events
-        public delegate void FrameHandler(Bitmap Frame, NewFrameEventArgs e);
+        public delegate void FrameHandler(object sender, NewFrameEventArgs e);
         public event FrameHandler FrameUpdate;
         #endregion
         public Camera()
         {
             Status = StatusType.STOPPED;
             InitializeTimer();
+            
         }
 
         #region Public Methods
@@ -75,10 +76,9 @@ namespace SwarmRoboticsGUI
             videoSource.VideoResolution = videoSource.VideoCapabilities[CapabilityIndex];
 
             // set NewFrame event handler
-            videoSource.NewFrame += new NewFrameEventHandler(ProcessFrame);
+            videoSource.NewFrame += new NewFrameEventHandler(FrameUpdate);
             // start the video source
             videoSource.Start();
-
             Status = StatusType.PLAYING;
         }
         public void StopCapture()
@@ -86,6 +86,7 @@ namespace SwarmRoboticsGUI
             if (Status == StatusType.PLAYING)
             {
                 videoSource.SignalToStop();
+                videoSource.NewFrame -= new NewFrameEventHandler(FrameUpdate);
                 Status = StatusType.STOPPED;
             }
         }
@@ -153,6 +154,14 @@ namespace SwarmRoboticsGUI
             //{
             //    videoCapture.SetCaptureProperty(CapProp.Settings, 1);
             //}
+            if (Name != null)
+            {
+                // gets currently connected devices
+                var VideoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+                // create video source
+                videoSource = new VideoCaptureDevice(VideoDevices[Index].MonikerString);
+                videoSource.DisplayPropertyPage(new IntPtr());
+            }
         }
 
         private bool disposed = false;
@@ -176,7 +185,7 @@ namespace SwarmRoboticsGUI
             if (videoSource != null)
             {
                 videoSource.SignalToStop();
-                videoSource.NewFrame -= new NewFrameEventHandler(ProcessFrame);
+                videoSource.NewFrame -= new NewFrameEventHandler(FrameUpdate);
                 videoSource = null;
             }
 
@@ -197,11 +206,6 @@ namespace SwarmRoboticsGUI
         {
             FPS = FrameCount;
             FrameCount = 0;
-        }
-        private void ProcessFrame(object sender, NewFrameEventArgs e)
-        {
-            FrameUpdate(e.Frame, e);
-            FrameCount++;
         }
         #endregion
     }

@@ -58,6 +58,10 @@ namespace SwarmRoboticsGUI
             ColourC = 1000;
             // Default lower saturation cutoff
             LowerS = 25;
+
+            LowerH = 0;
+            UpperH = 130;
+
             // Create 100ms timer to drive interface changes
             InitializeTimer();
             // Create event driven by new frames from the camera

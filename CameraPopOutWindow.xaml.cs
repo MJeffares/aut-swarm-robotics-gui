@@ -29,7 +29,7 @@ namespace SwarmRoboticsGUI
         }
         private void Frame_Tick(object sender, ElapsedEventArgs e)
         {
-            captureImageBox.Image = mainWindow.captureImageBox.Image;
+            //captureImageBox.Image = mainWindow.captureImageBox.Image;
         }
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
