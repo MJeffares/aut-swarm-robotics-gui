@@ -11,46 +11,13 @@ using System.Drawing;
 
 namespace SwarmRoboticsGUI
 {
-    public class ImageProcessing
+    public enum FilterType { NONE, GREYSCALE, CANNY_EDGES, COLOUR, NUM_FILTERS };
+
+    public static class ImageProcessing
     {
-        #region Enumerations
-        public enum FilterType { NONE, GREYSCALE, CANNY_EDGES, COLOUR, NUM_FILTERS };
-        #endregion
-
         #region Public Properties
-        //public UMat Image { get; private set; }
-        public UMat TestImage { get; private set; }
-        public FilterType Filter { get; set; }
-        public int LowerH { get; set; }
-        public int LowerV { get; set; }
-        public int UpperH { get; set; }
-        public int UpperS { get; set; }
-        public int UpperV { get; set; }
+        public static UMat TestImage = CvInvoke.Imread("...\\...\\Brae\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
         #endregion
-
-        #region Private Properties
-        private int HexCount { get; set; }
-        private int LargeContourCount { get; set; }
-        private int RobotCount { get; set; }
-        #endregion
-
-        public ImageProcessing()
-        {
-            Filter = FilterType.NONE;
-            try
-            {
-                // Load test image
-                UMat image = CvInvoke.Imread("...\\...\\Brae\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
-                // Resize
-                CvInvoke.Resize(image, image, new Size(1280, 720));
-                TestImage = image.Clone();
-            }
-            catch (Exception)
-            {
-                // If load fails, return black image of default size
-                TestImage = new Image<Gray, byte>(new Size(640, 480)).Mat.GetUMat(AccessType.Read);
-            }          
-        }
 
         #region Public Methods
         public static string ToString(FilterType filter)
@@ -69,7 +36,7 @@ namespace SwarmRoboticsGUI
                     return string.Format("Filter Text Error");
             }
         }
-        public void ProcessFilter(IInputArray Input, IOutputArray Output)
+        public static void ProcessFilter(IInputArray Input, IOutputArray Output, FilterType Filter)
         {
             switch (Filter)
             {
@@ -91,8 +58,8 @@ namespace SwarmRoboticsGUI
                 case FilterType.COLOUR:
                     using (var Out = new Mat())
                     using (var HOut = new Mat())
-                    using (ScalarArray lower = new ScalarArray(LowerH))
-                    using (ScalarArray upper = new ScalarArray(UpperH))
+                    using (ScalarArray lower = new ScalarArray(0))
+                    using (ScalarArray upper = new ScalarArray(150))
                     {
                         //
                         CvInvoke.CvtColor(Input, Out, ColorConversion.Bgr2Hsv);
@@ -103,14 +70,13 @@ namespace SwarmRoboticsGUI
                         CvInvoke.ExtractChannel(Out, Out, 1);
                         CvInvoke.Threshold(Out, Out, 0, 25, ThresholdType.Binary);
                         CvInvoke.BitwiseAnd(HOut, Out, Output);
-                        //CvInvoke.PutText(Out, CvInvoke.CountNonZero(Out).ToString(), new Point(20, 20), FontFace.HersheySimplex, 1, new MCvScalar(128, 128, 128), 2);
                     }
                     break;
                 default:
                     break;
             }
         }
-        public List<RobotItem> GetRobots(UMat Frame, List<RobotItem> RobotList)
+        public static void GetRobots(UMat Frame, List<RobotItem> RobotList)
         {
             // Find every contour in the image
             VectorOfVectorOfPoint Contours = GetCountours(Frame, 5, RetrType.External);
@@ -185,12 +151,7 @@ namespace SwarmRoboticsGUI
                                                                (int)(50 * Math.Sin(RobotList[index].Heading)));
                     }
                 }
-                // DEBUG: Store counters
-                this.HexCount = HexCount;
-                this.RobotCount = RobotCount;
-                LargeContourCount = ProcessedContours.Size;
             }
-            return RobotList;
         }
         #endregion
 
@@ -401,8 +362,7 @@ namespace SwarmRoboticsGUI
             if (IsOrange && IsGreen && IsPurple && !IsLightBlue && !IsDarkBlue && !IsYellow) RobotID = 5;
 
             return RobotID;
-        }
-        
+        }        
         #endregion
     }
 }

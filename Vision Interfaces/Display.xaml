@@ -33,7 +33,7 @@
     </UserControl.Resources>
     <Grid>
         <Viewbox Stretch="Fill">
-            <ItemsControl Width="1280" Height="720" Name="Arena" 
+            <ItemsControl Width="1920" Height="1080" Name="Arena" 
                           ItemsSource="{Binding Items, RelativeSource={RelativeSource AncestorType=UserControl}}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
