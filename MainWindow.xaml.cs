@@ -222,13 +222,13 @@ namespace SwarmRoboticsGUI
         private void PopulateFilters()
         {
             //loops through our filters and adds them to our menu
-            for (int i = 0; i < (int)FilterType.NUM_FILTERS; i++)
+            foreach (FilterType Filter in Enum.GetValues(typeof(FilterType)))
             {
-                MenuItem item = new MenuItem { Header = ImageProcessing.ToString((FilterType)i) };
+                MenuItem item = new MenuItem { Header = EnumUtils<FilterType>.GetDescription(Filter)};
                 item.Click += new RoutedEventHandler(menuFilterListItem_Click);
                 item.IsCheckable = true;
                 //by default select our first filter (no filter)
-                if (i == 0)
+                if (Filter == FilterType.NONE)
                 {
                     item.IsChecked = true;
                 }
@@ -456,7 +456,7 @@ namespace SwarmRoboticsGUI
             MenuItem menusender = (MenuItem)sender;
             string menusenderstring = menusender.ToString();
 
-            if (menusenderstring != ImageProcessing.ToString(camera1.Filter))
+            if (menusenderstring != EnumUtils<FilterType>.GetDescription(camera1.Filter))
             {
                 MenuItem[] allitems = menuFilterList.Items.OfType<MenuItem>().ToArray();
 
@@ -467,7 +467,7 @@ namespace SwarmRoboticsGUI
                 menusender.IsChecked = true;
                 camera1.Filter = (FilterType)menuFilterList.Items.IndexOf(menusender);
                 //
-                statusDisplayFilter.Text = ImageProcessing.ToString(camera1.Filter);
+                statusDisplayFilter.Text = EnumUtils<FilterType>.GetDescription(camera1.Filter);
             }
             else if (camera1.Filter != FilterType.NONE)
             {

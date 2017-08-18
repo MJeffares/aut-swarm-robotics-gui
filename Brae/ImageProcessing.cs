@@ -8,34 +8,30 @@ using Emgu.CV.Cuda;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.ComponentModel;
+using System.Reflection;
 
 namespace SwarmRoboticsGUI
 {
-    public enum FilterType { NONE, GREYSCALE, CANNY_EDGES, COLOUR, NUM_FILTERS };
+    public enum FilterType
+    {
+        [Description("No Filter")]
+        NONE,
+        [Description("Greyscale")]
+        GREYSCALE,
+        [Description("Canny Edges")]
+        CANNY_EDGES,
+        [Description("Colour Filtering")]
+        COLOUR
+    };
 
     public static class ImageProcessing
     {
         #region Public Properties
-        public static UMat TestImage = CvInvoke.Imread("...\\...\\Brae\\Images\\robotcutouts2.png").GetUMat(AccessType.Read);
+        public static UMat TestImage = CvInvoke.Imread("...\\...\\Brae\\Images\\robotcutouts3.png").GetUMat(AccessType.Read);
         #endregion
 
         #region Public Methods
-        public static string ToString(FilterType filter)
-        {
-            switch (filter)
-            {
-                case FilterType.NONE:
-                    return string.Format("No Filter");
-                case FilterType.GREYSCALE:
-                    return string.Format("Greyscale");
-                case FilterType.CANNY_EDGES:
-                    return string.Format("Canny Edges");
-                case FilterType.COLOUR:
-                    return string.Format("Colour Filtering");
-                default:
-                    return string.Format("Filter Text Error");
-            }
-        }
         public static void ProcessFilter(IInputArray Input, IOutputArray Output, FilterType Filter)
         {
             switch (Filter)
