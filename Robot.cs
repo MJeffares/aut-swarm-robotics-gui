@@ -118,6 +118,19 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
+        private int _Radius { get; set; }
+        public int Radius
+        {
+            get { return _Radius; }
+            set
+            {
+                if (_Radius != value)
+                {
+                    _Radius = value;
+                    NotifyPropertyChanged("Radius");
+                }
+            }
+        }
         private int _Height { get; set; }
         public int Height
         {
@@ -245,9 +258,10 @@ namespace SwarmRoboticsGUI
         public RobotItem(string Name, int ID) : base(Name, ID)
         {
             Group = "Unassigned";
-            // TEMP: Size of the robots is fixed
-            Height = 200;
-            Width = 200;
+            // TEMP: Size of the robots is fixed       
+            Radius = 100;
+            Width = 2 * Radius;
+            Height = (int)(Math.Sqrt(3) * Radius);
             Children = new ObservableCollection<Item>();
 
             // TEMP: Testing layout

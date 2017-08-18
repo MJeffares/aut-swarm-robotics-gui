@@ -35,6 +35,8 @@ namespace SwarmRoboticsGUI
             set { SetValue(ItemsProperty, value); }
         }
 
+        // TODO: Move OverlayType and SourceType outside of Display and add discriptions
+        // TODO: Remove ToString methods for enums OverlayType and SourceType
         #region Enumerations
         public enum OverlayType { NONE, DEBUG, PRETTY, INFO, GRID, TEST, NUM_OVERLAYS };
         public enum SourceType { NONE, CAMERA, CUTOUTS, NUM_SOURCES };
@@ -87,17 +89,17 @@ namespace SwarmRoboticsGUI
 
         private void Robot_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var Target = sender as Grid;
+            var Target = sender as Polygon;
             if (Target != null)
             {
                 var Robot = Target.DataContext as RobotItem;
                 if (Robot != null)
                 {
+                    int index = Items.IndexOf(Robot);
                     for (int i = 0; i < Items.Count; i++)
                     {
                         Items[i].IsSelected = false;
                     }
-                    int index = Items.IndexOf(Robot);
                     Items[index].IsSelected = true;
                 }
             }

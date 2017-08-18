@@ -137,6 +137,12 @@ namespace SwarmRoboticsGUI
             overlayWindow.Show();
             camera1.FrameUpdate += new Camera.FrameHandler(DrawCameraFrame);
 
+            // BRAE: Default setup for testing
+            overlayWindow.Display1.Source = Display.SourceType.CUTOUTS;
+            //camera1.Index = 1;
+            // This will run the camera at 640x480
+            //camera1.StartCapture();
+
             //serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
 
 			setupSystemTest();
@@ -438,7 +444,8 @@ namespace SwarmRoboticsGUI
                     break;
                 case Display.SourceType.CUTOUTS:
                     // Draw the testimage to the overlay imagebox
-                    captureImageBox.Image = ImageProcessing.TestImage;
+                    if (ImageProcessing.TestImage != null)
+                        captureImageBox.Image = ImageProcessing.TestImage;
                     break;
                 default:
                     break;
@@ -763,7 +770,7 @@ namespace SwarmRoboticsGUI
             xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
             if (InterfaceTimer != null)
             {
@@ -779,11 +786,13 @@ namespace SwarmRoboticsGUI
 
             if (camera1 != null)
             {
-                // Stop if capturing
-                if (camera1.Status == StatusType.PLAYING)
-                    camera1.StopCapture();
+                // BRAE: Setting the source to NONE to stop an exception.
+                overlayWindow.Display1.Source = Display.SourceType.NONE;
                 // Clear event
                 camera1.FrameUpdate -= new Camera.FrameHandler(DrawCameraFrame);
+                // Stop if capturing
+                if (camera1.Status == StatusType.PLAYING)
+                    camera1.StopCapture();                               
                 // Dispose of camera
                 camera1.Dispose();
             }

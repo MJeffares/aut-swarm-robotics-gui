@@ -62,7 +62,7 @@ namespace SwarmRoboticsGUI
             // Create 100ms timer to drive interface changes
             InitializeTimer();
             // Create event driven by new frames from the camera
-            //mainWindow.camera1.FrameUpdate += new Camera.FrameHandler(DrawOverlayFrame);
+            mainWindow.camera1.FrameUpdate += new Camera.FrameHandler(DrawOverlayFrame);
 
             RobotList = new ObservableCollection<RobotItem>();
             // Stores the UI context to be used to marshal 
@@ -111,10 +111,8 @@ namespace SwarmRoboticsGUI
                     }
                     break;
                 case Display.SourceType.CUTOUTS:
-                    var CutOuts = new UMat();
-                    CvInvoke.Resize(ImageProcessing.TestImage, CutOuts, new System.Drawing.Size(1280, 720));
                     // Apply image processing to find the robots
-                    ImageProcessing.GetRobots(CutOuts, List);
+                    ImageProcessing.GetRobots(ImageProcessing.TestImage, List);
                     // Update the robotlist on the UI thread
                     Update(uiContext, List);
                     break;

@@ -28,10 +28,16 @@ namespace SwarmRoboticsGUI
     public static class ImageProcessing
     {
         #region Public Properties
-        public static UMat TestImage = CvInvoke.Imread("...\\...\\Brae\\Images\\robotcutouts3.png").GetUMat(AccessType.Read);
+        public static UMat TestImage { get; }
         #endregion
 
         #region Public Methods
+        static ImageProcessing()
+        {
+            TestImage = new UMat();
+            var Image = CvInvoke.Imread("...\\...\\Brae\\Images\\robotcutouts3.png").GetUMat(AccessType.Read);
+            CvInvoke.Resize(Image, TestImage, new Size(1920, 1080));
+        }
         public static void ProcessFilter(IInputArray Input, IOutputArray Output, FilterType Filter)
         {
             switch (Filter)
@@ -75,9 +81,10 @@ namespace SwarmRoboticsGUI
         public static void GetRobots(UMat Frame, List<RobotItem> RobotList)
         {
             // Find every contour in the image
-            VectorOfVectorOfPoint Contours = GetCountours(Frame, 5, RetrType.External);
+            VectorOfVectorOfPoint Contours = new VectorOfVectorOfPoint();// = GetCountours(Frame, 5, RetrType.External);
+            GetCountours(Frame, Contours, 5, RetrType.External);
             // Filter out small and large contours
-            VectorOfVectorOfPoint ProcessedContours = FilterContourArea(Contours, 1000, 100000);
+            VectorOfVectorOfPoint ProcessedContours = FilterContourArea(Contours, 0, 1000000);
 
             // DEBUG: Counters
             int HexCount = 0, RobotCount = 0;
@@ -143,8 +150,8 @@ namespace SwarmRoboticsGUI
                         int dx = Direction.X - RobotList[index].Location.X;                       
                         RobotList[index].Heading = Math.Atan2(dy, dx);
                         RobotList[index].HeadingDeg = Math.Atan2(dy, dx) * 180 / Math.PI;
-                        RobotList[index].Direction = new Point((int)(50 * Math.Cos(RobotList[index].Heading)), 
-                                                               (int)(50 * Math.Sin(RobotList[index].Heading)));
+                        RobotList[index].Direction = new Point((int)(60 * Math.Cos(RobotList[index].Heading)), 
+                                                               (int)(60 * Math.Sin(RobotList[index].Heading)));
                     }
                 }
             }
@@ -152,18 +159,46 @@ namespace SwarmRoboticsGUI
         #endregion
 
         #region Private Methods
-        private static VectorOfVectorOfPoint GetCountours(UMat Frame, int BlurSize, RetrType Mode)
+        private static void GetCountours(IInputArray Frame, IOutputArray Contours, int BlurSize, RetrType Mode)
         {
-            VectorOfVectorOfPoint Contours = new VectorOfVectorOfPoint();
-            using (UMat Input = Frame.Clone())
+            if (CudaInvoke.HasCuda)
             {
-                CvInvoke.CvtColor(Input, Input, ColorConversion.Bgr2Gray);
-                CvInvoke.GaussianBlur(Input, Input, new Size(BlurSize, BlurSize), 0);
-                CvInvoke.BitwiseNot(Input, Input);
-                CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 3, 0);
-                CvInvoke.FindContours(Input, Contours, null, Mode, ChainApproxMethod.ChainApproxNone);
+                // The image arrays
+                var Input = new GpuMat(Frame);
+                var Canny = new GpuMat();
+                // Convert to grayscale
+                CudaInvoke.CvtColor(Input, Input, ColorConversion.Bgr2Gray);
+                // Noise removal but keeps edges
+                // More expensive operation therefore only used on Cuda
+                CudaInvoke.BilateralFilter(Input, Input, 9, 75, 75);
+                // Invert image
+                CudaInvoke.BitwiseNot(Input, Input);    
+                // Find edges using Canny                     
+                new CudaCannyEdgeDetector(0, 255).Detect(Input, Canny, null);
+                // Find only the external contours applying no shape approximations
+                // FindContours has no Cuda counterpart so the GpuMat is converted to a Mat
+                CvInvoke.FindContours(Canny.ToMat(), Contours, null, Mode, ChainApproxMethod.ChainApproxNone);
+                // Dispose of the image arrays
+                Input.Dispose();
+                Canny.Dispose();
             }
-            return Contours;
+            else
+            {
+                // Create an image array
+                var Input = new UMat();
+                // Convert to grayscale
+                CvInvoke.CvtColor(Frame, Input, ColorConversion.Bgr2Gray);
+                // Noise removal
+                CvInvoke.GaussianBlur(Input, Input, new Size(BlurSize, BlurSize), 0);
+                // Invert image
+                CvInvoke.BitwiseNot(Input, Input);
+                // Threshold the image to find the edges     
+                CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 3, 0);
+                // Find only the external contours applying no shape approximations
+                CvInvoke.FindContours(Input, Contours, null, Mode, ChainApproxMethod.ChainApproxNone);
+                // Dispose of the image array
+                Input.Dispose();
+            }
         }
         private static VectorOfVectorOfPoint FilterContourArea(VectorOfVectorOfPoint Contours, double LowerBound, double UpperBound)
         {
@@ -306,7 +341,7 @@ namespace SwarmRoboticsGUI
                 // Find contours
                 CvInvoke.FindContours(Input, Contours, null, RetrType.Ccomp, ChainApproxMethod.ChainApproxSimple);
             }
-            ProcessedContours = FilterContourArea(Contours, 50, 10000);
+            ProcessedContours = FilterContourArea(Contours, 50, 100000);
 
             MCvPoint2D64f TriangleCOM = new MCvPoint2D64f();
             for (int i = 0; i < ProcessedContours.Size; i++)
