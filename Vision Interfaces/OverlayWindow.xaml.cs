@@ -1,4 +1,5 @@
-﻿using Emgu.CV;
+﻿using AForge.Video;
+using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using System;
@@ -38,8 +39,6 @@ namespace SwarmRoboticsGUI
         public int UpperS { get; set; }
         public int UpperV { get; set; }
         #endregion
-
-        public ImageProcessing imgProc { get; set; }
         private System.Timers.Timer InterfaceTimer { get; set; }
 
         public ObservableCollection<RobotItem> RobotList { get; set; }
@@ -49,8 +48,6 @@ namespace SwarmRoboticsGUI
         public OverlayWindow(MainWindow mainWindow)
         {
             InitializeComponent();
-            // Create an image processing class for processing the camera frames
-            imgProc = new ImageProcessing();
             // Create an image display class for drawing to the image box
             // Set the window to the data context for data binding
             DataContext = this;
@@ -92,7 +89,7 @@ namespace SwarmRoboticsGUI
 
         #region Time Events
         
-        private void DrawOverlayFrame(object sender, EventArgs e)
+        private void DrawOverlayFrame(object sender, NewFrameEventArgs e)
         {
             var List = RobotList.ToList();
 
@@ -101,15 +98,13 @@ namespace SwarmRoboticsGUI
                 case Display.SourceType.NONE:
                     break;
                 case Display.SourceType.CAMERA:
-                    // Typecast object to get passed UMat class
-                    var Frame = sender as Bitmap;
                     // Make sure there is a frame
-                    if (Frame != null)
+                    if (e.Frame != null)
                     {
                         // Apply image processing to find the robots
-                        using (UMat UFrame = new Image<Bgr, byte>(Frame).Mat.GetUMat(AccessType.Read))
+                        using (UMat UFrame = new Image<Bgr, byte>(e.Frame).Mat.GetUMat(AccessType.Read))
                         {
-                            imgProc.GetRobots(UFrame, List);
+                            ImageProcessing.GetRobots(UFrame, List);
                         }
                         // Update the robotlist on the UI thread
                         Update(uiContext, List);
@@ -117,7 +112,7 @@ namespace SwarmRoboticsGUI
                     break;
                 case Display.SourceType.CUTOUTS:
                     // Apply image processing to find the robots
-                    imgProc.GetRobots(imgProc.TestImage, List);
+                    ImageProcessing.GetRobots(ImageProcessing.TestImage, List);
                     // Update the robotlist on the UI thread
                     Update(uiContext, List);
                     break;
@@ -131,9 +126,6 @@ namespace SwarmRoboticsGUI
         #region Private Events 
         private void Interface_Tick(object sender, ElapsedEventArgs e)
         {
-            // Update imgProc values from inputs on UI
-            imgProc.LowerH = LowerH;
-            imgProc.UpperH = UpperH;
             // Update the display with the interface when using the cutouts
             switch (Display1.Source)
             {
@@ -142,7 +134,6 @@ namespace SwarmRoboticsGUI
                 case Display.SourceType.CAMERA:
                     break;
                 case Display.SourceType.CUTOUTS:
-                    DrawOverlayFrame(this, new EventArgs());
                     break;
                 default:
                     break;
@@ -155,13 +146,6 @@ namespace SwarmRoboticsGUI
         private void btnClear_Click(object sender, RoutedEventArgs e)
         {
             ClearRobots(RobotList);
-        }
-        private void OverlayImageBox_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            // Notify the display where it was clicked
-            //Display.Click(e.Location);
-            // Update the frame
-            DrawOverlayFrame(this, new EventArgs());
         }
         #endregion
 

@@ -15,17 +15,15 @@ using Microsoft.Win32.SafeHandles;
 
 namespace SwarmRoboticsGUI
 {
+    public enum StatusType { PLAYING, PAUSED, STOPPED, REPLAY_ACTIVE, REPLAY_PAUSED, RECORDING };
     public class Camera : IDisposable
     {
-        #region Enumerations
-        public enum StatusType { PLAYING, PAUSED, STOPPED, REPLAY_ACTIVE, REPLAY_PAUSED, RECORDING };
-        #endregion 
-
         #region Public Properties
         // Camera Properties
         public string Name { get; set; }
         public int Index { get; set; }
         public StatusType Status { get; private set; }
+        public FilterType Filter { get; set; }
         public int CapabilityIndex { get; set; }
         public int FPS { get; private set; }
         #endregion
@@ -45,8 +43,8 @@ namespace SwarmRoboticsGUI
         public Camera()
         {
             Status = StatusType.STOPPED;
+            Filter = FilterType.NONE;
             InitializeTimer();
-            
         }
 
         #region Public Methods
@@ -85,8 +83,8 @@ namespace SwarmRoboticsGUI
         {
             if (Status == StatusType.PLAYING)
             {
-                videoSource.SignalToStop();
                 videoSource.NewFrame -= new NewFrameEventHandler(FrameUpdate);
+                videoSource.SignalToStop();
                 Status = StatusType.STOPPED;
             }
         }
@@ -149,11 +147,6 @@ namespace SwarmRoboticsGUI
         }
         public void OpenSettings()
         {
-            ////need try/catch or checks 
-            //if (Name != null)
-            //{
-            //    videoCapture.SetCaptureProperty(CapProp.Settings, 1);
-            //}
             if (Name != null)
             {
                 // gets currently connected devices
@@ -184,8 +177,6 @@ namespace SwarmRoboticsGUI
             FpsTimer.Dispose();
             if (videoSource != null)
             {
-                videoSource.SignalToStop();
-                videoSource.NewFrame -= new NewFrameEventHandler(FrameUpdate);
                 videoSource = null;
             }
 

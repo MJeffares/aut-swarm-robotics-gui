@@ -19,25 +19,27 @@
             </Style.Triggers>
         </Style>
         <Style x:Key="Triangle" TargetType="Polygon">
-            <Setter Property="Points" Value="0,1 0.5,0 1,1"/>
-            <Setter Property="Fill" Value="#000"/>
+            <!--<Setter Property="Points" Value="0,1 0.5,0 1,1"/>-->
+            <Setter Property="Points" Value="0,0 1,0.5 0,1"/>
+            <Setter Property="Fill" Value="Black"/>
             <Setter Property="Stretch" Value="Fill"/>
         </Style>
 
-        <SolidColorBrush x:Key="ListSpacerBrush" Color="#FF202020"/>
-        <SolidColorBrush x:Key="ListItemBrush" Color="#FF404040"/>
-        <SolidColorBrush x:Key="ListRobotBrush" Color="#FF101010"/>
-        <SolidColorBrush x:Key="ListGroupBrush" Color="#FF303030"/>
-        <SolidColorBrush x:Key="ListBrush" Color="#FF303030"/>
+        <SolidColorBrush x:Key="ListSpacerBrush" Color="#222"/>
+        <SolidColorBrush x:Key="ListItemBrush" Color="#444"/>
+        <SolidColorBrush x:Key="ListRobotBrush" Color="#111"/>
+        <SolidColorBrush x:Key="ListGroupBrush" Color="#333"/>
+        <SolidColorBrush x:Key="ListBrush" Color="#333"/>
         <SolidColorBrush x:Key="WhiteBrush" Color="#FFF"/>
+        <SolidColorBrush x:Key="BlackBrush" Color="#000"/>
     </UserControl.Resources>
     <Grid>
         <Viewbox Stretch="Fill">
-            <ItemsControl Width="1280" Height="720" Name="Arena" 
+            <ItemsControl Width="1920" Height="1080" Name="Arena" 
                           ItemsSource="{Binding Items, RelativeSource={RelativeSource AncestorType=UserControl}}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <Canvas />
+                        <Canvas Background="#333"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemContainerStyle>
@@ -49,10 +51,10 @@
                 </ItemsControl.ItemContainerStyle>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid MouseLeftButtonDown="Robot_MouseLeftButtonDown">
+                        <Grid>
                             <Polygon Name="Hexagon" Style="{StaticResource Hexagon}"
-                                     Height="{Binding Height}" 
-                                     Width="{Binding Width}">
+                                     Height="{Binding Width}" Width="{Binding Height}"
+                                     MouseLeftButtonDown="Robot_MouseLeftButtonDown">
                                 <Polygon.LayoutTransform>
                                     <TransformGroup>
                                         <RotateTransform Angle="{Binding HeadingDeg}"/>
@@ -60,17 +62,20 @@
                                 </Polygon.LayoutTransform>
                             </Polygon>
                             <Polygon Style="{StaticResource Triangle}"
-                                     Height="20"
-                                     Width="20" RenderTransformOrigin="0.5,0.5">
+                                     Height="20" Width="20" 
+                                     RenderTransformOrigin="0.5,0.5"
+                                     IsHitTestVisible="False">
                                 <Polygon.RenderTransform>
                                     <TransformGroup>
+                                        <RotateTransform Angle="{Binding HeadingDeg}"/>
                                         <TranslateTransform X="{Binding Direction.X}" Y="{Binding Direction.Y}"/>
                                     </TransformGroup>
                                 </Polygon.RenderTransform>
                             </Polygon>
                             <TextBlock Text="{Binding Name}" 
                                        VerticalAlignment="Center" HorizontalAlignment="Center"
-                                       Foreground="White" FontSize="20">
+                                       Foreground="White" FontSize="30"
+                                       IsHitTestVisible="False">
                             </TextBlock>
                             
                         </Grid>

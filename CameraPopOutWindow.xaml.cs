@@ -1,7 +1,9 @@
 ﻿/**********************************************************************************************************************************************
 * Namespaces
 **********************************************************************************************************************************************/
+using AForge.Video;
 using Emgu.CV;
+using Emgu.CV.Structure;
 using Emgu.CV.UI;
 using System;
 using System.Timers;
@@ -15,7 +17,6 @@ namespace SwarmRoboticsGUI
 	/// </summary>
 	public partial class CameraPopOutWindow : Window
 	{
-        private Timer FrameTimer { get; set; }
         private MainWindow mainWindow { get; set; }
 
         public CameraPopOutWindow(MainWindow mainWindow)
@@ -23,17 +24,23 @@ namespace SwarmRoboticsGUI
 			InitializeComponent();
             this.mainWindow = mainWindow;
 
-            FrameTimer = new Timer(50);
-            FrameTimer.Elapsed += Frame_Tick;
-            FrameTimer.Start();
+            // Create event driven by new frames from the camera
+            mainWindow.camera1.FrameUpdate += new Camera.FrameHandler(DrawCameraFrame);
         }
-        private void Frame_Tick(object sender, ElapsedEventArgs e)
+        private void DrawCameraFrame(object sender, NewFrameEventArgs e)
         {
-            //captureImageBox.Image = mainWindow.captureImageBox.Image;
-        }
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            FrameTimer.Dispose();
+            using (var Frame = new Image<Bgr, byte>(e.Frame).Mat)
+            using (var Image = new Mat())
+            {
+                if (Frame != null)
+                {
+                    // Apply the currently selected filter
+                    ImageProcessing.ProcessFilter(Frame, Image, mainWindow.camera1.Filter);
+                    // Draw the frame to the overlay imagebox
+                    if (Image != null)
+                        captureImageBox.Image = Image.Clone();
+                }
+            }
         }
 
         private void Window_Closed(object sender, EventArgs e)
