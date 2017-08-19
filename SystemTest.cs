@@ -35,6 +35,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using WPFCustomMessageBox;
 
@@ -50,10 +51,27 @@ namespace SwarmRoboticsGUI
 		public bool testMode = false;
 		int currentTestItem = 0;
 		bool doublecommandlockout = false;
+		public Dictionary<string, byte> twiMuxAddresses;
 		
 		public void setupSystemTest()
 		{
 			EstablishingCommunicationsWindow = new ProgressWindow("Establishing Communications", "Please wait while communications are tested.");
+
+			twiMuxAddresses = new Dictionary<string, byte>()
+			{
+				{"Proximity Front", 0xFA},
+				{"Proximity Front Right", 0xFF},
+				{"Proximity Rear Right", 0xFE},
+				{"Proximity Rear", 0xFD},
+				{"Proximity Rear Left", 0xFC},
+				{"Proximity Front Left", 0xFB},
+				{"Light Sensor Left Hand Side", 0xF8},
+				{"Light Sensor Right Hand Side", 0xF9}
+			};
+
+			this.DataContext = this;
+
+			cbSysTestTWISet.ItemsSource = twiMuxAddresses;
 
 			togglebtnControls = new List<ToggleButton>()
 			{
@@ -99,7 +117,7 @@ namespace SwarmRoboticsGUI
 			data[0] = SYSTEM_TEST_MESSAGE.COMMUNICATION;
 			data[1] = 0x01;
 
-			xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
+			xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
 
 			CommunicationManager.WaitForMessage tada = new CommunicationManager.WaitForMessage(0xE1, 15000, MyHandler);
 
@@ -246,8 +264,8 @@ namespace SwarmRoboticsGUI
 					byte[] lineSensor = MJLib.StringToByteArrayFastest(tokens[1]);
 					data = new byte[3];
 					data[0] = 0xE9;
-					data[1] = lineSensor[0];
-					data[2] = request;
+					data[1] = request;
+					data[2] = lineSensor[0];
                     xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
 					break;
 
@@ -264,6 +282,64 @@ namespace SwarmRoboticsGUI
 					break;
             }
 		}
+
+
+
+		private void slMotor_DragCompleted(object sender, DragCompletedEventArgs e)
+		{
+			Slider slider = sender as Slider;
+			slider.Value = 0;
+
+			byte[] motor = MJLib.StringToByteArrayFastest(slider.Tag.ToString());
+
+			byte[] data = new byte[3];
+			data[0] = 0xE6;
+			data[1] = motor[0];
+			data[2] += (byte)Math.Abs(slider.Value);
+
+			xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
+		}
+
+		private void slMotor_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+		{
+			Slider slider = sender as Slider;
+			byte[] motor = MJLib.StringToByteArrayFastest(slider.Tag.ToString());
+
+			byte[] data = new byte[3];
+			data[0] = 0xE6;
+			data[1] = motor[0];
+
+			if (slider.Value > 0)
+			{
+				data[2] = 0x80;
+			}
+
+			data[2] += (byte)Math.Abs(slider.Value);
+
+			xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
+		}
+
+		private void btnSysTestTWISet_Click(object sender, RoutedEventArgs e)
+		{
+			KeyValuePair<string, byte> selected = (KeyValuePair<string, byte>)cbSysTestTWISet.SelectedItem;
+
+			byte[] data = new byte[3];
+			data[0] = 0xEB;
+			data[1] = 0x01;
+			data[2] = selected.Value;
+
+			xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
+		}
+
+		private void btnSysTestTWIRead_Click(object sender, RoutedEventArgs e)
+		{
+			byte[] data = new byte[2];
+			data[0] = 0xEB;
+			data[1] = 0x00;
+
+			xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
+		}
+
 
 	}
 }

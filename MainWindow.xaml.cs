@@ -800,5 +800,5 @@ namespace SwarmRoboticsGUI
                 camera1.Dispose();         
             }
         }
-    }
+	}
 }

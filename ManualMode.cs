@@ -100,10 +100,6 @@ namespace SwarmRoboticsGUI
             xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
         }
 
-       
-
-
-
         private void tbManualModeSpeed_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             int num;
