@@ -220,7 +220,7 @@ namespace SwarmRoboticsGUI
         }
         private static void GetRobotRegion(IInputArray Frame, Rectangle Region, IOutputArray Result)
         {
-            if (CudaInvoke.HasCuda == false)
+            if (CudaInvoke.HasCuda)
             {
                 var Input = new GpuMat(Frame);
                 // Create an image from the frame cropped down to the contour region

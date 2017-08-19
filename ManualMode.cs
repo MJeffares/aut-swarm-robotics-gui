@@ -29,8 +29,7 @@ namespace SwarmRoboticsGUI
             public const byte RotateClockWise = 0xD2;
             public const byte RotateCounterClockWise = 0xD3;
         }
-
-        
+		
         private void ManualModeDirectionMouseEnter(object sender, MouseEventArgs e)
         {
             Button control = sender as Button;
@@ -117,5 +116,48 @@ namespace SwarmRoboticsGUI
                 e.Handled = true;
             }
         }
-    }
+		
+
+
+		private void robotTaskObstacleAvoidance_Click(object sender, RoutedEventArgs e)
+		{
+			CheckBox checkboxsender = sender as CheckBox;
+
+			if(checkboxsender.IsChecked == true)
+			{
+
+			}
+			else
+			{
+
+			}
+
+		}
+
+		private void robotTaskMoveRandomly_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void robotTaskDockViaLight_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void robotTaskDockViaLine_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void robotTaskMoveTowardsLight_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void robotTaskFollowLine_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+	}
 }
