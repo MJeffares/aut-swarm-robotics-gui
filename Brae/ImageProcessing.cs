@@ -320,14 +320,21 @@ namespace SwarmRoboticsGUI
             int Count = 0;
             const int LowerS = 25;
             const int ColourCount = 1000;
-
-            var Input = new GpuMat(Frame);
-            //(Frame as GpuMat).CopyTo(Input);
             var Out = new Mat();
             var HOut = new Mat();
 
-            CudaInvoke.CvtColor(Input, Input, ColorConversion.Bgr2Hsv);
-            Out = Input.ToMat();
+
+            if (CudaInvoke.HasCuda)
+            {
+                var GpuFrame = new GpuMat(Frame);
+                CudaInvoke.CvtColor(GpuFrame, GpuFrame, ColorConversion.Bgr2Hsv);
+                Out = GpuFrame.ToMat();
+                GpuFrame.Dispose();
+            }
+            else
+            {
+                CvInvoke.CvtColor(Frame, Out, ColorConversion.Bgr2Hsv);
+            }
             //CvInvoke.Blur(Out, Out, new Size(1, 1), new Point(0, 0));
             //
             ScalarArray lower = new ScalarArray(HueRange.Start);
@@ -345,8 +352,7 @@ namespace SwarmRoboticsGUI
             lower.Dispose();
             upper.Dispose();
             Out.Dispose();
-            HOut.Dispose();
-            Input.Dispose();
+            HOut.Dispose();           
             //
             if (Count > ColourCount)
             {
