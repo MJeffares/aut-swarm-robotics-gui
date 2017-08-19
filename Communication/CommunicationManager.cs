@@ -671,12 +671,17 @@ namespace SwarmRoboticsGUI
 
 		public class IMUSensorTestData : SystemTestMessage
 		{
-			public byte w;
-			public byte x;
-			public byte y;
-			public byte z;
+			public byte[] wArr = new byte[4];
+			public byte[] xArr = new byte[4];
+			public byte[] yArr = new byte[4];
+			public byte[] zArr = new byte[4];
 
-            public string wDisplay;
+			public ulong w;
+			public ulong x;
+			public ulong y;
+			public ulong z;
+
+			public string wDisplay;
             public string xDisplay;
             public string yDisplay;
             public string zDisplay;
@@ -685,12 +690,31 @@ namespace SwarmRoboticsGUI
 
 			public IMUSensorTestData(byte[] frame) : base(frame)
 			{
-				w = testMessage[0];
-				x = testMessage[1];
-				y = testMessage[2];
-				z = testMessage[3];
+				for(int i=0; i < 4; i++)
+				{
+					wArr[i] = testMessage[i];
+					w = (ulong) wArr[i] << (8 * i);
+				}
 
-                wDisplay = w.ToString();
+				for (int i = 0; i < 4; i++)
+				{
+					xArr[i] = testMessage[i + 4];
+					x = (ulong)xArr[i] << (8 * i);
+				}
+
+				for (int i = 0; i < 4; i++)
+				{
+					yArr[i] = testMessage[i + 8];
+					y = (ulong)yArr[i] << (8 * i);
+				}
+
+				for (int i = 0; i < 4; i++)
+				{
+					zArr[i] = testMessage[i + 12];
+					z = (ulong)zArr[i] << (8 * i);
+				}
+
+				wDisplay = w.ToString();
                 xDisplay = x.ToString();
                 yDisplay = y.ToString();
                 zDisplay = z.ToString();

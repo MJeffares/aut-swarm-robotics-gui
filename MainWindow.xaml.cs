@@ -764,5 +764,5 @@ namespace SwarmRoboticsGUI
             camera1.Dispose();
             camera1 = null;
         }
-    }
+	}
 }
