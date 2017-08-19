@@ -63,7 +63,7 @@
     </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <Optimize>false</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -238,7 +238,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Brae\Images\robotcutouts3.png" />
+    <Resource Include="Brae\Images\robotcutouts3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\Emgu.CV.3.2.0.2721\build\Emgu.CV.targets" Condition="Exists('packages\Emgu.CV.3.2.0.2721\build\Emgu.CV.targets')" />

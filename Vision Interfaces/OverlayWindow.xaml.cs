@@ -1,5 +1,6 @@
 ﻿using AForge.Video;
 using Emgu.CV;
+using Emgu.CV.Cuda;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using System;
@@ -40,10 +41,8 @@ namespace SwarmRoboticsGUI
         public int UpperV { get; set; }
         #endregion
         private System.Timers.Timer InterfaceTimer { get; set; }
-
         public ObservableCollection<RobotItem> RobotList { get; set; }
         private SynchronizationContext uiContext { get; set; }
-
 
         public OverlayWindow(MainWindow mainWindow)
         {
@@ -70,14 +69,12 @@ namespace SwarmRoboticsGUI
             uiContext = SynchronizationContext.Current;
         }
 
-
         #region Public Methods
         public void ClearRobots(ObservableCollection<RobotItem> RobotList)
         {
             RobotList.Clear();
         }
         #endregion
-
 
         private void InitializeTimer()
         {
@@ -88,21 +85,35 @@ namespace SwarmRoboticsGUI
         }
 
         #region Time Events
-        
+        private void Interface_Tick(object sender, ElapsedEventArgs e)
+        {
+            // Update the display with the interface when using the cutouts
+            switch (Display1.Source)
+            {
+                case SourceType.NONE:
+                    break;
+                case SourceType.CAMERA:
+                    break;
+                case SourceType.CUTOUTS:
+                    break;
+                default:
+                    break;
+            }
+        }
         private void DrawOverlayFrame(object sender, NewFrameEventArgs e)
         {
             var List = RobotList.ToList();
 
             switch (Display1.Source)
             {
-                case Display.SourceType.NONE:
+                case SourceType.NONE:
                     break;
-                case Display.SourceType.CAMERA:
+                case SourceType.CAMERA:
                     // Make sure there is a frame
                     if (e.Frame != null)
                     {
                         // Apply image processing to find the robots
-                        using (UMat UFrame = new Image<Bgr, byte>(e.Frame).Mat.GetUMat(AccessType.Read))
+                        using (var UFrame = new Image<Bgr, byte>(e.Frame).Mat.GetUMat(AccessType.Read))
                         {
                             ImageProcessing.GetRobots(UFrame, List);
                         }
@@ -110,7 +121,7 @@ namespace SwarmRoboticsGUI
                         Update(uiContext, List);
                     }
                     break;
-                case Display.SourceType.CUTOUTS:
+                case SourceType.CUTOUTS:
                     // Apply image processing to find the robots
                     ImageProcessing.GetRobots(ImageProcessing.TestImage, List);
                     // Update the robotlist on the UI thread
@@ -118,34 +129,19 @@ namespace SwarmRoboticsGUI
                     break;
                 default:
                     break;
-            }
-            
+            } 
         }
         #endregion
 
         #region Private Events 
-        private void Interface_Tick(object sender, ElapsedEventArgs e)
-        {
-            // Update the display with the interface when using the cutouts
-            switch (Display1.Source)
-            {
-                case Display.SourceType.NONE:
-                    break;
-                case Display.SourceType.CAMERA:
-                    break;
-                case Display.SourceType.CUTOUTS:
-                    break;
-                default:
-                    break;
-            }
-        }
+
         private void Overlay_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            InterfaceTimer.Dispose();
-        }
-        private void btnClear_Click(object sender, RoutedEventArgs e)
-        {
-            ClearRobots(RobotList);
+            if (InterfaceTimer != null)
+            {
+                InterfaceTimer.Stop();
+                InterfaceTimer.Dispose();
+            }
         }
         #endregion
 

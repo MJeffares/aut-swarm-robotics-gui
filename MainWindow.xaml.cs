@@ -87,7 +87,7 @@ namespace SwarmRoboticsGUI
         public MainWindow()
         {
             InitializeComponent();
-			this.DataContext = this;
+			DataContext = this;
 
 			//
 			CvInvoke.UseOpenCL = true;
@@ -132,25 +132,29 @@ namespace SwarmRoboticsGUI
             //
             TimeDisplayMode = TimeDisplayModeType.CURRENT;
             WindowStatus = WindowStatusType.MAXIMISED;
-            
+
+
+            var what = ImageProcessing.TestImage;
             // TEMP: display overlay on starup for debugging
             overlayWindow.Show();
             camera1.FrameUpdate += new Camera.FrameHandler(DrawCameraFrame);
 
             // BRAE: Default setup for testing
-            overlayWindow.Display1.Source = Display.SourceType.CUTOUTS;
+            //overlayWindow.Display1.Source = Display.SourceType.CUTOUTS;
             //camera1.Index = 1;
             // This will run the camera at 640x480
             //camera1.StartCapture();
 
             //serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
 
-			setupSystemTest();
+            setupSystemTest();
 		}
 
-		// Methods
-		#region
-		private void PopulateCameras()
+        
+
+        // Methods
+        #region
+        private void PopulateCameras()
         {
             // we dont want to update this if we are connected to a camera
             if (camera1.Status != StatusType.PLAYING && camera1.Status != StatusType.RECORDING)
@@ -251,13 +255,13 @@ namespace SwarmRoboticsGUI
         private void PopulateOverlays()
         {
             //loops through our filters and adds them to our menu
-            for (int i = 0; i < (int)Display.OverlayType.NUM_OVERLAYS; i++)
+            foreach (OverlayType Overlay in Enum.GetValues(typeof(OverlayType)))
             {
-                MenuItem item = new MenuItem { Header = Display.ToString((Display.OverlayType)i) };
+                MenuItem item = new MenuItem { Header = EnumUtils<OverlayType>.GetDescription(Overlay) };
                 item.Click += new RoutedEventHandler(menuOverlayListItem_Click);
                 item.IsCheckable = true;
                 //by default select our first filter (no filter)
-                if (i == 0)
+                if (Overlay == OverlayType.NONE)
                 {
                     item.IsChecked = true;
                 }
@@ -274,13 +278,13 @@ namespace SwarmRoboticsGUI
         private void PopulateSources()
         {
             //loops through our filters and adds them to our menu
-            for (int i = 0; i < (int)Display.SourceType.NUM_SOURCES; i++)
+            foreach (SourceType Source in Enum.GetValues(typeof(SourceType)))
             {
-                MenuItem item = new MenuItem { Header = Display.ToString((Display.SourceType)i) };
+                MenuItem item = new MenuItem { Header = EnumUtils<SourceType>.GetDescription(Source) };
                 item.Click += new RoutedEventHandler(menuSourceListItem_Click);
                 item.IsCheckable = true;
-                //by default select our first filter (no filter)
-                if (i == 0)
+                //by default select our first source (no source)
+                if (Source == SourceType.NONE)
                 {
                     item.IsChecked = true;
                 }
@@ -420,32 +424,35 @@ namespace SwarmRoboticsGUI
         {
             switch (overlayWindow.Display1.Source)
             {
-                case Display.SourceType.NONE:
+                case SourceType.NONE:
                     // Do nothing
                     break;
-                case Display.SourceType.CAMERA:
-                    var Frame = new Image<Bgr, byte>(e.Frame);
-                    if (Frame != null)
+                case SourceType.CAMERA:
+                    // Make sure there is a frame
+                    if (e.Frame != null)
                     {
-                        // Apply the currently selected filter
-                        if (camera1.Filter != FilterType.NONE)
+                        using (var Frame = new Image<Bgr, byte>(e.Frame).Mat)
                         {
-                            var Image = Frame.Clone();
-                            ImageProcessing.ProcessFilter(Frame, Image, camera1.Filter);
-                            if (Image != null)
-                                captureImageBox.Image = Image.Clone();
-                            Image.Dispose();
+                            // Apply the currently selected filter
+                            if (camera1.Filter != FilterType.NONE)
+                            {
+                                var Image = new Mat();
+                                ImageProcessing.ProcessFilter(Frame, Image, camera1.Filter);
+                                if (Image != null)
+                                    captureImageBox.Image = Image.Clone();
+                                Image.Dispose();
+                            }
+                            else
+                                captureImageBox.Image = Frame.Clone();
                         }
-                        else if (Frame != null)
-                            captureImageBox.Image = Frame.Clone();
                     }
-                    Frame.Dispose();
-                    e.Frame.Dispose();
                     break;
-                case Display.SourceType.CUTOUTS:
+                case SourceType.CUTOUTS:
                     // Draw the testimage to the overlay imagebox
                     if (ImageProcessing.TestImage != null)
-                        captureImageBox.Image = ImageProcessing.TestImage;
+                    {
+                        captureImageBox.Image = (UMat)ImageProcessing.TestImage;
+                    }
                     break;
                 default:
                     break;
@@ -492,7 +499,7 @@ namespace SwarmRoboticsGUI
             MenuItem menusender = (MenuItem)sender;
             string menusenderstring = menusender.ToString();
 
-            if (menusenderstring != Display.ToString(overlayWindow.Display1.Overlay))
+            if (menusenderstring != EnumUtils<OverlayType>.GetDescription(overlayWindow.Display1.Overlay))
             {
                 MenuItem[] allitems = menuOverlayList.Items.OfType<MenuItem>().ToArray();
 
@@ -501,7 +508,7 @@ namespace SwarmRoboticsGUI
                     item.IsChecked = false;
                 }
                 menusender.IsChecked = true;
-                overlayWindow.Display1.Overlay = (Display.OverlayType)menuOverlayList.Items.IndexOf(menusender);
+                overlayWindow.Display1.Overlay = (OverlayType)menuOverlayList.Items.IndexOf(menusender);
                 // TODO: Not sure where to display this right now
                 //statusDisplayFilter.Text = ImageDisplay.ToString(overlayWindow.Display.Overlay);
             }
@@ -512,7 +519,7 @@ namespace SwarmRoboticsGUI
             MenuItem menusender = (MenuItem)sender;
             string menusenderstring = menusender.ToString();
 
-            if (menusenderstring != Display.ToString(overlayWindow.Display1.Source))
+            if (menusenderstring != EnumUtils<SourceType>.GetDescription(overlayWindow.Display1.Source))
             {
                 MenuItem[] allitems = menuSourceList.Items.OfType<MenuItem>().ToArray();
 
@@ -521,7 +528,7 @@ namespace SwarmRoboticsGUI
                     item.IsChecked = false;
                 }
                 menusender.IsChecked = true;
-                overlayWindow.Display1.Source = (Display.SourceType)menuSourceList.Items.IndexOf(menusender);
+                overlayWindow.Display1.Source = (SourceType)menuSourceList.Items.IndexOf(menusender);
                 // TODO: Not sure where to display this right now
                 //statusDisplayFilter.Text = ImageDisplay.ToString(overlayWindow.Display.Overlay);
             }
@@ -787,14 +794,10 @@ namespace SwarmRoboticsGUI
             if (camera1 != null)
             {
                 // BRAE: Setting the source to NONE to stop an exception.
-                overlayWindow.Display1.Source = Display.SourceType.NONE;
+                overlayWindow.Display1.Source = SourceType.NONE;
                 // Clear event
                 camera1.FrameUpdate -= new Camera.FrameHandler(DrawCameraFrame);
-                // Stop if capturing
-                if (camera1.Status == StatusType.PLAYING)
-                    camera1.StopCapture();                               
-                // Dispose of camera
-                camera1.Dispose();
+                camera1.Dispose();         
             }
         }
     }

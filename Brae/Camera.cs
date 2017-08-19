@@ -33,6 +33,7 @@ namespace SwarmRoboticsGUI
         private int FrameCount { get; set; }
         private VideoWriter videoWriter { get; set; }
         private VideoCaptureDevice videoSource { get; set; }
+        private AsyncVideoSource AsyncVS { get; set; }
         private Timer FpsTimer { get; set; }
         #endregion
 
@@ -70,33 +71,33 @@ namespace SwarmRoboticsGUI
             var VideoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
             // create video source
             videoSource = new VideoCaptureDevice(VideoDevices[Index].MonikerString);
-
             videoSource.VideoResolution = videoSource.VideoCapabilities[CapabilityIndex];
 
+            AsyncVS = new AsyncVideoSource(videoSource);
             // set NewFrame event handler
-            videoSource.NewFrame += new NewFrameEventHandler(FrameUpdate);
+            AsyncVS.NewFrame += new NewFrameEventHandler(FrameUpdate);
             // start the video source
-            videoSource.Start();
+            AsyncVS.Start();
             Status = StatusType.PLAYING;
         }
         public void StopCapture()
         {
             if (Status == StatusType.PLAYING)
             {
-                videoSource.NewFrame -= new NewFrameEventHandler(FrameUpdate);
-                videoSource.SignalToStop();
+                AsyncVS.NewFrame -= new NewFrameEventHandler(FrameUpdate);
+                AsyncVS.SignalToStop();
                 Status = StatusType.STOPPED;
             }
         }
         public void PauseCapture()
         {
-            videoSource.SignalToStop();
+            AsyncVS.SignalToStop();
             Status = StatusType.PAUSED;
         }
         public void ResumeCapture()
         {
             Status = StatusType.PLAYING;
-            videoSource.Start();
+            AsyncVS.Start();
         }
         // Video Methods
         public void StartReplaying(string path)
@@ -174,10 +175,20 @@ namespace SwarmRoboticsGUI
             if (disposing)
                 handle.Dispose();
 
-            FpsTimer.Dispose();
+            if (FpsTimer != null)
+            {
+                FpsTimer.Stop();
+                FpsTimer.Dispose();
+            }
+            
+            if (AsyncVS != null)
+            {
+                AsyncVS.Stop();
+            }
+            
             if (videoSource != null)
             {
-                videoSource = null;
+                videoSource.Stop();
             }
 
             disposed = true;
