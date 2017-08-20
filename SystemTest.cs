@@ -202,7 +202,8 @@ namespace SwarmRoboticsGUI
 			public const byte START_STREAMING = 0x02;
 			public const byte STOP_STREAMING = 0xFF;
 		}
-		private static class SYSTEM_TEST_MESSAGE
+
+		public static class SYSTEM_TEST_MESSAGE
 		{
 			public const byte MODE = 0xE0;
 			public const byte COMMUNICATION = 0xE1;
@@ -217,6 +218,7 @@ namespace SwarmRoboticsGUI
 			public const byte TWI_EXT = 0xEC;
 			public const byte CAMERA = 0xED;
 		}
+
 
 
 		private void updateSystemsTest(string test, byte request)
@@ -330,16 +332,5 @@ namespace SwarmRoboticsGUI
 
 			xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
 		}
-
-		private void btnSysTestTWIRead_Click(object sender, RoutedEventArgs e)
-		{
-			byte[] data = new byte[2];
-			data[0] = 0xEB;
-			data[1] = 0x00;
-
-			xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
-		}
-
-
 	}
 }

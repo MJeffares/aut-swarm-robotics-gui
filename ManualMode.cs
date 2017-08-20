@@ -22,19 +22,30 @@ namespace SwarmRoboticsGUI
             public static byte[] WEST = { 0x00, 0x5A };
             public static byte[] NORTHWEST = { 0x00, 0x2D };
         }
-        private static class MANUAL_MODE_MESSAGE
+
+        private static class ROBOT_CONTROL_MESSAGE
         {
             public const byte Stop = 0xD0;
             public const byte MoveDirection = 0xD1;
             public const byte RotateClockWise = 0xD2;
             public const byte RotateCounterClockWise = 0xD3;
+            public const byte MoveRandomly = 0xD4;
+            public const byte DockViaLight = 0xD5;
+            public const byte DockViaLine = 0xD6;
+            public const byte Dock = 0xD7;
+            public const byte StartObstacleAvoidance = 0xD8;
+            public const byte StopObstacleAvoidance = 0xD9;
+            public const byte FollowLight = 0xDA;
+            public const byte FollowLine = 0xDB;
+            public const byte RotateToHeading = 0xDC;
+            public const byte MoveToPosition = 0xDD;
         }
 		
         private void ManualModeDirectionMouseEnter(object sender, MouseEventArgs e)
         {
             Button control = sender as Button;
             byte[] data = new byte[4];
-            data[0] = MANUAL_MODE_MESSAGE.MoveDirection;
+            data[0] = ROBOT_CONTROL_MESSAGE.MoveDirection;
 
             switch(control.Name)
             {
@@ -76,7 +87,7 @@ namespace SwarmRoboticsGUI
 
         private void ManualModeMouseLeave(object sender, MouseEventArgs e)
         {
-            byte[] data = new byte[1] { MANUAL_MODE_MESSAGE.Stop };
+            byte[] data = new byte[1] { ROBOT_CONTROL_MESSAGE.Stop };
             xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
         }
 
@@ -88,11 +99,11 @@ namespace SwarmRoboticsGUI
             switch(control.Name)
             {
                 case "btManualModeCW":
-                    data[0] = MANUAL_MODE_MESSAGE.RotateClockWise;
+                    data[0] = ROBOT_CONTROL_MESSAGE.RotateClockWise;
                     break;
 
                 case "btManualModeCCW":
-                    data[0] = MANUAL_MODE_MESSAGE.RotateCounterClockWise;
+                    data[0] = ROBOT_CONTROL_MESSAGE.RotateCounterClockWise;
                     break;
             }
             data[1] = (byte) Convert.ToInt16(tbManualModeSpeed.Text);
@@ -123,40 +134,81 @@ namespace SwarmRoboticsGUI
 		{
 			CheckBox checkboxsender = sender as CheckBox;
 
+            byte[] data;
+            data = new byte[1];
+           
 			if(checkboxsender.IsChecked == true)
 			{
-
+                data[0] = ROBOT_CONTROL_MESSAGE.StartObstacleAvoidance;
 			}
 			else
 			{
-
+                data[0] = ROBOT_CONTROL_MESSAGE.StopObstacleAvoidance;
 			}
-
+            xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
 		}
+
+        private void robotTaskStopMoving_Click(object sender, RoutedEventArgs e)
+        {
+            byte[] data;
+            data = new byte[1];
+            data[0] = ROBOT_CONTROL_MESSAGE.Stop;
+
+            xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
+        }
 
 		private void robotTaskMoveRandomly_Click(object sender, RoutedEventArgs e)
 		{
+            byte[] data;
+            data = new byte[1];
+            data[0] = ROBOT_CONTROL_MESSAGE.MoveRandomly;
 
+            xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
 		}
+
+        private void robotTaskDock_Click(object sender, RoutedEventArgs e)
+        {
+            byte[] data;
+            data = new byte[1];
+            data[0] = ROBOT_CONTROL_MESSAGE.Dock;
+
+            xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
+        }
 
 		private void robotTaskDockViaLight_Click(object sender, RoutedEventArgs e)
 		{
+            byte[] data;
+            data = new byte[1];
+            data[0] = ROBOT_CONTROL_MESSAGE.DockViaLight;
 
+            xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
 		}
 
 		private void robotTaskDockViaLine_Click(object sender, RoutedEventArgs e)
 		{
+            byte[] data;
+            data = new byte[1];
+            data[0] = ROBOT_CONTROL_MESSAGE.DockViaLine;
 
+            xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
 		}
 
 		private void robotTaskMoveTowardsLight_Click(object sender, RoutedEventArgs e)
 		{
+            byte[] data;
+            data = new byte[1];
+            data[0] = ROBOT_CONTROL_MESSAGE.FollowLight;
 
+            xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
 		}
 
 		private void robotTaskFollowLine_Click(object sender, RoutedEventArgs e)
 		{
+            byte[] data;
+            data = new byte[1];
+            data[0] = ROBOT_CONTROL_MESSAGE.FollowLine;
 
+            xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
 		}
 
 	}

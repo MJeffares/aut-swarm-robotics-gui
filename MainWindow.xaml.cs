@@ -106,7 +106,8 @@ namespace SwarmRoboticsGUI
 				{"Robot One", 0x0013A20041065FB3},
 				{"Robot Two",0x0013A2004147F9DD},
 				{"Robot Three",0x0013A2004152F256},
-				{"Robot Four",0x0013A2004147F9D8}
+				{"Robot Four",0x0013A2004147F9D8},
+                {"Broadcast", 0x000000000000FFFF}
 			};
 
 			dispSelectRobot.ItemsSource = robotsDictionary;
@@ -800,5 +801,7 @@ namespace SwarmRoboticsGUI
                 camera1.Dispose();         
             }
         }
+
+        
 	}
 }

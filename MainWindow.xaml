@@ -165,10 +165,14 @@
                                 <GridViewColumnHeader Tag="time_stamp" Click="GridViewColumnHeader_Click" Content="TimeStamp      "/>
                             </GridViewColumn>
 
-                            <GridViewColumn  x:Name = "gvcRawData" DisplayMemberBinding="{Binding RawMessageDisplay}">
-                                <GridViewColumnHeader Tag = "RawMessageDisplay" Click="GridViewColumnHeader_Click" Content="Raw Data      "/>
+                            <GridViewColumn x:Name = "gvcMessageType" DisplayMemberBinding="{Binding MessageTypeDisplay}">
+                                <GridViewColumnHeader Tag = "message_type" Click="GridViewColumnHeader_Click" Content="Message Type     "/>
                             </GridViewColumn>
 
+                            <GridViewColumn x:Name = "gvcMessageData" DisplayMemberBinding="{Binding MessageDataDisplay}">
+                                <GridViewColumnHeader Tag = "MessageDataDisplay" Click="GridViewColumnHeader_Click" Content="Message Data     "/>
+                            </GridViewColumn>
+                            
                             <GridViewColumn  x:Name = "gvcXbeeFrameLength" DisplayMemberBinding="{Binding FrameLengthDisplay}">
                                 <GridViewColumnHeader Tag = "frame_length" Click="GridViewColumnHeader_Click" Content="Xbee Frame Length      "/>
                             </GridViewColumn>
@@ -177,18 +181,12 @@
                                 <GridViewColumnHeader Tag = "frame_ID" Click="GridViewColumnHeader_Click" Content="Xbee Frame ID     "/>
                             </GridViewColumn>
 
-                            <!--<GridViewColumn Header="Xbee Frame Data"  x:Name = "gvcXbeeFrameData" DisplayMemberBinding="{Binding CommandDataDisplay}"/>-->
-
                             <GridViewColumn x:Name = "gvcSourceAddress" DisplayMemberBinding="{Binding SourceDisplay}">
                                 <GridViewColumnHeader Tag = "SourceDisplay" Click="GridViewColumnHeader_Click" Content="Source Address     "/>
                             </GridViewColumn>
 
-                            <GridViewColumn x:Name = "gvcMessageType" DisplayMemberBinding="{Binding MessageTypeDisplay}">
-                                <GridViewColumnHeader Tag = "message_type" Click="GridViewColumnHeader_Click" Content="Message Type     "/>
-                            </GridViewColumn>
-
-                            <GridViewColumn x:Name = "gvcMessageData" DisplayMemberBinding="{Binding MessageDataDisplay}">
-                                <GridViewColumnHeader Tag = "MessageDataDisplay" Click="GridViewColumnHeader_Click" Content="Message Data     "/>
+                            <GridViewColumn  x:Name = "gvcRawData" DisplayMemberBinding="{Binding RawMessageDisplay}">
+                                <GridViewColumnHeader Tag = "RawMessageDisplay" Click="GridViewColumnHeader_Click" Content="Raw Data      "/>
                             </GridViewColumn>
 
                         </GridView>
@@ -256,10 +254,10 @@
                     <TabItem Header="No Connection" x:Name="nc">
                         <Label HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold">Please connect to an Xbee module before continuing</Label>
                     </TabItem>
-                    <!--
+                    
                     <TabItem Header="Swarm Control" IsEnabled="False">
                     </TabItem>
-                    -->
+                    
                     <TabItem Header="Robot Control" IsEnabled="False">
                         <WrapPanel>
                             
@@ -267,13 +265,15 @@
                                 <StackPanel Margin="10">
                                     <Label Margin="5" FontWeight="Bold" Content="Robot Tasks" HorizontalAlignment="Center"/>
                                     <CheckBox Margin="5" HorizontalAlignment="Center" x:Name="robotTaskObstacleAvoidance" Click="robotTaskObstacleAvoidance_Click">Obstacle Avoidance</CheckBox>
+                                    <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskStopMoving" Click="robotTaskStopMoving_Click">Stop Moving</Button>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskMoveRandomly" Click="robotTaskMoveRandomly_Click">Move Randomly</Button>
+                                    <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskDock" Click="robotTaskDock_Click">Dock Using Best</Button>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskDockViaLight" Click="robotTaskDockViaLight_Click">Dock Via Light</Button>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskDockViaLine" Click="robotTaskDockViaLine_Click">Dock Via Line</Button>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskMoveTowardsLight" Click="robotTaskMoveTowardsLight_Click">Move Towards Light</Button>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskFollowLine" Click="robotTaskFollowLine_Click">Follow Line</Button>
 
-                                    <!--
+                                    
                                     
                                     <StackPanel Orientation="Horizontal">
                                         <Button Margin="5,5,0,5" x:Name="robotTaskRotateToHeading">Rotate to Heading</Button>
@@ -284,7 +284,6 @@
                                         </StackPanel>
                                     </StackPanel>
                                     
-                                   
                                     
                                     <Border BorderBrush="Gainsboro" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top"  Padding="5">
                                         <StackPanel Orientation="Horizontal">
@@ -305,7 +304,7 @@
                                             </StackPanel>
                                         </StackPanel>
                                     </Border>
-                                    -->
+                                    
                                     
                                 </StackPanel>
                             </Border>
@@ -335,10 +334,10 @@
                             </Border>
                         </WrapPanel>
                     </TabItem>
-                    <!--
+                    
                     <TabItem Header="Tower Control" IsEnabled="False">
                     </TabItem>
-                    -->
+                    
                     <TabItem Header = "Systems Test" IsEnabled="False">
                         <StackPanel Margin = "5">
 
@@ -476,16 +475,23 @@
 
 
                                             <ToggleButton Grid.Row="1" Grid.Column="1" x:Name="btnSysTestIMU" Content = "IMU" Tag = "IMU" Style="{DynamicResource ButtonStyle1}"/>
-                                            <WrapPanel Grid.Row="2" Grid.Column="1">
-                                                <Label Content="W:" Margin="1,0,0,0"/>
-                                                <TextBox x:Name="tbSysTestIMUW" IsReadOnly="True" Width="30" Margin="2"/>
-                                                <Label Content="X:"/>
-                                                <TextBox x:Name="tbSysTestIMUX" IsReadOnly="True" Width="30" Margin="2"/>
-                                                <Label Content="Y:"/>
-                                                <TextBox x:Name="tbSysTestIMUY" IsReadOnly="True" Width="30" Margin="2"/>
-                                                <Label Content="Z:"/>
-                                                <TextBox x:Name="tbSysTestIMUZ" IsReadOnly="True" Width="30" Margin="2"/>
-                                            </WrapPanel>
+                                            <StackPanel Orientation="Vertical" Grid.Row="2" Grid.Column="1" Width="120">
+                                                <WrapPanel>
+                                                    <Label Content="Pitch:" Margin="1,0,0,0"/>
+                                                    <TextBox x:Name="tbSysTestIMUPitch" IsReadOnly="True" Width="60" Margin="2"/>
+                                                </WrapPanel>
+                                                
+                                                <WrapPanel>
+                                                    <Label Content=" Roll: "/>
+                                                    <TextBox x:Name="tbSysTestIMURoll" IsReadOnly="True" Width="60" Margin="2"/>
+                                                </WrapPanel>
+                                                
+                                                <WrapPanel>
+                                                    <Label Content=" Yaw: "/>
+                                                    <TextBox x:Name="tbSysTestIMUYaw" IsReadOnly="True" Width="60" Margin="2"/>
+                                                </WrapPanel>
+                                               
+                                            </StackPanel>
 
                                         </Grid>
                                     </Border>
@@ -517,7 +523,6 @@
                                                 <Button Grid.Row="1" Grid.Column="1"  x:Name="btnSysTestTWISet" Content = "Set"  Margin="3" Click="btnSysTestTWISet_Click"/>
                                                 
                                                 <TextBox Grid.Row="2" Grid.Column="0" x:Name="tbSysTestTWIRead" IsReadOnly="True" Width="180" Margin="3"/>
-                                                <Button Grid.Row="2" Grid.Column="1" x:Name="btnSysTestTWIRead" Content = "Read" Margin="3" Click="btnSysTestTWIRead_Click" />
                                             </Grid>
                                         </Border>
                                     </WrapPanel>
