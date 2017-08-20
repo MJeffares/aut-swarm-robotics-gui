@@ -13,14 +13,14 @@ namespace SwarmRoboticsGUI
         public static class DIRECTION
         {            
             public static byte[] NORTH = { 0x00, 0x00 };
-            
-            public static byte[] NORTHEAST = { 0x01, 0x3B };
-            public static byte[] EAST = { 0x01, 0x0E };
-            public static byte[] SOUTHEAST = { 0x00, 0xE1 };
+
+            public static byte[] NORTHEAST = { 0x00, 0x3B };
+            public static byte[] EAST = { 0x00, 0x5A };
+            public static byte[] SOUTHEAST = { 0x00, 0x87 };
             public static byte[] SOUTH =  { 0x00, 0xB4 };
-            public static byte[] SOUTHWEST = { 0x00, 0x87 };
-            public static byte[] WEST = { 0x00, 0x5A };
-            public static byte[] NORTHWEST = { 0x00, 0x2D };
+            public static byte[] SOUTHWEST = { 0x00, 0xE1  };
+            public static byte[] WEST = { 0x01, 0x0E };
+            public static byte[] NORTHWEST = { 0x01, 0x2D };
         }
 
         private static class ROBOT_CONTROL_MESSAGE
@@ -33,12 +33,13 @@ namespace SwarmRoboticsGUI
             public const byte DockViaLight = 0xD5;
             public const byte DockViaLine = 0xD6;
             public const byte Dock = 0xD7;
-            public const byte StartObstacleAvoidance = 0xD8;
-            public const byte StopObstacleAvoidance = 0xD9;
+            public const byte StopObstacleAvoidance = 0xD8;
+            public const byte StartObstacleAvoidance = 0xD9;
             public const byte FollowLight = 0xDA;
             public const byte FollowLine = 0xDB;
             public const byte RotateToHeading = 0xDC;
             public const byte MoveToPosition = 0xDD;
+            public const byte MoveAtHeading = 0xDE;
         }
 		
         private void ManualModeDirectionMouseEnter(object sender, MouseEventArgs e)

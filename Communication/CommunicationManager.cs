@@ -334,8 +334,7 @@ namespace SwarmRoboticsGUI
 					messageWaitedOn.OnCompletion(this, args);
 				}
 			}
-
-            //if(window.testMode)
+            
             if(message.messageID > 0xDF && message.messageID < 0xF0)
             {
                 switch(message.messageID)
@@ -617,10 +616,10 @@ namespace SwarmRoboticsGUI
 		{
             public static class Sensors
             {
-                public const byte farLeft = 0x01;
-                public const byte centreLeft = 0x02;
-                public const byte centreRight = 0x03;
-                public const byte farRight = 0x04;
+                public const byte farLeft = 0x0D;
+                public const byte centreLeft = 0x0F;
+                public const byte centreRight = 0x00;
+                public const byte farRight = 0x07;
             }
 
 
