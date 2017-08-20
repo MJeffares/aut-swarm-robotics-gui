@@ -220,22 +220,23 @@ namespace SwarmRoboticsGUI
         }
         private static void GetRobotRegion(IInputArray Frame, Rectangle Region, IOutputArray Result)
         {
-            if (CudaInvoke.HasCuda == false)
-            {
-                var Input = new GpuMat(Frame);
-                // Create an image from the frame cropped down to the contour region
-                Input = Input.ColRange(Region.Left, Region.Right)
-                           .RowRange(Region.Top, Region.Bottom);
-                Input.CopyTo(Result);
-                Input.Dispose();
-            }
-            else
-            {
-                var Input = new UMat(Frame as UMat, Region);
-                Input.CopyTo(Result);
-                Input.Dispose();
-            }
-            
+            //if (CudaInvoke.HasCuda)
+            //{
+            //    var Input = new GpuMat(Frame);
+            //    var Test = new GpuMat(Frame);
+            //    // Create an image from the frame cropped down to the contour region
+            //    Input = Test.ColRange(Region.Left, Region.Right)
+            //               .RowRange(Region.Top, Region.Bottom);
+            //    Input.CopyTo(Result);
+            //    Test.Dispose();
+            //    Input.Dispose();
+            //}
+            //else
+            //{
+            var Input = new UMat(Frame as UMat, Region);
+            Input.CopyTo(Result);
+            Input.Dispose();
+            //}
         }
         
         // BRAE: Make these IsShape(Contour,Shape.Hexagon)?

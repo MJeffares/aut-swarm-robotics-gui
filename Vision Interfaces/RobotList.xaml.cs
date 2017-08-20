@@ -10,18 +10,18 @@ using System.Windows.Controls;
 
 namespace SwarmRoboticsGUI
 {
-    public partial class RobotGroups : UserControl
+    public partial class RobotList : UserControl
     {
         public static readonly DependencyProperty ItemsProperty =
             DependencyProperty.Register("Items",
             typeof(ObservableCollection<RobotItem>),
-            typeof(RobotGroups),
+            typeof(RobotList),
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
         public static readonly DependencyProperty GroupsProperty =
             DependencyProperty.Register("Groups",
             typeof(ObservableCollection<RobotGroup>),
-            typeof(RobotGroups),
+            typeof(RobotList),
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
         public ObservableCollection<RobotItem> Items
@@ -38,7 +38,7 @@ namespace SwarmRoboticsGUI
         private SynchronizationContext uiContext { get; set; }
         private System.Timers.Timer InterfaceTimer { get; set; }
 
-        public RobotGroups()
+        public RobotList()
         {
             InitializeComponent();
             //RobotTree.ItemsSource = Groups;
@@ -92,7 +92,6 @@ namespace SwarmRoboticsGUI
                         if (RobotIndex != -1)
                         {
                             // Replace the robot
-                            //Groups[GroupIndex].Children[RobotIndex] = R;
                             Groups[GroupIndex].Children.RemoveAt(RobotIndex);
                             Groups[GroupIndex].Children.Insert(RobotIndex, R);
                         }

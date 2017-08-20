@@ -26,28 +26,15 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-        private int _ID { get; set; }
-        public int ID
+        private string _Text { get; set; }
+        public string Text
         {
-            get { return _ID; }
+            get { return _Text; }
             set
             {
-                if (_ID != value)
+                if (_Text != value)
                 {
-                    _ID = value;
-                    NotifyPropertyChanged("ID");
-                }
-            }
-        }
-        private string _Value { get; set; }
-        public string Value
-        {
-            get { return _Value; }
-            set
-            {
-                if (_Value != value)
-                {
-                    _Value = value;
+                    _Text = value;
                     NotifyPropertyChanged("Value");
                 }
             }
@@ -57,15 +44,10 @@ namespace SwarmRoboticsGUI
         {
             this.Name = Name;
         }
-        public Item(string Name, string Value)
+        public Item(string Name, string Text)
         {
             this.Name = Name;
-            this.Value = Value;
-        }
-        public Item(string Name, int ID)
-        {
-            this.Name = Name;
-            this.ID = ID;
+            this.Text = Text;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -102,6 +84,19 @@ namespace SwarmRoboticsGUI
                 {
                     _Group = value;
                     NotifyPropertyChanged("Group");
+                }
+            }
+        }
+        private int _ID { get; set; }
+        public int ID
+        {
+            get { return _ID; }
+            set
+            {
+                if (_ID != value)
+                {
+                    _ID = value;
+                    NotifyPropertyChanged("ID");
                 }
             }
         }
@@ -255,8 +250,9 @@ namespace SwarmRoboticsGUI
             }
         }
 
-        public RobotItem(string Name, int ID) : base(Name, ID)
+        public RobotItem(string Name, int ID) : base(Name)
         {
+            this.ID = ID;
             Group = "Unassigned";
             // TEMP: Size of the robots is fixed       
             Radius = 100;

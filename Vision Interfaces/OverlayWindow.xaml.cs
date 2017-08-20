@@ -112,13 +112,18 @@ namespace SwarmRoboticsGUI
                     // Make sure there is a frame
                     if (e.Frame != null)
                     {
+                        var BitFrame = new Image<Bgr, byte>(e.Frame);
+                        var Frame = BitFrame.Mat;
+                        var UFrame = Frame.GetUMat(AccessType.Read);
+
                         // Apply image processing to find the robots
-                        using (var UFrame = new Image<Bgr, byte>(e.Frame).Mat.GetUMat(AccessType.Read))
-                        {
-                            ImageProcessing.GetRobots(UFrame, List);
-                        }
+                        ImageProcessing.GetRobots(UFrame, List);
                         // Update the robotlist on the UI thread
                         Update(uiContext, List);
+
+                        BitFrame.Dispose();
+                        Frame.Dispose();
+                        UFrame.Dispose();
                     }
                     break;
                 case SourceType.CUTOUTS:

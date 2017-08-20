@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SwarmRoboticsGUI"
+        xmlns:settings="clr-namespace:SwarmRoboticsGUI.Settings"
         xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
         mc:Ignorable="d"
         Title="Overlay" Height="740" Width="1280" MinHeight="740" MinWidth="800" 
@@ -42,12 +43,14 @@
             <ColumnDefinition Width="100"/>
             <ColumnDefinition/>
             <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="300"/>
         </Grid.ColumnDefinitions>
 
         <Button Click="Button_Click">Change Group</Button>
 
-        <local:RobotGroups x:Name="RobotGroups1" Grid.Row="1" Grid.Column="2" Items="{Binding RobotList, RelativeSource={RelativeSource AncestorType=Window}}"/>
+        <local:RobotList x:Name="RobotList1" Grid.Row="1" Grid.Column="2" Items="{Binding RobotList, RelativeSource={RelativeSource AncestorType=Window}}"/>
         <local:Display x:Name="Display1" Grid.Row="1" Grid.Column="1" Items="{Binding RobotList, RelativeSource={RelativeSource AncestorType=Window}}"/>
+        <settings:SettingsList x:Name="Settings1" Grid.Row="1" Grid.Column="3"/>
 
         <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Height="40" VerticalAlignment="Top" Background="{StaticResource AccentBrush}"/>
         <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Height="20" VerticalAlignment="Bottom" Background="{StaticResource AccentBrush}"/>

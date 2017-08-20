@@ -42,6 +42,7 @@ using System.Drawing;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
+using System.Threading;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
@@ -52,6 +53,9 @@ using System.Windows.Threading;
 
 namespace SwarmRoboticsGUI
 {
+    public enum WindowStatusType { MAXIMISED, MINIMISED, POPPED_OUT };
+    public enum TimeDisplayModeType { CURRENT, FROM_START, START };
+
     public partial class MainWindow : Window
     {
         // Declarations
@@ -65,10 +69,14 @@ namespace SwarmRoboticsGUI
         public CameraPopOutWindow popoutWindow;
         public OverlayWindow overlayWindow;
 		public Dictionary<string, UInt64> robotsDictionary;
-		// one second timer to calculate and update the fps count
-		private DispatcherTimer InterfaceTimer;
-        // 
-        private DateTime startTime;
+
+        public WindowStatusType WindowStatus { get; set; }
+        public TimeDisplayModeType TimeDisplayMode { get; set; }
+        public double WindowSize { get; set; }
+
+
+        // one second timer to calculate and update the fps count
+        private DispatcherTimer InterfaceTimer;
         //
         private OpenFileDialog openvideodialog = new OpenFileDialog();
         private SaveFileDialog savevideodialog = new SaveFileDialog();
@@ -76,11 +84,9 @@ namespace SwarmRoboticsGUI
         private FilterInfoCollection VideoDevices { get; set; }
         private VideoCaptureDevice VideoDevice { get; set; }
 
-        public enum WindowStatusType { MAXIMISED, MINIMISED, POPPED_OUT };
-        public enum TimeDisplayModeType { CURRENT, FROM_START, START };
-        public WindowStatusType WindowStatus { get; set; }
-        public TimeDisplayModeType TimeDisplayMode { get; set; }
-        public double WindowSize { get; set; }
+        private SynchronizationContext uiContext { get; set; }
+                
+        
         #endregion    
         
         // Main
@@ -88,12 +94,11 @@ namespace SwarmRoboticsGUI
         {
             InitializeComponent();
 			DataContext = this;
-
+            
 			//
 			CvInvoke.UseOpenCL = true;
             //
             camera1 = new Camera();
-
             xbee = new XbeeAPI(this);
             protocol = new ProtocolClass(this);
             // MANSEL: Maybe make a struct.
@@ -122,9 +127,6 @@ namespace SwarmRoboticsGUI
             savevideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
             savevideodialog.Title = "Record: Save As";
             //
-            startTime = new DateTime();
-            startTime = DateTime.Now;
-            //
             InterfaceTimer = new DispatcherTimer();
             InterfaceTimer.Tick += Interface_Tick;
             InterfaceTimer.Interval = new TimeSpan(0, 0, 1);
@@ -139,6 +141,10 @@ namespace SwarmRoboticsGUI
             overlayWindow.Show();
             camera1.FrameUpdate += new Camera.FrameHandler(DrawCameraFrame);
 
+            // Stores the UI context to be used to marshal 
+            // code from other threads to the UI thread.
+            uiContext = SynchronizationContext.Current;
+
             // BRAE: Default setup for testing
             //overlayWindow.Display1.Source = Display.SourceType.CUTOUTS;
             //camera1.Index = 1;
@@ -150,10 +156,57 @@ namespace SwarmRoboticsGUI
             setupSystemTest();
 		}
 
-        
+        public void ToggleCameraWindow()
+        {
+            switch (WindowStatus)
+            {
+                case WindowStatusType.POPPED_OUT:
+                    popoutWindow.Close();
+                    //set window to the size it had been before it was minimised
+                    mainGrid.ColumnDefinitions[3].Width = new GridLength(WindowSize);
+                    //set variable/flag
+                    WindowStatus = WindowStatusType.MAXIMISED;
+                    //re-enable the grid splitter so its size can be changed
+                    cameraGridSplitter.IsEnabled = true;
+                    // update arrow direction
+                    displayArrowTop.Content = "   >";
+                    displayArrowBottom.Content = "   >";
+                    // TEMP: toggles the name of the button
+                    menuDisplayPopOut.Header = "Pop Out Window";
 
-        // Methods
-        #region
+                    break;
+                default:
+                    // set size of window to original
+                    WindowSize = mainGrid.ColumnDefinitions[3].ActualWidth;
+                    // minimise window (make width = 0)     
+                    mainGrid.ColumnDefinitions[3].Width = new GridLength((double)0);
+                    // change camera window status to popped out
+                    WindowStatus = WindowStatusType.POPPED_OUT;
+                    // disable the grid splitter so window cannont be changed size until it is expanded               
+                    cameraGridSplitter.IsEnabled = false;
+                    // update arrow direction
+                    displayArrowTop.Content = "  < ";
+                    displayArrowBottom.Content = "  <  ";
+                    // TEMP: toggles the name of the button
+                    menuDisplayPopOut.Header = "Pop In Window";
+                    // create and show the window
+                    if (camera1.Status == StatusType.PLAYING)
+                    {
+                        popoutWindow = new CameraPopOutWindow(this);
+                        popoutWindow.Show();
+                        camera1.StartCapture();
+                    }
+                    else
+                    {
+                        popoutWindow = new CameraPopOutWindow(this);
+                        popoutWindow.Show();
+                    }
+                    break;
+            }
+        }
+
+
+        #region Private Methods
         private void PopulateCameras()
         {
             // we dont want to update this if we are connected to a camera
@@ -225,10 +278,6 @@ namespace SwarmRoboticsGUI
                     (menuCameraCapabilityList.Items[camera1.CapabilityIndex] as MenuItem).IsChecked = true;
             }
         }
-
-        /// <summary>
-        /// Automatically adds the filters defined in the class into our menu for selecting filters.
-        /// </summary>
         private void PopulateFilters()
         {
             //loops through our filters and adds them to our menu
@@ -298,59 +347,13 @@ namespace SwarmRoboticsGUI
             menuSourceList.Items.Add(settingsmenuitem);
             settingsmenuitem.Click += menuPlaceHolder_Click;
         }
-
-        public void ToggleCameraWindow()
-        {
-            switch (WindowStatus)
-            {
-                case WindowStatusType.POPPED_OUT:
-                    popoutWindow.Close();
-                    //set window to the size it had been before it was minimised
-                    mainGrid.ColumnDefinitions[3].Width = new GridLength(WindowSize);
-                    //set variable/flag
-                    WindowStatus = WindowStatusType.MAXIMISED;
-                    //re-enable the grid splitter so its size can be changed
-                    cameraGridSplitter.IsEnabled = true;
-                    // update arrow direction
-                    displayArrowTop.Content = "   >";
-                    displayArrowBottom.Content = "   >";
-                    // TEMP: toggles the name of the button
-                    menuDisplayPopOut.Header = "Pop Out Window";
-
-                    break;
-                default:
-                    // set size of window to original
-                    WindowSize = mainGrid.ColumnDefinitions[3].ActualWidth;
-                    // minimise window (make width = 0)     
-                    mainGrid.ColumnDefinitions[3].Width = new GridLength((double)0);
-                    // change camera window status to popped out
-                    WindowStatus = WindowStatusType.POPPED_OUT;
-                    // disable the grid splitter so window cannont be changed size until it is expanded               
-                    cameraGridSplitter.IsEnabled = false;
-                    // update arrow direction
-                    displayArrowTop.Content = "  < ";
-                    displayArrowBottom.Content = "  <  ";
-                    // TEMP: toggles the name of the button
-                    menuDisplayPopOut.Header = "Pop In Window";
-                    // create and show the window
-                    if (camera1.Status == StatusType.PLAYING)
-                    {
-                        popoutWindow = new CameraPopOutWindow(this);
-                        popoutWindow.Show();
-                        camera1.StartCapture();
-                    }
-                    else
-                    {
-                        popoutWindow = new CameraPopOutWindow(this);
-                        popoutWindow.Show();
-                    }
-                    break;
-            }
-        }
         #endregion
 
-        // Time events
-        #region
+
+        
+        
+
+        #region Time Events
         private void Interface_Tick(object sender, EventArgs arg)
         {
             // MANSEL: I hate this block of code. Does it belong here? Does it even work?
@@ -412,12 +415,12 @@ namespace SwarmRoboticsGUI
                 case TimeDisplayModeType.FROM_START:
                     if (camera1.Status == StatusType.RECORDING)
                     {
-                        statusTime.Text = (DateTime.Now - startTime).ToString(@"dd\.hh\:mm\:ss");
+                        statusTime.Text = (camera1.RecordingTime).ToString(@"dd\.hh\:mm\:ss");
                     }
                     break;
             }
 
-            statusFPS.Text = camera1.FPS.ToString();
+            statusFPS.Text = camera1.Fps.ToString();
         }
 
         private void DrawCameraFrame(object sender, NewFrameEventArgs e)
@@ -425,26 +428,27 @@ namespace SwarmRoboticsGUI
             switch (overlayWindow.Display1.Source)
             {
                 case SourceType.NONE:
-                    // Do nothing
                     break;
                 case SourceType.CAMERA:
                     // Make sure there is a frame
                     if (e.Frame != null)
                     {
-                        using (var Frame = new Image<Bgr, byte>(e.Frame).Mat)
+                        var BitFrame = new Image<Bgr, byte>(e.Frame);
+                        var Frame = BitFrame.Mat;
+                        //Apply the currently selected filter
+                        if (camera1.Filter != FilterType.NONE)
                         {
-                            // Apply the currently selected filter
-                            if (camera1.Filter != FilterType.NONE)
-                            {
-                                var Image = new Mat();
-                                ImageProcessing.ProcessFilter(Frame, Image, camera1.Filter);
-                                if (Image != null)
-                                    captureImageBox.Image = Image.Clone();
-                                Image.Dispose();
-                            }
-                            else
-                                captureImageBox.Image = Frame.Clone();
+                            var Image = new Mat();
+                            ImageProcessing.ProcessFilter(Frame, Image, camera1.Filter);
+                            if (Image != null)
+                                captureImageBox.Image = Image.Clone();
+                            Image.Dispose();
                         }
+                        else
+                            captureImageBox.Image = Frame.Clone();
+
+                        Frame.Dispose();
+                        BitFrame.Dispose();
                     }
                     break;
                 case SourceType.CUTOUTS:
@@ -459,11 +463,23 @@ namespace SwarmRoboticsGUI
             }
         }
 
-
         #endregion
 
-        // Input events
-        #region       
+        void Update(object state)
+        {
+            // Get the UI context from state
+            SynchronizationContext Context = state as SynchronizationContext;
+            // Execute the UpdateRobots function on the UI thread
+            Context.Post(StopCapture, null);
+        }
+
+        void StopCapture(object data)
+        {
+            captureImageBox.Dispose();
+            camera1.StopCapture();
+        }
+
+        #region Input Events       
         // Display menu
         private void menuFilterListItem_Click(object sender, RoutedEventArgs e)
         {
@@ -636,8 +652,6 @@ namespace SwarmRoboticsGUI
                 {
                     item.IsEnabled = false;
                 }
-                //set start date time as a variable 
-                startTime = DateTime.Now;
             }
         }
         private void menuCameraOptions_Click(object sender, RoutedEventArgs e)
@@ -777,27 +791,12 @@ namespace SwarmRoboticsGUI
             xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
         }
 
+
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            if (InterfaceTimer != null)
-            {
-                InterfaceTimer.Stop();
-                InterfaceTimer = null; 
-            }
-
-            if (popoutWindow != null)
-            {
-                popoutWindow.Close();
-                popoutWindow = null;
-            }
-
             if (camera1 != null)
             {
-                // BRAE: Setting the source to NONE to stop an exception.
-                overlayWindow.Display1.Source = SourceType.NONE;
-                // Clear event
-                camera1.FrameUpdate -= new Camera.FrameHandler(DrawCameraFrame);
-                camera1.Dispose();         
+                Update(uiContext);
             }
         }
 	}

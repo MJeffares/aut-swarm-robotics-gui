@@ -16,7 +16,7 @@ using Microsoft.Win32.SafeHandles;
 namespace SwarmRoboticsGUI
 {
     public enum StatusType { PLAYING, PAUSED, STOPPED, REPLAY_ACTIVE, REPLAY_PAUSED, RECORDING };
-    public class Camera : IDisposable
+    public class Camera
     {
         #region Public Properties
         // Camera Properties
@@ -25,16 +25,18 @@ namespace SwarmRoboticsGUI
         public StatusType Status { get; private set; }
         public FilterType Filter { get; set; }
         public int CapabilityIndex { get; set; }
-        public int FPS { get; private set; }
+        public int Fps { get; private set; }
+        public TimeSpan RecordingTime { get; private set; }
         #endregion
 
         #region Private Properties
         // Capture Properties
-        private int FrameCount { get; set; }
+        private int frameCount { get; set; }
         private VideoWriter videoWriter { get; set; }
         private VideoCaptureDevice videoSource { get; set; }
-        private AsyncVideoSource AsyncVS { get; set; }
-        private Timer FpsTimer { get; set; }
+        private AsyncVideoSource asyncVideoSource { get; set; }
+        private Timer fpsTimer { get; set; }
+        private DateTime recordingStartTime { get; set; }
         #endregion
 
         #region Public Events
@@ -67,37 +69,46 @@ namespace SwarmRoboticsGUI
 
         public void StartCapture()
         {
-            // gets currently connected devices
-            var VideoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
-            // create video source
-            videoSource = new VideoCaptureDevice(VideoDevices[Index].MonikerString);
-            videoSource.VideoResolution = videoSource.VideoCapabilities[CapabilityIndex];
+            if (Status != StatusType.PLAYING)
+            {
+                // gets currently connected devices
+                var VideoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+                // create video source
+                videoSource = new VideoCaptureDevice(VideoDevices[Index].MonikerString);
+                videoSource.VideoResolution = videoSource.VideoCapabilities[CapabilityIndex];
 
-            AsyncVS = new AsyncVideoSource(videoSource);
-            // set NewFrame event handler
-            AsyncVS.NewFrame += new NewFrameEventHandler(FrameUpdate);
-            // start the video source
-            AsyncVS.Start();
-            Status = StatusType.PLAYING;
+                asyncVideoSource = new AsyncVideoSource(videoSource, true);
+                // set NewFrame event handler
+                asyncVideoSource.NewFrame += new NewFrameEventHandler(FrameUpdate);
+                // start the video source
+                asyncVideoSource.Start();
+                Status = StatusType.PLAYING;
+                fpsTimer.Start();
+            }
         }
         public void StopCapture()
         {
             if (Status == StatusType.PLAYING)
             {
-                AsyncVS.NewFrame -= new NewFrameEventHandler(FrameUpdate);
-                AsyncVS.SignalToStop();
+                //videoSource.SignalToStop();                
+                //videoSource.WaitForStop();
+                asyncVideoSource.SignalToStop();
+                asyncVideoSource.WaitForStop();
+                if (FrameUpdate != null)
+                asyncVideoSource.NewFrame -= new NewFrameEventHandler(FrameUpdate);
+                fpsTimer.Stop();
                 Status = StatusType.STOPPED;
             }
         }
         public void PauseCapture()
         {
-            AsyncVS.SignalToStop();
+            asyncVideoSource.SignalToStop();
             Status = StatusType.PAUSED;
         }
         public void ResumeCapture()
         {
             Status = StatusType.PLAYING;
-            AsyncVS.Start();
+            asyncVideoSource.Start();
         }
         // Video Methods
         public void StartReplaying(string path)
@@ -157,57 +168,25 @@ namespace SwarmRoboticsGUI
                 videoSource.DisplayPropertyPage(new IntPtr());
             }
         }
-
-        private bool disposed = false;
-        private SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
-        public void Dispose()
-        {
-            // Dispose of unmanaged resources.
-            Dispose(true);
-            // Suppress finalization.
-            GC.SuppressFinalize(this);
-
-        }
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposed)
-                return;
-            if (disposing)
-                handle.Dispose();
-
-            if (FpsTimer != null)
-            {
-                FpsTimer.Stop();
-                FpsTimer.Dispose();
-            }
-            
-            if (AsyncVS != null)
-            {
-                AsyncVS.Stop();
-            }
-            
-            if (videoSource != null)
-            {
-                videoSource.Stop();
-            }
-
-            disposed = true;
-        }
         #endregion
 
         #region Private Methods
         private void InitializeTimer()
         {
             //
-            FpsTimer = new Timer(1000);
-            FpsTimer.AutoReset = true;
-            FpsTimer.Elapsed += FpsTimer_Tick;
-            FpsTimer.Enabled = true;
+            fpsTimer = new Timer(1000);
+            fpsTimer.AutoReset = true;
+            fpsTimer.Elapsed += FpsTimer_Tick;
         }
         private void FpsTimer_Tick(object sender, EventArgs e)
         {
-            FPS = FrameCount;
-            FrameCount = 0;
+            if (Status == StatusType.RECORDING)
+            {
+                RecordingTime = DateTime.Now - recordingStartTime;
+            }
+
+            Fps = frameCount;
+            frameCount = 0;
         }
         #endregion
     }
