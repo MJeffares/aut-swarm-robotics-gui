@@ -30,7 +30,8 @@ namespace SwarmRoboticsGUI
     {
 
         #region Public Properties
-        public static IInputArray TestImage { get; }
+        
+        public static IInputArray TestImage { get; set; } 
         #endregion
 
         #region Public Methods

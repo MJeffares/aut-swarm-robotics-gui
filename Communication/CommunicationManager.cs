@@ -7,12 +7,14 @@
 #region
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO.Ports;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -332,8 +334,8 @@ namespace SwarmRoboticsGUI
 					messageWaitedOn.OnCompletion(this, args);
 				}
 			}
-
-            if(window.testMode)
+            
+            if(message.messageID > 0xDF && message.messageID < 0xF0)
             {
                 switch(message.messageID)
                 {
@@ -359,7 +361,7 @@ namespace SwarmRoboticsGUI
 
 
                     case MESSAGE_TYPES.SYSTEM_TEST_TWI_MUX:
-
+                        DisplayTWIMuxTestData(message as TWIMuxTestData);
                         break;
 
                     case MESSAGE_TYPES.SYSTEM_TEST_FAST_CHARGE_CHIP:
@@ -460,10 +462,9 @@ namespace SwarmRoboticsGUI
 
         public void DisplayIMUSensorData(IMUSensorTestData message)
         {
-            window.UpdateTextBox(window.tbSysTestIMUW, message.wDisplay);
-            window.UpdateTextBox(window.tbSysTestIMUX, message.xDisplay);
-            window.UpdateTextBox(window.tbSysTestIMUY, message.yDisplay);
-            window.UpdateTextBox(window.tbSysTestIMUZ, message.zDisplay);
+           window.UpdateTextBox(window.tbSysTestIMUPitch, message.pitchDisplay);
+           window.UpdateTextBox(window.tbSysTestIMURoll, message.rollDisplay);
+           window.UpdateTextBox(window.tbSysTestIMUYaw, message.yawDisplay);
         }
 	
         public void DisplayLineSensorData(LineSensorTestData message)
@@ -487,6 +488,15 @@ namespace SwarmRoboticsGUI
                     break;
             }
         }
+
+        public void DisplayTWIMuxTestData(TWIMuxTestData message)
+        {
+            window.UpdateTextBox(window.tbSysTestTWIRead, message.MessageDataDisplay);
+        }
+
+
+
+
 
 		public class SwarmProtocolMessage: XbeeAPI.ZigbeeReceivePacket
 		{
@@ -606,10 +616,10 @@ namespace SwarmRoboticsGUI
 		{
             public static class Sensors
             {
-                public const byte farLeft = 0x01;
-                public const byte centreLeft = 0x02;
-                public const byte centreRight = 0x03;
-                public const byte farRight = 0x04;
+                public const byte farLeft = 0x0D;
+                public const byte centreLeft = 0x0F;
+                public const byte centreRight = 0x00;
+                public const byte farRight = 0x07;
             }
 
 
@@ -671,20 +681,17 @@ namespace SwarmRoboticsGUI
 
 		public class IMUSensorTestData : SystemTestMessage
 		{
-			public byte[] wArr = new byte[4];
-			public byte[] xArr = new byte[4];
-			public byte[] yArr = new byte[4];
-			public byte[] zArr = new byte[4];
+			public byte[] pitchArr = new byte[4];
+			public byte[] rollArr = new byte[4];
+			public byte[] yawArr = new byte[4];
 
-			public ulong w;
-			public ulong x;
-			public ulong y;
-			public ulong z;
+			public float pitch;
+			public float roll;
+			public float yaw;
 
-			public string wDisplay;
-            public string xDisplay;
-            public string yDisplay;
-            public string zDisplay;
+			public string pitchDisplay;
+            public string rollDisplay;
+            public string yawDisplay;
 
             //public override string MessageDataDisplay;
 
@@ -692,32 +699,25 @@ namespace SwarmRoboticsGUI
 			{
 				for(int i=0; i < 4; i++)
 				{
-					wArr[i] = testMessage[i];
-					w = (ulong) wArr[i] << (8 * i);
+					pitchArr[3-i] = testMessage[i];
 				}
+                pitch = BitConverter.ToSingle(pitchArr, 0);
 
 				for (int i = 0; i < 4; i++)
 				{
-					xArr[i] = testMessage[i + 4];
-					x = (ulong)xArr[i] << (8 * i);
+					rollArr[3-i] = testMessage[i + 4];
 				}
+                roll = BitConverter.ToSingle(rollArr, 0);
 
 				for (int i = 0; i < 4; i++)
 				{
-					yArr[i] = testMessage[i + 8];
-					y = (ulong)yArr[i] << (8 * i);
+					yawArr[3-i] = testMessage[i + 8];
 				}
+                yaw = BitConverter.ToSingle(yawArr, 0);
 
-				for (int i = 0; i < 4; i++)
-				{
-					zArr[i] = testMessage[i + 12];
-					z = (ulong)zArr[i] << (8 * i);
-				}
-
-				wDisplay = w.ToString();
-                xDisplay = x.ToString();
-                yDisplay = y.ToString();
-                zDisplay = z.ToString();
+				pitchDisplay = pitch.ToString();
+                rollDisplay = roll.ToString();
+                yawDisplay = yaw.ToString();
 
                 //MessageDataDisplay = "W: " + wDisplay + " X: " + xDisplay + " Y: " + yDisplay + " Z: " + zDisplay;
 			}
@@ -727,7 +727,7 @@ namespace SwarmRoboticsGUI
                 get
                 {
                     //MANSEL: Improve this
-                    return "W: " + wDisplay + " X: " + xDisplay + " Y: " + yDisplay + " Z: " + zDisplay;
+                    return "Pitch: " + pitchDisplay + " Roll: " + rollDisplay + " Yaw: " + yawDisplay;
                 }
             }
 
@@ -743,11 +743,42 @@ namespace SwarmRoboticsGUI
 			public MotorTestData(byte[] frame) : base(frame)
 			{
 				motor = testMessage[0];
-				//MANSEL: add motor conversion here
-				//sensorData[0] = testMessage[1];
-				//sensorData[1] = testMessage[2];
+
+                if(testMessage[1] > 0x80)
+                {
+                    motorDir = true;
+                    motorSpeed = testMessage[1] - 0x80;
+                }
+                else
+                {
+                    motorDir = false;
+                    motorSpeed = testMessage[1];
+                }
+
+				//MANSEL: test motor conversion
 			}
 		}
+
+
+        public class TWIMuxTestData : SystemTestMessage
+        {
+            public byte address;
+
+            public TWIMuxTestData(byte[] frame) : base(frame)
+            {
+                address = testMessage[0];
+            }
+
+            public override string MessageDataDisplay
+            {
+                get
+                {
+                    //MANSEL: Improve this
+                    return address.ToString();
+                }
+            }
+        }
+
 
 
 		public static SwarmProtocolMessage ParseSwarmProtocolMessage(XbeeAPI.XbeeAPIFrame receivedPacket)
@@ -767,6 +798,21 @@ namespace SwarmRoboticsGUI
 				case MESSAGE_TYPES.SYSTEM_TEST_LINE_FOLLOWERS:
                     swarmMessage = new LineSensorTestData(swarmMessage.rawMessage);
 					break;
+
+                case MESSAGE_TYPES.SYSTEM_TEST_MOUSE:
+                    swarmMessage = new MouseSensorTestData(swarmMessage.rawMessage);
+                    break;
+
+                case MESSAGE_TYPES.SYSTEM_TEST_IMU:
+                    swarmMessage = new IMUSensorTestData(swarmMessage.rawMessage);
+                    break;
+
+
+                case MESSAGE_TYPES.SYSTEM_TEST_TWI_MUX:
+                    swarmMessage = new TWIMuxTestData(swarmMessage.rawMessage);
+                    break;
+
+                    //MANSEL: Common issue with new receive
 
 				default:
 
@@ -1095,6 +1141,7 @@ namespace SwarmRoboticsGUI
 				lvCommunicatedMessages.Items.SortDescriptions.Add(new SortDescription(lvCommunicatedMessagesSortCol.Tag.ToString(), lvCommunicatedMessagesSortAdorner.Direction));
 			}
 
+            
 			lvCommunicatedMessages.Items.Refresh();
 		}
 
