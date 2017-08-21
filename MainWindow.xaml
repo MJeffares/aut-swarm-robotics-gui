@@ -609,13 +609,13 @@
                         </StackPanel>
                     </TabItem>
 
-                    <!--
+                    
                     <TabItem Header="Debug" IsEnabled="False" >
                         <TabControl Margin="5" TabStripPlacement="Left">
                             
-                    -->
+                   
                             <!-- The following code alllows vertical tabs -->
-                    <!--
+                    
                             <TabControl.Resources>
                                 <Style TargetType="{x:Type TabItem}">
                                     <Setter Property="HeaderTemplate">
@@ -693,7 +693,7 @@
                         </TabControl>
                     
                     </TabItem>
-                    -->
+                    
                 </TabControl>
                     
             </DockPanel>

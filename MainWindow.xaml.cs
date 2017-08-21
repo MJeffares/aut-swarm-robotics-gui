@@ -140,7 +140,7 @@ namespace SwarmRoboticsGUI
             var what = ImageProcessing.TestImage;
             // TEMP: display overlay on starup for debugging
             overlayWindow.Show();
-            camera1.FrameUpdate += new Camera.FrameHandler(DrawCameraFrame);
+            //camera1.FrameUpdate += new Camera.FrameHandler(DrawCameraFrame);
 
             // Stores the UI context to be used to marshal 
             // code from other threads to the UI thread.

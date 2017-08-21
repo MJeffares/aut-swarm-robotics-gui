@@ -100,8 +100,6 @@ namespace SwarmRoboticsGUI
                     break;
             }
         }
-        // BRAE: temp counter
-        int counter = 0;
         private void DrawOverlayFrame(object sender, NewFrameEventArgs e)
         {
             var List = RobotList.ToList();
@@ -111,10 +109,6 @@ namespace SwarmRoboticsGUI
                 case SourceType.NONE:
                     break;
                 case SourceType.CAMERA:
-                    // BRAE: Testing doing image processing every second
-                    if (counter > 30)
-                    {
-                        counter = 0;
                         // Make sure there is a frame
                         if (e.Frame != null)
                         {
@@ -131,11 +125,6 @@ namespace SwarmRoboticsGUI
                             Frame.Dispose();
                             UFrame.Dispose();
                         }
-                    }
-                    else
-                    {                       
-                        counter++;
-                    }
                     break;
                 case SourceType.CUTOUTS:
                     // Apply image processing to find the robots
