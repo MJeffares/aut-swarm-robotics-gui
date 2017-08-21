@@ -232,8 +232,9 @@
                   Foreground="White" FontSize="20" Padding="0" BorderThickness="0"
                   Background="Transparent"
                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                  ItemsSource="{Binding Groups, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                  ItemContainerStyle="{StaticResource GroupStyle}">
+                  ItemContainerStyle="{StaticResource ItemStyle}"
+                  ItemsSource="{Binding Groups, RelativeSource={RelativeSource AncestorType=UserControl}}">
+
             <TreeView.Resources>
                 <DataTemplate DataType="{x:Type e:Item}">
                     <Grid>
@@ -284,9 +285,21 @@
                 </DataTemplate>
                 <HierarchicalDataTemplate DataType="{x:Type local:SettingsGroup}" ItemsSource="{Binding Children}" ItemContainerStyle="{StaticResource ItemStyle}">
                     <TextBlock FontSize="20" Foreground="White" Text="{Binding Name}"/>
+                    <!--<TextBlock Text="{Binding Source={StaticResource Settings},Path=Default.CV_Colour_Red_HueLower}"/>-->
                 </HierarchicalDataTemplate>
-                
             </TreeView.Resources>
+            <!--<TreeViewItem ItemContainerStyle="{StaticResource ItemStyle}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Hue"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Source={StaticResource Settings}, Path=CV_Colour_Blue_HueLower}"/>
+                </Grid>
+            </TreeViewItem>-->
         </TreeView>
     </Grid>
+
+    
 </UserControl>

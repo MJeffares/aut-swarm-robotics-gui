@@ -8,22 +8,210 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SwarmRoboticsGUI.Properties
-{
-
-
+namespace SwarmRoboticsGUI.Properties {
+    
+    
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "11.0.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase
-    {
-
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+        
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
-
-        public static Settings Default
-        {
-            get
-            {
+        
+        public static Settings Default {
+            get {
                 return defaultInstance;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CV_Colour_Red_HueUpper {
+            get {
+                return ((int)(this["CV_Colour_Red_HueUpper"]));
+            }
+            set {
+                this["CV_Colour_Red_HueUpper"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CV_Colour_Red_HueLower {
+            get {
+                return ((int)(this["CV_Colour_Red_HueLower"]));
+            }
+            set {
+                this["CV_Colour_Red_HueLower"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CV_Colour_Blue_HueUpper {
+            get {
+                return ((int)(this["CV_Colour_Blue_HueUpper"]));
+            }
+            set {
+                this["CV_Colour_Blue_HueUpper"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CV_Colour_Blue_HueLower {
+            get {
+                return ((int)(this["CV_Colour_Blue_HueLower"]));
+            }
+            set {
+                this["CV_Colour_Blue_HueLower"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CV_Colour_Green_HueUpper {
+            get {
+                return ((int)(this["CV_Colour_Green_HueUpper"]));
+            }
+            set {
+                this["CV_Colour_Green_HueUpper"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CV_Colour_Green_HueLower {
+            get {
+                return ((int)(this["CV_Colour_Green_HueLower"]));
+            }
+            set {
+                this["CV_Colour_Green_HueLower"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CV_Colour_Orange_HueUpper {
+            get {
+                return ((int)(this["CV_Colour_Orange_HueUpper"]));
+            }
+            set {
+                this["CV_Colour_Orange_HueUpper"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CV_Colour_Orange_HueLower {
+            get {
+                return ((int)(this["CV_Colour_Orange_HueLower"]));
+            }
+            set {
+                this["CV_Colour_Orange_HueLower"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CV_Colour_Yellow_HueUpper {
+            get {
+                return ((int)(this["CV_Colour_Yellow_HueUpper"]));
+            }
+            set {
+                this["CV_Colour_Yellow_HueUpper"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CV_Colour_Yellow_HueLower {
+            get {
+                return ((int)(this["CV_Colour_Yellow_HueLower"]));
+            }
+            set {
+                this["CV_Colour_Yellow_HueLower"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CV_Colour_Purple_HueUpper {
+            get {
+                return ((int)(this["CV_Colour_Purple_HueUpper"]));
+            }
+            set {
+                this["CV_Colour_Purple_HueUpper"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CV_Colour_Purple_HueLower {
+            get {
+                return ((int)(this["CV_Colour_Purple_HueLower"]));
+            }
+            set {
+                this["CV_Colour_Purple_HueLower"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CV_Colour_LightBlue_HueUpper {
+            get {
+                return ((int)(this["CV_Colour_LightBlue_HueUpper"]));
+            }
+            set {
+                this["CV_Colour_LightBlue_HueUpper"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CV_Colour_LightBlue_HueLower {
+            get {
+                return ((int)(this["CV_Colour_LightBlue_HueLower"]));
+            }
+            set {
+                this["CV_Colour_LightBlue_HueLower"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CV_Colour_DarkBlue_HueUpper {
+            get {
+                return ((int)(this["CV_Colour_DarkBlue_HueUpper"]));
+            }
+            set {
+                this["CV_Colour_DarkBlue_HueUpper"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CV_Colour_DarkBlue_HueLower {
+            get {
+                return ((int)(this["CV_Colour_DarkBlue_HueLower"]));
+            }
+            set {
+                this["CV_Colour_DarkBlue_HueLower"] = value;
             }
         }
     }

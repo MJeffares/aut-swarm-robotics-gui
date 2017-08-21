@@ -3,9 +3,13 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:SwarmRoboticsGUI"
+             xmlns:properties="clr-namespace:SwarmRoboticsGUI.Properties"
              StartupUri="MainWindow.xaml" ShutdownMode="OnMainWindowClose">
 
     <Application.Resources>
+        <!--User Settings-->
+        <properties:Settings x:Key="Settings"/>
+
         <!--Brushes-->
         <RadialGradientBrush x:Key="RadialBrush" Center="0.5,0.5" GradientOrigin="0.5,0.5">
             <RadialGradientBrush.GradientStops>
@@ -25,7 +29,7 @@
             <GradientStop Color="#DDDDDD" Offset="0.5"/>
             <GradientStop Color="#CDCDCD" Offset="1"/>
         </LinearGradientBrush>
-        <SolidColorBrush x:Key="ButtonNormalBorder" Color="#FF707070"/>
+        <SolidColorBrush x:Key="ButtonNormalBorder" Color="#777"/>
 
         <!--Styles-->
         <Style x:Key="ButtonFocusVisual">
