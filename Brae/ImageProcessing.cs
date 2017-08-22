@@ -94,7 +94,7 @@ namespace SwarmRoboticsGUI
             var Contours = new VectorOfVectorOfPoint();
             var ProcessedContours = new VectorOfVectorOfPoint();
             // Find every contour in the image
-            GetCountours(Frame, Contours, 1, RetrType.Ccomp);
+            GetCountours(Frame, Contours, 0, RetrType.External);
             // Filter out small and large contours
             FilterContourArea(Contours, ProcessedContours, 10000, 1000000);
 
@@ -105,7 +105,7 @@ namespace SwarmRoboticsGUI
             {
                 VectorOfPoint ProcessedContour = ProcessedContours[i];
                 // Get approximate polygonal shape of contour
-                CvInvoke.ApproxPolyDP(ProcessedContour, ProcessedContour, 5.0, true);
+                CvInvoke.ApproxPolyDP(ProcessedContour, ProcessedContour, 4.5, true);
                 // If contour is not the right shape (hexagon), check next shape
                 if (!IsHexagon(ProcessedContour)) continue;
                 // DEBUG: Hexagon counter
@@ -173,7 +173,8 @@ namespace SwarmRoboticsGUI
                 CudaInvoke.CvtColor(Input, Input, ColorConversion.Bgr2Gray);
                 // Noise removal but keeps edges
                 // More expensive operation therefore only used on Cuda
-                CudaInvoke.BilateralFilter(Input, Input, 9, 75, 75);
+                if (BlurSize > 0 && BlurSize % 2 != 0)
+                    CudaInvoke.BilateralFilter(Input, Input, BlurSize, 75, 75);
                 // Invert image
                 CudaInvoke.BitwiseNot(Input, Input);    
                 // Find edges using Canny                     
@@ -192,7 +193,8 @@ namespace SwarmRoboticsGUI
                 // Convert to grayscale
                 CvInvoke.CvtColor(Frame, Input, ColorConversion.Bgr2Gray);
                 // Noise removal
-                CvInvoke.GaussianBlur(Input, Input, new Size(BlurSize, BlurSize), 0);
+                if (BlurSize > 0 && BlurSize % 2 != 0)
+                    CvInvoke.GaussianBlur(Input, Input, new Size(BlurSize, BlurSize), 0);
                 // Invert image
                 CvInvoke.BitwiseNot(Input, Input);
                 // Threshold the image to find the edges     
@@ -286,14 +288,14 @@ namespace SwarmRoboticsGUI
             {
                 case KnownColor.Orange:
                     HueRange.Start = 0;
-                    HueRange.End = 15;
+                    HueRange.End = 13;
                     break;
                 case KnownColor.Yellow:
-                    HueRange.Start = 15;
+                    HueRange.Start = 17;
                     HueRange.End = 30;
                     break;
                 case KnownColor.Green:
-                    HueRange.Start = 30;
+                    HueRange.Start = 40;
                     HueRange.End = 90;
                     break;
                 case KnownColor.LightBlue:
@@ -321,7 +323,9 @@ namespace SwarmRoboticsGUI
         {
             int Count = 0;
             const int LowerS = 25;
-            const int ColourCount = 1000;
+            int Width = Frame.GetInputArray().GetSize().Width;
+            int Height = Frame.GetInputArray().GetSize().Height;
+            int ColourCount = Width * Height / 20;
             var Out = new Mat();
             var HOut = new Mat();
 
@@ -395,17 +399,23 @@ namespace SwarmRoboticsGUI
             IsPurple = HasHueRange(Frame, GetHueRange(KnownColor.Purple));
 
             // Orange, Yellow, Green
-            if (IsOrange && IsYellow && IsGreen && !IsLightBlue && !IsDarkBlue && !IsPurple) RobotID = 0;
+            //if (IsOrange && IsYellow && IsGreen && !IsLightBlue && !IsDarkBlue && !IsPurple) RobotID = 0;
+            if (IsOrange && IsYellow && IsGreen) RobotID = 0;
             // DarkBlue, Yellow, Orange
-            if (IsDarkBlue && IsYellow && IsOrange && !IsLightBlue && !IsGreen && !IsPurple) RobotID = 1;
+            //if (IsDarkBlue && IsYellow && IsOrange && !IsLightBlue && !IsGreen && !IsPurple) RobotID = 1;
+            if (IsDarkBlue && IsYellow && IsOrange) RobotID = 1;
             // Green, Yellow, DarkBlue
-            if (IsGreen && IsYellow && IsDarkBlue && !IsLightBlue && !IsOrange && !IsPurple) RobotID = 2;
+            //if (IsGreen && IsYellow && IsDarkBlue && !IsLightBlue && !IsOrange && !IsPurple) RobotID = 2;
+            if (IsGreen && IsYellow && IsDarkBlue) RobotID = 2;
             // Orange, Yellow, Purple
-            if (IsOrange && IsYellow && IsPurple && !IsLightBlue && !IsDarkBlue && !IsGreen) RobotID = 3;
+            //if (IsOrange && IsYellow && IsPurple && !IsLightBlue && !IsDarkBlue && !IsGreen) RobotID = 3;
+            if (IsOrange && IsYellow && IsPurple) RobotID = 3;
             // LightBlue, Green, DarkBlue
-            if (IsLightBlue && IsGreen && IsDarkBlue && !IsYellow && !IsOrange && !IsPurple) RobotID = 4;
+            //if (IsLightBlue && IsGreen && IsDarkBlue && !IsYellow && !IsOrange && !IsPurple) RobotID = 4;
+            if (IsLightBlue && IsGreen && IsDarkBlue) RobotID = 4;
             // Orange, Green, Purple
-            if (IsOrange && IsGreen && IsPurple && !IsLightBlue && !IsDarkBlue && !IsYellow) RobotID = 5;
+            //if (IsOrange && IsGreen && IsPurple && !IsLightBlue && !IsDarkBlue && !IsYellow) RobotID = 5;
+            if (IsOrange && IsGreen && IsPurple) RobotID = 5;
 
             return RobotID;
         }    
