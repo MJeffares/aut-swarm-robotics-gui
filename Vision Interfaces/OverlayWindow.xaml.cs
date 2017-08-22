@@ -61,7 +61,7 @@ namespace SwarmRoboticsGUI
             // Create 100ms timer to drive interface changes
             InitializeTimer();
             // Create event driven by new frames from the camera
-            mainWindow.camera1.FrameUpdate += new Camera.FrameHandler(DrawOverlayFrame);
+            mainWindow.camera1.NewFrame += new NewFrameEventHandler(DrawOverlayFrame);
 
             RobotList = new ObservableCollection<RobotItem>();
             // Stores the UI context to be used to marshal 

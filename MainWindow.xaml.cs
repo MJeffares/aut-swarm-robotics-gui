@@ -140,7 +140,7 @@ namespace SwarmRoboticsGUI
             var what = ImageProcessing.TestImage;
             // TEMP: display overlay on starup for debugging
             overlayWindow.Show();
-            //camera1.FrameUpdate += new Camera.FrameHandler(DrawCameraFrame);
+            camera1.NewFrame += new NewFrameEventHandler(DrawCameraFrame);
 
             // Stores the UI context to be used to marshal 
             // code from other threads to the UI thread.
@@ -476,11 +476,11 @@ namespace SwarmRoboticsGUI
 
         void StopCapture(object data)
         {
-            captureImageBox.Dispose();
-            camera1.StopCapture();
+            
+            camera1.CloseCapture();
         }
 
-        #region Input Events       
+        #region Input Events
         // Display menu
         private void menuFilterListItem_Click(object sender, RoutedEventArgs e)
         {
@@ -797,10 +797,8 @@ namespace SwarmRoboticsGUI
         {
             if (camera1 != null)
             {
-                Update(uiContext);
+                Update(uiContext);                
             }
-        }
-
-        
+        }     
 	}
 }

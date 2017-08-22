@@ -39,10 +39,6 @@ namespace SwarmRoboticsGUI
         private DateTime recordingStartTime { get; set; }
         #endregion
 
-        #region Public Events
-        public delegate void FrameHandler(object sender, NewFrameEventArgs e);
-        public event FrameHandler FrameUpdate;
-        #endregion
         public Camera()
         {
             Status = StatusType.STOPPED;
@@ -79,7 +75,7 @@ namespace SwarmRoboticsGUI
 
                 asyncVideoSource = new AsyncVideoSource(videoSource, true);
                 // set NewFrame event handler
-                asyncVideoSource.NewFrame += new NewFrameEventHandler(FrameUpdate);
+                asyncVideoSource.NewFrame += NewFrame;
                 // start the video source
                 asyncVideoSource.Start();
                 Status = StatusType.PLAYING;
@@ -90,12 +86,26 @@ namespace SwarmRoboticsGUI
         {
             if (Status == StatusType.PLAYING)
             {
-                //videoSource.SignalToStop();                
-                //videoSource.WaitForStop();
-                asyncVideoSource.SignalToStop();
-                asyncVideoSource.WaitForStop();
-                if (FrameUpdate != null)
-                asyncVideoSource.NewFrame -= new NewFrameEventHandler(FrameUpdate);
+                if (asyncVideoSource.IsRunning)
+                {
+                    asyncVideoSource.SignalToStop();
+                }
+                asyncVideoSource.NewFrame -= NewFrame;
+                fpsTimer.Stop();
+                Status = StatusType.STOPPED;
+            }
+        }
+
+        public void CloseCapture()
+        {
+            if (Status == StatusType.PLAYING)
+            {
+                if (asyncVideoSource.IsRunning)
+                {
+                    asyncVideoSource.SignalToStop();
+                    asyncVideoSource.WaitForStop();
+                }
+                asyncVideoSource.NewFrame -= NewFrame;
                 fpsTimer.Stop();
                 Status = StatusType.STOPPED;
             }
@@ -189,5 +199,8 @@ namespace SwarmRoboticsGUI
             frameCount = 0;
         }
         #endregion
+
+
+        public NewFrameEventHandler NewFrame { get; set; }
     }
 }

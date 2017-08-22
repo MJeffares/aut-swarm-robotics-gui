@@ -94,9 +94,9 @@ namespace SwarmRoboticsGUI
             var Contours = new VectorOfVectorOfPoint();
             var ProcessedContours = new VectorOfVectorOfPoint();
             // Find every contour in the image
-            GetCountours(Frame, Contours, 5, RetrType.External);
+            GetCountours(Frame, Contours, 1, RetrType.Ccomp);
             // Filter out small and large contours
-            FilterContourArea(Contours, ProcessedContours, 0, 1000000);
+            FilterContourArea(Contours, ProcessedContours, 10000, 1000000);
 
             // DEBUG: Counters
             int HexCount = 0, RobotCount = 0;

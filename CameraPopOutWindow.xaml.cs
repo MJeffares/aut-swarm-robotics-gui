@@ -25,7 +25,7 @@ namespace SwarmRoboticsGUI
             this.mainWindow = mainWindow;
 
             // Create event driven by new frames from the camera
-            mainWindow.camera1.FrameUpdate += new Camera.FrameHandler(DrawCameraFrame);
+            mainWindow.camera1.NewFrame += new NewFrameEventHandler(DrawCameraFrame);
         }
         private void DrawCameraFrame(object sender, NewFrameEventArgs e)
         {
