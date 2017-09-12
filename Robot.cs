@@ -179,8 +179,22 @@ namespace SwarmRoboticsGUI
             }
         }
 
-        private Point _Location { get; set; }
-        public Point Location
+        private Point _Pixel { get; set; }
+        public Point Pixel
+        {
+            get { return _Pixel; }
+            set
+            {
+                if (_Pixel != value)
+                {
+                    _Pixel = value;
+                    NotifyPropertyChanged("Pixel");
+                }
+            }
+        }
+
+        private System.Windows.Point _Location { get; set; }
+        public System.Windows.Point Location
         {
             get { return _Location; }
             set
@@ -192,6 +206,21 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
+
+        private System.Windows.Point _DisplayLocation { get; set; }
+        public System.Windows.Point DisplayLocation
+        {
+            get { return _DisplayLocation; }
+            set
+            {
+                if (_DisplayLocation != value)
+                {
+                    _DisplayLocation = value;
+                    NotifyPropertyChanged("DisplayLocation");
+                }
+            }
+        }
+
         public Point PreviousLocation { get; set; }
         public Point Direction { get; set; }
         public Point[] Contour { get; set; }
