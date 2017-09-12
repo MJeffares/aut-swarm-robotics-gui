@@ -3,6 +3,7 @@
 **********************************************************************************************************************************************/
 #region
 
+using SwarmRoboticsGUI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,12 +16,14 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Threading;
+using XbeeHandler.XbeeFrames;
+
 
 #endregion
 
 
 
-namespace SwarmRoboticsGUI
+namespace XbeeHandler
 {
 	//**********************************************************************************************************************************************************
 
@@ -48,23 +51,23 @@ namespace SwarmRoboticsGUI
 			public const byte ROUTE_RECORD_INDICATOR = 0xA1;
 			public const byte MANY_TO_ONE_ROUTE_REQUEST_INDICATOR = 0xA3;
 		}
-
-
-        
-
-        
-
+		
 		//MANSEL: make a seperate source and destination class
 		public static class DESTINATION
 		{
 			public const UInt64 COORDINATOR = 0x0000000000000000;
 			public const UInt64 BROADCAST = 0x000000000000FFFF;
 
-			public const UInt64 ROBOT_ONE = 0x0013A20041065FB3;
-            public const UInt64 ROBOT_TWO = 0x0013A2004147F9DD;
-            public const UInt64 ROBOT_THREE = 0x0013A2004152F256;
-            public const UInt64 ROBOT_FOUR = 0x0013A2004147F9D8;
-            //MANSEL: get robot xbee ID's
+			public const UInt64 BROWN_ROBOT = 0x0013A20041065FB3;
+			public const UInt64 DARK_BLUE_ROBOT = 0x0013A200415B8C3A;
+			public const UInt64 GREEN_TOWER = 0x0013A200415B8C2A;
+			public const UInt64 LIGHT_BLUE_ROBOT = 0x0013A2004152F256;
+			public const UInt64 ORANGE_ROBOT = 0x0013A200415B8BE5;
+			public const UInt64 PINK_ROBOT = 0x0013A200415B8C18;
+			public const UInt64 PURPLE_ROBOT = 0x0013A200415B8BDD;
+			public const UInt64 RED_ROBOT = 0x0013A2004147F9DD;
+			public const UInt64 YELLOW_ROBOT = 0x0013A200415B8C38;
+
 
 			public static string ToString(UInt64 location)
 			{
@@ -76,19 +79,32 @@ namespace SwarmRoboticsGUI
 					case BROADCAST:
 						return "Broadcast Message";
 
-					case ROBOT_ONE:
-					    return "Robot 1";
+					case BROWN_ROBOT:
+					    return "Brown Robot";
 
-					
-					case ROBOT_TWO:
-						return "Robot 2";
+					case DARK_BLUE_ROBOT:
+						return "Dark Blue Robot";
 
-					case ROBOT_THREE:
-						return "Robot 3";
+					case GREEN_TOWER:
+						return "Tower Base Station";
 
-					case ROBOT_FOUR:
-						return "Robot 4";
-					
+					case LIGHT_BLUE_ROBOT:
+						return "Light Blue Robot";
+
+					case ORANGE_ROBOT:
+						return "Orange Robot";
+
+					case PINK_ROBOT:
+						return "Pink Robot";
+
+					case PURPLE_ROBOT:
+						return "Purple Robot";
+
+					case RED_ROBOT:
+						return "Red Robot";
+
+					case YELLOW_ROBOT:
+						return "Yellow Robot";					
 
 					default:
 						return "Warning: Unknown Desstination";
@@ -248,374 +264,6 @@ namespace SwarmRoboticsGUI
 			}
 			return 1;
 		}
-
-		public class XbeeAPIFrame
-		{
-			public DateTime timeStamp;
-			public byte[] rawMessage;
-			public int length;
-			public byte frameCommand;
-			public byte[] frameData;
-			public int checksum;
-
-			public XbeeAPIFrame(byte[] frame)
-			{
-				timeStamp = DateTime.Now;
-				rawMessage = new byte[frame.Length];
-				Array.Copy(frame, rawMessage, frame.Length);
-				length = 256 * frame[1] + frame[2];
-				frameCommand = frame[3];
-				frameData = new byte[frame.Length - 5];
-				Array.Copy(frame, 4, frameData, 0, frame.Length - 5);
-				checksum = frame[frame.Length - 1];
-			}
-
-
-			public string TimeStampDisplay
-			{
-				get
-				{
-					return timeStamp.ToString("HH:mm:ss:fff");
-				}
-			}
-
-			public string RawMessageDisplay
-			{
-				get
-				{
-					return MJLib.HexToString(rawMessage, 0, rawMessage.Length, true);
-				}
-			}
-
-			public string FrameLengthDisplay
-			{
-				get
-				{
-					return MJLib.HexToString(BitConverter.GetBytes(length), 0, 1, true) + " (" + length.ToString() + ")";
-				}
-			}
-
-			public virtual string FrameCommandDisplay
-			{
-				get
-				{
-					return "WARNING: unhandled xbee frame received";
-				}
-			}
-
-			public virtual string FrameDataDisplay
-			{
-				get
-				{
-					return MJLib.HexToString(frameData, 0, length, true);
-				}
-			}
-
-			public virtual string SourceDisplay
-			{
-				get
-				{
-					return "";
-				}
-			}
-
-			public virtual string MessageTypeDisplay
-			{
-				get
-				{
-					return "";
-				}
-			}
-
-			public virtual string MessageDataDisplay
-			{
-				get
-				{
-					return "";
-				}
-			}
-
-		}
-		/*
-
-		class ATCommand : XbeeAPIFrame
-		{
-			//MANSEL: add this class
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "Xbee: Many To One Route Request Indicator Received (N/H)";
-				}
-			}
-		}
-
-		class ATCommandQueue : XbeeAPIFrame
-		{
-			//MANSEL: add this class
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "Xbee: Many To One Route Request Indicator Received (N/H)";
-				}
-			}
-		}
-
-		class ZigbeeTransmitRequest : XbeeAPIFrame
-		{
-			//MANSEL: add this class
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "Xbee: Many To One Route Request Indicator Received (N/H)";
-				}
-			}
-		}
-
-		class ZigbeeExplicitAddressingCommandFrame : XbeeAPIFrame
-		{
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "Xbee: Many To One Route Request Indicator Received (N/H)";
-				}
-			}
-		}
-
-		class RemoteCommandRequest : XbeeAPIFrame
-		{
-			//MANSEL: add this class
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "Xbee: Many To One Route Request Indicator Received (N/H)";
-				}
-			}
-		}
-
-		class CreateSourceRoute : XbeeAPIFrame
-		{
-			//MANSEL: add this class
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "Xbee: Many To One Route Request Indicator Received (N/H)";
-				}
-			}
-		}
-
-		class ATCommandResponse : XbeeAPIFrame
-		{
-			//MANSEL: add this class
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "Xbee: AT Command Response Received (N/H)";
-				}
-			}
-		}
-
-		class ModemStatus : XbeeAPIFrame
-		{
-			//MANSEL: add this class
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "Xbee: Modem Status Received (N/H)";				
-				}
-			}
-		}
-		*/
-
-		class ZigbeeTransmitStatus : XbeeAPIFrame
-		{
-			public byte frameID;
-			public UInt16 destinationAddress16;
-			public byte transmitRetryCount;
-			public byte deliveryStatus;
-			public byte discoveryStatus;
-
-			public ZigbeeTransmitStatus(byte[] frame) : base(frame)
-			{
-				frameID = frameData[0];
-				destinationAddress16 = MJLib.ByteArrayToUInt16(frameData, 1);
-				transmitRetryCount = frameData[3];
-				deliveryStatus = frameData[4];
-				discoveryStatus = frameData[5];
-			}
-
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "WARNING: unhandled swarm message received";
-				}
-			}
-
-			public override string FrameDataDisplay
-			{
-				get
-				{
-					return MJLib.HexToString(frameData, 0, length, true);
-				}
-			}
-
-		}
-
-
-		public class ZigbeeReceivePacket : XbeeAPIFrame
-		{
-			public UInt64 sourceAddress64;
-			public UInt16 sourceAddress16;
-			public byte receiveOptions;
-			public byte[] receivedData;
-
-
-			public ZigbeeReceivePacket(byte[] frame) : base(frame)
-			{
-				sourceAddress64 = MJLib.ByteArrayToUInt64(frameData, 0);
-				sourceAddress16 = MJLib.ByteArrayToUInt16(frameData, 8);
-				receiveOptions = frameData[10];
-				receivedData = new byte[frameData.Length - 11];
-				Array.Copy(frameData, 11, receivedData, 0, frameData.Length - 11);
-			}
-
-			public override string SourceDisplay
-			{
-				get
-				{
-					//MANSEL: need to add UInt64 -> byte array
-					//return XbeeHandler.DESTINATION.ToString(sourceAddress64) + " (" + MJLib.HexToString(source64, 0, 8, true) + " , " + MJLib.HexToString(source16, 0, 2, true) + ")";
-
-					return XbeeAPI.DESTINATION.ToString(sourceAddress64) + " (" + sourceAddress64.ToString() + ")";
-				}
-			}
-		}
-
-
-		/*
-		class ZigbeeExplicitRXIndicator : XbeeAPIFrame
-		{
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "Xbee: Explicit Data Packet Received (N/H)";				
-				}
-			}
-		}
-
-		class ZigbeeIODataSampleRXIndicator : XbeeAPIFrame
-		{
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "Xbee: IO Sample Received (N/H)";
-				}
-			}
-		}
-
-		class XbeeSensorReadIndicator : XbeeAPIFrame
-		{
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "Xbee: Sensor Read Indicator Received (N/H)";				
-				}
-			}
-		}
-
-		class NodeIdentificationIndicator : XbeeAPIFrame
-		{
-			//MANSEL: add this class
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "Xbee: Node Identification Indicator Received (N/H)";				
-				}
-			}
-		}
-
-		class RemoteCommandResponse : XbeeAPIFrame
-		{
-			//MANSEL: add this class
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "Xbee: Remote Command Response Received (N/H)";				
-				}
-			}
-		}
-
-		class ExtendedModemStatus : XbeeAPIFrame
-		{
-			//MANSEL: add this class
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "Xbee: Extended Modem Status Received (N/H)";
-				}
-			}
-		}
-
-		class OverTheAirFirmwareUpdateStatus : XbeeAPIFrame
-		{
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "Xbee: OTA Firmware Update Status Received (N/H)";
-				}
-			}
-		}
-
-		class RouteRecordIndicator : XbeeAPIFrame
-		{
-			//MANSEL: add this class
-
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "Xbee: Route Record Indicator Received (N/H)";
-				}
-			}
-		}
-
-		class ManyToOneRouteRequestIndicator : XbeeAPIFrame
-		{
-			//MANSEL: add this class
-
-			public override string FrameCommandDisplay
-			{
-				get
-				{
-					return "Xbee: Many To One Route Request Indicator Received (N/H)";
-				}
-			}
-
-		}
-		*/
-
-
-
-
-
-
-
-
 
 		public XbeeAPIFrame ParseXbeeFrame(byte[] frame)
 		{

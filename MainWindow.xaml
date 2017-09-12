@@ -235,10 +235,18 @@
                 <StackPanel DockPanel.Dock="Top" Margin="5">
                     <StackPanel Height="90"  Width="220" HorizontalAlignment="Left" >
                         <Label Content="Communication" HorizontalAlignment="Center" Margin="0,0,0,0"/>
-                        <ComboBox x:Name = "dispSelectRobot"  MinHeight = "24" Width = "195" Margin = "0,0,0,8" HorizontalAlignment="Center" SelectedIndex = "0" SelectionChanged="dispSelectRobot_SelectionChanged">
+                        <ComboBox x:Name = "dispSelectRobot"  MinHeight = "24" Width = "195" Margin = "0,0,0,8" HorizontalAlignment="Center" SelectedIndex = "0" SelectionChanged="dispSelectRobot_SelectionChanged" ItemsSource="{Binding}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Path=Key}"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="4*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Rectangle Grid.Column="0" Margin="5,1" Width="12" Height="12" Stroke="{Binding Path=Colour}" StrokeThickness="1" VerticalAlignment="Center" Fill="{Binding Path=Colour}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Path=Name}"/>
+                                    </Grid>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>

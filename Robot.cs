@@ -264,8 +264,21 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-
-        private ObservableCollection<Item> _Children { get; set; }
+		private bool _IsCommunicating { get; set; }
+		public bool IsCommunicating
+		{
+			get { return _IsCommunicating; }
+			set
+			{
+				if (_IsCommunicating != value)
+				{
+					_IsCommunicating = value;
+					NotifyPropertyChanged("IsCommunicating");
+				}
+			}
+		}
+		
+		private ObservableCollection<Item> _Children { get; set; }
         public ObservableCollection<Item> Children
         {
             get { return _Children; }
@@ -279,7 +292,23 @@ namespace SwarmRoboticsGUI
             }
         }
 
-        public RobotItem(string Name, int ID) : base(Name)
+		private Brush _Colour { get; set; }
+		public Brush Colour
+		{
+			get { return _Colour; }
+			set
+			{
+				if (_Colour != value)
+				{
+					_Colour = value;
+					NotifyPropertyChanged("Colour");
+				}
+			}
+		}
+
+
+
+		public RobotItem(string Name, int ID) : base(Name)
         {
             this.ID = ID;
             Group = "Unassigned";

@@ -35,8 +35,11 @@ namespace SwarmRoboticsGUI
         private void dispSelectRobot_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox CBsender = sender as ComboBox;
-            KeyValuePair<string, UInt64> selected = (KeyValuePair<string, UInt64>)CBsender.SelectedItem;
-            commManger.currentTargetRobot = selected.Value;
+			//KeyValuePair<string, UInt64> selected = (KeyValuePair<string, UInt64>)CBsender.SelectedItem;
+			//commManger.currentTargetRobot = selected.Value;
+
+			TempRobotClass selected = (TempRobotClass)CBsender.SelectedItem;
+			commManger.currentTargetRobot = selected.ID;
         }
 	}
 }

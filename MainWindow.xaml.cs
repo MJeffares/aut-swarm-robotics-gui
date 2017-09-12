@@ -50,72 +50,105 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using XbeeHandler;
 
 namespace SwarmRoboticsGUI
 {
     public enum WindowStatusType { MAXIMISED, MINIMISED, POPPED_OUT };
     public enum TimeDisplayModeType { CURRENT, FROM_START, START };
 
-    public partial class MainWindow : Window
-    {
-        // Declarations
-        #region
-        // TODO: comment declarations
-        public Camera camera1;
-        public SerialUARTCommunication serial;
-        public XbeeAPI xbee;
-        public ProtocolClass protocol;
+
+
+	public partial class MainWindow : Window
+	{		
+		// Declarations
+		#region
+		// TODO: comment declarations
+		public Camera camera1;
+		public SerialUARTCommunication serial;
+		public XbeeAPI xbee;
+		public ProtocolClass protocol;
 		public CommunicationManager commManger;
-        public CameraPopOutWindow popoutWindow;
-        public OverlayWindow overlayWindow;
+		public CameraPopOutWindow popoutWindow;
+		public OverlayWindow overlayWindow;
 		public Dictionary<string, UInt64> robotsDictionary;
 
-        public WindowStatusType WindowStatus { get; set; }
-        public TimeDisplayModeType TimeDisplayMode { get; set; }
-        public double WindowSize { get; set; }
+		public WindowStatusType WindowStatus { get; set; }
+		public TimeDisplayModeType TimeDisplayMode { get; set; }
+		public double WindowSize { get; set; }
 
 
-        // one second timer to calculate and update the fps count
-        private DispatcherTimer InterfaceTimer;
-        //
-        private OpenFileDialog openvideodialog = new OpenFileDialog();
-        private SaveFileDialog savevideodialog = new SaveFileDialog();
+		// one second timer to calculate and update the fps count
+		private DispatcherTimer InterfaceTimer;
+		//
+		private OpenFileDialog openvideodialog = new OpenFileDialog();
+		private SaveFileDialog savevideodialog = new SaveFileDialog();
 
-        private FilterInfoCollection VideoDevices { get; set; }
-        private VideoCaptureDevice VideoDevice { get; set; }
+		private FilterInfoCollection VideoDevices { get; set; }
+		private VideoCaptureDevice VideoDevice { get; set; }
 
-        private SynchronizationContext uiContext { get; set; }
-                
-        
-        #endregion    
-        
-        // Main
-        public MainWindow()
-        {
-            InitializeComponent();
+		private SynchronizationContext uiContext { get; set; }
+
+
+		#endregion
+
+		//MANSEL: MOVE TO ROBOT.CS
+		public class TempRobotClass
+		{
+			public String Name { get; set; }
+			public UInt64 ID { get; set; }
+			public String Colour { get; set; }
+
+			public TempRobotClass(string name, UInt64 id, string colour)
+			{
+				Name = name;
+				ID = id;
+				Colour = colour;
+			}
+		}
+
+		public List<TempRobotClass> tempRobotList;
+
+
+		// Main
+		public MainWindow()
+		{
+			InitializeComponent();
 			DataContext = this;
-            
+
 			//
 			CvInvoke.UseOpenCL = true;
-            //
-            camera1 = new Camera();
-            xbee = new XbeeAPI(this);
-            protocol = new ProtocolClass(this);
-            // MANSEL: Maybe make a struct.
-            serial = new SerialUARTCommunication(this, menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);
-			commManger = new CommunicationManager(this,serial, xbee, protocol);
+			//
+			camera1 = new Camera();
+			xbee = new XbeeAPI(this);
+			protocol = new ProtocolClass(this);
+			// MANSEL: Maybe make a struct.
+			serial = new SerialUARTCommunication(this, menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);
+			commManger = new CommunicationManager(this, serial, xbee, protocol);
 
+			//MANSEL: REPLACE WITH ROBOT.CS
+			List<TempRobotClass> tempRobotList = new List<TempRobotClass>();
 			
-			robotsDictionary = new Dictionary<string, UInt64>()
-			{
-				{"Robot One", 0x0013A20041065FB3},
-				{"Robot Two",0x0013A2004147F9DD},
-				{"Robot Three",0x0013A2004152F256},
-				{"Robot Four",0x0013A2004147F9D8},
-                {"Broadcast", 0x000000000000FFFF}
-			};
+			TempRobotClass tempItem = new TempRobotClass("Brown Robot", 0x0013A20041065FB3, "SaddleBrown");
+			tempRobotList.Add(tempItem);
+			tempItem = new TempRobotClass("Dark Blue Robot", 0x0013A200415B8C3A, "MidnightBlue");
+			tempRobotList.Add(tempItem);
+			tempItem = new TempRobotClass("Tower Base Station", 0x0013A200415B8C2A, "Lime");
+			tempRobotList.Add(tempItem);
+			tempItem = new TempRobotClass("Light Blue Robot", 0x0013A2004152F256, "Cyan");
+			tempRobotList.Add(tempItem);
+			tempItem = new TempRobotClass("Orange Robot", 0x0013A200415B8BE5, "Orange");
+			tempRobotList.Add(tempItem);
+			tempItem = new TempRobotClass("Pink Robot", 0x0013A200415B8C18, "Plum");
+			tempRobotList.Add(tempItem);
+			tempItem = new TempRobotClass("Purple Robot", 0x0013A200415B8BDD, "Purple");
+			tempRobotList.Add(tempItem);
+			tempItem = new TempRobotClass("Red Robot", 0x0013A2004147F9DD, "Red");
+			tempRobotList.Add(tempItem);
+			tempItem = new TempRobotClass("Yellow Robot", 0x0013A200415B8C38, "Yellow");
+			tempRobotList.Add(tempItem);
 
-			dispSelectRobot.ItemsSource = robotsDictionary;
+			dispSelectRobot.ItemsSource = tempRobotList;
 
 			overlayWindow = new OverlayWindow(this);                      
             //
