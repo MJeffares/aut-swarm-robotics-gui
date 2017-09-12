@@ -1,30 +1,43 @@
-﻿
+﻿/**********************************************************************************************************************************************
+*	File: MainWindow.xaml.cs
+*
+*	Developed By: Mansel Jeffares and Brae Hartley
+*	First Build: 7 March 2017
+*	Current Build: 12 September 2017
+*
+*	Description :
+*		Does most of the important UI stuff
+*		Developed for a final year university project at Auckland University of Technology (AUT), New Zealand
+*		
+*	Useage :
+*		
+*
+*	Limitations :
+*		Build for x64, .NET 4.5.2
+*   
+*		Naming Conventions:
+*			Variables, camelCase, start lower case, subsequent words also upper case, if another object goes by the same name, then also with an underscore
+*			Methods, PascalCase, start upper case, subsequent words also upper case
+*			Constants, all upper case, unscores for seperation
+* 
+**********************************************************************************************************************************************/
+
+#region notestoself
+
 // MANSEL: This is an example of a Mansel task
 // BRAE: Use this to get Brae to do something for once
 // TODO: This is for general things that need doing
 // UNDONE: This is life
 
-// Namespaces
+#endregion
+
+
+/**********************************************************************************************************************************************
+* Namespaces
+**********************************************************************************************************************************************/
+#region
+
 using AForge.Video;
-///	File: MainWindow.xaml.cs
-///
-/// Developed By: Mansel Jeffares
-/// First Build: 7 March 2017
-/// Current Build:  27 April 2017
-///
-/// Description :
-///     Graphics User Interface for Swarm Robotics Project
-///     Built for x64, .NET 4.5.2
-///
-/// Limitations :
-///     Build for x64, will only detect Cameras with x64 drivers
-///
-/// Naming Conventions:
-///     CamelCase
-///     Variables start lower case, if another object goes by the same name, then also with an underscore
-///     Methods start upper case
-///     Constants, all upper case, unscores for seperation
-///
 using AForge.Video.DirectShow;
 using Emgu.CV;
 using Emgu.CV.Cuda;
@@ -51,6 +64,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using XbeeHandler;
+
+#endregion
+
 
 namespace SwarmRoboticsGUI
 {

@@ -2,11 +2,12 @@
 *	File: SwarmRoboticsProtocol.cs
 *
 *	Developed By: Mansel Jeffares
-*	First Build: 12 September 2017
+*	First Build: 31 July 2017
 *	Current Build:  12 September 2017
 *
 *	Description :
 *		Swarm Robotics Project Custom Protocol Messages Definitions
+*		Developed for a final year university project at Auckland University of Technology (AUT), New Zealand
 *		
 *	Useage :
 *		Used ontop of Xbee protocol

@@ -6,14 +6,14 @@
 *	Current Build:  30 July 2017
 *
 *	Description :
-*		Communication methods and functions for Swarm Robotics Project
-*		Built for x64, .NET 4.5.2
+*		Swrial communication classes methods 
+*		Developed for a final year university project at Auckland University of Technology (AUT), New Zealand
 *		
 *	Useage :
 *		
 *
 *	Limitations :
-*		Build for x64
+*		Built for x64, .NET 4.5.2
 *		1.5 Stopbits doesn't work unless also using 5 databits
 *   
 *		Naming Conventions:

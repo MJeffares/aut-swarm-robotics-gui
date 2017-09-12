@@ -7,13 +7,13 @@
 *
 *	Description :
 *		Methods required to implement the system test functionality
-*		Built for x64, .NET 4.5.2
+*		Developed for a final year university project at Auckland University of Technology (AUT), New Zealand
 *		
 *	Useage :
 *		
 *
 *	Limitations :
-*		Build for x64
+*		Built for x64, .NET 4.5.2
 *   
 *	Naming Conventions:
 *		Variables, camelCase, start lower case, subsequent words also upper case
