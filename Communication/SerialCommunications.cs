@@ -84,7 +84,7 @@ namespace SwarmRoboticsGUI
 		private string[] handshakingOptions = new string[] { "None", "XOnXOff", "RequestToSend", "RequestToSendXOnXOff" };
 
 		// default serial port settings
-		private const string DEFAULT_BAUD_RATE = "9600";
+		private const string DEFAULT_BAUD_RATE = "230400";
 		private const string DEFAULT_PARITY = "None";
 		private const string DEFAULT_DATA_BITS = "8";
 		private const string DEFAULT_STOP_BITS = "One";
