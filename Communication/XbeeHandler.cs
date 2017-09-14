@@ -50,33 +50,46 @@ using XbeeHandler.XbeeFrames;
 
 namespace XbeeHandler
 {
-
 	public class XbeeAPI
 	{
-		public static class API_FRAME
+		/**********************************************************************************************************************************************
+		* Class private fields
+		**********************************************************************************************************************************************/
+		#region 
+
+		private const byte FRAME_DELIMITER = 0x7E;
+		private const byte ESCAPE_BYTE = 0x7D;
+		private const byte XON = 0x11;
+		private const byte XOFF = 0x13;
+
+		Predicate<byte> isStartByte = (byte b) => { return b == 0x7E; };
+		int _receiveState = ReceiveStates.START;
+		int index = 0;
+		int startIndex = -1;
+		int length;
+		bool escape;
+		List<byte> frameAsList;
+		MainWindow window = null;
+
+		private static readonly IList<byte> BYTES_TO_ESCAPE = new List<byte> { FRAME_DELIMITER, ESCAPE_BYTE, XON, XOFF }.AsReadOnly();
+
+		bool escapeCarryOver = false;
+
+		#endregion
+
+		/**********************************************************************************************************************************************
+		* Constructor
+		**********************************************************************************************************************************************/
+		public XbeeAPI(MainWindow main)
 		{
-			public const byte AT_COMMAND = 0x08;
-			public const byte AT_COMMAND_QUEUE = 0x09;
-			public const byte ZIGBEE_TRANSMIT_REQUEST = 0x10;
-			public const byte EXPLICIT_ADDRESSING_ZIGBEE_COMMAND_FRAME = 0x11;
-			public const byte REMOTE_COMMAND_REQUEST = 0x17;
-			public const byte CREATE_SOURCE_ROUTE = 0x21;
-			public const byte AT_COMMAND_RESPONSE = 0x88;
-			public const byte MODEM_STATUS = 0x8A;
-			public const byte ZIGBEE_TRANSMIT_STATUS = 0x8B;
-			public const byte ZIGBEE_RECEIVE_PACKET = 0x90;
-			public const byte ZIGBEE_EXPLICIT_RX_INDICATOR = 0x91;
-			public const byte ZIGBEE_IO_DATA_SAMPLE_RX_INDICATOR = 0x92;
-			public const byte XBEE_SENSOR_READ_INDICATOR = 0x94;
-			public const byte NODE_IDENTIFICATION_INDICATOR = 0x95;
-			public const byte REMOTE_COMMAND_RESPONSE = 0x97;
-			public const byte EXTENDED_MODEM_STATUS = 0x98;
-			public const byte OTA_FIRMWARE_UPDATE_STATUS = 0xA0;
-			public const byte ROUTE_RECORD_INDICATOR = 0xA1;
-			public const byte MANY_TO_ONE_ROUTE_REQUEST_INDICATOR = 0xA3;
+			window = main;
 		}
-		
-		//MANSEL: make a seperate source and destination class
+
+		/**********************************************************************************************************************************************
+		* Child Classes
+		**********************************************************************************************************************************************/
+		#region
+
 		public static class DESTINATION
 		{
 			public const UInt64 COORDINATOR = 0x0000000000000000;
@@ -104,7 +117,7 @@ namespace XbeeHandler
 						return "Broadcast Message";
 
 					case BROWN_ROBOT:
-					    return "Brown Robot";
+						return "Brown Robot";
 
 					case DARK_BLUE_ROBOT:
 						return "Dark Blue Robot";
@@ -128,41 +141,13 @@ namespace XbeeHandler
 						return "Red Robot";
 
 					case YELLOW_ROBOT:
-						return "Yellow Robot";					
+						return "Yellow Robot";
 
 					default:
 						return "Warning: Unknown Desstination";
 				}
 			}
 		}
-
-
-
-		MainWindow window = null;
-
-		private const byte FRAME_DELIMITER = 0x7E;
-		private const byte ESCAPE_BYTE = 0x7D;
-		private const byte XON = 0x11;
-		private const byte XOFF = 0x13;
-
-        
-		private static readonly IList<byte> BYTES_TO_ESCAPE = new List<byte> { 0x7E, 0x7D, 0x11, 0x13 }.AsReadOnly();
-
-		public XbeeAPI(MainWindow main)
-		{
-			window = main;
-
-            
-		}
-
-
-		Predicate<byte> isStartByte = (byte b) => { return b == 0x7E; };
-		int _receiveState = ReceiveStates.START;
-		int index = 0;
-		int startIndex = -1;
-		int length;
-		bool escape;
-		List<byte> frameAsList;
 
 		static private class ReceiveStates
 		{
@@ -171,6 +156,13 @@ namespace XbeeHandler
 			public const int LENGTH_LSB = 2;
 			public const int Data = 3;
 		}
+
+		#endregion
+
+		/**********************************************************************************************************************************************
+		* Methods
+		**********************************************************************************************************************************************/
+		#region
 
 		public byte[] FindFrames(List<byte> buffer)
 		{
@@ -248,10 +240,7 @@ namespace XbeeHandler
 			}
 			return null;
 		}
-
-
-
-
+		
 		public byte[] EscapeReceivedByteArray(byte[] byteArrayToEscape)
 		{
 			Queue<byte> temp = new Queue<byte>();
@@ -296,78 +285,78 @@ namespace XbeeHandler
 			switch (frame[3])
 			{
 
-				case API_FRAME.AT_COMMAND_RESPONSE:
+				case API_FRAME_TYPES.AT_COMMAND_RESPONSE:
 					//window.UpdateSerialReceivedTextBox("\rXBEE: AT Command Response Received (N/H)");
 					specificFrame = null;
 					break;
 
-				case API_FRAME.MODEM_STATUS:
+				case API_FRAME_TYPES.MODEM_STATUS:
 					//window.UpdateSerialReceivedTextBox("\rXBEE: Modem Status Received (N/H)");
 					specificFrame = null;
 					break;
 
 
-				case API_FRAME.ZIGBEE_TRANSMIT_STATUS:
+				case API_FRAME_TYPES.ZIGBEE_TRANSMIT_STATUS:
 					//window.UpdateSerialReceivedTextBox("\rXBEE: Transmit Status Received (N/H)");
 					specificFrame = new ZigbeeTransmitStatus(frame);
 					break;
 
 
-				case API_FRAME.ZIGBEE_RECEIVE_PACKET:
+				case API_FRAME_TYPES.ZIGBEE_RECEIVE_PACKET:
 					//window.UpdateSerialReceivedTextBox("\rXBEE: Data Packet Received ");
 					specificFrame = new ZigbeeReceivePacket(frame);
 					break;
 
 
-				case API_FRAME.ZIGBEE_EXPLICIT_RX_INDICATOR:
+				case API_FRAME_TYPES.ZIGBEE_EXPLICIT_RX_INDICATOR:
 					//window.UpdateSerialReceivedTextBox("\rXBEE: Explicit Data Packet Received (N/H)");
 					specificFrame = null;
 					break;
 
 
-				case API_FRAME.ZIGBEE_IO_DATA_SAMPLE_RX_INDICATOR:
+				case API_FRAME_TYPES.ZIGBEE_IO_DATA_SAMPLE_RX_INDICATOR:
 					//window.UpdateSerialReceivedTextBox("\rXBEE: IO Sample Received (N/H)");		
 					specificFrame = null;
 					break;
 
 
-				case API_FRAME.XBEE_SENSOR_READ_INDICATOR:
+				case API_FRAME_TYPES.XBEE_SENSOR_READ_INDICATOR:
 					//window.UpdateSerialReceivedTextBox("\rXBEE: Sensor Read Indicator Received (N/H)");	
 					specificFrame = null;
 					break;
 
 
-				case API_FRAME.NODE_IDENTIFICATION_INDICATOR:
+				case API_FRAME_TYPES.NODE_IDENTIFICATION_INDICATOR:
 					//window.UpdateSerialReceivedTextBox("\rXBEE: Node Identification Indicator Received (N/H)");
 					specificFrame = null;
 					break;
 
 
-				case API_FRAME.REMOTE_COMMAND_RESPONSE:
+				case API_FRAME_TYPES.REMOTE_COMMAND_RESPONSE:
 					//window.UpdateSerialReceivedTextBox("\rXBEE: Remote Command Response Received (N/H)");
 					specificFrame = null;
 					break;
 
 
-				case API_FRAME.EXTENDED_MODEM_STATUS:
+				case API_FRAME_TYPES.EXTENDED_MODEM_STATUS:
 					//window.UpdateSerialReceivedTextBox("\rXBEE: Extended Modem Status Received (N/H)");
 					specificFrame = null;
 					break;
 
 
-				case API_FRAME.OTA_FIRMWARE_UPDATE_STATUS:
+				case API_FRAME_TYPES.OTA_FIRMWARE_UPDATE_STATUS:
 					//window.UpdateSerialReceivedTextBox("\rXBEE: OTA Firmware Update Status Received (N/H)");
 					specificFrame = null;
 					break;
 
 
-				case API_FRAME.ROUTE_RECORD_INDICATOR:
+				case API_FRAME_TYPES.ROUTE_RECORD_INDICATOR:
 					//window.UpdateSerialReceivedTextBox("\rXBEE: Route Record Indicator Received (N/H)");
 					specificFrame = null;
 					break;
 
 
-				case API_FRAME.MANY_TO_ONE_ROUTE_REQUEST_INDICATOR:
+				case API_FRAME_TYPES.MANY_TO_ONE_ROUTE_REQUEST_INDICATOR:
 					//window.UpdateSerialReceivedTextBox("\rXBEE: Many To One Route Request Indicator Received (N/H)");
 					specificFrame = null;
 					break;
@@ -382,29 +371,10 @@ namespace XbeeHandler
 			//window.RefreshListView();
 		}
 
-
-
-
-		//***********************************************************************************************************************************************************************
-
-
-
-
-
-		/*
-		public enum robots : UInt64 {	COORDINATOR = 0x0000000000000000,
-										BROADCAST = 0x000000000000FFFF,
-										ROBOT_ONE = 0x0013A20041065FB3 }
-
-		*/
-
-
-
 		public byte[] XbeeFrame(byte[] msg)
 		{
 			LinkedList<byte> messageList = new LinkedList<byte>();  //use a list over queue for added functionality
 																	//Queue<byte> messageQueue = new Queue<byte>();
-
 			byte length_msb;
 			byte length_lsb;
 			byte checksum;
@@ -559,7 +529,6 @@ namespace XbeeHandler
 			return messageList.ToArray<byte>();
 		}
 
-
 		public byte[] Escape(byte[] Frame_To_Escape)
 		{
 			//List<byte> list = Frame_To_Escape.ToList<byte>();
@@ -582,9 +551,9 @@ namespace XbeeHandler
 			return list.ToArray();
 		}
 
-		bool escapeCarryOver = false;
+		
 
-		//XXXX rename
+		//MANSEL: rename
 		public byte[] DeEscape(byte[] Frame_To_DeEscape)
 		{
 			Queue<byte> temp = new Queue<byte>();
@@ -620,9 +589,6 @@ namespace XbeeHandler
 			return temp.ToArray();
 		}
 
-
-
-
 		public byte CalculateChecksum(byte api, byte[] data)
 		{
 			int checksum_int = api;
@@ -649,7 +615,7 @@ namespace XbeeHandler
 
 		public void SendFrame(byte api_frame, byte[] data)
 		{
-
+			//MANSEL: Why is this empty
 		}
 
 
@@ -657,7 +623,7 @@ namespace XbeeHandler
 		{
 			byte[] frame_data = new byte[data.Length + 14];
 
-			frame_data[0] = API_FRAME.ZIGBEE_TRANSMIT_REQUEST;
+			frame_data[0] = API_FRAME_TYPES.ZIGBEE_TRANSMIT_REQUEST;
 			frame_data[1] = 200;
 
 			//byte[] destination_address_64 = BitConverter.GetBytes(destination);
@@ -703,7 +669,7 @@ namespace XbeeHandler
 		{
 			byte[] frame_data = new byte[15];
 
-			frame_data[0] = API_FRAME.ZIGBEE_TRANSMIT_REQUEST;
+			frame_data[0] = API_FRAME_TYPES.ZIGBEE_TRANSMIT_REQUEST;
 			frame_data[1] = 200;
 
 			//byte[] destination_address_64 = BitConverter.GetBytes(destination);
@@ -735,5 +701,8 @@ namespace XbeeHandler
 			}
 
 		}
+
+		#endregion
+
 	}
 }

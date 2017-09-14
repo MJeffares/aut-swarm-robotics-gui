@@ -125,6 +125,7 @@
 
         <Grid x:Name="mainGrid">
 
+            
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="Column0" Width="*" MinWidth="150"/>
                 <ColumnDefinition x:Name="Column1" Width="2*" MinWidth="300"/>
@@ -132,6 +133,15 @@
                 <ColumnDefinition x:Name="Column3" Width="2*"/>
             </Grid.ColumnDefinitions>
 
+            <!--
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="Column0" Width="3*" MinWidth="150"/>
+                <ColumnDefinition x:Name="Column1" Width="2*" MinWidth="300"/>
+                <ColumnDefinition x:Name="Column2" Width="5"/>
+                <ColumnDefinition x:Name="Column3" Width="1*"/>
+            </Grid.ColumnDefinitions>
+            -->
+            
             <Grid.RowDefinitions>
                 <RowDefinition x:Name="Row0" Height="3*"/>
             </Grid.RowDefinitions>
@@ -165,7 +175,7 @@
                                 <GridViewColumnHeader Tag="time_stamp" Click="GridViewColumnHeader_Click" Content="TimeStamp      "/>
                             </GridViewColumn>
 
-                            <!--
+                            
                             <GridViewColumn x:Name = "gvcMessageType" DisplayMemberBinding="{Binding MessageTypeDisplay}">
                                 <GridViewColumnHeader Tag = "message_type" Click="GridViewColumnHeader_Click" Content="Message Type     "/>
                             </GridViewColumn>
@@ -185,7 +195,7 @@
                             <GridViewColumn x:Name = "gvcSourceAddress" DisplayMemberBinding="{Binding SourceDisplay}">
                                 <GridViewColumnHeader Tag = "SourceDisplay" Click="GridViewColumnHeader_Click" Content="Source Address     "/>
                             </GridViewColumn>
-                            -->
+                            
                             <GridViewColumn  x:Name = "gvcRawData" DisplayMemberBinding="{Binding RawMessageDisplay}">
                                 <GridViewColumnHeader Tag = "RawMessageDisplay" Click="GridViewColumnHeader_Click" Content="Raw Data      "/>
                             </GridViewColumn>

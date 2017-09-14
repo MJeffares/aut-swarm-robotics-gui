@@ -38,6 +38,31 @@ using System;
 
 namespace XbeeHandler.XbeeFrames
 {
+	public static class API_FRAME_TYPES
+	{
+		public const byte AT_COMMAND = 0x08;
+		public const byte AT_COMMAND_QUEUE = 0x09;
+		public const byte ZIGBEE_TRANSMIT_REQUEST = 0x10;
+		public const byte EXPLICIT_ADDRESSING_ZIGBEE_COMMAND_FRAME = 0x11;
+		public const byte REMOTE_COMMAND_REQUEST = 0x17;
+		public const byte CREATE_SOURCE_ROUTE = 0x21;
+		public const byte AT_COMMAND_RESPONSE = 0x88;
+		public const byte MODEM_STATUS = 0x8A;
+		public const byte ZIGBEE_TRANSMIT_STATUS = 0x8B;
+		public const byte ZIGBEE_RECEIVE_PACKET = 0x90;
+		public const byte ZIGBEE_EXPLICIT_RX_INDICATOR = 0x91;
+		public const byte ZIGBEE_IO_DATA_SAMPLE_RX_INDICATOR = 0x92;
+		public const byte XBEE_SENSOR_READ_INDICATOR = 0x94;
+		public const byte NODE_IDENTIFICATION_INDICATOR = 0x95;
+		public const byte REMOTE_COMMAND_RESPONSE = 0x97;
+		public const byte EXTENDED_MODEM_STATUS = 0x98;
+		public const byte OTA_FIRMWARE_UPDATE_STATUS = 0xA0;
+		public const byte ROUTE_RECORD_INDICATOR = 0xA1;
+		public const byte MANY_TO_ONE_ROUTE_REQUEST_INDICATOR = 0xA3;
+	}
+
+
+
 	public class XbeeAPIFrame
 	{
 		public DateTime timeStamp;

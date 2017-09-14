@@ -163,6 +163,8 @@ namespace SwarmRoboticsGUI
 			tempRobotList.Add(tempItem);
 			tempItem = new TempRobotClass("Yellow Robot", 0x0013A200415B8C38, "Yellow");
 			tempRobotList.Add(tempItem);
+			tempItem = new TempRobotClass("Broadcast", 0x000000000000FFFF, "White");
+			tempRobotList.Add(tempItem);
 
 			dispSelectRobot.ItemsSource = tempRobotList;
 
