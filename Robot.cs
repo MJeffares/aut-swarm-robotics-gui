@@ -221,8 +221,23 @@ namespace SwarmRoboticsGUI
             }
         }
 
+
         public Point PreviousLocation { get; set; }
-        public Point Direction { get; set; }
+
+        public Point _Direction { get; set; }
+        public Point Direction
+        {
+            get { return _Direction; }
+            set
+            {
+                if (_Direction != value)
+                {
+                    _Direction = value;
+                    NotifyPropertyChanged("Direction");
+                }
+            }
+        }
+
         public Point[] Contour { get; set; }
         
         private bool _IsTracked { get; set; }

@@ -25,7 +25,8 @@ namespace SwarmRoboticsGUI
             this.mainWindow = mainWindow;
 
             // Create event driven by new frames from the camera
-            mainWindow.camera1.NewFrame += new NewFrameEventHandler(DrawCameraFrame);
+            // TODO: fix the popout window
+            //mainWindow.camera1.NewFrame += new NewFrameEventHandler(DrawCameraFrame);
         }
         private void DrawCameraFrame(object sender, NewFrameEventArgs e)
         {

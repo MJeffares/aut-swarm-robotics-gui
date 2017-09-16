@@ -78,7 +78,7 @@ namespace SwarmRoboticsGUI
 	public partial class MainWindow : Window
 	{		
 		// Declarations
-		#region
+		#region Public Properties
 		// TODO: comment declarations
 		public Camera camera1;
 		public SerialUARTCommunication serial;
@@ -88,25 +88,22 @@ namespace SwarmRoboticsGUI
 		public CameraPopOutWindow popoutWindow;
 		public OverlayWindow overlayWindow;
 		public Dictionary<string, UInt64> robotsDictionary;
+        public List<RobotItem> RobotList;
 
 		public WindowStatusType WindowStatus { get; set; }
 		public TimeDisplayModeType TimeDisplayMode { get; set; }
 		public double WindowSize { get; set; }
+        #endregion
 
-
-		// one second timer to calculate and update the fps count
-		private DispatcherTimer InterfaceTimer;
+        #region Private Properties
+        // one second timer to calculate and update the fps count
+        private DispatcherTimer InterfaceTimer;
 		//
 		private OpenFileDialog openvideodialog = new OpenFileDialog();
 		private SaveFileDialog savevideodialog = new SaveFileDialog();
-
 		private FilterInfoCollection VideoDevices { get; set; }
 		private VideoCaptureDevice VideoDevice { get; set; }
-
-		private SynchronizationContext uiContext { get; set; }
-
-
-		#endregion
+	#endregion
 
 		//MANSEL: MOVE TO ROBOT.CS
 		public class TempRobotClass
@@ -168,12 +165,16 @@ namespace SwarmRoboticsGUI
 
 			dispSelectRobot.ItemsSource = tempRobotList;
 
-			overlayWindow = new OverlayWindow(this);                      
             //
             PopulateFilters();
             PopulateOverlays();
             PopulateCameras();
             PopulateSources();
+            PopulateRobots();
+
+            overlayWindow = new OverlayWindow(this);                      
+            
+            
             //
             openvideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
             savevideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
@@ -191,11 +192,7 @@ namespace SwarmRoboticsGUI
             var what = ImageProcessing.TestImage;
             // TEMP: display overlay on starup for debugging
             overlayWindow.Show();
-            camera1.NewFrame += new NewFrameEventHandler(DrawCameraFrame);
-
-            // Stores the UI context to be used to marshal 
-            // code from other threads to the UI thread.
-            uiContext = SynchronizationContext.Current;
+            camera1.Process += new EventHandler(DrawCameraFrame);
 
             // BRAE: Default setup for testing
             //overlayWindow.Display1.Source = Display.SourceType.CUTOUTS;
@@ -208,6 +205,7 @@ namespace SwarmRoboticsGUI
             setupSystemTest();
 		}
 
+        #region Public Methods
         public void ToggleCameraWindow()
         {
             switch (WindowStatus)
@@ -256,7 +254,7 @@ namespace SwarmRoboticsGUI
                     break;
             }
         }
-
+        #endregion
 
         #region Private Methods
         private void PopulateCameras()
@@ -266,16 +264,16 @@ namespace SwarmRoboticsGUI
             {
                 // gets currently connected devices
                 VideoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
-
                 // clears cameras from menu                                      
                 menuCameraList.Items.Clear();
                 menuCameraConnect.IsEnabled = false;
                 menuCameraCapabilityList.IsEnabled = false;
 
                 // loops through cameras and adds them to menu
-                for (int i = 0; i < VideoDevices.Count; i++)
+                //for (int i = 0; i < VideoDevices.Count; i++)
+                for (int i = VideoDevices.Count; i > 0; i--)
                 {
-                    MenuItem item = new MenuItem { Header = VideoDevices[i].Name };
+                    MenuItem item = new MenuItem { Header = VideoDevices[i-1].Name };
                     item.Click += new RoutedEventHandler(menuCameraListItem_Click);
                     item.IsCheckable = true;
                     menuCameraList.Items.Add(item);
@@ -399,6 +397,19 @@ namespace SwarmRoboticsGUI
             menuSourceList.Items.Add(settingsmenuitem);
             settingsmenuitem.Click += menuPlaceHolder_Click;
         }
+
+        private void PopulateRobots()
+        {
+            RobotList = new List<RobotItem>();
+            RobotList.Add(new RobotItem("Red Robot", 0));
+            RobotList.Add(new RobotItem("Yellow Robot", 1));
+            RobotList.Add(new RobotItem("Purple Robot", 2));
+            RobotList.Add(new RobotItem("Light Blue Robot", 3));
+            RobotList.Add(new RobotItem("Dark Blue Robot", 4));
+            RobotList.Add(new RobotItem("Poop Robot", 5));
+            RobotList.Add(new RobotItem("Pink Robot", 6));
+            RobotList.Add(new RobotItem("Orange Robot", 7));
+        }
         #endregion
 
 
@@ -475,32 +486,27 @@ namespace SwarmRoboticsGUI
             statusFPS.Text = camera1.Fps.ToString();
         }
 
-        private void DrawCameraFrame(object sender, NewFrameEventArgs e)
+        private void DrawCameraFrame(object sender, EventArgs e)
         {
+            var Frame = sender as UMat;
+
             switch (overlayWindow.Display1.Source)
             {
                 case SourceType.NONE:
                     break;
                 case SourceType.CAMERA:
                     // Make sure there is a frame
-                    if (e.Frame != null)
+                    if (Frame != null)
                     {
-                        var BitFrame = new Image<Bgr, byte>(e.Frame);
-                        var Frame = BitFrame.Mat;
                         //Apply the currently selected filter
                         if (camera1.Filter != FilterType.NONE)
                         {
-                            var Image = new Mat();
-                            ImageProcessing.ProcessFilter(Frame, Image, camera1.Filter);
-                            if (Image != null)
-                                captureImageBox.Image = Image.Clone();
-                            Image.Dispose();
+                            ImageProcessing.ProcessFilter(Frame, Frame, camera1.Filter);
+                            if (Frame != null)
+                                captureImageBox.Image = Frame;
                         }
                         else
-                            captureImageBox.Image = Frame.Clone();
-
-                        Frame.Dispose();
-                        BitFrame.Dispose();
+                            captureImageBox.Image = Frame;
                     }
                     break;
                 case SourceType.CUTOUTS:
@@ -516,20 +522,6 @@ namespace SwarmRoboticsGUI
         }
 
         #endregion
-
-        void Update(object state)
-        {
-            // Get the UI context from state
-            SynchronizationContext Context = state as SynchronizationContext;
-            // Execute the UpdateRobots function on the UI thread
-            Context.Post(StopCapture, null);
-        }
-
-        void StopCapture(object data)
-        {
-            
-            camera1.CloseCapture();
-        }
 
         #region Input Events
         // Display menu
@@ -630,7 +622,9 @@ namespace SwarmRoboticsGUI
                     // Update camera
                     camera1.Name = menusender.ToString();
                     camera1.Index = menuCameraList.Items.IndexOf(menusender);
+
                     VideoDevice = new VideoCaptureDevice(VideoDevices[camera1.Index].MonikerString);
+                    
 
                     camera1.CapabilityIndex = VideoDevice.VideoCapabilities.Length - 1;
 
@@ -846,10 +840,7 @@ namespace SwarmRoboticsGUI
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            if (camera1 != null)
-            {
-                Update(uiContext);                
-            }
+            camera1.CloseCapture();
         }     
 	}
 }

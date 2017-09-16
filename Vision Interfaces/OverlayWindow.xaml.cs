@@ -41,7 +41,7 @@ namespace SwarmRoboticsGUI
         public int UpperV { get; set; }
         #endregion
         private System.Timers.Timer InterfaceTimer { get; set; }
-        public ObservableCollection<RobotItem> RobotList { get; set; }
+        public List<RobotItem> RobotList { get; set; }
         private SynchronizationContext uiContext { get; set; }
 
         public OverlayWindow(MainWindow mainWindow)
@@ -61,9 +61,9 @@ namespace SwarmRoboticsGUI
             // Create 100ms timer to drive interface changes
             InitializeTimer();
             // Create event driven by new frames from the camera
-            mainWindow.camera1.NewFrame += new NewFrameEventHandler(DrawOverlayFrame);
-
-            RobotList = new ObservableCollection<RobotItem>();
+            mainWindow.camera1.Process += new EventHandler(DrawOverlayFrame);
+            //
+            RobotList = mainWindow.RobotList;
             // Stores the UI context to be used to marshal 
             // code from other threads to the UI thread.
             uiContext = SynchronizationContext.Current;
@@ -100,9 +100,9 @@ namespace SwarmRoboticsGUI
                     break;
             }
         }
-        private void DrawOverlayFrame(object sender, NewFrameEventArgs e)
+        private void DrawOverlayFrame(object sender, EventArgs e)
         {
-            var List = RobotList.ToList();
+            UMat Frame = sender as UMat;
 
             switch (Display1.Source)
             {
@@ -110,27 +110,20 @@ namespace SwarmRoboticsGUI
                     break;
                 case SourceType.CAMERA:
                         // Make sure there is a frame
-                        if (e.Frame != null)
+                        if (Frame != null)
                         {
-                            var BitFrame = new Image<Bgr, byte>(e.Frame);
-                            var Frame = BitFrame.Mat;
-                            var UFrame = Frame.GetUMat(AccessType.Read);
-
                             // Apply image processing to find the robots
-                            ImageProcessing.GetRobots(UFrame, List);
+                            ImageProcessing.GetRobots(Frame, RobotList);
+                            
                             // Update the robotlist on the UI thread
-                            Update(uiContext, List);
-
-                            BitFrame.Dispose();
-                            Frame.Dispose();
-                            UFrame.Dispose();
+                            //Update(uiContext, RobotList);
                         }
                     break;
                 case SourceType.CUTOUTS:
                     // Apply image processing to find the robots
-                    ImageProcessing.GetRobots(ImageProcessing.TestImage, List);
+                    ImageProcessing.GetRobots(ImageProcessing.TestImage, RobotList);
                     // Update the robotlist on the UI thread
-                    Update(uiContext, List);
+                    //Update(uiContext, RobotList);
                     break;
                 default:
                     break;
@@ -139,7 +132,6 @@ namespace SwarmRoboticsGUI
         #endregion
 
         #region Private Events 
-
         private void Overlay_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (InterfaceTimer != null)

@@ -14,7 +14,7 @@ namespace SwarmRoboticsGUI
     {
         public static readonly DependencyProperty ItemsProperty =
             DependencyProperty.Register("Items",
-            typeof(ObservableCollection<RobotItem>),
+            typeof(List<RobotItem>),
             typeof(RobotList),
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
@@ -24,9 +24,9 @@ namespace SwarmRoboticsGUI
             typeof(RobotList),
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-        public ObservableCollection<RobotItem> Items
+        public List<RobotItem> Items
         {
-            get { return (ObservableCollection<RobotItem>)GetValue(ItemsProperty); }
+            get { return (List<RobotItem>)GetValue(ItemsProperty); }
             set { SetValue(ItemsProperty, value); }
         }
 
