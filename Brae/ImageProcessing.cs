@@ -26,11 +26,24 @@ namespace SwarmRoboticsGUI
         [Description("Colour Filtering")]
         COLOUR
     };
+   
+
     public static class ImageProcessing
     {
+        private enum Shape
+        {
+            [Description("Triangle")]
+            TRIANGLE,
+            [Description("Square")]
+            SQUARE,
+            [Description("Pentagon")]
+            PENTAGON,
+            [Description("Hexagon")]
+            HEXAGON
+        };
 
         #region Public Properties
-        
+
         public static IInputArray TestImage { get; set; } 
         #endregion
 
@@ -99,48 +112,38 @@ namespace SwarmRoboticsGUI
             var ArenaContour = new VectorOfPoint();
             // Arena corner closest to pixel origin
             var Origin = new Point();
-            // Pixel to real-world scaling factor
-            double factor = 0;
+           
 
             // TEMP: real-world values to display
             double displayFactor = 1024 / REAL_DISTANCE;
 
-           // UMat ArenaFrame = new UMat();
-            //CvInvoke.Resize(Frame, ArenaFrame, new Size(0, 0), 0.5, 0.5);
-            factor = IndentifyArena(Frame, ArenaContour);
-            if (ArenaContour.Size != 0)
+            // Pixel to real-world scaling factor
+            double factor = IndentifyArena(Frame, ArenaContour);
+            if (factor != 0)
                 Origin = FindOrigin(Frame, ArenaContour);
 
-            var Contours = new VectorOfVectorOfPoint();
-            var ProcessedContours = new VectorOfVectorOfPoint();
-            // Find every contour in the image
-
-            var BigFrame = Frame as UMat;
-            //CvInvoke.PyrDown(Frame, BigFrame);
-            //CvInvoke.PyrUp(Frame, BigFrame);
-            GetCountours(BigFrame, Contours, 1, RetrType.List, ChainApproxMethod.ChainApproxSimple);
-            // Filter out small and large contours
-            FilterContourArea(Contours, ProcessedContours, 1000, 100000);
-            // DEBUG: Counters
-            int HexCount = 0, RobotCount = 0;
-            // Loop through the filtered contours in the frame
-            for (int i = 0; i < ProcessedContours.Size; i++)
+            //var Contours = new VectorOfVectorOfPoint();
+            var Hexagons = new VectorOfVectorOfPoint();
+            using (var Contours = new VectorOfVectorOfPoint())
             {
-                VectorOfPoint ProcessedContour = ProcessedContours[i];
-                // Get approximate polygonal shape of contour
-                CvInvoke.ApproxPolyDP(ProcessedContour, ProcessedContour, CvInvoke.ArcLength(ProcessedContour, true) * 0.02, true);
-                // If contour is not the right shape (hexagon), check next shape
-                if (!IsHexagon(ProcessedContour)) 
-                    continue;
-                // DEBUG: Hexagon counter
-                HexCount++;
-                // Rectangular region that encompasses the contour
-                Rectangle RobotBounds = CvInvoke.BoundingRectangle(ProcessedContour);
-                var RobotImage = new UMat();
-                GetRobotRegion(Frame, RobotBounds, RobotImage);
+                // Find every contour in the image
+                GetCountours(Frame, Contours, 1, RetrType.List, ChainApproxMethod.ChainApproxSimple);
+                // Filter out small and large contours
+                FilterContourArea(Contours, Contours, 1000, 100000);
+                
+                int HexCount = GetHexagons(Contours, Hexagons);
+            }
+            int RobotCount = 0;
+
+            // Loop through the hexagons in the frame
+            for (int i = 0; i < Hexagons.Size; i++)
+            {
+                VectorOfPoint Hexagon = Hexagons[i];
+                var RobotFrame = new UMat();
+                GetRobotFrame(Frame, Hexagon, RobotFrame);
 
                 // Check for the colour ID, Returns (-1) if no robot ID
-                int RobotID = IdentifyRobot(RobotImage);
+                int RobotID = IdentifyRobot(RobotFrame);
                 // Goto next robot if not true
                 if (RobotID == -1) continue;
                 // Robot is tracked by image processing
@@ -158,11 +161,11 @@ namespace SwarmRoboticsGUI
                 }
                 RobotList[index].IsTracked = true;
                 // DEBUG: Store the vertices of the hexagonal shape
-                RobotList[index].Contour = ProcessedContour.ToArray();
+                RobotList[index].Contour = Hexagon.ToArray();
                 // DEBUG: Robot counter
                 RobotCount++;
                 // Get the robots center
-                MCvPoint2D64f COM = CvInvoke.Moments(ProcessedContour).GravityCenter;
+                MCvPoint2D64f COM = CvInvoke.Moments(Hexagon).GravityCenter;
 
                 // Store the robots pixel location
                 RobotList[index].Pixel = new Point((int)COM.X, (int)COM.Y);
@@ -182,20 +185,23 @@ namespace SwarmRoboticsGUI
                 }
 
                 // Get the robots direction
-                Point Direction = FindDirection(RobotImage);
+                Point Direction = FindDirection(RobotFrame);
                 // Jump to next contour if true
                 if (Direction.IsEmpty) continue;
 
-                Direction = new Point(Direction.X + RobotBounds.X, Direction.Y + RobotBounds.Y);
                 if (RobotList[index].Pixel.X > 0 && RobotList[index].Pixel.Y > 0)
                 {
-                    // Get robot heading using Atan function
+                    // Get robot facing using Atan function
                     int dy = Direction.Y - RobotList[index].Pixel.Y;
                     int dx = Direction.X - RobotList[index].Pixel.X;
-                    RobotList[index].Heading = Math.Atan2(dy, dx);
-                    RobotList[index].HeadingDeg = Math.Atan2(dy, dx) * 180 / Math.PI;
-                    RobotList[index].Direction = new Point((int)(100 * Math.Cos(RobotList[index].Heading)),
-                                                           (int)(100 * Math.Sin(RobotList[index].Heading)));
+                    RobotList[index].Facing = Math.Atan2(dy, dx);
+                    RobotList[index].FacingDeg = Math.Atan2(dy, dx) * 180 / Math.PI;
+
+                    //int DirectionX = (int)(RobotList[index].Width * Math.Cos(RobotList[index].Heading) * 0.9);
+                    //int DirectionY = (int)(RobotList[index].Width * Math.Sin(RobotList[index].Heading) * 0.9);
+                    int DirectionX = (int)(RobotList[index].Width * 0.4);
+                    int DirectionY = 0;
+                    RobotList[index].Direction = new Point(DirectionX, DirectionY);
                 }
             }
         }
@@ -242,8 +248,6 @@ namespace SwarmRoboticsGUI
                 CvInvoke.Canny(Input, Input, 0, 255);
                 // Find only the external contours applying no shape approximations
                 CvInvoke.FindContours(Input, Contours, null, Mode, Approx);
-                // Dispose of the image array
-                Input.Dispose();
             }
         }
         private static void FilterContourArea(IInputArray Contours, IOutputArray FilteredContours, double LowerBound, double UpperBound)
@@ -262,84 +266,71 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-        private static void GetRobotRegion(IInputArray Frame, Rectangle Region, IOutputArray Result)
+        private static void GetRobotFrame(IInputArray Frame, IInputArray Contour, IOutputArray RobotFrame)
         {
-            //if (CudaInvoke.HasCuda)
-            //{
-            //    var Input = new GpuMat(Frame);
-            //    var Test = new GpuMat(Frame);
-            //    // Create an image from the frame cropped down to the contour region
-            //    Input = Test.ColRange(Region.Left, Region.Right)
-            //               .RowRange(Region.Top, Region.Bottom);
-            //    Input.CopyTo(Result);
-            //    Test.Dispose();
-            //    Input.Dispose();
-            //}
-            //else
-            //{
-            var Input = new UMat(Frame as UMat, Region);
-            Input.CopyTo(Result);
-            Input.Dispose();
-            //}
+            var Input = Frame as UMat;
+            Input = new UMat(Input, CvInvoke.BoundingRectangle(Contour));
+            Input.CopyTo(RobotFrame);
+            RobotFrame.GetOutputArray().GetUMat().CopyTo(RobotFrame);
         }
-        
-        // BRAE: Make these IsShape(Contour,Shape.Hexagon)?
-        private static bool IsHexagon(VectorOfPoint Contour)
+        private static int GetHexagons(IInputArray Contours, IOutputArray Hexagons)
         {
-            // Check for 6 vertices
-            if (Contour.Size != 6)
+            var Input = Contours as VectorOfVectorOfPoint;
+            var Output = Hexagons as VectorOfVectorOfPoint;
+            for (int i = 0; i < Input.Size; i++)
             {
-                return false;
-            }
-            LineSegment2D[] edges = PointCollection.PolyLine(Contour.ToArray(), true);
-            for (int j = 0; j < edges.Length; j++)
-            {
-                double angle = Math.Abs(edges[(j + 1) % edges.Length].GetExteriorAngleDegree(edges[j]));
-                // Target Angle of 60 degrees
-                if (angle < 30 || angle > 90)
+                VectorOfPoint Contour = Input[i];
+                // Get approximate polygonal shape of contour
+                CvInvoke.ApproxPolyDP(Contour, Contour, CvInvoke.ArcLength(Contour, true) * 0.02, true);
+                // If contour is not the right shape (hexagon), check next shape
+                if (IsShape(Contour, Shape.HEXAGON))
                 {
-                    return false;
+                    Output.Push(Contour);
                 }
             }
-            return true;
+            Hexagons = Output;
+            return Output.Size;
         }
-        private static bool IsEquilTriangle(VectorOfPoint Contour)
+        private static bool IsShape(IInputArray Contour, Shape Shape)
         {
-            if (Contour.Size != 3)
+            var contour = Contour as VectorOfPoint;
+            const int tolerance = 20;
+            int sides = 0;
+            switch(Shape)
             {
-                return false;
+                case Shape.TRIANGLE:
+                    sides = 3;
+                    break;
+                case Shape.SQUARE:
+                    sides = 4;
+                    break;
+                case Shape.PENTAGON:
+                    sides = 5;
+                    break;
+                case Shape.HEXAGON:
+                    sides = 6;
+                    break;
             }
-            LineSegment2D[] edges = PointCollection.PolyLine(Contour.ToArray(), true);
-            for (int j = 0; j < edges.Length; j++)
-            {
-                double angle = Math.Abs(edges[(j + 1) % edges.Length].GetExteriorAngleDegree(edges[j]));
-                // Target angle of 120 degrees
-                if (angle < 100 || angle > 140)
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-        private static bool IsSquare(VectorOfPoint Contour)
-        {
-            if (Contour.Size != 4)
-            {
-                return false;
-            }
-            LineSegment2D[] edges = PointCollection.PolyLine(Contour.ToArray(), true);
-            for (int j = 0; j < edges.Length; j++)
-            {
-                double angle = Math.Abs(edges[(j + 1) % edges.Length].GetExteriorAngleDegree(edges[j]));
-                // Target angle of 120 degrees
-                if (angle < 70 || angle > 110)
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
+            double exterior = 360 / sides;
 
+            // Check for correct number of vertices
+            if (contour.Size != sides)
+            {
+                return false;
+            }
+
+            LineSegment2D[] edges = PointCollection.PolyLine(contour.ToArray(), true);
+            for (int j = 0; j < edges.Length; j++)
+            {
+                double angle = Math.Abs(edges[(j + 1) % edges.Length].GetExteriorAngleDegree(edges[j]));
+                // Angle is outside the tolerance
+                if (angle < exterior - tolerance || angle > exterior + tolerance)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
         private static Range GetHueRange(KnownColor TargetColour)
         {
             Range HueRange = new Range();
@@ -388,12 +379,15 @@ namespace SwarmRoboticsGUI
             var Out = new Mat();
             var HOut = new Mat();
 
+            //bool HasCuda = CudaInvoke.HasCuda;
+            // BRAE: No more cuda for now
+            bool HasCuda = false;
 
-            if (CudaInvoke.HasCuda)
+            if (HasCuda)
             {
                 var GpuFrame = new GpuMat(Frame);
                 CudaInvoke.CvtColor(GpuFrame, GpuFrame, ColorConversion.Bgr2Hsv);
-                Out = GpuFrame.ToMat();
+                GpuFrame.Download(Out);
                 GpuFrame.Dispose();
             }
             else
@@ -427,14 +421,14 @@ namespace SwarmRoboticsGUI
         }
         private static Point FindDirection(IInputArray Frame)
         {
-            var input = Frame as UMat;
+            var Input = Frame as UMat;
             var Contours = new VectorOfVectorOfPoint();
             var ProcessedContours = new VectorOfVectorOfPoint();
-            double MaxArea = input.Cols * input.Rows;
+            double MaxArea = Input.Cols * Input.Rows;
             double MinArea = MaxArea * 0.005;
 
 
-            GetCountours(Frame, Contours, 1, RetrType.List, ChainApproxMethod.ChainApproxSimple);
+            GetCountours(Input, Contours, 1, RetrType.List, ChainApproxMethod.ChainApproxSimple);
             FilterContourArea(Contours, ProcessedContours, MinArea, MaxArea);
 
             MCvPoint2D64f TriangleCOM = new MCvPoint2D64f();
@@ -445,7 +439,7 @@ namespace SwarmRoboticsGUI
                 // Get approximate polygonal shape of contour
                 CvInvoke.ApproxPolyDP(ProcessedContour, ProcessedContour, CvInvoke.ArcLength(ProcessedContour, true) * 0.1, true);
                 // Check if contour is the right shape (triangle)
-                if (IsEquilTriangle(ProcessedContour))
+                if (IsShape(ProcessedContour, Shape.TRIANGLE))
                 {
                     TriangleCOM = CvInvoke.Moments(ProcessedContour).GravityCenter;
                     return new Point((int)TriangleCOM.X, (int)TriangleCOM.Y);
@@ -453,7 +447,6 @@ namespace SwarmRoboticsGUI
             }
             return new Point();
         }
-
         private static double IndentifyArena(IInputArray Frame, IOutputArray Contour)
         {
             var ArenaContour = Contour as VectorOfPoint;
@@ -476,7 +469,7 @@ namespace SwarmRoboticsGUI
                 // Get approximate polygonal shape of contour
                 CvInvoke.ApproxPolyDP(ProcessedContour, ProcessedContour, CvInvoke.ArcLength(ProcessedContour, true) * 0.02, true);
                 // If contour is not the right shape (square), check next shape
-                if (!IsSquare(ProcessedContour)) continue;
+                if (!IsShape(ProcessedContour, Shape.SQUARE)) continue;
 
                 int originIndex = -1;
                 int oppositeIndex = -1;
@@ -552,24 +545,24 @@ namespace SwarmRoboticsGUI
 
             return RobotID;
         }    
-
-        private static Point FindOrigin(IInputArray Frame, VectorOfPoint Contour)
+        private static Point FindOrigin(IInputArray Frame, IInputArray Contour)
         {
-            var Origin = new Point();
+            var origin = new Point();
+            var contour = Contour as VectorOfPoint;
 
             for (int index = 0; index < 4; index++)
             {
                 int xy = 0;
-                int x = Contour[index].X;
-                int y = Contour[index].Y;
+                int x = contour[index].X;
+                int y = contour[index].Y;
 
                 if (x + y > xy)
                 {
                     xy = x + y;
-                    Origin = Contour[index];
+                    origin = contour[index];
                 }
             }
-            return Origin;
+            return origin;
         }
         #endregion
     }

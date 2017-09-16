@@ -67,14 +67,14 @@
                                      IsHitTestVisible="False">
                                 <Polygon.RenderTransform>
                                     <TransformGroup>
-                                        <RotateTransform Angle="{Binding HeadingDeg}"/>
-                                        <TranslateTransform X="{Binding Direction.X}" Y="{Binding Direction.Y}"/>
+                                        <TranslateTransform X="{Binding Direction.X}"/>
+                                        <RotateTransform Angle="{Binding FacingDeg}"/>
                                     </TransformGroup>
                                 </Polygon.RenderTransform>
                             </Polygon>
                             <TextBlock Text="{Binding Name}" 
                                        VerticalAlignment="Center" HorizontalAlignment="Center"
-                                       Foreground="White" FontSize="30"
+                                       Foreground="White" FontSize="20"
                                        IsHitTestVisible="False">
                             </TextBlock>
                             

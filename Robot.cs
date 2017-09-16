@@ -153,7 +153,7 @@ namespace SwarmRoboticsGUI
             }
         }
         private double _Heading { get; set; }
-        public double Heading
+        public double Facing
         {
             get { return _Heading; }
             set
@@ -166,7 +166,7 @@ namespace SwarmRoboticsGUI
             }
         }
         private double _HeadingDeg { get; set; }
-        public double HeadingDeg
+        public double FacingDeg
         {
             get { return _HeadingDeg; }
             set
