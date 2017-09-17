@@ -105,6 +105,7 @@ namespace SwarmRoboticsGUI
 		private VideoCaptureDevice VideoDevice { get; set; }
 	#endregion
 
+
 		// Main
 		public MainWindow()
 		{
@@ -117,8 +118,7 @@ namespace SwarmRoboticsGUI
 			camera1 = new Camera();
 			xbee = new XbeeAPI(this);
 			protocol = new ProtocolClass(this);
-			// MANSEL: Maybe make a struct.
-			serial = new SerialUARTCommunication(this, menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);
+			serial = new SerialUARTCommunication(this, menuCommunication);
 			commManger = new CommunicationManager(this, serial, xbee, protocol);			
 
             //
@@ -733,11 +733,6 @@ namespace SwarmRoboticsGUI
         private void btnCommunicationTest_Click(object sender, RoutedEventArgs e)
         {
             //protocol.SendMessage(ProtocolClass.MESSAGE_TYPES.COMMUNICATION_TEST);
-        }
-        // Other
-        private void menu_Hover(object sender, RoutedEventArgs e)
-        {
-            // TODO: Work out why this was here
         }
         private void btnCameraMinimise_Click(object sender, MouseButtonEventArgs e)
         {

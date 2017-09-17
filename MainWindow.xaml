@@ -11,9 +11,9 @@
     Title="Swarm Robotics Graphics User Interface" Height="900" Width="1600" MinHeight="300" MinWidth="500" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
 
     <DockPanel x:Name="innerWin">
-        <Menu DockPanel.Dock="Top" MouseEnter="menu_Hover" Height="21" MinWidth="300">
+        <Menu DockPanel.Dock="Top" Height="21" MinWidth="300">
 
-            <MenuItem Header="File" MouseEnter="menu_Hover" Click="menu_Hover">
+            <MenuItem Header="File" >
                 <MenuItem x:Name="menuRecordNew" Header="New Recording" IsEnabled="False" Click="menuRecordNew_Click" />
                 <MenuItem x:Name="menuRecordPause" Header="Pause Recording" IsCheckable="True" IsEnabled="False"/>
                 <MenuItem x:Name="menuRecordStop" Header="Stop Recording" IsEnabled="False" Click="menuRecordStop_Click" />
@@ -21,39 +21,30 @@
                 <MenuItem x:Name="menuRecordingSettings" Header="Recording Settings" />
             </MenuItem>
 
-            <MenuItem Header="Display" MouseEnter="menu_Hover" Click="menu_Hover">
+            <MenuItem Header="Display" >
                 <MenuItem x:Name="menuViewList" Header="View"/>
-                <MenuItem x:Name="menuFilterList" Header="Camera Filters" MouseEnter="menu_Hover" Click="menu_Hover"/>
-                <MenuItem x:Name="menuOverlayList" Header="Overlays" MouseEnter="menu_Hover" Click="menu_Hover"/>
-                <MenuItem x:Name="menuSourceList" Header="Source" MouseEnter="menu_Hover" Click="menu_Hover"/>
+                <MenuItem x:Name="menuFilterList" Header="Camera Filters" />
+                <MenuItem x:Name="menuOverlayList" Header="Overlays" />
+                <MenuItem x:Name="menuSourceList" Header="Source" />
                 <MenuItem x:Name="menuFilterFlipVertical" Header="Flip Vertical" Click="menuFilterFlipVertical_Click"/>
                 <MenuItem x:Name="menuFilterFlipHorizontal" Header="Flip Horizontal" Click="menuFilterFlipHorizontal_Click"/>
                 <MenuItem x:Name="menuDisplayPopOut" Header="Pop Out Window" Click="menuDisplayPopOut_Click"/>
 
             </MenuItem>
 
-            <MenuItem Header="Camera" Click="menu_Hover">
-                <MenuItem x:Name="menuCameraList" Header="Connected Cameras" MouseEnter="menu_Hover"/>
-                <MenuItem x:Name="menuCameraCapabilityList" Header="Camera Resolution" MouseEnter="menu_Hover"/>
+            <MenuItem Header="Camera" >
+                <MenuItem x:Name="menuCameraList" Header="Connected Cameras"/>
+                <MenuItem x:Name="menuCameraCapabilityList" Header="Camera Resolution"/>
                 <MenuItem x:Name="menuCameraConnect" Header="Start Capture" IsEnabled="False" IsCheckable="True"  Click="menuCameraConnect_Click"/>
                 <MenuItem x:Name="menuCameraFreeze" Header="Freeze Frame" IsEnabled="False" IsCheckable="True" Click="menuCameraFreeze_Click" />
                 <Separator/>
                 <MenuItem x:Name="menuCameraOptions" Header="Camera Options" Click="menuCameraOptions_Click"/>
             </MenuItem>
 
-            <MenuItem Header="Serial Comms" Click="menu_Hover">
-                <MenuItem x:Name="menuCommunicationPortList" Header="Communication Port" MouseEnter="menu_Hover"/>
-                <MenuItem x:Name="menuCommunicationBaudList" Header="Baud Rate" MouseEnter="menu_Hover"/>
-                <MenuItem x:Name="menuCommunicationParityList" Header="Parity" MouseEnter="menu_Hover"/>
-                <MenuItem x:Name="menuCommunicationDataList" Header="Data Bits" MouseEnter="menu_Hover"/>
-                <MenuItem x:Name="menuCommunicationStopBitsList" Header="Stop Bits" MouseEnter="menu_Hover"/>
-                <MenuItem x:Name="menuCommunicationHandshakeList" Header="Handshaking" MouseEnter="menu_Hover"/>
-                <MenuItem x:Name="menuCommunicationConnect" Header="Connect" IsEnabled="False" IsCheckable="True" />
-                <Separator/>
-                <MenuItem x:Name="menuCommunicationoptions" Header="Options" Click="menuCameraOptions_Click"/>
+            <MenuItem x:Name="menuCommunication" Header="Serial Communications">
             </MenuItem>
 
-            <MenuItem Header="Replay" MouseEnter="menu_Hover" Click="menu_Hover">
+            <MenuItem Header="Replay" >
                 <MenuItem x:Name="menuReplayOpen" Header="Open Replay" Click="menuReplayOpen_Click"/>
                 <MenuItem x:Name="menuReplayPause" Header="Pause Replay" IsCheckable="True" IsEnabled="False"/>
                 <Separator/>

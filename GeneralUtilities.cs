@@ -56,6 +56,20 @@ public static class ExtensionMethod
 static class MJLib
 {
 	/// <summary>
+	/// Initialises a new instance of the System.Windows.Controls.MenuItem class with a header string
+	/// </summary>
+	/// <param name="header">Header String that is displayed</param>
+	/// <returns>A new MenuItem instance</returns>
+	public static MenuItem CreateMenuItem(string header)
+	{
+		MenuItem item = new MenuItem();		//Creates the instance using the normal method
+		item.Header = header;				//Sets the name of the item
+		return item;						//Returns the item
+	}
+
+
+
+	/// <summary>
 	/// Converts a byte to hexidecimal string
 	/// </summary>
 	/// <param name="data">Sender object from handler</param>

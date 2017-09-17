@@ -106,33 +106,17 @@ namespace SwarmRoboticsGUI
 
 
 		//constructor
-		public SerialUARTCommunication(MainWindow main, MenuItem port, MenuItem baud, MenuItem parity, MenuItem data, MenuItem stop, MenuItem handshaking, MenuItem connect)
+		public SerialUARTCommunication(MainWindow main, MenuItem serialMenu )
 		{
 			window = main;
-			portList = port;
-			baudList = baud;
-			parityList = parity;
-			dataBitsList = data;
-			stopBitsList = stop;
-			handshakingList = handshaking;
-			connectButton = connect;
 
 			rxByteBuffer = new List<byte>();
 
-
 			_serialPort = new SerialPort();
-
-			/*
-			communicatedMessages = new List<communicated_message>();
-			newestMessage = new communicated_message() { time_stamp = DateTime.Now };
-			communicatedMessages.Add(newestMessage);
-			window.UpdateListViewBinding(communicatedMessages);
-			communicatedMessages.Clear();
-			*/
 
 			window.RefreshListView();
 
-			PopulateSerialSettings();
+			PopulateSerialSettings(serialMenu);
 			PopulateSerialPorts();
 
 			//Binding Event Handlers
@@ -170,8 +154,27 @@ namespace SwarmRoboticsGUI
 		}
 
 
-		private void PopulateSerialSettings()
+		private void PopulateSerialSettings(MenuItem mainMenu)
 		{
+			portList = MJLib.CreateMenuItem("Communication Port");
+			baudList = MJLib.CreateMenuItem("Baud Rate");
+			parityList = MJLib.CreateMenuItem("Parity");
+			dataBitsList = MJLib.CreateMenuItem("Data Bits");
+			stopBitsList = MJLib.CreateMenuItem("Stop Bits");
+			handshakingList = MJLib.CreateMenuItem("Handshaking");
+			connectButton = MJLib.CreateMenuItem("Connect");
+
+			connectButton.IsEnabled = false;
+			connectButton.IsCheckable = true;
+
+			mainMenu.Items.Add(portList);
+			mainMenu.Items.Add(baudList);
+			mainMenu.Items.Add(parityList);
+			mainMenu.Items.Add(dataBitsList);
+			mainMenu.Items.Add(stopBitsList);
+			mainMenu.Items.Add(handshakingList);
+			mainMenu.Items.Add(connectButton);
+
 			MJLib.PopulateMenuItemList(baudList, baudRateOptions, DEFAULT_BAUD_RATE, MJLib.menuMutuallyExclusiveMenuItem_Click);
 			MJLib.PopulateMenuItemList(parityList, parityOptions, DEFAULT_PARITY, MJLib.menuMutuallyExclusiveMenuItem_Click);
 			MJLib.PopulateMenuItemList(dataBitsList, dataBitOptions, DEFAULT_DATA_BITS, MJLib.menuMutuallyExclusiveMenuItem_Click);
