@@ -105,24 +105,6 @@ namespace SwarmRoboticsGUI
 		private VideoCaptureDevice VideoDevice { get; set; }
 	#endregion
 
-		//MANSEL: MOVE TO ROBOT.CS
-		public class TempRobotClass
-		{
-			public String Name { get; set; }
-			public UInt64 ID { get; set; }
-			public String Colour { get; set; }
-
-			public TempRobotClass(string name, UInt64 id, string colour)
-			{
-				Name = name;
-				ID = id;
-				Colour = colour;
-			}
-		}
-
-		public List<TempRobotClass> tempRobotList;
-
-
 		// Main
 		public MainWindow()
 		{
@@ -137,33 +119,7 @@ namespace SwarmRoboticsGUI
 			protocol = new ProtocolClass(this);
 			// MANSEL: Maybe make a struct.
 			serial = new SerialUARTCommunication(this, menuCommunicationPortList, menuCommunicationBaudList, menuCommunicationParityList, menuCommunicationDataList, menuCommunicationStopBitsList, menuCommunicationHandshakeList, menuCommunicationConnect);
-			commManger = new CommunicationManager(this, serial, xbee, protocol);
-
-			//MANSEL: REPLACE WITH ROBOT.CS
-			List<TempRobotClass> tempRobotList = new List<TempRobotClass>();
-			
-			TempRobotClass tempItem = new TempRobotClass("Brown Robot", 0x0013A20041065FB3, "SaddleBrown");
-			tempRobotList.Add(tempItem);
-			tempItem = new TempRobotClass("Dark Blue Robot", 0x0013A200415B8C3A, "MidnightBlue");
-			tempRobotList.Add(tempItem);
-			tempItem = new TempRobotClass("Tower Base Station", 0x0013A200415B8C2A, "Lime");
-			tempRobotList.Add(tempItem);
-			tempItem = new TempRobotClass("Light Blue Robot", 0x0013A2004152F256, "Cyan");
-			tempRobotList.Add(tempItem);
-			tempItem = new TempRobotClass("Orange Robot", 0x0013A200415B8BE5, "Orange");
-			tempRobotList.Add(tempItem);
-			tempItem = new TempRobotClass("Pink Robot", 0x0013A200415B8C18, "Plum");
-			tempRobotList.Add(tempItem);
-			tempItem = new TempRobotClass("Purple Robot", 0x0013A200415B8BDD, "Purple");
-			tempRobotList.Add(tempItem);
-			tempItem = new TempRobotClass("Red Robot", 0x0013A2004147F9DD, "Red");
-			tempRobotList.Add(tempItem);
-			tempItem = new TempRobotClass("Yellow Robot", 0x0013A200415B8C38, "Yellow");
-			tempRobotList.Add(tempItem);
-			tempItem = new TempRobotClass("Broadcast", 0x000000000000FFFF, "White");
-			tempRobotList.Add(tempItem);
-
-			dispSelectRobot.ItemsSource = tempRobotList;
+			commManger = new CommunicationManager(this, serial, xbee, protocol);			
 
             //
             PopulateFilters();
@@ -172,11 +128,12 @@ namespace SwarmRoboticsGUI
             PopulateSources();
             PopulateRobots();
 
-            overlayWindow = new OverlayWindow(this);                      
-            
-            
-            //
-            openvideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
+            overlayWindow = new OverlayWindow(this);
+
+			dispSelectRobot.ItemsSource = RobotList;
+
+			//
+			openvideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
             savevideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
             savevideodialog.Title = "Record: Save As";
             //
@@ -199,8 +156,6 @@ namespace SwarmRoboticsGUI
             //camera1.Index = 1;
             // This will run the camera at 640x480
             //camera1.StartCapture();
-
-            //serial._serialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
 
             setupSystemTest();
 		}
@@ -401,14 +356,18 @@ namespace SwarmRoboticsGUI
         private void PopulateRobots()
         {
             RobotList = new List<RobotItem>();
-            RobotList.Add(new RobotItem("Red Robot", 0));
-            RobotList.Add(new RobotItem("Yellow Robot", 1));
-            RobotList.Add(new RobotItem("Purple Robot", 2));
-            RobotList.Add(new RobotItem("Light Blue Robot", 3));
-            RobotList.Add(new RobotItem("Dark Blue Robot", 4));
-            RobotList.Add(new RobotItem("Poop Robot", 5));
-            RobotList.Add(new RobotItem("Pink Robot", 6));
-            RobotList.Add(new RobotItem("Orange Robot", 7));
+
+			RobotList.Add(new RobotItem("Brown Robot", 0x0013A20041065FB3, "SaddleBrown", 0));
+			RobotList.Add(new RobotItem("Dark Blue Robot", 0x0013A200415B8C3A, "MidnightBlue", 1));
+			RobotList.Add(new RobotItem("Light Blue Robot", 0x0013A2004152F256, "Cyan", 2));
+			RobotList.Add(new RobotItem("Orange Robot", 0x0013A200415B8BE5, "Orange", 3));
+			RobotList.Add(new RobotItem("Pink Robot", 0x0013A200415B8C18, "Plum", 4));
+			RobotList.Add(new RobotItem("Purple Robot", 0x0013A200415B8BDD, "Purple", 5));
+			RobotList.Add(new RobotItem("Red Robot", 0x0013A2004147F9DD, "Red", 6));
+			RobotList.Add(new RobotItem("Yellow Robot", 0x0013A200415B8C38, "Yellow", 7));
+
+			//("Tower Base Station", 0x0013A200415B8C2A, "Lime");
+			//("Broadcast", 0x000000000000FFFF, "White");
         }
         #endregion
 

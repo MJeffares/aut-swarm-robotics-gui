@@ -307,8 +307,8 @@ namespace SwarmRoboticsGUI
             }
         }
 
-		private Brush _Colour { get; set; }
-		public Brush Colour
+		private String _Colour { get; set; }
+		public String Colour
 		{
 			get { return _Colour; }
 			set
@@ -321,11 +321,41 @@ namespace SwarmRoboticsGUI
 			}
 		}
 
+		private UInt64 _Address64 { get; set; }
+		public UInt64 Address64
+		{
+			get { return _Address64; }
+			set
+			{
+				if (_Address64 != value)
+				{
+					_Address64 = value;
+					NotifyPropertyChanged("Address64");
+				}
+			}
+		}
+
+		private UInt16 _Address16 { get; set; }
+		public UInt16 Address16
+		{
+			get { return _Address16; }
+			set
+			{
+				if (_Address16 != value)
+				{
+					_Address16 = value;
+					NotifyPropertyChanged("Address16");
+				}
+			}
+		}
 
 
-		public RobotItem(string Name, int ID) : base(Name)
+		public RobotItem(string Name, UInt64 MAC_Address, string Colour, int ID) : base(Name)
         {
+			this.Name = Name;
             this.ID = ID;
+			this.Colour = Colour;
+			this.Address64 = MAC_Address;
             Group = "Unassigned";
             // TEMP: Size of the robots is fixed       
             Radius = 100;
