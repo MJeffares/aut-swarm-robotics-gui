@@ -42,6 +42,7 @@ namespace SwarmRoboticsGUI
         #endregion
         private System.Timers.Timer InterfaceTimer { get; set; }
         public List<RobotItem> RobotList { get; set; }
+        public Arena RobotArena { get; set; }
         private SynchronizationContext uiContext { get; set; }
 
         public OverlayWindow(MainWindow mainWindow)
@@ -60,6 +61,8 @@ namespace SwarmRoboticsGUI
 
             // Create 100ms timer to drive interface changes
             InitializeTimer();
+
+            RobotArena = new Arena(); 
             // Create event driven by new frames from the camera
             mainWindow.camera1.Process += new EventHandler(DrawOverlayFrame);
             //
@@ -100,9 +103,21 @@ namespace SwarmRoboticsGUI
                     break;
             }
         }
+
+        // TEMP: Counter to get the arena every 30 frames
+        private int counter { get; set; }
+
+
         private void DrawOverlayFrame(object sender, EventArgs e)
         {
+            counter++;
             UMat Frame = sender as UMat;
+
+            if (counter > 29)
+            {
+                Update(uiContext, Frame);
+                counter = 0;
+            }
 
             switch (Display1.Source)
             {
@@ -113,7 +128,7 @@ namespace SwarmRoboticsGUI
                         if (Frame != null)
                         {
                             // Apply image processing to find the robots
-                            ImageProcessing.GetRobots(Frame, RobotList);
+                            ImageProcessing.GetRobots(Frame, RobotList, RobotArena);
                             
                             // Update the robotlist on the UI thread
                             //Update(uiContext, RobotList);
@@ -121,7 +136,7 @@ namespace SwarmRoboticsGUI
                     break;
                 case SourceType.CUTOUTS:
                     // Apply image processing to find the robots
-                    ImageProcessing.GetRobots(ImageProcessing.TestImage, RobotList);
+                    ImageProcessing.GetRobots(ImageProcessing.TestImage, RobotList, RobotArena);
                     // Update the robotlist on the UI thread
                     //Update(uiContext, RobotList);
                     break;
@@ -129,6 +144,8 @@ namespace SwarmRoboticsGUI
                     break;
             }
         }
+
+        
         #endregion
 
         #region Private Events 
@@ -147,7 +164,8 @@ namespace SwarmRoboticsGUI
             // Get the UI context from state
             SynchronizationContext uiContext = state as SynchronizationContext;
             // Execute the UpdateRobots function on the UI thread
-            uiContext.Post(UpdateRobots, data);
+            //uiContext.Post(UpdateRobots, data);
+            uiContext.Post(UpdateArena, data);
         }
         private void UpdateRobots(object data)
         {
@@ -173,6 +191,11 @@ namespace SwarmRoboticsGUI
                     RobotList.Add(R);
                 }
             }
+        }
+
+        private void UpdateArena(object data)
+        {
+            ImageProcessing.GetArena(data as UMat, RobotArena);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

@@ -152,43 +152,43 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-        private double _Heading { get; set; }
+        private double _Facing { get; set; }
         public double Facing
         {
-            get { return _Heading; }
+            get { return _Facing; }
             set
             {
-                if (_Heading != value)
+                if (_Facing != value)
                 {
-                    _Heading = value;
-                    NotifyPropertyChanged("Heading");
+                    _Facing = value;
+                    NotifyPropertyChanged("Facing");
                 }
             }
         }
-        private double _HeadingDeg { get; set; }
+        private double _FacingDeg { get; set; }
         public double FacingDeg
         {
-            get { return _HeadingDeg; }
+            get { return _FacingDeg; }
             set
             {
-                if (_HeadingDeg != value)
+                if (_FacingDeg != value)
                 {
-                    _HeadingDeg = value;
-                    NotifyPropertyChanged("HeadingDeg");
+                    _FacingDeg = value;
+                    NotifyPropertyChanged("FacingDeg");
                 }
             }
         }
 
-        private Point _Pixel { get; set; }
-        public Point Pixel
+        private Point _PixelLocation { get; set; }
+        public Point PixelLocation
         {
-            get { return _Pixel; }
+            get { return _PixelLocation; }
             set
             {
-                if (_Pixel != value)
+                if (_PixelLocation != value)
                 {
-                    _Pixel = value;
-                    NotifyPropertyChanged("Pixel");
+                    _PixelLocation = value;
+                    NotifyPropertyChanged("PixelLocation");
                 }
             }
         }
@@ -224,16 +224,16 @@ namespace SwarmRoboticsGUI
 
         public Point PreviousLocation { get; set; }
 
-        public Point _Direction { get; set; }
-        public Point Direction
+        public double _FacingMarker { get; set; }
+        public double FacingMarker
         {
-            get { return _Direction; }
+            get { return _FacingMarker; }
             set
             {
-                if (_Direction != value)
+                if (_FacingMarker != value)
                 {
-                    _Direction = value;
-                    NotifyPropertyChanged("Direction");
+                    _FacingMarker = value;
+                    NotifyPropertyChanged("FacingMarker");
                 }
             }
         }
@@ -360,6 +360,47 @@ namespace SwarmRoboticsGUI
         public RobotGroup(string Name) : base(Name)
         {
             Children = new ObservableCollection<RobotItem>();
+        }
+    }
+
+    public class Arena : Item, INotifyPropertyChanged
+    {
+        private Point _Origin { get; set; }
+        public Point Origin
+        {
+            get { return _Origin; }
+            set
+            {
+                if (_Origin != value)
+                {
+                    _Origin = value;
+                    NotifyPropertyChanged("Origin");
+                }
+            }
+        }
+
+        private Point _Opposite { get; set; }
+        public Point Opposite
+        {
+            get { return _Opposite; }
+            set
+            {
+                if (_Opposite != value)
+                {
+                    _Opposite = value;
+                    NotifyPropertyChanged("Opposite");
+                }
+            }
+        }
+
+        public double ScaleFactor { get; set; }
+
+
+        public Point[] Contour { get; set; }
+
+        public Arena() : base("Arena")
+        {
+
         }
     }
 }
