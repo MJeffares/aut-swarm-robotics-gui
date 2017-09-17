@@ -67,10 +67,7 @@ namespace SwarmRoboticsGUI
         public Display()
         {
             InitializeComponent();
-            //Items = new ObservableCollection<RobotItem>();
-            //Arena.ItemsSource = Items;
         }
-
 
         private void Robot_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -81,10 +78,8 @@ namespace SwarmRoboticsGUI
                 if (Robot != null)
                 {
                     int index = Items.IndexOf(Robot);
-                    for (int i = 0; i < Items.Count; i++)
-                    {
-                        Items[i].IsSelected = false;
-                    }
+                    foreach (RobotItem R in Items)
+                        R.IsSelected = false;
                     Items[index].IsSelected = true;
                 }
             }

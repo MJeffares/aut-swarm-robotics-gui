@@ -146,13 +146,13 @@ namespace SwarmRoboticsGUI
             WindowStatus = WindowStatusType.MAXIMISED;
 
 
-            var what = ImageProcessing.TestImage;
+            //var what = ImageProcessing.TestImage;
             // TEMP: display overlay on starup for debugging
             overlayWindow.Show();
             camera1.Process += new EventHandler(DrawCameraFrame);
 
             // BRAE: Default setup for testing
-            //overlayWindow.Display1.Source = Display.SourceType.CUTOUTS;
+            overlayWindow.Display1.Source = SourceType.CAMERA;
             //camera1.Index = 1;
             // This will run the camera at 640x480
             //camera1.StartCapture();
@@ -460,9 +460,10 @@ namespace SwarmRoboticsGUI
                         //Apply the currently selected filter
                         if (camera1.Filter != FilterType.NONE)
                         {
-                            ImageProcessing.ProcessFilter(Frame, Frame, camera1.Filter);
-                            if (Frame != null)
-                                captureImageBox.Image = Frame;
+                            var proc = new UMat();
+                            ImageProcessing.ProcessFilter(Frame, proc, camera1.Filter);
+                            if (proc != null)
+                                captureImageBox.Image = proc;
                         }
                         else
                             captureImageBox.Image = Frame;

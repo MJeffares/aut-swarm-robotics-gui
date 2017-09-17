@@ -35,7 +35,7 @@
     </UserControl.Resources>
     <Grid>
         <Viewbox Stretch="Fill">
-            <ItemsControl Width="1920" Height="1080" Name="Arena" 
+            <ItemsControl Width="1080" Height="1080" Name="Arena" 
                           ItemsSource="{Binding Items, RelativeSource={RelativeSource AncestorType=UserControl}}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -45,7 +45,7 @@
                 <ItemsControl.ItemContainerStyle>
                     <Style TargetType="ContentPresenter">
                         <Setter Property="Canvas.Left" Value="{Binding DisplayLocation.X}"/>
-                        <Setter Property="Canvas.Margin" Value="-100,-100,0,0"/>
+                        <Setter Property="Canvas.Margin" Value="0,0,0,0"/>
                         <Setter Property="Canvas.Top" Value="{Binding DisplayLocation.Y}"/>
                     </Style>
                 </ItemsControl.ItemContainerStyle>
@@ -54,10 +54,11 @@
                         <Grid>
                             <Polygon Name="Hexagon" Style="{StaticResource Hexagon}"
                                      Height="{Binding Width}" Width="{Binding Height}"
-                                     MouseLeftButtonDown="Robot_MouseLeftButtonDown">
+                                     MouseLeftButtonDown="Robot_MouseLeftButtonDown"
+                                     RenderTransformOrigin="0.5,0.5">
                                 <Polygon.LayoutTransform>
                                     <TransformGroup>
-                                        <RotateTransform Angle="{Binding HeadingDeg}"/>
+                                        <RotateTransform Angle="{Binding FacingDeg}"/>
                                     </TransformGroup>
                                 </Polygon.LayoutTransform>
                             </Polygon>
@@ -67,7 +68,7 @@
                                      IsHitTestVisible="False">
                                 <Polygon.RenderTransform>
                                     <TransformGroup>
-                                        <TranslateTransform X="{Binding Direction.X}"/>
+                                        <TranslateTransform X="{Binding FacingMarker}"/>
                                         <RotateTransform Angle="{Binding FacingDeg}"/>
                                     </TransformGroup>
                                 </Polygon.RenderTransform>
