@@ -443,91 +443,6 @@ namespace XbeeHandler
 
 			return messageList.ToArray<byte>();
 		}
-		public byte[] XbeeFrame(byte api, byte[] msg)
-		{
-			LinkedList<byte> messageList = new LinkedList<byte>();  //use a list over queue for added functionality
-																	//Queue<byte> messageQueue = new Queue<byte>();
-
-			byte length_msb;
-			byte length_lsb;
-			byte checksum;
-
-			//calculate length
-			length_msb = (byte)((msg.Length >> 7) & 0xFF);
-			length_lsb = (byte)(msg.Length & 0xFF);
-
-
-			//calculate checksum
-			int checksum_int = api;
-			for (int i = 0; i < msg.Length; i++)
-			{
-				checksum_int += msg[i];
-			}
-			checksum = (byte)(0xFF - checksum_int);
-
-
-			messageList.AddLast(FRAME_DELIMITER);
-
-
-			if (BYTES_TO_ESCAPE.Contains(length_msb))
-			{
-				messageList.AddLast(ESCAPE_BYTE);
-				messageList.AddLast((byte)(length_msb ^ 0x20));
-			}
-			else
-			{
-				messageList.AddLast(length_msb);
-			}
-
-
-			if (BYTES_TO_ESCAPE.Contains(length_lsb))
-			{
-				messageList.AddLast(ESCAPE_BYTE);
-				messageList.AddLast((byte)(length_lsb ^ 0x20));
-			}
-			else
-			{
-				messageList.AddLast(length_lsb);
-			}
-
-
-			if (BYTES_TO_ESCAPE.Contains(api))
-			{
-				messageList.AddLast(ESCAPE_BYTE);
-				messageList.AddLast((byte)(api ^ 0x20));
-			}
-			else
-			{
-				messageList.AddLast(api);
-			}
-
-
-			for (int i = 0; i < msg.Length; i++)
-			{
-				if (BYTES_TO_ESCAPE.Contains(msg[i]))
-				{
-					messageList.AddLast(ESCAPE_BYTE);
-					messageList.AddLast((byte)(msg[i] ^ 0x20));
-				}
-				else
-				{
-					messageList.AddLast(msg[i]);
-				}
-			}
-
-
-			if (BYTES_TO_ESCAPE.Contains(checksum))
-			{
-				messageList.AddLast(ESCAPE_BYTE);
-				messageList.AddLast((byte)(checksum ^ 0x20));
-			}
-			else
-			{
-				messageList.AddLast(checksum);
-			}
-
-			return messageList.ToArray<byte>();
-		}
 
 		public byte[] Escape(byte[] Frame_To_Escape)
 		{
@@ -551,55 +466,7 @@ namespace XbeeHandler
 			return list.ToArray();
 		}
 
-		
 
-		//MANSEL: rename
-		public byte[] DeEscape(byte[] Frame_To_DeEscape)
-		{
-			Queue<byte> temp = new Queue<byte>();
-			byte[] data = new byte[Frame_To_DeEscape.Length * 2];
-
-
-			for (int i = 0; i < Frame_To_DeEscape.Length; i++)
-			{
-				if (Frame_To_DeEscape[i] == 0x7D)
-				{
-					i++;
-
-					if (i >= Frame_To_DeEscape.Length)
-					{
-						escapeCarryOver = true;
-					}
-					else
-					{
-						temp.Enqueue((byte)(Frame_To_DeEscape[i] ^ 0x20));
-					}
-				}
-				else if (escapeCarryOver)
-				{
-					temp.Enqueue((byte)(Frame_To_DeEscape[i] ^ 0x20));
-					escapeCarryOver = false;
-				}
-				else
-				{
-					temp.Enqueue(Frame_To_DeEscape[i]);
-				}
-			}
-
-			return temp.ToArray();
-		}
-
-		public byte CalculateChecksum(byte api, byte[] data)
-		{
-			int checksum_int = api;
-
-			for (int a = 0; a < data.Length; a++)
-			{
-				checksum_int += data[a];
-			}
-
-			return (byte)(0xFF - checksum_int);
-		}
 		public byte CalculateChecksum(byte[] data)  //only for data of msg
 		{
 			int checksum_int = 0;
@@ -664,42 +531,6 @@ namespace XbeeHandler
 			{
 				MessageBox.Show(excpt.Message);
 			}
-		}
-		public void SendTransmitRequest(UInt64 destination, byte data)
-		{
-			byte[] frame_data = new byte[15];
-
-			frame_data[0] = API_FRAME_TYPES.ZIGBEE_TRANSMIT_REQUEST;
-			frame_data[1] = 200;
-
-			//byte[] destination_address_64 = BitConverter.GetBytes(destination);
-
-			//destination_address_64.CopyTo(frame_data, 2);
-
-			frame_data[8] = 0xFF;
-			frame_data[9] = 0xFF;
-
-			byte[] destination_address_16 = { 0xFF, 0xFE };
-
-			destination_address_16.CopyTo(frame_data, 10);
-
-			frame_data[12] = 0x00;  //broadcast options
-
-			frame_data[13] = 0x00;  //options
-
-			frame_data[14] = data;
-
-			//serial._serial XbeeFrame(frame_data);
-			//SerialUARTCommunication serial
-			try
-			{
-				window.serial.SendByteArray(XbeeFrame(frame_data));
-			}
-			catch (Exception excpt)
-			{
-				MessageBox.Show(excpt.Message);
-			}
-
 		}
 
 		#endregion
