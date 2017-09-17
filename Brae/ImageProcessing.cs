@@ -153,12 +153,16 @@ namespace SwarmRoboticsGUI
                 // Look for robot index in collection
                 int index = RobotList.FindIndex(TrackedID);
                 // If the index is negative, create a new robot
+
+				//BRAE: Robot list is now fixed length
+				/*
                 if (index < 0)
                 {
                     RobotItem Robot = new RobotItem("Robot " + RobotID.ToString(), RobotID);
                     RobotList.Add(Robot);
                     index = RobotList.IndexOf(Robot);
                 }
+				*/
                 RobotList[index].IsTracked = true;
                 // DEBUG: Store the vertices of the hexagonal shape
                 RobotList[index].Contour = Hexagon.ToArray();
