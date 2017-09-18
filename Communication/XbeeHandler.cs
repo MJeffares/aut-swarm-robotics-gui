@@ -73,7 +73,7 @@ namespace XbeeHandler
 
 		private static readonly IList<byte> BYTES_TO_ESCAPE = new List<byte> { FRAME_DELIMITER, ESCAPE_BYTE, XON, XOFF }.AsReadOnly();
 
-		bool escapeCarryOver = false;
+		//bool escapeCarryOver = false;
 
 		#endregion
 
