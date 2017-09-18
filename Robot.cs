@@ -349,7 +349,6 @@ namespace SwarmRoboticsGUI
 			}
 		}
 
-
 		public RobotItem(string Name, UInt64 MAC_Address, string Colour, int ID) : base(Name)
         {
 			this.Name = Name;
@@ -371,6 +370,7 @@ namespace SwarmRoboticsGUI
             Children.Add(new Item("Heading", ""));
         }
     }
+
     public class RobotGroup : Item, INotifyPropertyChanged
     {
         private ObservableCollection<RobotItem> _Children { get; set; }
@@ -431,6 +431,111 @@ namespace SwarmRoboticsGUI
         public Arena() : base("Arena")
         {
 
+        }
+    }
+
+    public class ChargingDockItem : Item, INotifyPropertyChanged
+    {
+        private String _Colour { get; set; }
+        public String Colour
+        {
+            get { return _Colour; }
+            set
+            {
+                if (_Colour != value)
+                {
+                    _Colour = value;
+                    NotifyPropertyChanged("Colour");
+                }
+            }
+        }
+
+        private UInt64 _Address64 { get; set; }
+        public UInt64 Address64
+        {
+            get { return _Address64; }
+            set
+            {
+                if (_Address64 != value)
+                {
+                    _Address64 = value;
+                    NotifyPropertyChanged("Address64");
+                }
+            }
+        }
+
+        private UInt16 _Address16 { get; set; }
+        public UInt16 Address16
+        {
+            get { return _Address16; }
+            set
+            {
+                if (_Address16 != value)
+                {
+                    _Address16 = value;
+                    NotifyPropertyChanged("Address16");
+                }
+            }
+        }
+
+        public ChargingDockItem(String Name, UInt64 MAC_Address, string Colour) : base(Name)
+        {
+            this.Name = Name;
+            this._Address64 = MAC_Address;
+            this.Colour = Colour;
+        }
+    }
+
+    public class CommunicationItem : Item, INotifyPropertyChanged
+    {
+        private String _Colour { get; set; }
+        public String Colour
+        {
+            get { return _Colour; }
+            set
+            {
+                if (_Colour != value)
+                {
+                    _Colour = value;
+                    NotifyPropertyChanged("Colour");
+                }
+            }
+        }
+
+        private UInt64 _Address64 { get; set; }
+        public UInt64 Address64
+        {
+            get { return _Address64; }
+            set
+            {
+                if (_Address64 != value)
+                {
+                    _Address64 = value;
+                    NotifyPropertyChanged("Address64");
+                }
+            }
+        }
+
+        private UInt16 _Address16 { get; set; }
+        public UInt16 Address16
+        {
+            get { return _Address16; }
+            set
+            {
+                if (_Address16 != value)
+                {
+                    _Address16 = value;
+                    NotifyPropertyChanged("Address16");
+                }
+            }
+        }
+
+        public CommunicationItem(String Name, UInt64 MAC_Address, string Colour) : base(Name)
+        {
+            this.Name = Name;
+            this.Address16 = 0xFFFE;
+            this._Address64 = MAC_Address;
+            this.Colour = Colour;
         }
     }
 }

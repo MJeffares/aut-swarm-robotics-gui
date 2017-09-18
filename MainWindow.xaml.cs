@@ -88,7 +88,7 @@ namespace SwarmRoboticsGUI
 		public CameraPopOutWindow popoutWindow;
 		public OverlayWindow overlayWindow;
 		public Dictionary<string, UInt64> robotsDictionary;
-        public List<RobotItem> RobotList;
+        public List<Item> RobotList;
 
 		public WindowStatusType WindowStatus { get; set; }
 		public TimeDisplayModeType TimeDisplayMode { get; set; }
@@ -161,6 +161,7 @@ namespace SwarmRoboticsGUI
 		}
 
         #region Public Methods
+
         public void ToggleCameraWindow()
         {
             switch (WindowStatus)
@@ -209,9 +210,11 @@ namespace SwarmRoboticsGUI
                     break;
             }
         }
+
         #endregion
 
         #region Private Methods
+
         private void PopulateCameras()
         {
             // we dont want to update this if we are connected to a camera
@@ -252,6 +255,7 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
+
         private void PopulateCameraCapabilities()
         {
             // we dont want to update this if we are connected to a camera
@@ -283,6 +287,7 @@ namespace SwarmRoboticsGUI
                     (menuCameraCapabilityList.Items[camera1.CapabilityIndex] as MenuItem).IsChecked = true;
             }
         }
+
         private void PopulateFilters()
         {
             //loops through our filters and adds them to our menu
@@ -306,6 +311,7 @@ namespace SwarmRoboticsGUI
             menuFilterList.Items.Add(settingsmenuitem);
             settingsmenuitem.Click += menuPlaceHolder_Click;
         }
+
         private void PopulateOverlays()
         {
             //loops through our filters and adds them to our menu
@@ -329,6 +335,7 @@ namespace SwarmRoboticsGUI
             menuOverlayList.Items.Add(settingsmenuitem);
             settingsmenuitem.Click += menuPlaceHolder_Click;
         }
+
         private void PopulateSources()
         {
             //loops through our filters and adds them to our menu
@@ -355,7 +362,7 @@ namespace SwarmRoboticsGUI
 
         private void PopulateRobots()
         {
-            RobotList = new List<RobotItem>();
+            RobotList = new List<Item>();
 
 			RobotList.Add(new RobotItem("Brown Robot", 0x0013A20041065FB3, "SaddleBrown", 0));
 			RobotList.Add(new RobotItem("Dark Blue Robot", 0x0013A200415B8C3A, "MidnightBlue", 1));
@@ -366,19 +373,38 @@ namespace SwarmRoboticsGUI
 			RobotList.Add(new RobotItem("Red Robot", 0x0013A2004147F9DD, "Red", 6));
 			RobotList.Add(new RobotItem("Yellow Robot", 0x0013A200415B8C38, "Yellow", 7));
 
-			//("Tower Base Station", 0x0013A200415B8C2A, "Lime");
-			//("Broadcast", 0x000000000000FFFF, "White");
+            RobotList.Add(new ChargingDockItem("Tower Base Station", 0x0013A200415B8C2A, "Lime"));
+            RobotList.Add(new CommunicationItem("Broadcast", 0x000000000000FFFF, "White"));
         }
+
+        private void DisplayTime()
+        {
+            switch (TimeDisplayMode)
+            {
+                case TimeDisplayModeType.CURRENT:
+                    statusTime.Text = DateTime.Now.ToString("t");
+                    statusTime.Text = DateTime.Now.ToString();
+                    statusTime.Text = String.Format("{0:d dd HH:mm:ss}", DateTime.Now);
+                    statusTime.Text = String.Format("{0:T}", DateTime.Now.ToString());
+                    break;
+
+                case TimeDisplayModeType.FROM_START:
+                    if (camera1.Status == StatusType.RECORDING)
+                    {
+                        statusTime.Text = (camera1.RecordingTime).ToString(@"dd\.hh\:mm\:ss");
+                    }
+                    break;
+            }
+        }
+
         #endregion
 
 
-        
-        
-
         #region Time Events
+
         private void Interface_Tick(object sender, EventArgs arg)
         {
-            // MANSEL: I hate this block of code. Does it belong here? Does it even work?
+            // BRAE: You hate this block of code. Does it belong here? Maybe? Does it even work? It did. Replace its functionality elsewhere? somewhere more appropiate like imgproc?
             //serial._serialPort.Write("Test");
 
             /// Error message for zero frames
@@ -425,24 +451,9 @@ namespace SwarmRoboticsGUI
             ///	statusFPS.Text = "FPS: " + _fpscount.ToString();
             ///	_fpscount = 0;
             ///}
+            ///statusFPS.Text = camera1.Fps.ToString();
 
-            switch (TimeDisplayMode)
-            {
-                case TimeDisplayModeType.CURRENT:
-                    statusTime.Text = DateTime.Now.ToString("t");
-                    ///statusTime.Text = DateTime.Now.ToString();
-                    ///statusTime.Text = String.Format("{0:d dd HH:mm:ss}" ,DateTime.Now);
-                    ///statusTime.Text = String.Format("{0:T}", DateTime.Now.ToString());
-                    break;
-                case TimeDisplayModeType.FROM_START:
-                    if (camera1.Status == StatusType.RECORDING)
-                    {
-                        statusTime.Text = (camera1.RecordingTime).ToString(@"dd\.hh\:mm\:ss");
-                    }
-                    break;
-            }
-
-            statusFPS.Text = camera1.Fps.ToString();
+            DisplayTime();
         }
 
         private void DrawCameraFrame(object sender, EventArgs e)
@@ -480,11 +491,12 @@ namespace SwarmRoboticsGUI
                     break;
             }
         }
-
+        
         #endregion
 
-        #region Input Events
-        // Display menu
+        #region Input Handlers
+
+        //Display Menu
         private void menuFilterListItem_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menusender = (MenuItem)sender;
@@ -514,6 +526,7 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
+
         private void menuOverlayListItem_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menusender = (MenuItem)sender;
@@ -558,7 +571,9 @@ namespace SwarmRoboticsGUI
         {
             ToggleCameraWindow();
         }
-        // Camera menu
+
+
+        //Camera menu
         private void menuCameraListItem_Click(object sender, RoutedEventArgs e)
         {
             var menusender = sender as MenuItem;
@@ -593,6 +608,7 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
+
         private void menuCameraCapabilityListItem_Click(object sender, RoutedEventArgs e)
         {
             var menusender = sender as MenuItem;
@@ -660,10 +676,12 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
+
         private void menuCameraOptions_Click(object sender, RoutedEventArgs e)
         {
             camera1.OpenSettings();
         }
+
         private void menuCameraFreeze_Click(object sender, RoutedEventArgs e)
         {
             if (camera1.Status == StatusType.PLAYING)
@@ -675,14 +693,17 @@ namespace SwarmRoboticsGUI
                 camera1.ResumeCapture();
             }
         }
+
         private void menuFilterFlipVertical_Click(object sender, RoutedEventArgs e)
         {
             camera1.FlipVertical();
         }
+
         private void menuFilterFlipHorizontal_Click(object sender, RoutedEventArgs e)
         {
             camera1.FlipHorizontal();
         }
+
         // Replay menu
         private void menuReplayOpen_Click(object sender, RoutedEventArgs e)
         {
@@ -702,6 +723,7 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
+
         private void menuRecordNew_Click(object sender, RoutedEventArgs e)
         {
             if (camera1.Status == StatusType.PLAYING)
@@ -718,6 +740,7 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
+
         private void menuRecordStop_Click(object sender, RoutedEventArgs e)
         {
             //
@@ -729,12 +752,13 @@ namespace SwarmRoboticsGUI
             statusRecordingText.Text = "Not Recording";
             statusRecordingDot.Foreground = System.Windows.Media.Brushes.Black;
         }
-        // Communications menu
+
 
         private void btnCommunicationTest_Click(object sender, RoutedEventArgs e)
         {
             //protocol.SendMessage(ProtocolClass.MESSAGE_TYPES.COMMUNICATION_TEST);
         }
+
         private void btnCameraMinimise_Click(object sender, MouseButtonEventArgs e)
         {
             switch (WindowStatus)
@@ -767,12 +791,11 @@ namespace SwarmRoboticsGUI
                     break;
             }
         }
+
         private void menuPlaceHolder_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Sorry Placeholder");
         }
-
-
 
         private void btnBatteryVoltage_Click(object sender, RoutedEventArgs e)
         {

@@ -60,6 +60,34 @@ namespace SwarmRoboticsGUI
 	public class CommunicationManager
 	{
 
+        private SerialUARTCommunication primarySerialPort;
+        private XbeeAPI xbeeHandler;
+        public MainWindow window;
+        private ProtocolClass swarmRoboticsProtocolHandler;
+        public UInt64 currentTargetRobot;
+
+        private List<byte[]> rxMessageBuffer;
+        private List<XbeeAPIFrame> rxXbeeMessageBuffer;
+
+        public CommunicationManager(MainWindow main, SerialUARTCommunication mainSerialPort, XbeeAPI xbeeManager, ProtocolClass swarmManager)
+        {
+            window = main;
+            primarySerialPort = mainSerialPort;
+            xbeeHandler = xbeeManager;
+            swarmRoboticsProtocolHandler = swarmManager;
+            rxMessageBuffer = new List<byte[]>();
+            rxXbeeMessageBuffer = new List<XbeeAPIFrame>();
+            WaitForMessage.MessagesToWaitFor = new List<WaitForMessage>();
+
+            primarySerialPort.DataReceived += new SerialUARTCommunication.SerialDataReceivedHandler(PrimarySerialPortDataReceived);
+
+            window.UpdateListViewBinding(rxXbeeMessageBuffer);
+        }
+
+
+
+
+
 		public class RequestedMessageReceivedArgs : EventArgs
 		{
 			public XbeeAPIFrame msg;
@@ -145,30 +173,7 @@ namespace SwarmRoboticsGUI
 		}
 		*/
 		
-		private SerialUARTCommunication primarySerialPort;
-		private XbeeAPI xbeeHandler;
-		public MainWindow window;
-		private ProtocolClass swarmRoboticsProtocolHandler;
-        public UInt64 currentTargetRobot;
-
-		private List<byte[]> rxMessageBuffer;
-		private List<XbeeAPIFrame> rxXbeeMessageBuffer;
-
-		public CommunicationManager(MainWindow main, SerialUARTCommunication mainSerialPort, XbeeAPI xbeeManager, ProtocolClass swarmManager)
-		{
-			window = main;
-			primarySerialPort = mainSerialPort;
-			xbeeHandler = xbeeManager;
-			swarmRoboticsProtocolHandler = swarmManager;
-			rxMessageBuffer = new List<byte[]>();
-			rxXbeeMessageBuffer = new List<XbeeAPIFrame>();
-			//templist = new List<WaitForMessage.MyTempClass>();
-			WaitForMessage.MessagesToWaitFor = new List<WaitForMessage>();
-
-			primarySerialPort.DataReceived += new SerialUARTCommunication.SerialDataReceivedHandler(PrimarySerialPortDataReceived);
-
-			window.UpdateListViewBinding(rxXbeeMessageBuffer);
-		}
+		
 
 		private void PrimarySerialPortDataReceived(object sender, EventArgs e)
 		{

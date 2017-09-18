@@ -65,8 +65,9 @@ namespace SwarmRoboticsGUI
             RobotArena = new Arena(); 
             // Create event driven by new frames from the camera
             mainWindow.camera1.Process += new EventHandler(DrawOverlayFrame);
-            //
-            RobotList = mainWindow.RobotList;
+
+            //Creates a local copy of the robotlist only containing the robots themselves
+            RobotList =  mainWindow.RobotList.Where(x => x is RobotItem).Cast<RobotItem>().ToList<RobotItem>();
             // Stores the UI context to be used to marshal 
             // code from other threads to the UI thread.
             uiContext = SynchronizationContext.Current;
@@ -171,6 +172,8 @@ namespace SwarmRoboticsGUI
         {
             // Updates from another thread
             var RobotList1 = new ObservableCollection<RobotItem>((List<RobotItem>)data);
+
+
             foreach(RobotItem R in RobotList1)
             {
                 // Robot with the same ID
