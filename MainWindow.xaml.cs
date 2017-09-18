@@ -805,17 +805,6 @@ namespace SwarmRoboticsGUI
 
 		#endregion
 
-        private void ToggleButton_Click(object sender, RoutedEventArgs e)
-        {
-            byte[] data;
-            data = new byte[2];
-            data[0] = SYSTEM_TEST_MESSAGE.COMMUNICATION;
-            data[1] = 0x01;
-
-            xbee.SendTransmitRequest(XbeeAPI.DESTINATION.BROADCAST, data);
-        }
-
-
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             camera1.CloseCapture();

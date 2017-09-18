@@ -59,7 +59,7 @@ namespace SwarmRoboticsGUI
             }
         }
     }
-    public class RobotItem : Item, INotifyPropertyChanged
+    public class RobotItem : CommunicationItem, INotifyPropertyChanged
     {
         private int _Battery { get; set; }
         public int Battery
@@ -307,49 +307,7 @@ namespace SwarmRoboticsGUI
             }
         }
 
-		private String _Colour { get; set; }
-		public String Colour
-		{
-			get { return _Colour; }
-			set
-			{
-				if (_Colour != value)
-				{
-					_Colour = value;
-					NotifyPropertyChanged("Colour");
-				}
-			}
-		}
-
-		private UInt64 _Address64 { get; set; }
-		public UInt64 Address64
-		{
-			get { return _Address64; }
-			set
-			{
-				if (_Address64 != value)
-				{
-					_Address64 = value;
-					NotifyPropertyChanged("Address64");
-				}
-			}
-		}
-
-		private UInt16 _Address16 { get; set; }
-		public UInt16 Address16
-		{
-			get { return _Address16; }
-			set
-			{
-				if (_Address16 != value)
-				{
-					_Address16 = value;
-					NotifyPropertyChanged("Address16");
-				}
-			}
-		}
-
-		public RobotItem(string Name, UInt64 MAC_Address, string Colour, int ID) : base(Name)
+		public RobotItem(string Name, UInt64 MAC_Address, string Colour, int ID) : base(Name, MAC_Address, Colour)
         {
 			this.Name = Name;
             this.ID = ID;
@@ -434,54 +392,12 @@ namespace SwarmRoboticsGUI
         }
     }
 
-    public class ChargingDockItem : Item, INotifyPropertyChanged
+    public class ChargingDockItem : CommunicationItem, INotifyPropertyChanged
     {
-        private String _Colour { get; set; }
-        public String Colour
-        {
-            get { return _Colour; }
-            set
-            {
-                if (_Colour != value)
-                {
-                    _Colour = value;
-                    NotifyPropertyChanged("Colour");
-                }
-            }
-        }
-
-        private UInt64 _Address64 { get; set; }
-        public UInt64 Address64
-        {
-            get { return _Address64; }
-            set
-            {
-                if (_Address64 != value)
-                {
-                    _Address64 = value;
-                    NotifyPropertyChanged("Address64");
-                }
-            }
-        }
-
-        private UInt16 _Address16 { get; set; }
-        public UInt16 Address16
-        {
-            get { return _Address16; }
-            set
-            {
-                if (_Address16 != value)
-                {
-                    _Address16 = value;
-                    NotifyPropertyChanged("Address16");
-                }
-            }
-        }
-
-        public ChargingDockItem(String Name, UInt64 MAC_Address, string Colour) : base(Name)
+        public ChargingDockItem(String Name, UInt64 MAC_Address, string Colour) : base(Name, MAC_Address, Colour)
         {
             this.Name = Name;
-            this._Address64 = MAC_Address;
+            this.Address64 = MAC_Address;
             this.Colour = Colour;
         }
     }
@@ -534,7 +450,7 @@ namespace SwarmRoboticsGUI
         {
             this.Name = Name;
             this.Address16 = 0xFFFE;
-            this._Address64 = MAC_Address;
+            this.Address64 = MAC_Address;
             this.Colour = Colour;
         }
     }

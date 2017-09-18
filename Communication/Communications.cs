@@ -70,7 +70,7 @@ namespace SwarmRoboticsGUI
         private void dispSelectRobot_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox CBsender = sender as ComboBox;
-			RobotItem selected = (RobotItem)CBsender.SelectedItem;
+			CommunicationItem selected = (CommunicationItem)CBsender.SelectedItem;
 			commManger.currentTargetRobot = selected.Address64;
         }
 	}
