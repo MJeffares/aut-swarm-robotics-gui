@@ -89,7 +89,7 @@ namespace SwarmRoboticsGUI
 		public OverlayWindow overlayWindow;
         public SwarmManager swarmManager;
 		public Dictionary<string, UInt64> robotsDictionary;
-        public List<Item> RobotList;
+        public List<Item> ItemList;
         
 
 
@@ -139,7 +139,7 @@ namespace SwarmRoboticsGUI
 
             overlayWindow = new OverlayWindow(this);
 
-			dispSelectRobot.ItemsSource = RobotList;
+			dispSelectRobot.ItemsSource = ItemList;
 
 			//
 			openvideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
@@ -371,22 +371,22 @@ namespace SwarmRoboticsGUI
 
         private void PopulateRobots()
         {
-            RobotList = new List<Item>();
+            ItemList = new List<Item>();
             // BRAE: add drawing.color as "ID"
             // MANSEL: add drawing.color as "ID"
             // TODO: add drawing.color as "ID"
             //System.Drawing.Color.SaddleBrown
-            RobotList.Add(new RobotItem("Red Robot", 0x0013A2004147F9DD, "Red", 0));
-            RobotList.Add(new RobotItem("Yellow Robot", 0x0013A200415B8C38, "Yellow", 1));
-            RobotList.Add(new RobotItem("Purple Robot", 0x0013A200415B8BDD, "Purple", 2));
-            RobotList.Add(new RobotItem("Light Blue Robot", 0x0013A2004152F256, "Cyan", 3));
-            RobotList.Add(new RobotItem("Dark Blue Robot", 0x0013A200415B8C3A, "MidnightBlue", 4));
-			RobotList.Add(new RobotItem("Brown Robot", 0x0013A20041065FB3, "SaddleBrown", 5));
-            RobotList.Add(new RobotItem("Pink Robot", 0x0013A200415B8C18, "Plum", 6));		
-			RobotList.Add(new RobotItem("Orange Robot", 0x0013A200415B8BE5, "Orange", 7));
+            ItemList.Add(new RobotItem("Red Robot", 0x0013A2004147F9DD, "Red", 0));
+            ItemList.Add(new RobotItem("Yellow Robot", 0x0013A200415B8C38, "Yellow", 1));
+            ItemList.Add(new RobotItem("Purple Robot", 0x0013A200415B8BDD, "Purple", 2));
+            ItemList.Add(new RobotItem("Light Blue Robot", 0x0013A2004152F256, "Cyan", 3));
+            ItemList.Add(new RobotItem("Dark Blue Robot", 0x0013A200415B8C3A, "MidnightBlue", 4));
+			ItemList.Add(new RobotItem("Brown Robot", 0x0013A20041065FB3, "SaddleBrown", 5));
+            ItemList.Add(new RobotItem("Pink Robot", 0x0013A200415B8C18, "Plum", 6));		
+			ItemList.Add(new RobotItem("Orange Robot", 0x0013A200415B8BE5, "Orange", 7));
 
-            RobotList.Add(new ChargingDockItem("Tower Base Station", 0x0013A200415B8C2A, "Lime"));
-            RobotList.Add(new CommunicationItem("Broadcast", 0x000000000000FFFF, "White"));
+            ItemList.Add(new ChargingDockItem("Tower Base Station", 0x0013A200415B8C2A, "Lime"));
+            ItemList.Add(new CommunicationItem("Broadcast", 0x000000000000FFFF, "White"));
         }
 
         private void DisplayTime()
