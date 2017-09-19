@@ -52,7 +52,7 @@ namespace SwarmRoboticsGUI
 
             PositioningTimer = new DispatcherTimer();
             PositioningTimer.Tick += PositioningTimer_Tick;
-            PositioningTimer.Interval = new System.TimeSpan(0, 0, 10);
+            PositioningTimer.Interval = new System.TimeSpan(0, 0, 5);
             PositioningTimer.Start();
 
            // RegisteredRobots = mainWindow.RobotList.Where(R => R is RobotItem && (R as RobotItem).IsTracked).Cast<RobotItem>().ToList<RobotItem>();
@@ -77,7 +77,7 @@ namespace SwarmRoboticsGUI
             {
                 byte[] data;
                 UInt16 num;
-                data = new byte[5];
+                data = new byte[7];
 
                 data[0] = 0xA0;
 
@@ -91,6 +91,11 @@ namespace SwarmRoboticsGUI
                 data[3] = (byte)(num >> 0x8);
                 data[4] = (byte)(num);
 
+
+                num = (UInt16)R.FacingDeg;
+
+                data[5] = (byte)(num >> 0x8);
+                data[6] = (byte)(num);
 
                 mainwindow.xbee.SendTransmitRequest(R.Address64, data);
             }
