@@ -15,9 +15,11 @@ namespace SwarmRoboticsGUI
         private List<RobotItem> RobotList;
         private List<RobotItem> RegisteredRobots;
 
+        MainWindow mainwindow;
 
         public SwarmManager(MainWindow mainWindow)
         {
+            mainwindow = mainWindow;
             
             CheckupTimer = new DispatcherTimer();
             CheckupTimer.Tick += CheckupTimer_Tick;
@@ -37,12 +39,37 @@ namespace SwarmRoboticsGUI
 
         private void CheckupTimer_Tick(object sender, EventArgs arg)
         {
-            RegisteredRobots = RobotList.Where(R => R.IsTracked).ToList<RobotItem>();
+            
+
+            
+
         }
 
         private void PositioningTimer_Tick(object sender, EventArgs arg)
         {
-            //RegisteredRobots = RobotList.Where(R => R.IsTracked).ToList<RobotItem>();
+            RegisteredRobots = RobotList.Where(R => R.IsTracked).ToList<RobotItem>();
+
+            foreach (RobotItem R in RegisteredRobots)
+            {
+                byte[] data;
+                UInt16 num;
+                data = new byte[5];
+
+                data[0] = 0xA0;
+
+                num = (UInt16)R.Location.X;
+
+                data[1] = (byte)(num >> 0xFF);
+                data[2] = (byte)(num);
+
+                num = (UInt16)R.Location.Y;
+
+                data[3] = (byte)(num >> 0xFF);
+                data[4] = (byte)(num);
+
+
+                mainwindow.xbee.SendTransmitRequest(R.Address64, data);
+            }
         }
     }
 }
