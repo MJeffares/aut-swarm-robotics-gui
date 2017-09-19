@@ -107,7 +107,7 @@ namespace SwarmRoboticsGUI
                         CvInvoke.InRange(HOut, lower, upper, HOut);
                         //
                         CvInvoke.ExtractChannel(Out, Out, 1);
-                        //CvInvoke.Threshold(Out, Out, 0, 25, ThresholdType.BinaryInv);
+                        CvInvoke.Threshold(Out, Out, 25, 255, ThresholdType.Binary);
                         CvInvoke.BitwiseAnd(HOut, Out, Output);
                     }
                     break;
@@ -117,9 +117,8 @@ namespace SwarmRoboticsGUI
         }
         public static void GetRobots(IInputArray Frame, List<RobotItem> RobotList, Arena Arena)
         {
-
-            //const double REAL_DISTANCE = 1664.882954;
-            const double REAL_DISTANCE = 840;
+            const double REAL_DISTANCE = 1664.882954;
+            //const double REAL_DISTANCE = 840;
             //const double REAL_DISTANCE = 297;
 
 
@@ -405,15 +404,15 @@ namespace SwarmRoboticsGUI
             {
                 case KnownColor.Orange:
                     HueRange.Start = 0;
-                    HueRange.End = 13;
+                    HueRange.End = 10;
                     break;
                 case KnownColor.Yellow:
-                    HueRange.Start = 17;
+                    HueRange.Start = 20;
                     HueRange.End = 30;
                     break;
                 case KnownColor.Green:
-                    HueRange.Start = 40;
-                    HueRange.End = 90;
+                    HueRange.Start = 30;
+                    HueRange.End = 100;
                     break;
                 case KnownColor.LightBlue:
                     HueRange.Start = 100;
@@ -423,9 +422,9 @@ namespace SwarmRoboticsGUI
                     HueRange.Start = 110;
                     HueRange.End = 130;
                     break;
-                case KnownColor.Purple:
-                    HueRange.Start = 130;
-                    HueRange.End = 175;
+                case KnownColor.Red:
+                    HueRange.Start = 150;
+                    HueRange.End = 190;
                     break;
                 default:
                     HueRange.Start = 0;
@@ -442,7 +441,7 @@ namespace SwarmRoboticsGUI
             const int LowerS = 25;
             int Width = Frame.GetInputArray().GetSize().Width;
             int Height = Frame.GetInputArray().GetSize().Height;
-            int ColourCount = Width * Height / 40;
+            int ColourCount = Width * Height / 20;
             var Out = new Mat();
             var HOut = new Mat();
 
@@ -519,7 +518,7 @@ namespace SwarmRoboticsGUI
         }
         private static int IdentifyRobot(IInputArray Frame, IInputArray Contour)
         {
-            bool IsOrange = false, IsYellow = false, IsGreen = false, IsDarkBlue = false, IsLightBlue = false, IsPurple = false;
+            bool IsOrange = false, IsYellow = false, IsGreen = false, IsDarkBlue = false, IsLightBlue = false, IsRed = false;
             int RobotID = -1;
             var hexagon = Contour as VectorOfPoint;
             var Image = Frame as UMat;
@@ -537,24 +536,24 @@ namespace SwarmRoboticsGUI
             IsGreen = HasHueRange(Image, GetHueRange(KnownColor.Green));
             IsLightBlue = HasHueRange(Image, GetHueRange(KnownColor.LightBlue));
             IsDarkBlue = HasHueRange(Image, GetHueRange(KnownColor.DarkBlue));
-            IsPurple = HasHueRange(Image, GetHueRange(KnownColor.Purple));
+            IsRed = HasHueRange(Image, GetHueRange(KnownColor.Red));
 
-            // LIGHTBLUE GREEN PURPLE
-            if (!IsOrange && !IsYellow && IsGreen && IsLightBlue && !IsDarkBlue && IsPurple) RobotID = 0;       // RED
-            // ORANGE LIGHTBLUE PURPLE
-            else if (IsOrange && !IsYellow && !IsGreen && IsLightBlue && !IsDarkBlue && IsPurple) RobotID = 1;  // YELLOW
-            // ORANGE GREEN PURPLE
-            else if (IsOrange && !IsYellow && IsGreen && !IsLightBlue && !IsDarkBlue && IsPurple) RobotID = 2;  // PURPLE
+            // LIGHTBLUE GREEN RED
+            if (!IsOrange && !IsYellow && IsGreen && IsLightBlue && !IsDarkBlue && IsRed) RobotID = 0;       // RED
+            // ORANGE LIGHTBLUE RED
+            else if (IsOrange && !IsYellow && !IsGreen && IsLightBlue && !IsDarkBlue && IsRed) RobotID = 1;  // YELLOW
+            // ORANGE GREEN RED
+            else if (IsOrange && !IsYellow && IsGreen && !IsLightBlue && !IsDarkBlue && IsRed) RobotID = 2;  // PURPLE
             // GREEN YELLOW DARKBLUE
-            else if (!IsOrange && IsYellow && IsGreen && !IsLightBlue && IsDarkBlue && !IsPurple) RobotID = 3;  // LIGHTBLUE
+            else if (!IsOrange && IsYellow && IsGreen && !IsLightBlue && IsDarkBlue && !IsRed) RobotID = 3;  // LIGHTBLUE
             // LIGHTBLUE GREEN DARKBLUE
-            else if (!IsOrange && !IsYellow && IsGreen && IsLightBlue && IsDarkBlue && !IsPurple) RobotID = 4;  // DARKBLUE
+            else if (!IsOrange && !IsYellow && IsGreen && IsLightBlue && IsDarkBlue && !IsRed) RobotID = 4;  // DARKBLUE
             // ORANGE YELLOW GREEN
-            else if (IsOrange && IsYellow && IsGreen && !IsLightBlue && !IsDarkBlue && !IsPurple) RobotID = 5;  // BROWN
+            else if (IsOrange && IsYellow && IsGreen && !IsLightBlue && !IsDarkBlue && !IsRed) RobotID = 5;  // BROWN
             // LIGHTBLUE YELLOW ORANGE
-            else if (IsOrange && IsYellow && !IsGreen && IsLightBlue && !IsDarkBlue && !IsPurple) RobotID = 6;  // PINK
-            // ORANGE YELLOW PURPLE
-            else if (IsOrange && IsYellow && !IsGreen && !IsLightBlue && !IsDarkBlue && IsPurple) RobotID = 7;  // ORANGE
+            else if (IsOrange && IsYellow && !IsGreen && IsLightBlue && !IsDarkBlue && !IsRed) RobotID = 6;  // PINK
+            // ORANGE YELLOW RED
+            else if (IsOrange && IsYellow && !IsGreen && !IsLightBlue && !IsDarkBlue && IsRed) RobotID = 7;  // ORANGE
 
             return RobotID;
         }    
@@ -590,8 +589,8 @@ namespace SwarmRoboticsGUI
             double pixelDistance = -1;
 
             double factor = 0;
-            //const double REAL_DISTANCE = 1664.882954;
-            const double REAL_DISTANCE = 840;
+            const double REAL_DISTANCE = 1664.882954;
+            //const double REAL_DISTANCE = 840;
             //const double REAL_DISTANCE = 297;
 
             var size = Frame.GetInputArray().GetSize();

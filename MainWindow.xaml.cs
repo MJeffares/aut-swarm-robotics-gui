@@ -459,7 +459,7 @@ namespace SwarmRoboticsGUI
             ///	statusFPS.Text = "FPS: " + _fpscount.ToString();
             ///	_fpscount = 0;
             ///}
-            ///statusFPS.Text = camera1.Fps.ToString();
+            statusFPS.Text = camera1.Fps.ToString();
 
             DisplayTime();
         }
@@ -479,7 +479,7 @@ namespace SwarmRoboticsGUI
                         //Apply the currently selected filter
                         if (camera1.Filter != FilterType.NONE)
                         {
-                            var proc = new UMat();
+                            var proc = new Mat();
                             ImageProcessing.ProcessFilter(Frame, proc, camera1.Filter, HueLower, HueUpper);
                             if (proc != null)
                                 captureImageBox.Image = proc;

@@ -10,18 +10,18 @@
         <!--Polygon shapes-->
         <Style x:Key="Hexagon" TargetType="Polygon">
             <Setter Property="Points" Value="0,0.25 0,0.75 0.6123724357,1 1.224744871,0.75 1.224744871,0.25 0.6123724357,0"/>
-            <Setter Property="Fill" Value="#222"/>
+            <Setter Property="Fill" Value="#AAA"/>
             <Setter Property="Stretch" Value="Fill"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                    <Setter Property="Fill" Value="White"/>
+                    <Setter Property="Fill" Value="#CCC"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
         <Style x:Key="Triangle" TargetType="Polygon">
             <!--<Setter Property="Points" Value="0,1 0.5,0 1,1"/>-->
             <Setter Property="Points" Value="0,0 1,0.5 0,1"/>
-            <Setter Property="Fill" Value="Black"/>
+            <Setter Property="Fill" Value="#444"/>
             <Setter Property="Stretch" Value="Fill"/>
         </Style>
 
@@ -39,19 +39,23 @@
                           ItemsSource="{Binding Items, RelativeSource={RelativeSource AncestorType=UserControl}}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <Canvas Background="#333"/>
+                        <Canvas Background="#FFF" Width="1177" Height="1177"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemContainerStyle>
                     <Style TargetType="ContentPresenter">
-                        <Setter Property="Canvas.Left" Value="{Binding DisplayLocation.X}"/>
+                        <Setter Property="Canvas.Left" Value="{Binding Location.X}"/>
                         <Setter Property="Canvas.Margin" Value="0,0,0,0"/>
-                        <Setter Property="Canvas.Top" Value="{Binding DisplayLocation.Y}"/>
+                        <Setter Property="Canvas.Top" Value="{Binding Location.Y}"/>
                     </Style>
                 </ItemsControl.ItemContainerStyle>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="30"/>
+                            </Grid.RowDefinitions>
                             <Polygon Name="Hexagon" Style="{StaticResource Hexagon}"
                                      Height="{Binding Width}" Width="{Binding Height}"
                                      MouseLeftButtonDown="Robot_MouseLeftButtonDown"
@@ -75,10 +79,23 @@
                             </Polygon>
                             <TextBlock Text="{Binding Name}" 
                                        VerticalAlignment="Center" HorizontalAlignment="Center"
-                                       Foreground="White" FontSize="20"
+                                       Foreground="#000" FontSize="20"
                                        IsHitTestVisible="False">
                             </TextBlock>
-                            
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Location.X, StringFormat=N0}" 
+                                       Foreground="#000" FontSize="20"
+                                       IsHitTestVisible="False">
+                                </TextBlock>
+                                <TextBlock Grid.Column="1" Text="{Binding Location.Y, StringFormat=N0}" 
+                                       Foreground="#000" FontSize="20"
+                                       IsHitTestVisible="False">
+                                </TextBlock>
+                            </Grid>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
