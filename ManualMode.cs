@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
+using System.Timers;
 
 namespace SwarmRoboticsGUI
 {
@@ -176,24 +177,6 @@ namespace SwarmRoboticsGUI
             xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
         }
 
-		private void robotTaskDockViaLight_Click(object sender, RoutedEventArgs e)
-		{
-            byte[] data;
-            data = new byte[1];
-            data[0] = ROBOT_CONTROL_MESSAGE.DockViaLight;
-
-            xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
-		}
-
-		private void robotTaskDockViaLine_Click(object sender, RoutedEventArgs e)
-		{
-            byte[] data;
-            data = new byte[1];
-            data[0] = ROBOT_CONTROL_MESSAGE.DockViaLine;
-
-            xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
-		}
-
 		private void robotTaskMoveTowardsLight_Click(object sender, RoutedEventArgs e)
 		{
             byte[] data;
@@ -211,6 +194,96 @@ namespace SwarmRoboticsGUI
 
             xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
 		}
+
+        private void robotTaskRotateToHeading_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void tbRotateToHeading_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            int num;
+
+            if (int.TryParse(((TextBox)sender).Text + e.Text, out num))
+            {
+                if (num >= 0)
+                {
+                    if (num > 360)
+                    {
+                        num = 360;
+                    }
+                    ((TextBox)sender).Text = num.ToString();
+                }
+                e.Handled = true;
+            }
+        }        
+
+        /*
+        private void btnRotateToHeadingUp_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Button senderbutton = (Button) sender as Button;
+
+            UInt16 num;
+            int acc = 10;
+            Timer t = new Timer();
+            t.Interval = 50;
+
+            UInt16.TryParse(tbRotateToHeading.Text, out num);
+
+            while(senderbutton.IsPressed)
+            {
+                
+
+                if (num == 360)
+                {
+                    num = 0;
+                }
+                else
+                {
+                    num = (UInt16)(num + (acc/10));
+                    acc++;
+                }
+            }
+
+            tbRotateToHeading.Text = num.ToString();
+        }
+        */
+
+        private void btnRotateToHeadingUp_Click(object sender, RoutedEventArgs e)
+        {
+            int num;
+
+            int.TryParse(tbRotateToHeading.Text, out num);
+
+            if(num == 360)
+            {
+                num = 0;
+            }
+            else
+            {
+                num++;
+            }
+
+            tbRotateToHeading.Text = num.ToString();
+        }
+
+        private void btnRotateToHeadingDown_Click(object sender, RoutedEventArgs e)
+        {
+            int num;
+
+            int.TryParse(tbRotateToHeading.Text, out num);
+
+            if (num == 0)
+            {
+                num = 360;
+            }
+            else
+            {
+                num--;
+            }
+
+            tbRotateToHeading.Text = num.ToString();
+        }
 
 	}
 }

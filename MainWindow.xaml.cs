@@ -87,8 +87,10 @@ namespace SwarmRoboticsGUI
 		public CommunicationManager commManger;
 		public CameraPopOutWindow popoutWindow;
 		public OverlayWindow overlayWindow;
+        public SwarmManager swarmManager;
 		public Dictionary<string, UInt64> robotsDictionary;
         public List<Item> RobotList;
+        
 
 
         public int HueLower { get; set; }
@@ -132,6 +134,8 @@ namespace SwarmRoboticsGUI
             PopulateCameras();
             PopulateSources();
             PopulateRobots();
+
+            swarmManager = new SwarmManager(this);
 
             overlayWindow = new OverlayWindow(this);
 
@@ -816,6 +820,6 @@ namespace SwarmRoboticsGUI
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             camera1.CloseCapture();
-        }     
+        }          
 	}
 }
