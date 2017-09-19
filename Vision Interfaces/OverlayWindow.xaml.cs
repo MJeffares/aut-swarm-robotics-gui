@@ -43,7 +43,6 @@ namespace SwarmRoboticsGUI
         private System.Timers.Timer InterfaceTimer { get; set; }
         public List<RobotItem> RobotList { get; set; }
         public Arena RobotArena { get; set; }
-        private SynchronizationContext uiContext { get; set; }
 
         public OverlayWindow(MainWindow mainWindow)
         {
@@ -68,9 +67,6 @@ namespace SwarmRoboticsGUI
 
             //Creates a local copy of the robotlist only containing the robots themselves
             RobotList =  mainWindow.ItemList.Where(x => x is RobotItem).Cast<RobotItem>().ToList<RobotItem>();
-            // Stores the UI context to be used to marshal 
-            // code from other threads to the UI thread.
-            uiContext = SynchronizationContext.Current;
         }
 
         #region Public Methods
@@ -111,35 +107,33 @@ namespace SwarmRoboticsGUI
 
         private void DrawOverlayFrame(object sender, EventArgs e)
         {
-            counter++;
-            UMat Frame = sender as UMat;
-
-            if (counter > 29)
-            {
-                Update(uiContext, Frame);
-                counter = 0;
-            }
+            
 
             switch (Display1.Source)
             {
                 case SourceType.NONE:
                     break;
                 case SourceType.CAMERA:
+                    counter++;
+                    using (UMat Frame = sender as UMat)
+                    {
                         // Make sure there is a frame
                         if (Frame != null)
                         {
+                            if (counter > 29)
+                            {
+                                ImageProcessing.GetArena(Frame, RobotArena);
+
+                                counter = 0;
+                            }
                             // Apply image processing to find the robots
                             ImageProcessing.GetRobots(Frame, RobotList, RobotArena);
-                            
-                            // Update the robotlist on the UI thread
-                            //Update(uiContext, RobotList);
                         }
+                    }
                     break;
                 case SourceType.CUTOUTS:
                     // Apply image processing to find the robots
                     ImageProcessing.GetRobots(ImageProcessing.TestImage, RobotList, RobotArena);
-                    // Update the robotlist on the UI thread
-                    //Update(uiContext, RobotList);
                     break;
                 default:
                     break;
@@ -159,47 +153,6 @@ namespace SwarmRoboticsGUI
             }
         }
         #endregion
-
-        private void Update(object state, object data)
-        {
-            // Get the UI context from state
-            SynchronizationContext uiContext = state as SynchronizationContext;
-            // Execute the UpdateRobots function on the UI thread
-            //uiContext.Post(UpdateRobots, data);
-            uiContext.Post(UpdateArena, data);
-        }
-        private void UpdateRobots(object data)
-        {
-            // Updates from another thread
-            var RobotList1 = new ObservableCollection<RobotItem>((List<RobotItem>)data);
-
-
-            foreach(RobotItem R in RobotList1)
-            {
-                // Robot with the same ID
-                var Robot = RobotList.Where(f => f.ID == R.ID).FirstOrDefault();
-                // Robot exist in list
-                if (Robot != null)
-                {
-                    var index = RobotList.IndexOf(Robot);
-                    if (Robot.IsSelected)
-                    {
-                        R.IsSelected = true;
-                    }
-                    RobotList.RemoveAt(index);
-                    RobotList.Insert(index, R);
-                }
-                else
-                {
-                    RobotList.Add(R);
-                }
-            }
-        }
-
-        private void UpdateArena(object data)
-        {
-            ImageProcessing.GetArena(data as UMat, RobotArena);
-        }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
