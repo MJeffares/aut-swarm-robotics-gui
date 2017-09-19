@@ -62,7 +62,7 @@ namespace SwarmRoboticsGUI
             }
         }
 
-        public static void ProcessFilter(IInputArray Input, IOutputArray Output, FilterType Filter)
+        public static void ProcessFilter(IInputArray Input, IOutputArray Output, FilterType Filter, int HueLower = 0, int HueUpper = 255)
         {
             switch (Filter)
             {
@@ -97,8 +97,8 @@ namespace SwarmRoboticsGUI
                 case FilterType.COLOUR:
                     using (var Out = new Mat())
                     using (var HOut = new Mat())
-                    using (ScalarArray lower = new ScalarArray(0))
-                    using (ScalarArray upper = new ScalarArray(150))
+                    using (ScalarArray lower = new ScalarArray(HueLower))
+                    using (ScalarArray upper = new ScalarArray(HueUpper))
                     {
                         //
                         CvInvoke.CvtColor(Input, Out, ColorConversion.Bgr2Hsv);
@@ -107,7 +107,7 @@ namespace SwarmRoboticsGUI
                         CvInvoke.InRange(HOut, lower, upper, HOut);
                         //
                         CvInvoke.ExtractChannel(Out, Out, 1);
-                        CvInvoke.Threshold(Out, Out, 0, 25, ThresholdType.Binary);
+                        //CvInvoke.Threshold(Out, Out, 0, 25, ThresholdType.BinaryInv);
                         CvInvoke.BitwiseAnd(HOut, Out, Output);
                     }
                     break;
@@ -146,7 +146,7 @@ namespace SwarmRoboticsGUI
                 var RobotFrameOffset = GetRobotFrame(Frame, Hexagon, RobotFrame);
 
                 // Check for the colour ID, Returns (-1) if no robot ID
-                int RobotID = IdentifyRobot(RobotFrame);
+                int RobotID = IdentifyRobot(RobotFrame, Hexagon);
                 // Goto next contour if not true
                 if (RobotID == -1) continue;
 
@@ -172,9 +172,9 @@ namespace SwarmRoboticsGUI
                 // Use the arena's size and location in frame to scale robots location to real world
                 if (Arena.ScaleFactor != 0 && !Arena.Origin.IsEmpty)
                 {
-                    RobotList[index].Width = (int)(GetRobotWidth(Hexagon) * Arena.ScaleFactor * displayFactor);
+                    //RobotList[index].Width = (int)(GetRobotWidth(Hexagon) * Arena.ScaleFactor * displayFactor);
                     //RobotList[index].Width /= 2;
-                    RobotList[index].Height = (int)(RobotList[index].Width / 2 * Math.Sqrt(3));
+                    //RobotList[index].Height = (int)(RobotList[index].Width / 2 * Math.Sqrt(3));
 
                     // Store the robots real-world location
                     RobotList[index].Location = new System.Windows.Point((COM.X - Arena.Origin.X) * Arena.ScaleFactor,
@@ -416,15 +416,15 @@ namespace SwarmRoboticsGUI
                     HueRange.End = 90;
                     break;
                 case KnownColor.LightBlue:
-                    HueRange.Start = 90;
-                    HueRange.End = 105;
+                    HueRange.Start = 100;
+                    HueRange.End = 110;
                     break;
                 case KnownColor.DarkBlue:
-                    HueRange.Start = 105;
-                    HueRange.End = 125;
+                    HueRange.Start = 110;
+                    HueRange.End = 130;
                     break;
                 case KnownColor.Purple:
-                    HueRange.Start = 125;
+                    HueRange.Start = 130;
                     HueRange.End = 175;
                     break;
                 default:
@@ -517,37 +517,44 @@ namespace SwarmRoboticsGUI
             }
             return 0;
         }
-        private static int IdentifyRobot(IInputArray Frame)
+        private static int IdentifyRobot(IInputArray Frame, IInputArray Contour)
         {
             bool IsOrange = false, IsYellow = false, IsGreen = false, IsDarkBlue = false, IsLightBlue = false, IsPurple = false;
             int RobotID = -1;
+            var hexagon = Contour as VectorOfPoint;
+            var Image = Frame as UMat;
+
+            var Mask = new UMat();
+            CvInvoke.DrawContours(Mask, new VectorOfVectorOfPoint(hexagon), -1, new MCvScalar(255, 255, 255), -1);
+
+            var Masked = new UMat();
+            Image.CopyTo(Masked, Mask);
+
 
             // Look for colours on the robot
-            IsOrange = HasHueRange(Frame, GetHueRange(KnownColor.Orange));
-            IsYellow = HasHueRange(Frame, GetHueRange(KnownColor.Yellow));
-            IsGreen = HasHueRange(Frame, GetHueRange(KnownColor.Green));
-            IsLightBlue = HasHueRange(Frame, GetHueRange(KnownColor.LightBlue));
-            IsDarkBlue = HasHueRange(Frame, GetHueRange(KnownColor.DarkBlue));
-            IsPurple = HasHueRange(Frame, GetHueRange(KnownColor.Purple));
+            IsOrange = HasHueRange(Image, GetHueRange(KnownColor.Orange));
+            IsYellow = HasHueRange(Image, GetHueRange(KnownColor.Yellow));
+            IsGreen = HasHueRange(Image, GetHueRange(KnownColor.Green));
+            IsLightBlue = HasHueRange(Image, GetHueRange(KnownColor.LightBlue));
+            IsDarkBlue = HasHueRange(Image, GetHueRange(KnownColor.DarkBlue));
+            IsPurple = HasHueRange(Image, GetHueRange(KnownColor.Purple));
 
-            // Orange, Yellow, Green
-            if (IsOrange && IsYellow && IsGreen && !IsLightBlue && !IsDarkBlue && !IsPurple) RobotID = 0;
-            //if (IsOrange && IsYellow && IsGreen) RobotID = 0;
-            // DarkBlue, Yellow, Orange
-            else if (IsDarkBlue && IsYellow && IsOrange && !IsLightBlue && !IsGreen && !IsPurple) RobotID = 1;
-            //if (IsDarkBlue && IsYellow && IsOrange) RobotID = 1;
-            // Green, Yellow, DarkBlue
-            else if (IsGreen && IsYellow && IsDarkBlue && !IsLightBlue && !IsOrange && !IsPurple) RobotID = 2;
-            //if (IsGreen && IsYellow && IsDarkBlue) RobotID = 2;
-            // Orange, Yellow, Purple
-            else if (IsOrange && IsYellow && IsPurple && !IsLightBlue && !IsDarkBlue && !IsGreen) RobotID = 3;
-            //if (IsOrange && IsYellow && IsPurple) RobotID = 3;
-            // LightBlue, Green, DarkBlue
-            else if (IsLightBlue && IsGreen && IsDarkBlue && !IsYellow && !IsOrange && !IsPurple) RobotID = 4;
-            //if (IsLightBlue && IsGreen && IsDarkBlue) RobotID = 4;
-            // Orange, Green, Purple
-            else if (IsOrange && IsGreen && IsPurple && !IsLightBlue && !IsDarkBlue && !IsYellow) RobotID = 5;
-            //if (IsOrange && IsGreen && IsPurple) RobotID = 5;
+            // LIGHTBLUE GREEN PURPLE
+            if (!IsOrange && !IsYellow && IsGreen && IsLightBlue && !IsDarkBlue && IsPurple) RobotID = 0;       // RED
+            // ORANGE LIGHTBLUE PURPLE
+            else if (IsOrange && !IsYellow && !IsGreen && IsLightBlue && !IsDarkBlue && IsPurple) RobotID = 1;  // YELLOW
+            // ORANGE GREEN PURPLE
+            else if (IsOrange && !IsYellow && IsGreen && !IsLightBlue && !IsDarkBlue && IsPurple) RobotID = 2;  // PURPLE
+            // GREEN YELLOW DARKBLUE
+            else if (!IsOrange && IsYellow && IsGreen && !IsLightBlue && IsDarkBlue && !IsPurple) RobotID = 3;  // LIGHTBLUE
+            // LIGHTBLUE GREEN DARKBLUE
+            else if (!IsOrange && !IsYellow && IsGreen && IsLightBlue && IsDarkBlue && !IsPurple) RobotID = 4;  // DARKBLUE
+            // ORANGE YELLOW GREEN
+            else if (IsOrange && IsYellow && IsGreen && !IsLightBlue && !IsDarkBlue && !IsPurple) RobotID = 5;  // BROWN
+            // LIGHTBLUE YELLOW ORANGE
+            else if (IsOrange && IsYellow && !IsGreen && IsLightBlue && !IsDarkBlue && !IsPurple) RobotID = 6;  // PINK
+            // ORANGE YELLOW PURPLE
+            else if (IsOrange && IsYellow && !IsGreen && !IsLightBlue && !IsDarkBlue && IsPurple) RobotID = 7;  // ORANGE
 
             return RobotID;
         }    

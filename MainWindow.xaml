@@ -116,7 +116,7 @@
 
         <Grid x:Name="mainGrid">
 
-            
+
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="Column0" Width="*" MinWidth="150"/>
                 <ColumnDefinition x:Name="Column1" Width="2*" MinWidth="300"/>
@@ -132,7 +132,7 @@
                 <ColumnDefinition x:Name="Column3" Width="1*"/>
             </Grid.ColumnDefinitions>
             -->
-            
+
             <Grid.RowDefinitions>
                 <RowDefinition x:Name="Row0" Height="3*"/>
             </Grid.RowDefinitions>
@@ -166,7 +166,7 @@
                                 <GridViewColumnHeader Tag="time_stamp" Click="GridViewColumnHeader_Click" Content="TimeStamp      "/>
                             </GridViewColumn>
 
-                            
+
                             <GridViewColumn x:Name = "gvcMessageType" DisplayMemberBinding="{Binding MessageTypeDisplay}">
                                 <GridViewColumnHeader Tag = "message_type" Click="GridViewColumnHeader_Click" Content="Message Type     "/>
                             </GridViewColumn>
@@ -186,7 +186,7 @@
                             <GridViewColumn x:Name = "gvcSourceAddress" DisplayMemberBinding="{Binding SourceDisplay}">
                                 <GridViewColumnHeader Tag = "SourceDisplay" Click="GridViewColumnHeader_Click" Content="Source Address     "/>
                             </GridViewColumn>
-                            
+
                             <GridViewColumn  x:Name = "gvcRawData" DisplayMemberBinding="{Binding RawMessageDisplay}">
                                 <GridViewColumnHeader Tag = "RawMessageDisplay" Click="GridViewColumnHeader_Click" Content="Raw Data      "/>
                             </GridViewColumn>
@@ -236,7 +236,7 @@
                 <StackPanel DockPanel.Dock="Top" Margin="5">
                     <StackPanel Height="90"  Width="220" HorizontalAlignment="Left" >
                         <Label Content="Communication" HorizontalAlignment="Center" Margin="0,0,0,0"/>
-                        <ComboBox x:Name = "dispSelectRobot"  MinHeight = "24" Width = "195" Margin = "0,0,0,8" HorizontalAlignment="Center" SelectedIndex = "0" SelectionChanged="dispSelectRobot_SelectionChanged" ItemsSource="{Binding}">
+                        <ComboBox x:Name = "dispSelectRobot"  MinHeight = "24" Width = "194" Margin = "12,0,14,8" HorizontalAlignment="Center" SelectedIndex = "0" SelectionChanged="dispSelectRobot_SelectionChanged" ItemsSource="{Binding}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
@@ -279,14 +279,14 @@
                                     <CheckBox Margin="5" HorizontalAlignment="Center" x:Name="robotTaskObstacleAvoidance" Click="robotTaskObstacleAvoidance_Click">Obstacle Avoidance</CheckBox>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskStopMoving" Click="robotTaskStopMoving_Click">Stop Moving</Button>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskMoveRandomly" Click="robotTaskMoveRandomly_Click">Move Randomly</Button>
-                                    <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskDock" Click="robotTaskDock_Click">Dock Using Best Avaliable </Button>
+                                    <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskDock" Click="robotTaskDock_Click">Dock Using Best Avaliable</Button>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskDockViaLight" Click="robotTaskDockViaLight_Click">Dock Via Light</Button>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskDockViaLine" Click="robotTaskDockViaLine_Click">Dock Via Line</Button>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskMoveTowardsLight" Click="robotTaskMoveTowardsLight_Click">Move Towards Light</Button>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskFollowLine" Click="robotTaskFollowLine_Click">Follow Line</Button>
 
-                                    
-                                    
+
+
                                     <!--
                                     
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="5">
@@ -384,12 +384,12 @@
                         </WrapPanel>
                     </TabItem>
 
-                    
+
                     <!--
                     <TabItem Header="Tower Control" IsEnabled="False">
                     </TabItem>
                     -->
-                    
+
                     <TabItem Header = "Systems Test" IsEnabled="False">
                         <StackPanel Margin = "5">
 
@@ -618,13 +618,13 @@
                         </StackPanel>
                     </TabItem>
 
-                    
+
                     <TabItem Header="Debug" IsEnabled="False" >
                         <TabControl Margin="5" TabStripPlacement="Left">
-                            
-                   
+
+
                             <!-- The following code alllows vertical tabs -->
-                    
+
                             <TabControl.Resources>
                                 <Style TargetType="{x:Type TabItem}">
                                     <Setter Property="HeaderTemplate">
@@ -689,21 +689,25 @@
 
                                 </Grid>
                             </TabItem>
-                            
+
                         </TabControl>
-                    
+
                     </TabItem>
-                    
+
                 </TabControl>
-                    
+
             </DockPanel>
-        
+
             <GridSplitter x:Name="cameraGridSplitter" Grid.Column="2" Width="5" HorizontalAlignment="Center">
             </GridSplitter>
 
             <WindowsFormsHost Grid.Column="3" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,5,0,201" Visibility="Visible" Grid.RowSpan="2">
                 <em:ImageBox x:Name="captureImageBox" Height="240" Width="320" SizeMode="StretchImage" FunctionalMode="Minimum"/>
             </WindowsFormsHost>
+            <Slider x:Name="HueLowerSlider" Value="{Binding HueLower, Mode=TwoWay}" Grid.Column="3" HorizontalAlignment="Left" Margin="100,680,0,0" VerticalAlignment="Top" Height="20" Width="260" Maximum="360" SmallChange="1"/>
+            <Slider x:Name="HueUpperSlider" Value="{Binding HueUpper, Mode=TwoWay}" Grid.Column="3" HorizontalAlignment="Left" Margin="100,720,0,0" VerticalAlignment="Top" Height="20" Width="260" Maximum="360" SmallChange="1"/>
+            <TextBox Grid.Column="3" HorizontalAlignment="Left" Height="23" Margin="378,678,0,0" TextWrapping="Wrap" Text="{Binding Value, ElementName=HueLowerSlider}" VerticalAlignment="Top" Width="120"/>
+            <TextBox Grid.Column="3" HorizontalAlignment="Left" Height="23" Margin="378,719,0,0" TextWrapping="Wrap" Text="{Binding Value, ElementName=HueUpperSlider}" VerticalAlignment="Top" Width="120"/>
 
         </Grid>
     </DockPanel>

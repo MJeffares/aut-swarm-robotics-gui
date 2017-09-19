@@ -315,7 +315,7 @@ namespace SwarmRoboticsGUI
 			this.Address64 = MAC_Address;
             Group = "Unassigned";
             // TEMP: Size of the robots is fixed       
-            Radius = 100;
+            Radius = 50;
             Width = 2 * Radius;
             Height = (int)(Math.Sqrt(3) * Radius);
             Children = new ObservableCollection<Item>();

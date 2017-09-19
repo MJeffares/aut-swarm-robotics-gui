@@ -90,6 +90,11 @@ namespace SwarmRoboticsGUI
 		public Dictionary<string, UInt64> robotsDictionary;
         public List<Item> RobotList;
 
+
+        public int HueLower { get; set; }
+        public int HueUpper { get; set; }
+
+
 		public WindowStatusType WindowStatus { get; set; }
 		public TimeDisplayModeType TimeDisplayMode { get; set; }
 		public double WindowSize { get; set; }
@@ -363,15 +368,18 @@ namespace SwarmRoboticsGUI
         private void PopulateRobots()
         {
             RobotList = new List<Item>();
-
-			RobotList.Add(new RobotItem("Brown Robot", 0x0013A20041065FB3, "SaddleBrown", 0));
-			RobotList.Add(new RobotItem("Dark Blue Robot", 0x0013A200415B8C3A, "MidnightBlue", 1));
-			RobotList.Add(new RobotItem("Light Blue Robot", 0x0013A2004152F256, "Cyan", 2));
-			RobotList.Add(new RobotItem("Orange Robot", 0x0013A200415B8BE5, "Orange", 3));
-			RobotList.Add(new RobotItem("Pink Robot", 0x0013A200415B8C18, "Plum", 4));
-			RobotList.Add(new RobotItem("Purple Robot", 0x0013A200415B8BDD, "Purple", 5));
-			RobotList.Add(new RobotItem("Red Robot", 0x0013A2004147F9DD, "Red", 6));
-			RobotList.Add(new RobotItem("Yellow Robot", 0x0013A200415B8C38, "Yellow", 7));
+            // BRAE: add drawing.color as "ID"
+            // MANSEL: add drawing.color as "ID"
+            // TODO: add drawing.color as "ID"
+            //System.Drawing.Color.SaddleBrown
+            RobotList.Add(new RobotItem("Red Robot", 0x0013A2004147F9DD, "Red", 0));
+            RobotList.Add(new RobotItem("Yellow Robot", 0x0013A200415B8C38, "Yellow", 1));
+            RobotList.Add(new RobotItem("Purple Robot", 0x0013A200415B8BDD, "Purple", 2));
+            RobotList.Add(new RobotItem("Light Blue Robot", 0x0013A2004152F256, "Cyan", 3));
+            RobotList.Add(new RobotItem("Dark Blue Robot", 0x0013A200415B8C3A, "MidnightBlue", 4));
+			RobotList.Add(new RobotItem("Brown Robot", 0x0013A20041065FB3, "SaddleBrown", 5));
+            RobotList.Add(new RobotItem("Pink Robot", 0x0013A200415B8C18, "Plum", 6));		
+			RobotList.Add(new RobotItem("Orange Robot", 0x0013A200415B8BE5, "Orange", 7));
 
             RobotList.Add(new ChargingDockItem("Tower Base Station", 0x0013A200415B8C2A, "Lime"));
             RobotList.Add(new CommunicationItem("Broadcast", 0x000000000000FFFF, "White"));
@@ -472,7 +480,7 @@ namespace SwarmRoboticsGUI
                         if (camera1.Filter != FilterType.NONE)
                         {
                             var proc = new UMat();
-                            ImageProcessing.ProcessFilter(Frame, proc, camera1.Filter);
+                            ImageProcessing.ProcessFilter(Frame, proc, camera1.Filter, HueLower, HueUpper);
                             if (proc != null)
                                 captureImageBox.Image = proc;
                         }
