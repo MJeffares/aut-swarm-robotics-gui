@@ -107,7 +107,7 @@ namespace SwarmRoboticsGUI
 
         private void DrawOverlayFrame(object sender, EventArgs e)
         {
-            
+            UMat Frame = sender as UMat;
 
             switch (Display1.Source)
             {
@@ -115,21 +115,19 @@ namespace SwarmRoboticsGUI
                     break;
                 case SourceType.CAMERA:
                     counter++;
-                    using (UMat Frame = sender as UMat)
-                    {
-                        // Make sure there is a frame
-                        if (Frame != null)
-                        {
-                            if (counter > 29)
-                            {
-                                ImageProcessing.GetArena(Frame, RobotArena);
 
-                                counter = 0;
-                            }
-                            // Apply image processing to find the robots
-                            ImageProcessing.GetRobots(Frame, RobotList, RobotArena);
+                    // Make sure there is a frame
+                    if (Frame != null)
+                    {
+                        if (counter > 29)
+                        {
+                            ImageProcessing.GetArena(Frame, RobotArena);
+
+                            counter = 0;
                         }
-                    }
+                        // Apply image processing to find the robots
+                        ImageProcessing.GetRobots(Frame, RobotList, RobotArena);
+                    }                   
                     break;
                 case SourceType.CUTOUTS:
                     // Apply image processing to find the robots
