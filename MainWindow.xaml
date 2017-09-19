@@ -279,24 +279,18 @@
                                     <CheckBox Margin="5" HorizontalAlignment="Center" x:Name="robotTaskObstacleAvoidance" Click="robotTaskObstacleAvoidance_Click">Obstacle Avoidance</CheckBox>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskStopMoving" Click="robotTaskStopMoving_Click">Stop Moving</Button>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskMoveRandomly" Click="robotTaskMoveRandomly_Click">Move Randomly</Button>
-                                    <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskDock" Click="robotTaskDock_Click">Dock Using Best Avaliable</Button>
-                                    <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskDockViaLight" Click="robotTaskDockViaLight_Click">Dock Via Light</Button>
-                                    <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskDockViaLine" Click="robotTaskDockViaLine_Click">Dock Via Line</Button>
+                                    <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskDock" Click="robotTaskDock_Click">Dock</Button>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskMoveTowardsLight" Click="robotTaskMoveTowardsLight_Click">Move Towards Light</Button>
-                                    <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskFollowLine" Click="robotTaskFollowLine_Click">Follow Line</Button>
-
-
-
-                                    <!--
+                                    <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskFollowLine" Click="robotTaskFollowLine_Click">Follow Line</Button>                                   
                                     
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="5">
-                                        <Button x:Name="robotTaskRotateToHeading" Margin="0,0,5,5">Rotate to Heading</Button>
+                                        <Button x:Name="robotTaskRotateToHeading" Margin="0,0,5,5" Click="robotTaskRotateToHeading_Click">Turn to Facing</Button>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Label Content="HDG: " Height="20" Padding="0,-5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                            <TextBox x:Name="tbRotateToHeading"  Width="35" Height="20" Text="000.0"/>
+                                            <Label Content="FACE: " Height="20" Padding="0,-5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
+                                            <TextBox x:Name="tbRotateToHeading"  Width="35" Height="20" Text="000" TextAlignment="Center" PreviewTextInput="tbRotateToHeading_PreviewTextInput" />
                                             <StackPanel Orientation="Vertical">
-                                                <Button x:Name="btnRotateToHeadingUp" Content="˄" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
-                                                <Button x:Name="btnRotateToHeadingDown" Content="˅" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
+                                                <Button x:Name="btnRotateToHeadingUp" Content="˄" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" Click="btnRotateToHeadingUp_Click" />
+                                                <Button x:Name="btnRotateToHeadingDown" Content="˅" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" Click="btnRotateToHeadingDown_Click" />
                                             </StackPanel>
                                         </StackPanel>
                                     </StackPanel>
@@ -307,54 +301,59 @@
                                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                                 <Label Content="X: " Height="20" Padding="0,-5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                                <TextBox x:Name="tbMoveToPositionX"  Width="35" Height="20" Text="000.0"/>
+                                                <TextBox x:Name="tbMoveToPositionX"  Width="35" Height="20" Text="0" TextAlignment="Center"/>
                                                 <StackPanel Orientation="Vertical">
                                                     <Button x:Name="btnMoveToPositionXUp" Content="˄" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
                                                     <Button x:Name="btnMoveToPositionXDown" Content="˅" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
                                                 </StackPanel>
+                                                <Label Content="mm" Height="20" Padding="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal">
                                                 <Label Content="Y: " Height="20" Padding="0,-5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                                <TextBox x:Name="tbMoveToPositionY"  Width="35" Height="20" Text="000.0"/>
+                                                <TextBox x:Name="tbMoveToPositionY"  Width="35" Height="20" Text="0" TextAlignment="Center"/>
                                                 <StackPanel Orientation="Vertical">
                                                     <Button x:Name="btnMoveToPositionYUp" Content="˄" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
                                                     <Button x:Name="btnMoveToPositionYDown" Content="˅" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
                                                 </StackPanel>
+                                                <Label Content="mm" Height="20" Padding="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
                                             </StackPanel>
                                         </StackPanel>
                                     </StackPanel>
 
                                     <StackPanel Orientation="Vertical">
-                                        <Button Margin="5" Height="20" x:Name="robotTaskMoveToPositionAtHeading">Move to Position At Heading</Button>
+                                        <Button Margin="5" Height="20" x:Name="robotTaskMoveToPositionAtHeading">Move to Position With Facing</Button>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5">
-                                            <Label Content="HDG: " Height="20" Padding="0,-5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                            <TextBox x:Name="tbMoveToPositionAtHeadingHDG"  Width="35" Height="20" Text="000.0"/>
+                                            <Label Content="FACE: " Height="20" Padding="0,-5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
+                                            <TextBox x:Name="tbMoveToPositionAtHeadingHDG"  Width="35" Height="20" Text="000" TextAlignment="Center"/>
                                             <StackPanel Orientation="Vertical">
                                                 <Button x:Name="btnMoveToPositionAtHeadingHDGUp" Content="˄" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
                                                 <Button x:Name="btnHDGDown" Content="˅" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
                                             </StackPanel>
+                                            
                                         </StackPanel>
                                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                                 <Label Content="X: " Height="20" Padding="0,-5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                                <TextBox x:Name="tbMoveToPositionAtHeadingX"  Width="35" Height="20" Text="000.0"/>
+                                                <TextBox x:Name="tbMoveToPositionAtHeadingX"  Width="35" Height="20" Text="0" TextAlignment="Center"/>
                                                 <StackPanel Orientation="Vertical">
                                                     <Button x:Name="btnMoveToPositionAtHeadingXUp" Content="˄" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
                                                     <Button x:Name="btnMoveToPositionAtHeadingXDown" Content="˅" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
                                                 </StackPanel>
+                                                <Label Content="mm" Height="20" Padding="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal">
                                                 <Label Content="Y: " Height="20" Padding="0,-5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                                <TextBox x:Name="tbMoveToPositionAtHeadingY"  Width="35" Height="20" Text="000.0"/>
+                                                <TextBox x:Name="tbMoveToPositionAtHeadingY"  Width="35" Height="20" Text="0" TextAlignment="Center"/>
                                                 <StackPanel Orientation="Vertical">
                                                     <Button x:Name="btnMoveToPositionAtHeadingYUp" Content="˄" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
                                                     <Button x:Name="btnMoveToPositionAtHeadingYDown" Content="˅" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
                                                 </StackPanel>
+                                                <Label Content="mm" Height="20" Padding="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
                                             </StackPanel>
                                         </StackPanel>
                                     </StackPanel>
 
-                                    -->
+                                    
                                 </StackPanel>
                             </Border>
 
