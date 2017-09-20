@@ -101,9 +101,8 @@ namespace SwarmRoboticsGUI
             }
         }
 
-        // TEMP: Counter to get the arena every 30 frames
+        
         private int counter { get; set; }
-
 
         private void DrawOverlayFrame(object sender, EventArgs e)
         {
@@ -114,17 +113,20 @@ namespace SwarmRoboticsGUI
                 case SourceType.NONE:
                     break;
                 case SourceType.CAMERA:
-                    counter++;
-
                     // Make sure there is a frame
                     if (Frame != null)
                     {
+                        // TEMP: Counter to get the arena every 30 frames
+                        counter++;
                         if (counter > 29)
                         {
                             ImageProcessing.GetArena(Frame, RobotArena);
 
                             counter = 0;
                         }
+                        //RobotArena.Origin = new System.Drawing.Point(0, 0);
+                        //RobotArena.ScaleFactor = 1;
+
                         // Apply image processing to find the robots
                         ImageProcessing.GetRobots(Frame, RobotList, RobotArena);
                     }                   

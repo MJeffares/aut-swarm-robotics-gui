@@ -14,22 +14,9 @@ namespace SwarmRoboticsGUI.Settings
 
     public class SettingsGroup : Item, INotifyPropertyChanged
     {
-        private ObservableCollection<Item> _Children { get; set; }
-        public ObservableCollection<Item> Children
-        {
-            get { return _Children; }
-            set
-            {
-                if (_Children != value)
-                {
-                    _Children = value;
-                    NotifyPropertyChanged("Children");
-                }
-            }
-        }
         public SettingsGroup(string Name) : base(Name)
         {
-            Children = new ObservableCollection<Item>();
+            Children = new List<Item>();
         }
     }
 

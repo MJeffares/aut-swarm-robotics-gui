@@ -12,7 +12,7 @@ using System.Reflection;
 
 namespace SwarmRoboticsGUI
 {
-    public class Item
+    public class Item: INotifyPropertyChanged
     {
         private string _Name { get; set; }
         public string Name
@@ -36,7 +36,7 @@ namespace SwarmRoboticsGUI
                 if (_Text != value)
                 {
                     _Text = value;
-                    NotifyPropertyChanged("Value");
+                    NotifyPropertyChanged("Text");
                 }
             }
         }
@@ -73,11 +73,11 @@ namespace SwarmRoboticsGUI
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
-                var test = this.GetType().GetProperty(PropertyName).GetValue(this, null);
-           
-                var child = Children.Where(f => f.Name == PropertyName).SingleOrDefault();
-                if (child != null)
-                    Children.ElementAt(Children.IndexOf(child)).Text = test.ToString();
+                var Value = GetType().GetProperty(PropertyName).GetValue(this, null);
+                var Child = Children.Where(f => f.Name == PropertyName).SingleOrDefault();
+
+                if (Child != null)
+                    Children.ElementAt(Children.IndexOf(Child)).Text = Value.ToString();
             }
         }
     }
@@ -200,7 +200,6 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-
         private Point _PixelLocation { get; set; }
         public Point PixelLocation
         {
@@ -214,7 +213,6 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-
         private System.Windows.Point _Location { get; set; }
         public System.Windows.Point Location
         {
@@ -228,9 +226,7 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-
         public Point PreviousLocation { get; set; }
-
         public double _FacingMarker { get; set; }
         public double FacingMarker
         {
@@ -244,9 +240,7 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-
-        public Point[] Contour { get; set; }
-        
+        public Point[] Contour { get; set; }       
         private bool _IsTracked { get; set; }
         public bool IsTracked
         {
@@ -257,6 +251,19 @@ namespace SwarmRoboticsGUI
                 {
                     _IsTracked = value;
                     NotifyPropertyChanged("IsTracked");
+                }
+            }
+        }
+        private bool _IsVisible { get; set; }
+        public bool IsVisible
+        {
+            get { return _IsVisible; }
+            set
+            {
+                if (_IsVisible != value)
+                {
+                    _IsVisible = value;
+                    NotifyPropertyChanged("IsVisible");
                 }
             }
         }
@@ -313,14 +320,14 @@ namespace SwarmRoboticsGUI
             Height = (int)(Math.Sqrt(3) * Radius);
 
             // TEMP: Set position off the arena intially
-            Location = new System.Windows.Point(-100, -100);
+            Location = new System.Windows.Point(0, 0);
             
-            // TEMP: Testing layout
-            Children.Add(new Item("ID", ID.ToString()));
-            Children.Add(new Item("Battery", Battery.ToString()));
-            Children.Add(new Item("Task", "Task"));
-            Children.Add(new Item("Location", Location.X.ToString() + ", " + Location.Y.ToString()));
-            Children.Add(new Item("Facing", FacingDeg.ToString()));
+            // Create property labels
+            Children.Add(new Item("ID"));
+            Children.Add(new Item("Battery"));
+            Children.Add(new Item("Task"));
+            Children.Add(new Item("Location"));
+            Children.Add(new Item("FacingDeg"));
         }
         
     }

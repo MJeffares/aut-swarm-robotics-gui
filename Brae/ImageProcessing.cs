@@ -173,18 +173,17 @@ namespace SwarmRoboticsGUI
                 // Use the arena's size and location in frame to scale robots location to real world
                 if (Arena.ScaleFactor != 0 && !Arena.Origin.IsEmpty)
                 {
-                    //RobotList[index].Width = (int)(GetRobotWidth(Hexagon) * Arena.ScaleFactor * displayFactor);
+                    // BRAE: Calculate robot width dynamically
+                    // Get the robot width using the arena scale factor
+                    //RobotList[index].Width += (int)(GetRobotWidth(Hexagon) * Arena.ScaleFactor);
+                    // Take the average of the new and previous width value
                     //RobotList[index].Width /= 2;
+                    // Calulate height using sqrt(3)*radius
                     //RobotList[index].Height = (int)(RobotList[index].Width / 2 * Math.Sqrt(3));
 
                     // Store the robots real-world location
                     RobotList[index].Location = new System.Windows.Point((COM.X - Arena.Origin.X) * Arena.ScaleFactor,
                         (COM.Y - Arena.Origin.Y) * Arena.ScaleFactor);
-                }
-                else
-                {
-                    //RobotList[index].Location = RobotList[index].PixelLocation;
-                    //RobotList[index].DisplayLocation = RobotList[index].PixelLocation;
                 }
 
                 // Get the robots facing
@@ -482,7 +481,7 @@ namespace SwarmRoboticsGUI
             //
             CvInvoke.ExtractChannel(Out, SOut, 1);
             CvInvoke.Threshold(SOut, SOut, SaturationRange.Start, SaturationRange.End, ThresholdType.Binary);
-            CvInvoke.BitwiseAnd(SOut, Out, SOut);
+            CvInvoke.BitwiseAnd(SOut, HOut, SOut);
             //
             CvInvoke.ExtractChannel(Out, Out, 2);
             CvInvoke.Threshold(Out, Out, ValueRange.Start, ValueRange.End, ThresholdType.Binary);

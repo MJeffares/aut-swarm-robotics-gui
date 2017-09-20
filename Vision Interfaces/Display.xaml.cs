@@ -79,8 +79,12 @@ namespace SwarmRoboticsGUI
                 {
                     int index = Items.IndexOf(Robot);
                     foreach (RobotItem R in Items)
+                    {
                         R.IsSelected = false;
+                        R.IsExpanded = false;
+                    }
                     Items[index].IsSelected = true;
+                    Items[index].IsExpanded = true;
                 }
             }
         }
