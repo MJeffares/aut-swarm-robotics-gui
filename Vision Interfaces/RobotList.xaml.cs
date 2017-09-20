@@ -20,7 +20,7 @@ namespace SwarmRoboticsGUI
 
         public static readonly DependencyProperty GroupsProperty =
             DependencyProperty.Register("Groups",
-            typeof(ObservableCollection<RobotGroup>),
+            typeof(List<RobotGroup>),
             typeof(RobotList),
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
@@ -30,9 +30,9 @@ namespace SwarmRoboticsGUI
             set { SetValue(ItemsProperty, value); }
         }
 
-        public ObservableCollection<RobotGroup> Groups
+        public List<RobotGroup> Groups
         {
-            get { return (ObservableCollection<RobotGroup>)GetValue(GroupsProperty); }
+            get { return (List<RobotGroup>)GetValue(GroupsProperty); }
             set { SetValue(GroupsProperty, value); }
         }
         private SynchronizationContext uiContext { get; set; }
@@ -42,7 +42,13 @@ namespace SwarmRoboticsGUI
         {
             InitializeComponent();
             //RobotTree.ItemsSource = Groups;
-            Groups = new ObservableCollection<RobotGroup>();
+            Groups = new List<RobotGroup>();
+
+            Groups.Add(new RobotGroup("Roaming"));
+            Groups.Add(new RobotGroup("Formation"));
+            Groups.Add(new RobotGroup("Docked"));
+            Groups.Add(new RobotGroup("Graveyard"));
+
             // Stores the UI context to be used to marshal 
             // code from other threads to the UI thread.
             uiContext = SynchronizationContext.Current;
@@ -72,67 +78,22 @@ namespace SwarmRoboticsGUI
         {
             if (Items != null)
             {
-                foreach (RobotItem R in Items)
+                foreach (RobotItem Robot in Items)
                 {
+                    // Find the group the robot is currently in and remove the robot from this list
+                    var Gprev = Groups.Where(g => g.Children.Where(r => r.Name == Robot.Name).Any()).FirstOrDefault();
+                    if (Gprev != null)
+                    {
+                        var Rprev = Gprev.Children.Where(r => r.Name == Robot.Name).FirstOrDefault();
+                        if (Rprev != null)
+                            Groups.ElementAt(Groups.IndexOf(Gprev)).Children.Remove(Rprev);
+                    }
                     // Find the group the robot is assigned to.
-                    var G = Groups.Where(f => f.Name == R.Group).FirstOrDefault();
-                    // Find the group the robot is currently in
-                    var Gprev = Groups.Where(f => f.Children.Where(g => g.Name == R.Name).Any()).FirstOrDefault();
-                    // If the group exists
+                    var G = Groups.Where(g => g.Name == Robot.Group).SingleOrDefault();
                     if (G != null)
-                    {
-                        // Get the group index inside the group collection
-                        int GroupIndex = Groups.IndexOf(G);
-
-                        // Find the robot inside the group
-                        var Robot = G.Children.Where(f => f.ID == R.ID).FirstOrDefault();
-                        // Get the robot index inside the group
-                        int RobotIndex = G.Children.IndexOf(Robot);
-                        // Robot was found in the group
-                        if (RobotIndex != -1)
-                        {
-                            // Replace the robot
-                            Groups[GroupIndex].Children.RemoveAt(RobotIndex);
-                            Groups[GroupIndex].Children.Insert(RobotIndex, R);
-                        }
-                        else
-                        {
-                            // Add the robot
-                            Groups[GroupIndex].Children.Add(R);
-                        }
-
-                        // The assigned group is different to the group the robot was in
-                        if (G != Gprev)
-                        {
-                            // Remove the robot from the previous group
-                            if (Gprev != null)
-                            {
-                                // Find previous group index
-                                GroupIndex = Groups.IndexOf(Gprev);
-                                // Find the robot inside the group
-                                Robot = Gprev.Children.Where(f => f.ID == R.ID).FirstOrDefault();
-                                // Get the robot index inside the group
-                                RobotIndex = Gprev.Children.IndexOf(Robot);
-                                // Replace the robot
-                                Groups[GroupIndex].Children.RemoveAt(RobotIndex);
-                                // Group is empty
-                                if (Groups[GroupIndex].Children.Count == 0)
-                                {
-                                    // Remove the group
-                                    Groups.RemoveAt(GroupIndex);
-                                }
-                            }
-                        }
-                    }
-                    // The group doesn't exist
-                    else
-                    {
-                        // Create a new group
-                        var NewGroup = new RobotGroup(R.Group.ToString());
-                        NewGroup.Children.Add(R);
-                        Groups.Add(NewGroup);
-                    }
+                        Groups.ElementAt(Groups.IndexOf(G)).Children.Add(Robot);
                 }
+                RobotTree.ItemsSource = Groups;
             }          
         }
 

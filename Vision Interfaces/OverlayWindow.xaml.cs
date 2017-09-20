@@ -66,7 +66,7 @@ namespace SwarmRoboticsGUI
             mainWindow.camera1.Process += new EventHandler(DrawOverlayFrame);
 
             //Creates a local copy of the robotlist only containing the robots themselves
-            RobotList =  mainWindow.ItemList.Where(x => x is RobotItem).Cast<RobotItem>().ToList<RobotItem>();
+            RobotList =  mainWindow.ItemList.Where(R => R is RobotItem).Cast<RobotItem>().ToList<RobotItem>();
         }
 
         #region Public Methods

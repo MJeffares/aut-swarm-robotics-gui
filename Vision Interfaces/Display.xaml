@@ -63,6 +63,7 @@
                                 <Polygon.LayoutTransform>
                                     <TransformGroup>
                                         <RotateTransform Angle="{Binding FacingDeg}"/>
+                                        <TranslateTransform X="-44" Y="-44"/>
                                     </TransformGroup>
                                 </Polygon.LayoutTransform>
                             </Polygon>

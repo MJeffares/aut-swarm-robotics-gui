@@ -97,18 +97,24 @@ namespace SwarmRoboticsGUI
                 case FilterType.COLOUR:
                     using (var Out = new Mat())
                     using (var HOut = new Mat())
+                    using (var SOut = new Mat())
                     using (ScalarArray lower = new ScalarArray(HueLower))
                     using (ScalarArray upper = new ScalarArray(HueUpper))
                     {
                         //
                         CvInvoke.CvtColor(Input, Out, ColorConversion.Bgr2Hsv);
+                        
                         //
                         CvInvoke.ExtractChannel(Out, HOut, 0);
                         CvInvoke.InRange(HOut, lower, upper, HOut);
                         //
-                        CvInvoke.ExtractChannel(Out, Out, 1);
-                        CvInvoke.Threshold(Out, Out, 25, 255, ThresholdType.Binary);
-                        CvInvoke.BitwiseAnd(HOut, Out, Output);
+                        CvInvoke.ExtractChannel(Out, SOut, 1);
+                        CvInvoke.Threshold(SOut, SOut, 40, 230, ThresholdType.Binary);
+                        CvInvoke.BitwiseAnd(SOut, HOut, SOut);
+                        //
+                        CvInvoke.ExtractChannel(Out, Out, 2);
+                        CvInvoke.Threshold(Out, Out, 60, 195, ThresholdType.Binary);
+                        CvInvoke.BitwiseAnd(SOut, Out, Output);
                     }
                     break;
                 default:
@@ -117,13 +123,9 @@ namespace SwarmRoboticsGUI
         }
         public static void GetRobots(IInputArray Frame, List<RobotItem> RobotList, Arena Arena)
         {
-            const double REAL_DISTANCE = 1664.882954;
+            //const double REAL_DISTANCE = 1664.882954;
             //const double REAL_DISTANCE = 840;
             //const double REAL_DISTANCE = 297;
-
-
-            // TEMP: real-world values to display
-            double displayFactor = 1080 / REAL_DISTANCE;
 
             var Hexagons = new VectorOfVectorOfPoint();
             using (var Contours = new VectorOfVectorOfPoint())
@@ -178,9 +180,6 @@ namespace SwarmRoboticsGUI
                     // Store the robots real-world location
                     RobotList[index].Location = new System.Windows.Point((COM.X - Arena.Origin.X) * Arena.ScaleFactor,
                         (COM.Y - Arena.Origin.Y) * Arena.ScaleFactor);
-                    // Store the robots display location
-                    RobotList[index].DisplayLocation = new System.Windows.Point(RobotList[index].Location.X * displayFactor,
-                        RobotList[index].Location.Y * displayFactor);
                 }
                 else
                 {
@@ -403,28 +402,40 @@ namespace SwarmRoboticsGUI
             switch (TargetColour)
             {
                 case KnownColor.Orange:
-                    HueRange.Start = 0;
-                    HueRange.End = 10;
+                    //HueRange.Start = 5;
+                    //HueRange.End = 10;
+                    HueRange.Start = 8;
+                    HueRange.End = 19;
                     break;
                 case KnownColor.Yellow:
-                    HueRange.Start = 20;
-                    HueRange.End = 30;
+                    //HueRange.Start = 20;
+                    //HueRange.End = 30;
+                    HueRange.Start = 28;
+                    HueRange.End = 32;
                     break;
                 case KnownColor.Green:
-                    HueRange.Start = 30;
-                    HueRange.End = 100;
+                    //HueRange.Start = 30;
+                    //HueRange.End = 100;
+                    HueRange.Start = 29;
+                    HueRange.End = 62;
                     break;
                 case KnownColor.LightBlue:
-                    HueRange.Start = 100;
-                    HueRange.End = 110;
+                    //HueRange.Start = 100;
+                    //HueRange.End = 110;
+                    HueRange.Start = 98;
+                    HueRange.End = 109;
                     break;
                 case KnownColor.DarkBlue:
-                    HueRange.Start = 110;
-                    HueRange.End = 130;
+                    //HueRange.Start = 110;
+                    //HueRange.End = 130;
+                    HueRange.Start = 109;
+                    HueRange.End = 125;
                     break;
                 case KnownColor.Red:
-                    HueRange.Start = 150;
-                    HueRange.End = 190;
+                    //HueRange.Start = 150;
+                    //HueRange.End = 190;
+                    HueRange.Start = 160;
+                    HueRange.End = 180;
                     break;
                 default:
                     HueRange.Start = 0;
@@ -438,13 +449,14 @@ namespace SwarmRoboticsGUI
         private static bool HasHueRange(IInputArray Frame, Range HueRange)
         {
             int Count = 0;
-            const int LowerS = 25;
+            Range SaturationRange = new Range(25, 230);
+            Range ValueRange = new Range(60, 195);
             int Width = Frame.GetInputArray().GetSize().Width;
             int Height = Frame.GetInputArray().GetSize().Height;
             int ColourCount = Width * Height / 20;
             var Out = new Mat();
             var HOut = new Mat();
-
+            var SOut = new Mat();
             //bool HasCuda = CudaInvoke.HasCuda;
             // BRAE: No more cuda for now
             bool HasCuda = false;
@@ -468,11 +480,14 @@ namespace SwarmRoboticsGUI
             CvInvoke.ExtractChannel(Out, HOut, 0);
             CvInvoke.InRange(HOut, lower, upper, HOut);
             //
-            CvInvoke.ExtractChannel(Out, Out, 1);
-            CvInvoke.Threshold(Out, Out, LowerS, 255, ThresholdType.Binary);
-            CvInvoke.BitwiseAnd(HOut, Out, HOut);
+            CvInvoke.ExtractChannel(Out, SOut, 1);
+            CvInvoke.Threshold(SOut, SOut, SaturationRange.Start, SaturationRange.End, ThresholdType.Binary);
+            CvInvoke.BitwiseAnd(SOut, Out, SOut);
             //
-            Count = CvInvoke.CountNonZero(HOut);
+            CvInvoke.ExtractChannel(Out, Out, 2);
+            CvInvoke.Threshold(Out, Out, ValueRange.Start, ValueRange.End, ThresholdType.Binary);
+            CvInvoke.BitwiseAnd(SOut, Out, Out);
+            Count = CvInvoke.CountNonZero(Out);
 
             lower.Dispose();
             upper.Dispose();

@@ -247,6 +247,12 @@
             </Style.Triggers>
         </Style>
 
+        <CollectionViewSource x:Key="GroupedItems" Source="{Binding Items}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="Group"/>
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
+
     </UserControl.Resources>
 
     <Grid Background="{StaticResource ListBrush}">
@@ -276,13 +282,13 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <TextBlock FontSize="10" Foreground="White" Text="{Binding Name}"/>
-                        <TextBlock Grid.Column="1" FontSize="10" Foreground="White" Text="{Binding Value}"/>
+                        <TextBlock Grid.Column="1" FontSize="10" Foreground="White" Text="{Binding Text}"/>
                     </Grid>
                 </DataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type local:RobotItem}" ItemsSource="{Binding Children}" ItemContainerStyle="{StaticResource ItemStyle}">
+                <HierarchicalDataTemplate DataType="{x:Type local:RobotItem}" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}" ItemContainerStyle="{StaticResource ItemStyle}">
                     <TextBlock FontSize="20" Foreground="White" Text="{Binding Name}"/>
                 </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type local:RobotGroup}" ItemsSource="{Binding Children}" ItemContainerStyle="{StaticResource RobotStyle}">
+                <HierarchicalDataTemplate DataType="{x:Type local:RobotGroup}" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}" ItemContainerStyle="{StaticResource RobotStyle}">
                     <TextBlock FontSize="20" Foreground="White" Text="{Binding Name}"/>
                 </HierarchicalDataTemplate>
             </TreeView.Resources>

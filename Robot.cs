@@ -8,6 +8,7 @@ using System.Drawing;
 using Emgu.CV;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace SwarmRoboticsGUI
 {
@@ -43,11 +44,27 @@ namespace SwarmRoboticsGUI
         public Item(string Name)
         {
             this.Name = Name;
+            Children = new List<Item>();
         }
         public Item(string Name, string Text)
         {
             this.Name = Name;
             this.Text = Text;
+            Children = new List<Item>();
+        }
+
+        private List<Item> _Children { get; set; }
+        public List<Item> Children
+        {
+            get { return _Children; }
+            set
+            {
+                if (_Children != value)
+                {
+                    _Children = value;
+                    NotifyPropertyChanged("Children");
+                }
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -56,6 +73,11 @@ namespace SwarmRoboticsGUI
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
+                var test = this.GetType().GetProperty(PropertyName).GetValue(this, null);
+           
+                var child = Children.Where(f => f.Name == PropertyName).SingleOrDefault();
+                if (child != null)
+                    Children.ElementAt(Children.IndexOf(child)).Text = test.ToString();
             }
         }
     }
@@ -207,21 +229,6 @@ namespace SwarmRoboticsGUI
             }
         }
 
-        private System.Windows.Point _DisplayLocation { get; set; }
-        public System.Windows.Point DisplayLocation
-        {
-            get { return _DisplayLocation; }
-            set
-            {
-                if (_DisplayLocation != value)
-                {
-                    _DisplayLocation = value;
-                    NotifyPropertyChanged("DisplayLocation");
-                }
-            }
-        }
-
-
         public Point PreviousLocation { get; set; }
 
         public double _FacingMarker { get; set; }
@@ -293,61 +300,36 @@ namespace SwarmRoboticsGUI
 			}
 		}
 		
-		private ObservableCollection<Item> _Children { get; set; }
-        public ObservableCollection<Item> Children
-        {
-            get { return _Children; }
-            set
-            {
-                if (_Children != value)
-                {
-                    _Children = value;
-                    NotifyPropertyChanged("Children");
-                }
-            }
-        }
-
 		public RobotItem(string Name, UInt64 MAC_Address, string Colour, int ID) : base(Name, MAC_Address, Colour)
         {
 			this.Name = Name;
             this.ID = ID;
 			this.Colour = Colour;
 			this.Address64 = MAC_Address;
-            Group = "Unassigned";
+            Group = "Roaming";
             // TEMP: Size of the robots is fixed       
             Radius = 30;
             Width = 2 * Radius;
             Height = (int)(Math.Sqrt(3) * Radius);
-            Children = new ObservableCollection<Item>();
 
+            // TEMP: Set position off the arena intially
+            Location = new System.Windows.Point(-100, -100);
+            
             // TEMP: Testing layout
-            Children.Add(new Item("ID", ""));
-            Children.Add(new Item("Battery", ""));
-            Children.Add(new Item("Task", ""));
-            Children.Add(new Item("Location", ""));
-            Children.Add(new Item("Heading", ""));
+            Children.Add(new Item("ID", ID.ToString()));
+            Children.Add(new Item("Battery", Battery.ToString()));
+            Children.Add(new Item("Task", "Task"));
+            Children.Add(new Item("Location", Location.X.ToString() + ", " + Location.Y.ToString()));
+            Children.Add(new Item("Facing", FacingDeg.ToString()));
         }
+        
     }
 
     public class RobotGroup : Item, INotifyPropertyChanged
     {
-        private ObservableCollection<RobotItem> _Children { get; set; }
-        public ObservableCollection<RobotItem> Children
-        {
-            get { return _Children; }
-            set
-            {
-                if (_Children != value)
-                {
-                    _Children = value;
-                    NotifyPropertyChanged("Children");
-                }
-            }
-        }
-
         public RobotGroup(string Name) : base(Name)
         {
-            Children = new ObservableCollection<RobotItem>();
+
         }
     }
 
