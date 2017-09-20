@@ -115,7 +115,7 @@ namespace SwarmRoboticsGUI
 			byte[] data;
 			data = new byte[2];
 			data[0] = SYSTEM_TEST_MESSAGE.COMMUNICATION;
-			data[1] = 0x01;
+			data[1] = REQUEST.SINGLE_SAMPLE;
 
 			xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
 

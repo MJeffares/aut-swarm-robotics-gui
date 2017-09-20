@@ -321,10 +321,12 @@ namespace SwarmRoboticsGUI
 	{
 		// variables
 		private MainWindow window = null;
+
 		public static class MESSAGE_TYPES
 		{
 			public const byte COMMUNICATION_TEST = 0x00;
 			public const byte BATTERY_VOLTAGE = 0x01;
+
 
 			public const byte SYSTEM_TEST_COMMUNICATION = 0xE1;
 			public const byte SYSTEM_TEST_PROXIMITY_SENSORS = 0xE4;
@@ -337,6 +339,11 @@ namespace SwarmRoboticsGUI
 			public const byte SYSTEM_TEST_TWI_MUX = 0xEB;
 			public const byte SYSTEM_TEST_TWI_EXTERNAL = 0xEC;
 			public const byte SYSTEM_TEST_CAMERA = 0xED;
+
+            public const byte TOWER_LIGHT_SENSORS = 0xF0;
+            public const byte TOWER_LEDS = 0xF1;
+            public const byte TOWER_DOCK_ENABLE = 0xF2;
+
 		}
 
 		// constructor
@@ -406,6 +413,24 @@ namespace SwarmRoboticsGUI
                     
                 }
             }
+            else if(message.messageID > 0xEF && message.messageID <= 0xFF)
+            {
+                switch(message.messageID)
+                {
+                    case MESSAGE_TYPES.TOWER_LIGHT_SENSORS:
+                            DisplayTowerLightData(message as TowerDockingLightSensorData);
+                            break;
+
+                    case MESSAGE_TYPES.TOWER_LEDS:
+
+                        break;
+
+                    case MESSAGE_TYPES.TOWER_DOCK_ENABLE:
+
+                        break;
+
+                }
+            }
 
             /*
 				switch(message.messageID)
@@ -438,6 +463,40 @@ namespace SwarmRoboticsGUI
             */
 
 		}
+
+
+        public void DisplayTowerLightData(TowerDockingLightSensorData message)
+        {
+            switch (message.sensor)
+            {
+                case TowerDockingLightSensorData.Sensors.A:
+                    window.UpdateTextBox(window.tbDockLightA, message.MessageDataDisplay);
+                    break;
+
+                case TowerDockingLightSensorData.Sensors.B:
+                    window.UpdateTextBox(window.tbDockLightB, message.MessageDataDisplay);
+                    break;
+
+                case TowerDockingLightSensorData.Sensors.C:
+                    window.UpdateTextBox(window.tbDockLightC, message.MessageDataDisplay);
+                    break;
+
+                case TowerDockingLightSensorData.Sensors.D:
+                    window.UpdateTextBox(window.tbDockLightD, message.MessageDataDisplay);
+                    break;
+
+                case TowerDockingLightSensorData.Sensors.E:
+                    window.UpdateTextBox(window.tbDockLightE, message.MessageDataDisplay);
+                    break;
+
+                case TowerDockingLightSensorData.Sensors.F:
+                    window.UpdateTextBox(window.tbDockLightF, message.MessageDataDisplay);
+                    break;
+            }
+        }
+
+
+
 
 		public void DisplayProximityData(ProximitySensorTestData message)
 		{
@@ -561,6 +620,10 @@ namespace SwarmRoboticsGUI
                     break;
 
                     //MANSEL: Common issue with new receive
+
+                case MESSAGE_TYPES.TOWER_LIGHT_SENSORS:
+                    swarmMessage = new TowerDockingLightSensorData(swarmMessage.rawMessage);
+                    break;
 
 				default:
 

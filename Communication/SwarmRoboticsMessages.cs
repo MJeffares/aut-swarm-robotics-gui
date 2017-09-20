@@ -310,4 +310,37 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		}
 	}
 
+    public class TowerDockingLightSensorData : SystemTestMessage
+    {
+        public static class Sensors
+        {
+            public const byte A = 0x01;
+            public const byte B = 0x02;
+            public const byte C = 0x03;
+            public const byte D = 0x04;
+            public const byte E = 0x05;
+            public const byte F = 0x06;
+        }
+
+
+        public byte sensor;
+        //public byte[] sensorData = new byte[2];
+        public byte sensorData;
+
+        public TowerDockingLightSensorData(byte[] frame)
+            : base(frame)
+        {
+            sensor = testMessage[0];
+            sensorData = testMessage[1];
+        }
+
+        public override string MessageDataDisplay
+        {
+            get
+            {
+                //MANSEL: Improve this
+                return sensorData.ToString();
+            }
+        }
+    }
 }

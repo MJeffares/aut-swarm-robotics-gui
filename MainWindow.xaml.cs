@@ -167,6 +167,7 @@ namespace SwarmRoboticsGUI
             //camera1.StartCapture();
 
             setupSystemTest();
+            TowerControlSetup();
 		}
 
         #region Public Methods
