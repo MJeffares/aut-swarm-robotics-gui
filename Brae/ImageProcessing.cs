@@ -476,7 +476,7 @@ namespace SwarmRoboticsGUI
             ScalarArray lower = new ScalarArray(HueRange.Start);
             ScalarArray upper = new ScalarArray(HueRange.End);
             //
-            CvInvoke.ExtractChannel(Out, HOut, 0);
+            CvInvoke.ExtractChannel(Frame, HOut, 0);
             CvInvoke.InRange(HOut, lower, upper, HOut);
             //
             //CvInvoke.ExtractChannel(Out, SOut, 1);
@@ -546,8 +546,8 @@ namespace SwarmRoboticsGUI
             Range SaturationRange = new Range(25, 230);
             var SOut = new Mat();
             //
-            CvInvoke.CvtColor(Masked, SOut, ColorConversion.Bgr2Hsv);
-            CvInvoke.ExtractChannel(SOut, SOut, 1);
+            CvInvoke.CvtColor(Masked, Masked, ColorConversion.Bgr2Hsv);
+            CvInvoke.ExtractChannel(Masked, SOut, 1);
             //CvInvoke.Threshold(SOut, SOut, SaturationRange.Start, SaturationRange.End, ThresholdType.Binary);
             CvInvoke.AdaptiveThreshold(SOut, SOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
             //CvInvoke.BitwiseAnd(SOut, HOut, SOut);
