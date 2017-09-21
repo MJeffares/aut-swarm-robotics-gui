@@ -302,8 +302,8 @@ namespace SwarmRoboticsGUI
                 if (BlurSize > 0 && BlurSize % 2 != 0)
                     CvInvoke.GaussianBlur(Input, Input, new Size(BlurSize, BlurSize), 0);
                 // Threshold the image to find the edges  
-                CvInvoke.Canny(Input, Input, 0, 255);
-                //CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
+                //CvInvoke.Canny(Input, Input, 0, 255);
+                CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
                 // Find only the external contours applying no shape approximations
                 CvInvoke.FindContours(Input, Contours, null, Mode, Approx);
                 // Dispose of the image arrays
@@ -449,7 +449,7 @@ namespace SwarmRoboticsGUI
         {
             int Count = 0;
             //Range SaturationRange = new Range(25, 230);
-            Range ValueRange = new Range(60, 195);
+            //Range ValueRange = new Range(60, 195);
             int Width = Frame.GetInputArray().GetSize().Width;
             int Height = Frame.GetInputArray().GetSize().Height;
             int ColourCount = Width * Height / 20;
@@ -521,15 +521,17 @@ namespace SwarmRoboticsGUI
             Image.CopyTo(Masked, Mask);
 
             Range SaturationRange = new Range(25, 230);
+            Range ValueRange = new Range(60, 195);
             var SOut = new Mat();
             var VOut = new Mat();
             //
             CvInvoke.CvtColor(Masked, Masked, ColorConversion.Bgr2Hsv);
             CvInvoke.ExtractChannel(Masked, SOut, 1);
             CvInvoke.ExtractChannel(Masked, VOut, 2);
-            //CvInvoke.Threshold(SOut, SOut, SaturationRange.Start, SaturationRange.End, ThresholdType.Binary);
-            CvInvoke.AdaptiveThreshold(SOut, SOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
-            CvInvoke.AdaptiveThreshold(VOut, VOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
+            CvInvoke.Threshold(SOut, SOut, SaturationRange.Start, SaturationRange.End, ThresholdType.Binary);
+            CvInvoke.Threshold(VOut, VOut, ValueRange.Start, ValueRange.End, ThresholdType.Binary);
+            //CvInvoke.AdaptiveThreshold(SOut, SOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
+            //CvInvoke.AdaptiveThreshold(VOut, VOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
 
             CvInvoke.BitwiseAnd(SOut, VOut, SOut);
             
