@@ -154,6 +154,12 @@ namespace SwarmRoboticsGUI
             }
             int RobotCount = 0;
 
+            CvInvoke.CvtColor(Input, Input, ColorConversion.Bgr2Yuv);
+            VectorOfUMat Channels = new VectorOfUMat();
+            CvInvoke.Split(Input, Channels);
+            CvInvoke.EqualizeHist(Channels[0], Channels[0]);
+            CvInvoke.Merge(Channels, Input);
+
             // Loop through the hexagons in the frame
             for (int i = 0; i < Hexagons.Size; i++)
             {
