@@ -159,7 +159,7 @@ namespace SwarmRoboticsGUI
             {
                 VectorOfPoint Hexagon = Hexagons[i];
                 var RobotFrame = new UMat();
-                var RobotFrameOffset = GetRobotFrame(Frame, Hexagon, RobotFrame);
+                var RobotFrameOffset = GetRobotFrame(Input, Hexagon, RobotFrame);
 
                 // Check for the colour ID, Returns (-1) if no robot ID
                 int RobotID = IdentifyRobot(RobotFrame, Hexagon);
@@ -268,11 +268,13 @@ namespace SwarmRoboticsGUI
             // If the arena was identified and a distance factor was calculated, find the origin point
             if (factor != 0)
             {
-                Origin = FindOrigin(Frame, ArenaContour);
+                Origin = FindOrigin(Frame, ArenaContour);                
                 if (!Origin.IsEmpty)
                 {
+                    var Bounds = CvInvoke.BoundingRectangle(ArenaContour);
+                    
                     Arena.ScaleFactor = factor;
-                    Arena.Origin = Origin;
+                    Arena.Origin = new Point(Origin.X - Bounds.X, Origin.Y - Bounds.Y);
                     Arena.Contour = ArenaContour.ToArray();
                 }
             }
