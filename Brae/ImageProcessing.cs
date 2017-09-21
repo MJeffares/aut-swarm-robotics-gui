@@ -133,7 +133,7 @@ namespace SwarmRoboticsGUI
                 // Find every contour in the image
                 GetCountours(Frame, Contours, 1, RetrType.List, ChainApproxMethod.ChainApproxSimple);
                 // Filter out small and large contours
-                FilterContourArea(Contours, Contours, 1000, 5000);
+                FilterContourArea(Contours, Contours, 1000, 2000);
                 
                 int HexCount = GetHexagons(Contours, Hexagons);
             }
