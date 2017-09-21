@@ -135,13 +135,22 @@ namespace SwarmRoboticsGUI
             var Input = new UMat(Frame as UMat, Bounds);
 
             using (var Contours = new VectorOfVectorOfPoint())
+            using (var FilteredContours = new VectorOfVectorOfPoint())
             {
                 // Find every contour in the image
                 GetCountours(Input, Contours, 1, RetrType.List, ChainApproxMethod.ChainApproxSimple);
                 // Filter out small and large contours
-                FilterContourArea(Contours, Contours, 1000, 2000);
-                
-                int HexCount = GetHexagons(Contours, Hexagons);
+                FilterContourArea(Contours, FilteredContours, 1000, 5000);
+
+                int HexCount = GetHexagons(FilteredContours, Hexagons);
+
+                /*
+                 * //used to check sizes
+                for (int i = 0; i < Hexagons.Size; i++)
+                {
+                    var size = CvInvoke.ContourArea(Hexagons[i]);
+                }
+                 * */
             }
             int RobotCount = 0;
 

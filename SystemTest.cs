@@ -121,6 +121,7 @@ namespace SwarmRoboticsGUI
 
 			CommunicationManager.WaitForMessage tada = new CommunicationManager.WaitForMessage(0xE1, 15000, MyHandler);
 
+            EstablishingCommunicationsWindow = new ProgressWindow("Establishing Communications", "Please wait while communications are tested.");
 			EstablishingCommunicationsWindow.ShowDialog();
 		}
 
