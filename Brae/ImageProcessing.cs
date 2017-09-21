@@ -128,10 +128,16 @@ namespace SwarmRoboticsGUI
             //const double REAL_DISTANCE = 297;
 
             var Hexagons = new VectorOfVectorOfPoint();
+
+            if (Arena.Contour == null) return;
+
+            var Bounds = CvInvoke.BoundingRectangle(new VectorOfPoint(Arena.Contour));
+            var Input = new UMat(Frame as UMat, Bounds);
+
             using (var Contours = new VectorOfVectorOfPoint())
             {
                 // Find every contour in the image
-                GetCountours(Frame, Contours, 1, RetrType.List, ChainApproxMethod.ChainApproxSimple);
+                GetCountours(Input, Contours, 1, RetrType.List, ChainApproxMethod.ChainApproxSimple);
                 // Filter out small and large contours
                 FilterContourArea(Contours, Contours, 1000, 2000);
                 
@@ -144,7 +150,7 @@ namespace SwarmRoboticsGUI
             {
                 VectorOfPoint Hexagon = Hexagons[i];
                 var RobotFrame = new UMat();
-                var RobotFrameOffset = GetRobotFrame(Frame, Hexagon, RobotFrame);
+                var RobotFrameOffset = GetRobotFrame(Input, Hexagon, RobotFrame);
 
                 // Check for the colour ID, Returns (-1) if no robot ID
                 int RobotID = IdentifyRobot(RobotFrame, Hexagon);
