@@ -150,7 +150,7 @@ namespace SwarmRoboticsGUI
             {
                 VectorOfPoint Hexagon = Hexagons[i];
                 var RobotFrame = new UMat();
-                var RobotFrameOffset = GetRobotFrame(Input, Hexagon, RobotFrame);
+                var RobotFrameOffset = GetRobotFrame(Frame, Hexagon, RobotFrame);
 
                 // Check for the colour ID, Returns (-1) if no robot ID
                 int RobotID = IdentifyRobot(RobotFrame, Hexagon);
