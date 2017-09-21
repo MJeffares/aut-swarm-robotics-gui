@@ -133,7 +133,7 @@ namespace SwarmRoboticsGUI
                 // Find every contour in the image
                 GetCountours(Frame, Contours, 1, RetrType.List, ChainApproxMethod.ChainApproxSimple);
                 // Filter out small and large contours
-                FilterContourArea(Contours, Contours, 1000, 50000);
+                FilterContourArea(Contours, Contours, 1000, 5000);
                 
                 int HexCount = GetHexagons(Contours, Hexagons);
             }
@@ -520,8 +520,8 @@ namespace SwarmRoboticsGUI
             var Masked = new UMat();
             Image.CopyTo(Masked, Mask);
 
-            Range SaturationRange = new Range(25, 230);
-            Range ValueRange = new Range(60, 195);
+            Range SaturationRange = new Range(15, 240);
+            Range ValueRange = new Range(40, 200);
             var SOut = new Mat();
             var VOut = new Mat();
             //
@@ -534,8 +534,7 @@ namespace SwarmRoboticsGUI
             //CvInvoke.AdaptiveThreshold(VOut, VOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
 
             CvInvoke.BitwiseAnd(SOut, VOut, SOut);
-            
-            //CvInvoke.BitwiseAnd(SOut, HOut, SOut);
+
             Masked.CopyTo(Image, SOut);
 
             // Look for colours on the robot
