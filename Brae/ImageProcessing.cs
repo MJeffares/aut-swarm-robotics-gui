@@ -154,6 +154,18 @@ namespace SwarmRoboticsGUI
             }
             int RobotCount = 0;
 
+            CvInvoke.Imwrite("zbefore.png", Input);
+            
+
+            CvInvoke.CvtColor(Input, Input, ColorConversion.Bgr2Yuv);
+            VectorOfUMat Channels = new VectorOfUMat();
+            CvInvoke.Split(Input, Channels);
+            CvInvoke.EqualizeHist(Channels[0], Channels[0]);
+            CvInvoke.Merge(Channels, Input);
+            CvInvoke.CvtColor(Input, Input, ColorConversion.Yuv2Bgr);
+
+            CvInvoke.Imwrite("zafter.png", Input);
+
             // Loop through the hexagons in the frame
             for (int i = 0; i < Hexagons.Size; i++)
             {
@@ -540,13 +552,18 @@ namespace SwarmRoboticsGUI
             var Masked = new UMat();
             Image.CopyTo(Masked, Mask);
 
+            //RangeF histrange = new RangeF(0, 256);
+            //var hist = new DenseHistogram(256, histrange);
+            //CvInvoke.CalcHist(Masked, 0, Mask, hist, 256, histrange, false);
+                
+            /*
             var Equalised = new UMat();
             CvInvoke.CvtColor(Masked, Equalised, ColorConversion.Bgr2Gray);
             CvInvoke.EqualizeHist(Equalised, Equalised);
             CvInvoke.CvtColor(Equalised, Equalised, ColorConversion.Gray2Bgr);
-
             CvInvoke.Imwrite("zbefore.png", Masked);
             CvInvoke.Imwrite("zafter.png", Equalised);
+             * */
 
             Range SaturationRange = new Range(15, 240);
             Range ValueRange = new Range(40, 200);
