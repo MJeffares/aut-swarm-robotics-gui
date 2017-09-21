@@ -13,14 +13,14 @@
         <!--Brushes-->
         <RadialGradientBrush x:Key="RadialBrush" Center="0.5,0.5" GradientOrigin="0.5,0.5">
             <RadialGradientBrush.GradientStops>
-                <GradientStop Color="#FF505050" Offset="0"/>
-                <GradientStop Color="#FF646464" Offset="1"/>
+                <GradientStop Color="#555" Offset="0"/>
+                <GradientStop Color="#777" Offset="1"/>
             </RadialGradientBrush.GradientStops>
         </RadialGradientBrush>
         <RadialGradientBrush x:Key="RadialBrush2" Center="0.5,0.5" GradientOrigin="0.5,0.5">
             <RadialGradientBrush.GradientStops>
-                <GradientStop Color="#FF909090" Offset="0"/>
-                <GradientStop Color="#FF646464" Offset="1"/>
+                <GradientStop Color="#999" Offset="0"/>
+                <GradientStop Color="#666" Offset="1"/>
             </RadialGradientBrush.GradientStops>
         </RadialGradientBrush>
         <LinearGradientBrush x:Key="ButtonNormalBackground" EndPoint="0,1" StartPoint="0,0">

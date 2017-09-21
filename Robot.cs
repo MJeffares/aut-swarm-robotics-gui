@@ -83,6 +83,7 @@ namespace SwarmRoboticsGUI
     }
     public class RobotItem : CommunicationItem, INotifyPropertyChanged
     {
+        #region Status Properties
         private int _Battery { get; set; }
         public int Battery
         {
@@ -135,6 +136,62 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
+        private double _Facing { get; set; }
+        public double Facing
+        {
+            get { return _Facing; }
+            set
+            {
+                if (_Facing != value)
+                {
+                    _Facing = value;
+                    NotifyPropertyChanged("Facing");
+                }
+            }
+        }
+        private System.Windows.Point _Location { get; set; }
+        public System.Windows.Point Location
+        {
+            get { return _Location; }
+            set
+            {
+                if (_Location != value)
+                {
+                    _Location = value;
+                    NotifyPropertyChanged("Location");
+                }
+            }
+        }
+        public Point PreviousLocation { get; set; }
+        private bool _IsCommunicating { get; set; }
+        public bool IsCommunicating
+        {
+            get { return _IsCommunicating; }
+            set
+            {
+                if (_IsCommunicating != value)
+                {
+                    _IsCommunicating = value;
+                    NotifyPropertyChanged("IsCommunicating");
+                }
+            }
+        }
+        private bool _IsTracked { get; set; }
+        public bool IsTracked
+        {
+            get { return _IsTracked; }
+            set
+            {
+                if (_IsTracked != value)
+                {
+                    _IsTracked = value;
+                    NotifyPropertyChanged("IsTracked");
+                }
+            }
+        }
+        #endregion
+
+        #region Dimension Properties
         private int _Radius { get; set; }
         public int Radius
         {
@@ -174,19 +231,10 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-        private double _Facing { get; set; }
-        public double Facing
-        {
-            get { return _Facing; }
-            set
-            {
-                if (_Facing != value)
-                {
-                    _Facing = value;
-                    NotifyPropertyChanged("Facing");
-                }
-            }
-        }
+        #endregion
+
+
+        #region Display Properties
         private double _FacingDeg { get; set; }
         public double FacingDeg
         {
@@ -197,6 +245,19 @@ namespace SwarmRoboticsGUI
                 {
                     _FacingDeg = value;
                     NotifyPropertyChanged("FacingDeg");
+                }
+            }
+        }
+        public double _FacingMarker { get; set; }
+        public double FacingMarker
+        {
+            get { return _FacingMarker; }
+            set
+            {
+                if (_FacingMarker != value)
+                {
+                    _FacingMarker = value;
+                    NotifyPropertyChanged("FacingMarker");
                 }
             }
         }
@@ -212,48 +273,8 @@ namespace SwarmRoboticsGUI
                     NotifyPropertyChanged("PixelLocation");
                 }
             }
-        }
-        private System.Windows.Point _Location { get; set; }
-        public System.Windows.Point Location
-        {
-            get { return _Location; }
-            set
-            {
-                if (_Location != value)
-                {
-                    _Location = value;
-                    NotifyPropertyChanged("Location");
-                }
-            }
-        }
-        public Point PreviousLocation { get; set; }
-        public double _FacingMarker { get; set; }
-        public double FacingMarker
-        {
-            get { return _FacingMarker; }
-            set
-            {
-                if (_FacingMarker != value)
-                {
-                    _FacingMarker = value;
-                    NotifyPropertyChanged("FacingMarker");
-                }
-            }
-        }
-        public Point[] Contour { get; set; }       
-        private bool _IsTracked { get; set; }
-        public bool IsTracked
-        {
-            get { return _IsTracked; }
-            set
-            {
-                if (_IsTracked != value)
-                {
-                    _IsTracked = value;
-                    NotifyPropertyChanged("IsTracked");
-                }
-            }
-        }
+        }              
+        public Point[] Contour { get; set; }              
         private bool _IsVisible { get; set; }
         public bool IsVisible
         {
@@ -293,34 +314,23 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-		private bool _IsCommunicating { get; set; }
-		public bool IsCommunicating
-		{
-			get { return _IsCommunicating; }
-			set
-			{
-				if (_IsCommunicating != value)
-				{
-					_IsCommunicating = value;
-					NotifyPropertyChanged("IsCommunicating");
-				}
-			}
-		}
-		
-		public RobotItem(string Name, UInt64 MAC_Address, string Colour, int ID) : base(Name, MAC_Address, Colour)
+        #endregion
+
+        public RobotItem(string Name, UInt64 MAC_Address, string Colour, int ID) : base(Name, MAC_Address, Colour)
         {
 			this.Name = Name;
             this.ID = ID;
 			this.Colour = Colour;
 			this.Address64 = MAC_Address;
-            Group = "Roaming";
+            Group = "Not Connected";
             // TEMP: Size of the robots is fixed       
-            Radius = 30;
+            Radius = 40;
             Width = 2 * Radius;
             Height = (int)(Math.Sqrt(3) * Radius);
 
             // TEMP: Set position off the arena intially
             Location = new System.Windows.Point(0, 0);
+            IsVisible = false;
             
             // Create property labels
             Children.Add(new Item("ID"));

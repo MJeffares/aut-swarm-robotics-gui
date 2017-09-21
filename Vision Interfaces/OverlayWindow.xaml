@@ -8,16 +8,21 @@
         xmlns:settings="clr-namespace:SwarmRoboticsGUI.Settings"
         xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
         mc:Ignorable="d"
-        Title="Overlay" Height="740" Width="1280" MinHeight="740" MinWidth="800" 
-        Closing="Overlay_Closing">
+        Title="Overlay" MinHeight="740" MinWidth="800" 
+        Closing="Overlay_Closing" Height="800" Width="1200">
     <Window.Resources>
         <!--Solid Brushes-->
-        <SolidColorBrush x:Key="ListSpacerBrush" Color="#FF202020"/>
-        <SolidColorBrush x:Key="ListItemBrush" Color="#FF404040"/>
-        <SolidColorBrush x:Key="ListRobotBrush" Color="#FF101010"/>
-        <SolidColorBrush x:Key="ListGroupBrush" Color="#FF303030"/>
-        <SolidColorBrush x:Key="WindowBrush" Color="#FF303030"/>
-        <SolidColorBrush x:Key="AccentBrush" Color="SkyBlue"/>
+        <SolidColorBrush x:Key="ListSpacerBrush" Color="#222"/>
+        <SolidColorBrush x:Key="ListItemBrush" Color="#444"/>
+        <SolidColorBrush x:Key="ListRobotBrush" Color="#111"/>
+        <SolidColorBrush x:Key="ListGroupBrush" Color="#333"/>
+        <SolidColorBrush x:Key="GridSplitterBackgroundBrush" Color="#444"/>
+        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#222"/>
+        <SolidColorBrush x:Key="WindowForegroundBrush" Color="#333"/>
+        <SolidColorBrush x:Key="WindowAccentBrush" Color="IndianRed"/>
+        
+        
+
         <!--Radial Gradient Brushes-->
         <RadialGradientBrush x:Key="RadialBrush" Center="0.4,0.4" GradientOrigin="0.4,0.4">
             <RadialGradientBrush.GradientStops>
@@ -33,73 +38,54 @@
         </RadialGradientBrush>
     </Window.Resources>
 
-    <Grid Background="{StaticResource WindowBrush}">
+    <Grid Background="{StaticResource WindowBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
             <RowDefinition/>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="200" MinWidth="100" MaxWidth="400"/>
             <ColumnDefinition/>
-            <ColumnDefinition Width="300"/>
-            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="300" MinWidth="250" MaxWidth="600"/>
+            <!--<ColumnDefinition Width="300"/>-->
         </Grid.ColumnDefinitions>
 
-        <Button Click="Button_Click">Change Group</Button>
+        <!--Placeholder Grid-->
+        <Grid Grid.Row="1" 
+              Background="{StaticResource WindowForegroundBrush}"/>
+        <local:RobotList x:Name="RobotList1" 
+                         Grid.Row="1" 
+                         Grid.Column="2" 
+                         Items="{Binding RobotList, RelativeSource={RelativeSource AncestorType=Window}}"/>
+        <local:Display x:Name="Display1" 
+                       Grid.Row="1" 
+                       Grid.Column="1" 
+                       Items="{Binding RobotList, RelativeSource={RelativeSource AncestorType=Window}}"/>
+        <!--<settings:SettingsList x:Name="Settings1" Grid.Row="1" Grid.Column="3"/>-->
 
-        <local:RobotList x:Name="RobotList1" Grid.Row="1" Grid.Column="2" Items="{Binding RobotList, RelativeSource={RelativeSource AncestorType=Window}}"/>
-        <local:Display x:Name="Display1" Grid.Row="1" Grid.Column="1" Items="{Binding RobotList, RelativeSource={RelativeSource AncestorType=Window}}"/>
-        <settings:SettingsList x:Name="Settings1" Grid.Row="1" Grid.Column="3"/>
+        <GridSplitter Grid.Column="0"
+                      Grid.Row="1"
+                      Width="5" 
+                      HorizontalAlignment="Right"
+                      Background="{StaticResource GridSplitterBackgroundBrush}"/>
+        <GridSplitter Grid.Column="2"
+                      Grid.Row="1"
+                      Width="5" 
+                      HorizontalAlignment="Left"
+                      Background="{StaticResource GridSplitterBackgroundBrush}"/>
 
-        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Height="40" VerticalAlignment="Top" Background="{StaticResource AccentBrush}"/>
-        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Height="20" VerticalAlignment="Bottom" Background="{StaticResource AccentBrush}"/>
-
-        <!--<Grid Grid.Row="2" Grid.Column="1" Height="80" Width="600" VerticalAlignment="Bottom" Margin="0,0,0,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="100"/>
-            </Grid.ColumnDefinitions>
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="20"/>
-                <RowDefinition Height="20"/>
-                <RowDefinition Height="20"/>
-                <RowDefinition Height="20"/>
-            </Grid.RowDefinitions>
-
-            <TextBox Grid.Column="0" Grid.Row="1" Height="20" Width="50" Text="{Binding Value, ElementName=slider}"/>
-            <TextBox Grid.Column="0" Grid.Row="2" Height="20" Width="50" Text="{Binding Value, ElementName=slider1}"/>
-            <TextBlock Grid.Column="1" Grid.Row="0" Height="20" Width="Auto" Text="Threshold" HorizontalAlignment="Center"/>
-            <Slider Grid.Column="1" Grid.Row="1" x:Name="slider" Value="{Binding Path=UpperC, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="255"/>
-            <Slider Grid.Column="1" Grid.Row="2" x:Name="slider1" Value="{Binding Path=LowerC, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="255"/>
-            <Button Grid.Column="1" Grid.Row="3" x:Name="btnClear" HorizontalAlignment="Left" Width="100" Content="Clear Robots" Background="White" Click="btnClear_Click"/>
-
-            <TextBox Grid.Column="2" Grid.Row="1" Height="20" Width="50" Text="{Binding Value, ElementName=slider2}"/>
-            <TextBox Grid.Column="2" Grid.Row="2" Height="20" Width="50" Text="{Binding Value, ElementName=slider3}"/>
-            <TextBox Grid.Column="2" Grid.Row="3" Height="20" Width="50" Text="{Binding Value, ElementName=slider4}"/>
-            <TextBlock Grid.Column="3" Grid.Row="0" Height="20" Width="Auto" Text="Hue, Count" HorizontalAlignment="Center"/>
-            <Slider Grid.Column="3" Grid.Row="1" x:Name="slider2" Value="{Binding Path=UpperH, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="255"/>
-            <Slider Grid.Column="3" Grid.Row="2" x:Name="slider3" Value="{Binding Path=LowerH, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="255"/>
-            <Slider Grid.Column="3" Grid.Row="3" x:Name="slider4" Value="{Binding Path=ColourC, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="10000"/>
-
-            <TextBox Name="test"  Grid.Column="4" Grid.Row="1" Height="20" Width="50" Text="{Binding Value, ElementName=slider5}"/>
-            <TextBox Grid.Column="4" Grid.Row="2" Height="20" Width="50" Text="{Binding Value, ElementName=slider6}"/>
-            <TextBlock Grid.Column="5" Grid.Row="0" Height="20" Width="Auto" Text="Saturation" HorizontalAlignment="Center"/>
-            <Slider Grid.Column="5" Grid.Row="1" x:Name="slider5" Value="{Binding Path=UpperS, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="100000"/>
-            <Slider Grid.Column="5" Grid.Row="2" x:Name="slider6" Value="{Binding Path=LowerS, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="255"/>
-
-            <TextBox Grid.Column="6" Grid.Row="1" Height="20" Width="50" Text="{Binding Value, ElementName=slider7}"/>
-            <TextBox Grid.Column="6" Grid.Row="2" Height="20" Width="50" Text="{Binding Value, ElementName=slider8}"/>
-            <TextBlock Grid.Column="7" Grid.Row="0" Height="20" Width="Auto" Text="Value" HorizontalAlignment="Center"/>
-            <Slider Grid.Column="7" Grid.Row="1" x:Name="slider7" Value="{Binding Path=UpperV, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="255"/>
-            <Slider Grid.Column="7" Grid.Row="2" x:Name="slider8" Value="{Binding Path=LowerV, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Maximum="255"/>
-        </Grid>-->
+        <Grid Grid.Row="0" 
+              Grid.Column="0" 
+              Grid.ColumnSpan="3" 
+              Height="40" 
+              VerticalAlignment="Top" 
+              Background="{StaticResource WindowAccentBrush}"/>
+        <Grid Grid.Row="2" 
+              Grid.Column="0" 
+              Grid.ColumnSpan="3" 
+              Height="20" 
+              VerticalAlignment="Bottom" 
+              Background="{StaticResource WindowAccentBrush}"/>
     </Grid>
 </Window>

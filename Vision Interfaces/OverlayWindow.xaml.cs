@@ -152,23 +152,23 @@ namespace SwarmRoboticsGUI
                 InterfaceTimer.Dispose();
             }
         }
+
+        //private void Button_Click(object sender, RoutedEventArgs e)
+        //{
+        //    // Find robot with ID of 1
+        //    var Robot = RobotList.Where(f => f.ID == 1).SingleOrDefault();
+        //    // Get the robot index inside the group
+        //    int RobotIndex = RobotList.IndexOf(Robot);
+        //    // Move to a new group
+        //    RobotList[RobotIndex].Group = "Formation 1";
+
+        //    // Find robot with ID of 2
+        //    Robot = RobotList.Where(f => f.ID == 2).SingleOrDefault();
+        //    // Get the robot index inside the group
+        //    RobotIndex = RobotList.IndexOf(Robot);
+        //    // Set the battery to 50%
+        //    RobotList[RobotIndex].Battery = 50;
+        //}
         #endregion
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            // Find robot with ID of 1
-            var Robot = RobotList.Where(f => f.ID == 1).SingleOrDefault();
-            // Get the robot index inside the group
-            int RobotIndex = RobotList.IndexOf(Robot);
-            // Move to a new group
-            RobotList[RobotIndex].Group = "Formation 1";
-
-            // Find robot with ID of 2
-            Robot = RobotList.Where(f => f.ID == 2).SingleOrDefault();
-            // Get the robot index inside the group
-            RobotIndex = RobotList.IndexOf(Robot);
-            // Set the battery to 50%
-            RobotList[RobotIndex].Battery = 50;
-        }
     }
 }
