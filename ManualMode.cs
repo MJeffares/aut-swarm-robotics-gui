@@ -31,8 +31,7 @@ namespace SwarmRoboticsGUI
             public const byte RotateClockWise = 0xD2;
             public const byte RotateCounterClockWise = 0xD3;
             public const byte MoveRandomly = 0xD4;
-            public const byte DockViaLight = 0xD5;
-            public const byte DockViaLine = 0xD6;
+            public const byte ReleaseDock = 0xD6;
             public const byte Dock = 0xD7;
             public const byte StopObstacleAvoidance = 0xD8;
             public const byte StartObstacleAvoidance = 0xD9;
@@ -173,6 +172,15 @@ namespace SwarmRoboticsGUI
             byte[] data;
             data = new byte[1];
             data[0] = ROBOT_CONTROL_MESSAGE.Dock;
+
+            xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
+        }
+
+        private void robotTaskReleaseDock_Click(object sender, RoutedEventArgs e)
+        {
+            byte[] data;
+            data = new byte[1];
+            data[0] = ROBOT_CONTROL_MESSAGE.ReleaseDock;
 
             xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
         }

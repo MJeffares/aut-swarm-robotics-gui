@@ -280,6 +280,7 @@
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskStopMoving" Click="robotTaskStopMoving_Click">Stop Moving</Button>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskMoveRandomly" Click="robotTaskMoveRandomly_Click">Move Randomly</Button>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskDock" Click="robotTaskDock_Click">Dock</Button>
+                                    <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskReleaseDock" Click="robotTaskReleaseDock_Click">ReleaseDock</Button>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskMoveTowardsLight" Click="robotTaskMoveTowardsLight_Click">Move Towards Light</Button>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskFollowLine" Click="robotTaskFollowLine_Click">Follow Line</Button>                                   
                                     

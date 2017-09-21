@@ -118,7 +118,7 @@ namespace SwarmRoboticsGUI
                     {
                         // TEMP: Counter to get the arena every 30 frames
                         counter++;
-                        if (counter > 29)
+                        if (counter > 1)
                         {
                             ImageProcessing.GetArena(Frame, RobotArena);
 

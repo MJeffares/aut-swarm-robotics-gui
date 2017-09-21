@@ -161,6 +161,9 @@ namespace SwarmRoboticsGUI
                 var RobotFrame = new UMat();
                 var RobotFrameOffset = GetRobotFrame(Input, Hexagon, RobotFrame);
 
+
+                //CvInvoke.Imwrite("frame.png", RobotFrame);
+
                 // Check for the colour ID, Returns (-1) if no robot ID
                 int RobotID = IdentifyRobot(RobotFrame, Hexagon);
                 // Goto next contour if not true
@@ -242,7 +245,7 @@ namespace SwarmRoboticsGUI
 
             //GetCountours(Frame, Contours, 0, RetrType.List, ChainApproxMethod.ChainApproxNone);
             // Filter out small and large contours
-            FilterContourArea(Contours, ProcessedContours, 1000000, 2000000);
+            FilterContourArea(Contours, ProcessedContours, 100000, 2000000);
 
             // Loop through the filtered contours in the frame
             for (int i = 0; i < ProcessedContours.Size; i++)
@@ -536,6 +539,14 @@ namespace SwarmRoboticsGUI
 
             var Masked = new UMat();
             Image.CopyTo(Masked, Mask);
+
+            var Equalised = new UMat();
+            CvInvoke.CvtColor(Masked, Equalised, ColorConversion.Bgr2Gray);
+            CvInvoke.EqualizeHist(Equalised, Equalised);
+            CvInvoke.CvtColor(Equalised, Equalised, ColorConversion.Gray2Bgr);
+
+            CvInvoke.Imwrite("zbefore.png", Masked);
+            CvInvoke.Imwrite("zafter.png", Equalised);
 
             Range SaturationRange = new Range(15, 240);
             Range ValueRange = new Range(40, 200);
