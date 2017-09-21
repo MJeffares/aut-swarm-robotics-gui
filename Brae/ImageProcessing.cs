@@ -548,7 +548,7 @@ namespace SwarmRoboticsGUI
             //
             CvInvoke.CvtColor(Masked, SOut, ColorConversion.Bgr2Hsv);
             CvInvoke.ExtractChannel(SOut, SOut, 1);
-            CvInvoke.Threshold(SOut, SOut, SaturationRange.Start, SaturationRange.End, ThresholdType.Binary);
+            //CvInvoke.Threshold(SOut, SOut, SaturationRange.Start, SaturationRange.End, ThresholdType.Binary);
             CvInvoke.AdaptiveThreshold(SOut, SOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
             //CvInvoke.BitwiseAnd(SOut, HOut, SOut);
             Masked.CopyTo(Image, SOut);
