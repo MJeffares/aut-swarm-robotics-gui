@@ -204,6 +204,7 @@ namespace SwarmRoboticsGUI
 
 			if (xbeeHandler.ValidateChecksum(data) == 1)
 			{
+                //MANSEL: index out of range error
 				primarySerialPort.rxByteBuffer.RemoveAt(0);
 				return 1;
 			}

@@ -154,17 +154,36 @@ namespace SwarmRoboticsGUI
             }
             int RobotCount = 0;
 
-            CvInvoke.Imwrite("zbefore.png", Input);
-            
-
-            CvInvoke.CvtColor(Input, Input, ColorConversion.Bgr2Yuv);
             VectorOfUMat Channels = new VectorOfUMat();
-            CvInvoke.Split(Input, Channels);
-            CvInvoke.EqualizeHist(Channels[0], Channels[0]);
-            CvInvoke.Merge(Channels, Input);
-            CvInvoke.CvtColor(Input, Input, ColorConversion.Yuv2Bgr);
 
+            CvInvoke.Imwrite("zbefore.png", Input);    
+            CvInvoke.CvtColor(Input, Input, ColorConversion.Bgr2Hsv);   
+         
+            CvInvoke.Split(Input, Channels);
+
+            //HistogramViewer.Show(Input);            
+
+            CvInvoke.EqualizeHist(Channels[2], Channels[2]);
+
+            CvInvoke.Merge(Channels, Input);
+            //HistogramViewer.Show(Input);
+
+            CvInvoke.CvtColor(Input, Input, ColorConversion.Hsv2Bgr);
             CvInvoke.Imwrite("zafter.png", Input);
+
+
+            /*
+            var hist = new Mat();
+            Input.ConvertTo(hist, DepthType.Cv8U);
+            int[] all = { 0, 1, 2 };
+            int[] size = { 8, 8, 8 };
+            float[] range = {0.0f, 256.0f, 0.0f, 256.0f, 0.0f, 256.0f };
+            */
+            
+            //CvInvoke.CalcHist(Channels, all, null, hist, size, range, false);
+            //HistogramViewer.Show(hist);
+
+            //CvInvoke.Imwrite("zafter.png", hist );
 
             // Loop through the hexagons in the frame
             for (int i = 0; i < Hexagons.Size; i++)
@@ -175,7 +194,7 @@ namespace SwarmRoboticsGUI
 
 
                 //CvInvoke.Imwrite("frame.png", RobotFrame);
-
+                
                 // Check for the colour ID, Returns (-1) if no robot ID
                 int RobotID = IdentifyRobot(RobotFrame, Hexagon);
                 // Goto next contour if not true
@@ -551,6 +570,13 @@ namespace SwarmRoboticsGUI
 
             var Masked = new UMat();
             Image.CopyTo(Masked, Mask);
+
+            CvInvoke.Imwrite("frame.png", Masked);
+
+            var img = new UMat();
+            CvInvoke.CvtColor(Masked, img, ColorConversion.Bgr2Hsv);
+
+            //HistogramViewer.Show(img);
 
             //RangeF histrange = new RangeF(0, 256);
             //var hist = new DenseHistogram(256, histrange);
