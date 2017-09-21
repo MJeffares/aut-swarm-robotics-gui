@@ -453,24 +453,9 @@ namespace SwarmRoboticsGUI
             int Width = Frame.GetInputArray().GetSize().Width;
             int Height = Frame.GetInputArray().GetSize().Height;
             int ColourCount = Width * Height / 20;
-            var Out = new Mat();
-            var HOut = new Mat();
-            //var SOut = new Mat();
-            //bool HasCuda = CudaInvoke.HasCuda;
-            // BRAE: No more cuda for now
-            bool HasCuda = false;
 
-            if (HasCuda)
-            {
-                var GpuFrame = new GpuMat(Frame);
-                CudaInvoke.CvtColor(GpuFrame, GpuFrame, ColorConversion.Bgr2Hsv);
-                GpuFrame.Download(Out);
-                GpuFrame.Dispose();
-            }
-            else
-            {
-                //CvInvoke.CvtColor(Frame, Out, ColorConversion.Bgr2Hsv);
-            }
+            var HOut = new Mat();
+
             //CvInvoke.Blur(Out, Out, new Size(1, 1), new Point(0, 0));
             //
             ScalarArray lower = new ScalarArray(HueRange.Start);
@@ -478,19 +463,11 @@ namespace SwarmRoboticsGUI
             //
             CvInvoke.ExtractChannel(Frame, HOut, 0);
             CvInvoke.InRange(HOut, lower, upper, HOut);
-            //
-            //CvInvoke.ExtractChannel(Out, SOut, 1);
-            //CvInvoke.Threshold(SOut, SOut, SaturationRange.Start, SaturationRange.End, ThresholdType.Binary);
-            //CvInvoke.BitwiseAnd(SOut, HOut, SOut);
-            //
-            CvInvoke.ExtractChannel(Out, Out, 2);
-            CvInvoke.Threshold(Out, Out, ValueRange.Start, ValueRange.End, ThresholdType.Binary);
-            CvInvoke.BitwiseAnd(HOut, Out, Out);
-            Count = CvInvoke.CountNonZero(Out);
+
+            Count = CvInvoke.CountNonZero(HOut);
 
             lower.Dispose();
             upper.Dispose();
-            Out.Dispose();
             HOut.Dispose();           
             //
             if (Count > ColourCount)
@@ -545,11 +522,17 @@ namespace SwarmRoboticsGUI
 
             Range SaturationRange = new Range(25, 230);
             var SOut = new Mat();
+            var VOut = new Mat();
             //
             CvInvoke.CvtColor(Masked, Masked, ColorConversion.Bgr2Hsv);
             CvInvoke.ExtractChannel(Masked, SOut, 1);
+            CvInvoke.ExtractChannel(Masked, VOut, 2);
             //CvInvoke.Threshold(SOut, SOut, SaturationRange.Start, SaturationRange.End, ThresholdType.Binary);
             CvInvoke.AdaptiveThreshold(SOut, SOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
+            CvInvoke.AdaptiveThreshold(VOut, VOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
+
+            CvInvoke.BitwiseAnd(SOut, VOut, SOut);
+            
             //CvInvoke.BitwiseAnd(SOut, HOut, SOut);
             Masked.CopyTo(Image, SOut);
 
