@@ -75,7 +75,7 @@ namespace SwarmRoboticsGUI
                 videoCapture.SetCaptureProperty(CapProp.FrameHeight, 1080);
                 videoCapture.SetCaptureProperty(CapProp.FrameWidth, 1920);
                 videoCapture.SetCaptureProperty(CapProp.FrameCount, 30);
-                videoCapture.SetCaptureProperty(CapProp.Exposure, -6);
+                //videoCapture.SetCaptureProperty(CapProp.Exposure, -6);
                 videoCapture.Start();
 
                 Status = StatusType.PLAYING;

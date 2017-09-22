@@ -70,7 +70,12 @@ namespace SwarmRoboticsGUI
                     Input.GetInputArray().CopyTo(Output);
                     break;
                 case FilterType.GREYSCALE:
-                    CvInvoke.CvtColor(Input, Output, ColorConversion.Bgr2Gray);
+                    using (var In = new UMat())
+                    {
+                        //CvInvoke.CvtColor(Input, Output, ColorConversion.Bgr2Gray);
+                        CvInvoke.CvtColor(Input, In, ColorConversion.Bgr2Hsv);
+                        CvInvoke.ExtractChannel(In, Output, 2);
+                    }
                     break;
                 case FilterType.CANNY_EDGES:
                     using (var Out = new UMat(Input.GetInputArray().GetSize(), Input.GetInputArray().GetDepth(), Input.GetInputArray().GetChannels()))
@@ -130,9 +135,13 @@ namespace SwarmRoboticsGUI
             var Hexagons = new VectorOfVectorOfPoint();
 
             if (Arena.Contour == null) return;
-
-            var Bounds = CvInvoke.BoundingRectangle(new VectorOfPoint(Arena.Contour));
+            
+            var Bounds = CvInvoke.BoundingRectangle(new VectorOfPoint(Arena.Contour));           
             var Input = new UMat(Frame as UMat, Bounds);
+
+            // DEBUG: Draw arena contour on frame
+            //var Input = Frame as UMat;
+            //CvInvoke.DrawContours(Input, new VectorOfVectorOfPoint(new VectorOfPoint(Arena.Contour)), -1, new MCvScalar(255, 0, 0), 3);
 
             using (var Contours = new VectorOfVectorOfPoint())
             using (var FilteredContours = new VectorOfVectorOfPoint())
@@ -154,35 +163,35 @@ namespace SwarmRoboticsGUI
             }
             int RobotCount = 0;
 
-            VectorOfUMat Channels = new VectorOfUMat();
+            //CvInvoke.Imwrite("arenaFrame.png", Input);
+            //var InputHSV = new UMat();
+            //CvInvoke.CvtColor(Input, InputHSV, ColorConversion.Bgr2Hsv);
+            //VectorOfUMat Channels = new VectorOfUMat();
+            //CvInvoke.Split(InputHSV, Channels);            
+            //CvInvoke.CLAHE(Channels[2], 40, new Size(8, 8), Channels[2]);            
+            //CvInvoke.Merge(Channels, InputHSV);
+            //CvInvoke.CvtColor(InputHSV, Input, ColorConversion.Hsv2Bgr);
+            //CvInvoke.Imwrite("clahe result.png", Input);
 
-            CvInvoke.Imwrite("zbefore.png", Input);    
-            CvInvoke.CvtColor(Input, Input, ColorConversion.Bgr2Hsv);   
-         
-            CvInvoke.Split(Input, Channels);
+            //VectorOfUMat Channels = new VectorOfUMat();
+            //CvInvoke.Imwrite("zbefore.png", Input);    
+            //CvInvoke.CvtColor(Input, Input, ColorConversion.Bgr2Hsv);           
+            //CvInvoke.Split(Input, Channels);
+            ////HistogramViewer.Show(Input);            
+            //CvInvoke.EqualizeHist(Channels[2], Channels[2]);
+            //CvInvoke.Merge(Channels, Input);
+            ////HistogramViewer.Show(Input);
+            //CvInvoke.CvtColor(Input, Input, ColorConversion.Hsv2Bgr);
+            //CvInvoke.Imwrite("zafter.png", Input);
 
-            //HistogramViewer.Show(Input);            
-
-            CvInvoke.EqualizeHist(Channels[2], Channels[2]);
-
-            CvInvoke.Merge(Channels, Input);
-            //HistogramViewer.Show(Input);
-
-            CvInvoke.CvtColor(Input, Input, ColorConversion.Hsv2Bgr);
-            CvInvoke.Imwrite("zafter.png", Input);
-
-
-            /*
-            var hist = new Mat();
-            Input.ConvertTo(hist, DepthType.Cv8U);
-            int[] all = { 0, 1, 2 };
-            int[] size = { 8, 8, 8 };
-            float[] range = {0.0f, 256.0f, 0.0f, 256.0f, 0.0f, 256.0f };
-            */
+            //var hist = new Mat();
+            //Input.ConvertTo(hist, DepthType.Cv8U);
+            //int[] all = { 0, 1, 2 };
+            //int[] size = { 8, 8, 8 };
+            //float[] range = {0.0f, 256.0f, 0.0f, 256.0f, 0.0f, 256.0f };            
             
             //CvInvoke.CalcHist(Channels, all, null, hist, size, range, false);
             //HistogramViewer.Show(hist);
-
             //CvInvoke.Imwrite("zafter.png", hist );
 
             // Loop through the hexagons in the frame
@@ -192,11 +201,17 @@ namespace SwarmRoboticsGUI
                 var RobotFrame = new UMat();
                 var RobotFrameOffset = GetRobotFrame(Input, Hexagon, RobotFrame);
 
-
+                // DEBUG: Get robot frame image
                 //CvInvoke.Imwrite("frame.png", RobotFrame);
-                
+                VectorOfPoint RelativeHex = new VectorOfPoint();
+                Point[] Points = new Point[Hexagon.Size];
+                for (int h = 0; h < Hexagon.Size; h++)
+                {
+                    Points[h] = Point.Subtract(Hexagon[h], new Size(RobotFrameOffset.X, RobotFrameOffset.Y));
+                }
+                RelativeHex.Push(Points);
                 // Check for the colour ID, Returns (-1) if no robot ID
-                int RobotID = IdentifyRobot(RobotFrame, Hexagon);
+                int RobotID = IdentifyRobot(RobotFrame, RelativeHex);
                 // Goto next contour if not true
                 if (RobotID == -1) continue;
 
@@ -229,7 +244,7 @@ namespace SwarmRoboticsGUI
                     //RobotList[index].Width /= 2;
                     // Calulate height using sqrt(3)*radius
                     //RobotList[index].Height = (int)(RobotList[index].Width / 2 * Math.Sqrt(3));
-
+                    RobotList[index].IsVisible = true;
                     // Store the robots real-world location
                     RobotList[index].Location = new System.Windows.Point((COM.X - Arena.Origin.X) * Arena.ScaleFactor,
                         (COM.Y - Arena.Origin.Y) * Arena.ScaleFactor);
@@ -268,7 +283,7 @@ namespace SwarmRoboticsGUI
             // Noise removal
             // Threshold the image to find the edges  
             //CvInvoke.Canny(Input, Input, 0, 255);
-            CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
+            CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 3, 0);
 
             CvInvoke.GaussianBlur(Input, Input, new Size(3, 3), 0);
             // Find only the external contours applying no shape approximations
@@ -276,14 +291,14 @@ namespace SwarmRoboticsGUI
 
             //GetCountours(Frame, Contours, 0, RetrType.List, ChainApproxMethod.ChainApproxNone);
             // Filter out small and large contours
-            FilterContourArea(Contours, ProcessedContours, 100000, 2000000);
+            FilterContourArea(Contours, ProcessedContours, 1000000, 1500000);
 
             // Loop through the filtered contours in the frame
             for (int i = 0; i < ProcessedContours.Size; i++)
             {
                 VectorOfPoint ProcessedContour = ProcessedContours[i];
                 // Get approximate polygonal shape of contour
-                CvInvoke.ApproxPolyDP(ProcessedContour, ProcessedContour, CvInvoke.ArcLength(ProcessedContour, true) * 0.06, true);
+                CvInvoke.ApproxPolyDP(ProcessedContour, ProcessedContour, CvInvoke.ArcLength(ProcessedContour, true) * 0.02, true);
 
                 // If contour is not the right shape (square), check next shape
                 if (!IsShape(ProcessedContour, Shape.SQUARE)) continue;
@@ -292,7 +307,6 @@ namespace SwarmRoboticsGUI
 
                 ArenaContour.Push(ProcessedContour);
                 break;
-
             }
             // Test square is 210x210mm with area 44100mm^2
             // this area = square area / factor^2
@@ -348,13 +362,19 @@ namespace SwarmRoboticsGUI
                 // Create an image array
                 var Input = new UMat();
                 // Convert to grayscale
-                CvInvoke.CvtColor(Frame, Input, ColorConversion.Bgr2Gray);
+                //CvInvoke.CvtColor(Frame, Input, ColorConversion.Bgr2Gray);
+
+                CvInvoke.CvtColor(Frame, Input, ColorConversion.Bgr2Hsv);
+                CvInvoke.ExtractChannel(Input, Input, 2);
+
+
+
                 // Noise removal
                 if (BlurSize > 0 && BlurSize % 2 != 0)
                     CvInvoke.GaussianBlur(Input, Input, new Size(BlurSize, BlurSize), 0);
                 // Threshold the image to find the edges  
                 //CvInvoke.Canny(Input, Input, 0, 255);
-                CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
+                CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 9, 0);
                 // Find only the external contours applying no shape approximations
                 CvInvoke.FindContours(Input, Contours, null, Mode, Approx);
                 // Dispose of the image arrays
@@ -395,7 +415,7 @@ namespace SwarmRoboticsGUI
             {
                 VectorOfPoint Contour = Input[i];
                 // Get approximate polygonal shape of contour
-                CvInvoke.ApproxPolyDP(Contour, Contour, CvInvoke.ArcLength(Contour, true) * 0.02, true);
+                CvInvoke.ApproxPolyDP(Contour, Contour, CvInvoke.ArcLength(Contour, true) * 0.05, true);
 
                 // If contour is not the right shape (hexagon), check next shape
                 if (IsShape(Contour, Shape.HEXAGON))
@@ -409,7 +429,7 @@ namespace SwarmRoboticsGUI
         private static bool IsShape(IInputArray Contour, Shape Shape)
         {
             var contour = Contour as VectorOfPoint;
-            const int tolerance = 20;
+            const int tolerance = 10;
             int sides = 0;
             switch(Shape)
             {
@@ -454,32 +474,32 @@ namespace SwarmRoboticsGUI
                 case KnownColor.Orange:
                     //HueRange.Start = 5;
                     //HueRange.End = 10;
-                    HueRange.Start = 8;
+                    HueRange.Start = 10;
                     HueRange.End = 19;
                     break;
                 case KnownColor.Yellow:
                     //HueRange.Start = 20;
                     //HueRange.End = 30;
-                    HueRange.Start = 28;
-                    HueRange.End = 32;
+                    HueRange.Start = 25;
+                    HueRange.End = 30;
                     break;
                 case KnownColor.Green:
                     //HueRange.Start = 30;
                     //HueRange.End = 100;
-                    HueRange.Start = 29;
-                    HueRange.End = 62;
+                    HueRange.Start = 31;
+                    HueRange.End = 80;
                     break;
                 case KnownColor.LightBlue:
                     //HueRange.Start = 100;
                     //HueRange.End = 110;
                     HueRange.Start = 98;
-                    HueRange.End = 109;
+                    HueRange.End = 110;
                     break;
                 case KnownColor.DarkBlue:
                     //HueRange.Start = 110;
                     //HueRange.End = 130;
-                    HueRange.Start = 109;
-                    HueRange.End = 125;
+                    HueRange.Start = 110;
+                    HueRange.End = 160;
                     break;
                 case KnownColor.Red:
                     //HueRange.Start = 150;
@@ -560,78 +580,91 @@ namespace SwarmRoboticsGUI
         }
         private static int IdentifyRobot(IInputArray Frame, IInputArray Contour)
         {
-            bool IsOrange = false, IsYellow = false, IsGreen = false, IsDarkBlue = false, IsLightBlue = false, IsRed = false;
+            bool IsOrange = false, IsYellow = false, IsGreen = false;
+            bool IsDarkBlue = false, IsLightBlue = false, IsRed = false;
             int RobotID = -1;
             var hexagon = Contour as VectorOfPoint;
-            var Image = Frame as UMat;
+            var Image = Frame.GetInputArray();
 
-            var Mask = new UMat();
+            //CvInvoke.Imwrite("Input.png", Frame);
+
+            var Mask = new Mat(Image.GetSize(), Image.GetDepth(), Image.GetChannels());
+            Mask.SetTo(new MCvScalar(0, 0, 0));
             CvInvoke.DrawContours(Mask, new VectorOfVectorOfPoint(hexagon), -1, new MCvScalar(255, 255, 255), -1);
 
-            var Masked = new UMat();
+            //CvInvoke.Imwrite("Mask.png", Mask);
+
+            var Masked = new Mat();
             Image.CopyTo(Masked, Mask);
 
-            CvInvoke.Imwrite("frame.png", Masked);
-
-            var img = new UMat();
-            CvInvoke.CvtColor(Masked, img, ColorConversion.Bgr2Hsv);
+            CvInvoke.Imwrite("Masked.png", Masked);
+            
+            //CvInvoke.Imwrite("frame.png", Masked);
+            //CvInvoke.CvtColor(Masked, img, ColorConversion.Bgr2Hsv);
 
             //HistogramViewer.Show(img);
 
             //RangeF histrange = new RangeF(0, 256);
             //var hist = new DenseHistogram(256, histrange);
             //CvInvoke.CalcHist(Masked, 0, Mask, hist, 256, histrange, false);
-                
-            /*
-            var Equalised = new UMat();
-            CvInvoke.CvtColor(Masked, Equalised, ColorConversion.Bgr2Gray);
-            CvInvoke.EqualizeHist(Equalised, Equalised);
-            CvInvoke.CvtColor(Equalised, Equalised, ColorConversion.Gray2Bgr);
-            CvInvoke.Imwrite("zbefore.png", Masked);
-            CvInvoke.Imwrite("zafter.png", Equalised);
-             * */
 
-            Range SaturationRange = new Range(15, 240);
-            Range ValueRange = new Range(40, 200);
+            Range SaturationRange = new Range(25, 200);
+            Range ValueRange = new Range(30, 200);
             var SOut = new Mat();
             var VOut = new Mat();
             //
             CvInvoke.CvtColor(Masked, Masked, ColorConversion.Bgr2Hsv);
+            //CvInvoke.Imwrite("MaskedHSV.png", Masked);
+
             CvInvoke.ExtractChannel(Masked, SOut, 1);
             CvInvoke.ExtractChannel(Masked, VOut, 2);
             CvInvoke.Threshold(SOut, SOut, SaturationRange.Start, SaturationRange.End, ThresholdType.Binary);
+            //CvInvoke.Imwrite("SOut.png", SOut);
             CvInvoke.Threshold(VOut, VOut, ValueRange.Start, ValueRange.End, ThresholdType.Binary);
+            //CvInvoke.Imwrite("VOut.png", VOut);
             //CvInvoke.AdaptiveThreshold(SOut, SOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
             //CvInvoke.AdaptiveThreshold(VOut, VOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
 
             CvInvoke.BitwiseAnd(SOut, VOut, SOut);
 
-            Masked.CopyTo(Image, SOut);
+            Masked.CopyTo(Masked, SOut);
+
+            var robotcheck = new Mat();
+            CvInvoke.CvtColor(Masked, robotcheck, ColorConversion.Hsv2Bgr);
+            //CvInvoke.Imwrite("robot.png", robotcheck);
 
             // Look for colours on the robot
-            IsOrange = HasHueRange(Image, GetHueRange(KnownColor.Orange));
-            IsYellow = HasHueRange(Image, GetHueRange(KnownColor.Yellow));
-            IsGreen = HasHueRange(Image, GetHueRange(KnownColor.Green));
-            IsLightBlue = HasHueRange(Image, GetHueRange(KnownColor.LightBlue));
-            IsDarkBlue = HasHueRange(Image, GetHueRange(KnownColor.DarkBlue));
-            IsRed = HasHueRange(Image, GetHueRange(KnownColor.Red));
+            IsOrange = HasHueRange(Masked, GetHueRange(KnownColor.Orange));
+            IsYellow = HasHueRange(Masked, GetHueRange(KnownColor.Yellow));
+            IsGreen = HasHueRange(Masked, GetHueRange(KnownColor.Green));
+            IsLightBlue = HasHueRange(Masked, GetHueRange(KnownColor.LightBlue));
+            IsDarkBlue = HasHueRange(Masked, GetHueRange(KnownColor.DarkBlue));
+            IsRed = HasHueRange(Masked, GetHueRange(KnownColor.Red));
 
             // LIGHTBLUE GREEN RED
             if (!IsOrange && !IsYellow && IsGreen && IsLightBlue && !IsDarkBlue && IsRed) RobotID = 0;       // RED
+            //if (IsGreen && IsLightBlue && IsRed) RobotID = 0;       // RED
             // ORANGE LIGHTBLUE RED
             else if (IsOrange && !IsYellow && !IsGreen && IsLightBlue && !IsDarkBlue && IsRed) RobotID = 1;  // YELLOW
+            //else if (IsOrange && IsLightBlue && IsRed) RobotID = 1;  // YELLOW
             // ORANGE GREEN RED
             else if (IsOrange && !IsYellow && IsGreen && !IsLightBlue && !IsDarkBlue && IsRed) RobotID = 2;  // PURPLE
+            //else if (IsOrange && IsGreen && IsRed) RobotID = 2;  // PURPLE
             // GREEN YELLOW DARKBLUE
             else if (!IsOrange && IsYellow && IsGreen && !IsLightBlue && IsDarkBlue && !IsRed) RobotID = 3;  // LIGHTBLUE
+            //else if (IsYellow && IsGreen && IsDarkBlue) RobotID = 3;  // LIGHTBLUE
             // LIGHTBLUE GREEN DARKBLUE
             else if (!IsOrange && !IsYellow && IsGreen && IsLightBlue && IsDarkBlue && !IsRed) RobotID = 4;  // DARKBLUE
+            //else if (IsGreen && IsLightBlue && IsDarkBlue) RobotID = 4;  // DARKBLUE
             // ORANGE YELLOW GREEN
             else if (IsOrange && IsYellow && IsGreen && !IsLightBlue && !IsDarkBlue && !IsRed) RobotID = 5;  // BROWN
+            //else if (IsOrange && IsYellow && IsGreen) RobotID = 5;  // BROWN
             // LIGHTBLUE YELLOW ORANGE
             else if (IsOrange && IsYellow && !IsGreen && IsLightBlue && !IsDarkBlue && !IsRed) RobotID = 6;  // PINK
+            //else if (IsOrange && IsYellow && IsLightBlue) RobotID = 6;  // PINK
             // ORANGE YELLOW RED
             else if (IsOrange && IsYellow && !IsGreen && !IsLightBlue && !IsDarkBlue && IsRed) RobotID = 7;  // ORANGE
+            //else if (IsOrange && IsYellow && IsRed) RobotID = 7;  // ORANGE
 
             return RobotID;
         }    
