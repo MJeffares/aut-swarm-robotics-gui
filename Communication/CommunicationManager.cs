@@ -62,7 +62,7 @@ namespace SwarmRoboticsGUI
 
         private SerialUARTCommunication primarySerialPort;
         private XbeeAPI xbeeHandler;
-        public MainWindow window;
+        public MainWindow window { get; set; }
         private ProtocolClass swarmRoboticsProtocolHandler;
         public UInt64 currentTargetRobot;
 
@@ -321,7 +321,7 @@ namespace SwarmRoboticsGUI
 	public class ProtocolClass
 	{
 		// variables
-		private MainWindow window = null;
+		private MainWindow window { get; set; }
 
 		public static class MESSAGE_TYPES
 		{

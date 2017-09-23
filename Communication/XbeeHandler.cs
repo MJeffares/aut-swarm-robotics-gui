@@ -52,24 +52,22 @@ namespace XbeeHandler
 {
 	public class XbeeAPI
 	{
-		/**********************************************************************************************************************************************
-		* Class private fields
-		**********************************************************************************************************************************************/
-		#region 
-
+		#region Private Properties
 		private const byte FRAME_DELIMITER = 0x7E;
 		private const byte ESCAPE_BYTE = 0x7D;
 		private const byte XON = 0x11;
 		private const byte XOFF = 0x13;
 
 		Predicate<byte> isStartByte = (byte b) => { return b == 0x7E; };
-		int _receiveState = ReceiveStates.START;
-		int index = 0;
-		int startIndex = -1;
-		int length;
-		bool escape;
-		List<byte> frameAsList;
-		MainWindow window = null;
+        private int _receiveState = ReceiveStates.START;
+        private int index = 0;
+        private int startIndex = -1;
+        private int length;
+        private bool escape;
+        private List<byte> frameAsList;
+		//private MainWindow window { get; set; }
+        private SerialUARTCommunication serial { get; set; }
+
 
 		private static readonly IList<byte> BYTES_TO_ESCAPE = new List<byte> { FRAME_DELIMITER, ESCAPE_BYTE, XON, XOFF }.AsReadOnly();
 
@@ -77,18 +75,13 @@ namespace XbeeHandler
 
 		#endregion
 
-		/**********************************************************************************************************************************************
-		* Constructor
-		**********************************************************************************************************************************************/
+        // Constructor
 		public XbeeAPI(MainWindow main)
 		{
-			window = main;
+			serial = main.serial;
 		}
 
-		/**********************************************************************************************************************************************
-		* Child Classes
-		**********************************************************************************************************************************************/
-		#region
+		#region Child classes
 
 		public static class DESTINATION
 		{
@@ -159,10 +152,7 @@ namespace XbeeHandler
 
 		#endregion
 
-		/**********************************************************************************************************************************************
-		* Methods
-		**********************************************************************************************************************************************/
-		#region
+		#region Public Methods
 
 		public byte[] FindFrames(List<byte> buffer)
 		{
@@ -525,7 +515,7 @@ namespace XbeeHandler
 			//SerialUARTCommunication serial
 			try
 			{
-				window.serial.SendByteArray(XbeeFrame(frame_data));
+				serial.SendByteArray(XbeeFrame(frame_data));
 			}
 			catch (Exception excpt)
 			{

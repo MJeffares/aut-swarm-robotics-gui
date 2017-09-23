@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Threading;
+using XbeeHandler;
 //using SwarmRoboticsGUI;
 
 
@@ -38,12 +39,11 @@ namespace SwarmRoboticsGUI
         private DispatcherTimer PositioningTimer;
         private List<RobotItem> RobotList;
         private List<RobotItem> RegisteredRobots;
-
-        MainWindow mainwindow;
+        private XbeeAPI xbee { get; set; }
 
         public SwarmManager(MainWindow mainWindow)
         {
-            mainwindow = mainWindow;
+            xbee = mainWindow.xbee;
             
             CheckupTimer = new DispatcherTimer();
             CheckupTimer.Tick += CheckupTimer_Tick;
@@ -100,7 +100,7 @@ namespace SwarmRoboticsGUI
                 data[5] = (byte)(num >> 0x8);
                 data[6] = (byte)(num);
 
-                mainwindow.xbee.SendTransmitRequest(R.Address64, data);
+                xbee.SendTransmitRequest(R.Address64, data);
             }
         }
     }

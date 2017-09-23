@@ -827,12 +827,19 @@ namespace SwarmRoboticsGUI
             //control.Text = TextAlignment;
             //lvCommunicatedMessages.Dispatcher.Invoke(new RefreshListViewCallback(this.Refresh));
             //control.Dispatcher.Invoke(new UpdateTextBoxCallback(this.UpdateText),new object { control, text } );
+
             control.Dispatcher.Invoke(new UpdateTextBoxCallback(this.UpdateText), new object[] { control, text });
         }
         private void UpdateText(TextBox control, string text)
         {
             control.Text = text;
         }
+
+        public void Update(object message)
+        {
+        }
+
+
         /*
 		public delegate void UpdateTextCallback(string text);
 
