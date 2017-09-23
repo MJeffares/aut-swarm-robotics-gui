@@ -944,19 +944,11 @@ namespace SwarmRoboticsGUI
 
         private void PopulateSerialPorts()
         {
-            connectButton.IsEnabled = false;
-            
+            connectButton.IsEnabled = false;        
 
             string[] ports = serial.GetOpenPorts();
 
-            if (ports == null)
-            {
-                MenuItem nonefound = new MenuItem { Header = "No Com Ports Found" };
-                portList.Items.Add(nonefound);
-                nonefound.IsEnabled = false;
-                connectButton.IsEnabled = false;
-            }
-            else
+            if (ports != null)
             {
                 portList.Items.Clear();
                 foreach (string port in ports)
@@ -973,6 +965,14 @@ namespace SwarmRoboticsGUI
                         connectButton.IsEnabled = true;
                     }
                 }
+            }
+
+            if (ports.Length == 0)
+            {
+                MenuItem nonefound = new MenuItem { Header = "No Com Ports Found" };
+                portList.Items.Add(nonefound);
+                nonefound.IsEnabled = false;
+                connectButton.IsEnabled = false;
             }
         }
 
@@ -1004,8 +1004,8 @@ namespace SwarmRoboticsGUI
             {
                 serial.Disconnect();
                 connectButton.Header = "Connect";
-                connectButton.IsChecked = false;
             }
+            connectButton.IsChecked = false;
 
             if (serial.IsConnected)
             {
