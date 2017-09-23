@@ -319,57 +319,61 @@ namespace SwarmRoboticsGUI
 					MessageBox.Show(excpt.ToString());
 				}
 			}
-			else    //if the serial port is currently open
-			{
-				try
-				{
-					_serialPort.Close();
-				}
-				catch (Exception excpt)
-				{
-					MessageBox.Show(excpt.ToString());
-				}
-
-
-				////creates a list with all settings in it
-				//MenuItem[] ports = portList.Items.OfType<MenuItem>().ToArray();
-				//MenuItem[] bauds = baudList.Items.OfType<MenuItem>().ToArray();
-				//MenuItem[] paritys = parityList.Items.OfType<MenuItem>().ToArray();
-				//MenuItem[] datas = dataBitsList.Items.OfType<MenuItem>().ToArray();
-				//MenuItem[] stops = stopBitsList.Items.OfType<MenuItem>().ToArray();
-				//MenuItem[] handshakes = handshakingList.Items.OfType<MenuItem>().ToArray();
-
-				//List<MenuItem> itemList = new List<MenuItem>(ports.Concat<MenuItem>(ports));
-				//itemList.AddRange(bauds);
-				//itemList.AddRange(paritys);
-				//itemList.AddRange(datas);
-				//itemList.AddRange(stops);
-				//itemList.AddRange(handshakes);
-
-				//MenuItem[] finalArray = itemList.ToArray();
-
-				////re-enables all settings
-				//foreach (var item in finalArray)
-				//{
-				//	item.IsEnabled = true;
-				//}
-
-				//updates connect button
-				//connectButton.Header = "Connect";
-				//connectButton.IsChecked = false;
-
-				//foreach (TabItem item in window.tcCenter.Items)
-				//{
-				//	item.IsEnabled = false;
-				//	item.Visibility = Visibility.Hidden;
-				//}
-				//window.nc.IsEnabled = true;
-				//window.nc.Visibility = Visibility.Visible;
-				//window.nc.IsSelected = true;
-			}
+			
 
 		}
 
+        public void Disconnect()
+        {
+            if (_serialPort.IsOpen)    //if the serial port is currently open
+            {
+                try
+                {
+                    _serialPort.Close();
+                }
+                catch (Exception excpt)
+                {
+                    MessageBox.Show(excpt.ToString());
+                }
+
+
+                ////creates a list with all settings in it
+                //MenuItem[] ports = portList.Items.OfType<MenuItem>().ToArray();
+                //MenuItem[] bauds = baudList.Items.OfType<MenuItem>().ToArray();
+                //MenuItem[] paritys = parityList.Items.OfType<MenuItem>().ToArray();
+                //MenuItem[] datas = dataBitsList.Items.OfType<MenuItem>().ToArray();
+                //MenuItem[] stops = stopBitsList.Items.OfType<MenuItem>().ToArray();
+                //MenuItem[] handshakes = handshakingList.Items.OfType<MenuItem>().ToArray();
+
+                //List<MenuItem> itemList = new List<MenuItem>(ports.Concat<MenuItem>(ports));
+                //itemList.AddRange(bauds);
+                //itemList.AddRange(paritys);
+                //itemList.AddRange(datas);
+                //itemList.AddRange(stops);
+                //itemList.AddRange(handshakes);
+
+                //MenuItem[] finalArray = itemList.ToArray();
+
+                ////re-enables all settings
+                //foreach (var item in finalArray)
+                //{
+                //	item.IsEnabled = true;
+                //}
+
+                //updates connect button
+                //connectButton.Header = "Connect";
+                //connectButton.IsChecked = false;
+
+                //foreach (TabItem item in window.tcCenter.Items)
+                //{
+                //	item.IsEnabled = false;
+                //	item.Visibility = Visibility.Hidden;
+                //}
+                //window.nc.IsEnabled = true;
+                //window.nc.Visibility = Visibility.Visible;
+                //window.nc.IsSelected = true;
+            }
+        }
 
 		public void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
 		{

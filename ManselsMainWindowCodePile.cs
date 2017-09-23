@@ -947,12 +947,13 @@ namespace SwarmRoboticsGUI
         private void PopulateSerialPorts()
         {
             connectButton.IsEnabled = false;
-            portList.Items.Clear();
+            
 
             string[] ports = serial.GetOpenPorts();
 
             if (ports == null)
             {
+                portList.Items.Clear();
                 MenuItem nonefound = new MenuItem { Header = "No Com Ports Found" };
                 portList.Items.Add(nonefound);
                 nonefound.IsEnabled = false;
@@ -999,7 +1000,14 @@ namespace SwarmRoboticsGUI
             var stop = MJLib.GetCheckedItemInList(stopBitsList, true).Header.ToString();
             var handshake = MJLib.GetCheckedItemInList(handshakingList, true).Header.ToString();
 
-            serial.Connect(port, baud, parity, data, stop, handshake);
+            if (!serial.IsConnected)
+                serial.Connect(port, baud, parity, data, stop, handshake);
+            else
+            {
+                serial.Disconnect();
+                connectButton.Header = "Connect";
+                connectButton.IsChecked = false;
+            }
 
             if (serial.IsConnected)
             {
@@ -1013,11 +1021,6 @@ namespace SwarmRoboticsGUI
                 tcCenter.SelectedIndex++;
                 nc.IsEnabled = false;
                 nc.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                connectButton.Header = "Connect";
-                connectButton.IsChecked = false;
             }
         }
     }
