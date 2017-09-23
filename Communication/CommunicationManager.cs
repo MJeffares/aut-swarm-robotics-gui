@@ -580,7 +580,8 @@ namespace SwarmRoboticsGUI
 
         public void DisplayTWIMuxTestData(TWIMuxTestData message)
         {
-            window.UpdateTextBox(window.tbSysTestTWIRead, message.MessageDataDisplay);
+
+			window.UpdateTextBox(window.tbSysTestTWIRead, window.twiMuxAddresses.FirstOrDefault(x => x.Value == message.address).Key);
         }
 
 
