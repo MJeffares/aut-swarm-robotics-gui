@@ -894,6 +894,7 @@ namespace SwarmRoboticsGUI
         ///
         /// Serial Communication Converted
         ///
+        #region 
         // supported serial port settings
         private string[] baudRateOptions = new string[] { "4800", "9600", "19200", "38400", "57600", "115200", "230400", "460800", "921600" };
         private string[] parityOptions = new string[] { "None", "Odd", "Even", "Mark", "Space" };
@@ -953,7 +954,6 @@ namespace SwarmRoboticsGUI
 
             if (ports == null)
             {
-                portList.Items.Clear();
                 MenuItem nonefound = new MenuItem { Header = "No Com Ports Found" };
                 portList.Items.Add(nonefound);
                 nonefound.IsEnabled = false;
@@ -961,6 +961,7 @@ namespace SwarmRoboticsGUI
             }
             else
             {
+                portList.Items.Clear();
                 foreach (string port in ports)
                 {
                     MenuItem item = new MenuItem { Header = port };
