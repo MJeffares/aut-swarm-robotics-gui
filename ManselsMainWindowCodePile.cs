@@ -891,10 +891,7 @@ namespace SwarmRoboticsGUI
 		*/
         #endregion
 
-        ///
-        /// Serial Communication Converted
-        ///
-        #region 
+        #region Serial Communication Converted
         // supported serial port settings
         private string[] baudRateOptions = new string[] { "4800", "9600", "19200", "38400", "57600", "115200", "230400", "460800", "921600" };
         private string[] parityOptions = new string[] { "None", "Odd", "Even", "Mark", "Space" };
@@ -1024,5 +1021,6 @@ namespace SwarmRoboticsGUI
                 nc.Visibility = Visibility.Collapsed;
             }
         }
+        #endregion
     }
 }
