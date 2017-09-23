@@ -22,14 +22,12 @@ namespace SwarmRoboticsGUI
         // Camera Properties
         public string Name { get; set; }
         public int Index { get; set; }
+        public string MonikerString { get; set; }
         public int CapabilityIndex { get; set; }
         public FilterType Filter { get; set; }
         public StatusType Status { get; private set; }       
         public int Fps { get; private set; }
         public TimeSpan RecordingTime { get; private set; }
-
-
-        public EventHandler Process { get; set; }
         #endregion
 
         #region Private Properties
@@ -42,6 +40,8 @@ namespace SwarmRoboticsGUI
 
         private UMat Frame { get; set; }
         #endregion
+
+        public EventHandler Process { get; set; }
 
         public Camera()
         {
@@ -59,30 +59,29 @@ namespace SwarmRoboticsGUI
         }
 
         // Capture
-        public void Resize(Size Size)
-        {
-            if (Status == StatusType.PLAYING)
-            {
-                videoCapture.Stop();
-            }
-
-        }
         public void StartCapture()
         {
             if (Status != StatusType.PLAYING)
             {
+                // Get the user-selected camera device
                 videoCapture = new VideoCapture(Index);
                 videoCapture.ImageGrabbed += GetFrame;
-
+                var videoDevice = new VideoCaptureDevice(MonikerString);
+                // Set the user selected capability
+                var videoCapability = videoDevice.VideoCapabilities[CapabilityIndex];
+                // Enable hardware encoding if the camera supports it
                 videoCapture.SetCaptureProperty(CapProp.FourCC, VideoWriter.Fourcc('M', 'J', 'P', 'G'));
-                videoCapture.SetCaptureProperty(CapProp.FrameHeight, 1080);
-                videoCapture.SetCaptureProperty(CapProp.FrameWidth, 1920);
-                videoCapture.SetCaptureProperty(CapProp.FrameCount, 30);
+                // Set the camera frame size and framerate
+                videoCapture.SetCaptureProperty(CapProp.FrameHeight, videoCapability.FrameSize.Height);
+                videoCapture.SetCaptureProperty(CapProp.FrameWidth, videoCapability.FrameSize.Width);
+                videoCapture.SetCaptureProperty(CapProp.FrameCount, videoCapability.AverageFrameRate);
                 //videoCapture.SetCaptureProperty(CapProp.Exposure, -6);
-                videoCapture.Start();
 
+                // Start capturing and recording fps
+                videoCapture.Start();
                 fpsTimer.Start();
 
+                // Update the camera status
                 Status = StatusType.PLAYING;
             }
         }
@@ -149,13 +148,6 @@ namespace SwarmRoboticsGUI
         }
 
         // Controls
-        public void FlipVertical()
-        {
-            if (videoCapture != null)
-            {
-                videoCapture.FlipVertical = !videoCapture.FlipVertical;
-            }
-        }
         public void FlipHorizontal()
         {
             if (videoCapture != null)
@@ -163,6 +155,13 @@ namespace SwarmRoboticsGUI
                 videoCapture.FlipHorizontal = !videoCapture.FlipHorizontal;
             }
         }
+        public void FlipVertical()
+        {
+            if (videoCapture != null)
+            {
+                videoCapture.FlipVertical = !videoCapture.FlipVertical;
+            }
+        }      
         public void OpenSettings()
         {
             if (Name != null)

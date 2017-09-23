@@ -569,10 +569,11 @@ namespace SwarmRoboticsGUI
                     // Update camera
                     camera1.Name = menusender.ToString();
                     camera1.Index = menuCameraList.Items.IndexOf(menusender);
+                    camera1.MonikerString = VideoDevices[camera1.Index].MonikerString;
 
-                    VideoDevice = new VideoCaptureDevice(VideoDevices[camera1.Index].MonikerString);
+                    VideoDevice = new VideoCaptureDevice(camera1.MonikerString);
                     
-
+                    // Default capability to last in list
                     camera1.CapabilityIndex = VideoDevice.VideoCapabilities.Length - 1;
 
                     // Populate resolution options
