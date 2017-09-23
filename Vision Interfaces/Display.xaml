@@ -22,6 +22,9 @@
         <!--Arena Brushes-->
         <SolidColorBrush x:Key="ViewBoxBackgroundBrush" Color="#222"/>
         <SolidColorBrush x:Key="ArenaBackgroundBrush" Color="#FFF"/>
+        
+        <!--Window Brushes-->
+        <SolidColorBrush x:Key="GridSplitterBackgroundBrush" Color="#444"/>
 
         <!--Checker Pattern-->
         <VisualBrush x:Key="Checker" TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute" Viewbox="0,0,15,15" ViewboxUnits="Absolute">
@@ -65,7 +68,7 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
 
-    <Grid Background="{StaticResource Checker}">
+    <Grid>
         <Viewbox Stretch="Uniform">
             <ItemsControl Name="Arena"
                           ItemsSource="{Binding Items, RelativeSource={RelativeSource AncestorType=UserControl}}">
@@ -92,7 +95,7 @@
                                 <ColumnDefinition/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            
+
                             <Polygon Name="Hexagon" Style="{StaticResource Hexagon}"
                                      Height="{Binding Width}" Width="{Binding Height}"
                                      MouseLeftButtonDown="Robot_MouseLeftButtonDown"
@@ -103,7 +106,7 @@
                                     </TransformGroup>
                                 </Polygon.LayoutTransform>
                             </Polygon>
-                            
+
                             <Polygon Style="{StaticResource Triangle}"
                                      Height="20" Width="20" 
                                      RenderTransformOrigin="0.5,0.5"
@@ -115,7 +118,7 @@
                                     </TransformGroup>
                                 </Polygon.RenderTransform>
                             </Polygon>
-                            
+
                             <TextBlock Grid.Column="1" Text="{Binding Name}" 
                                        VerticalAlignment="Center" HorizontalAlignment="Left"
                                        Padding="5,0,0,0"

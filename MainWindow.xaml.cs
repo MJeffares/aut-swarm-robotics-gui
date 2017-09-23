@@ -31,11 +31,7 @@
 
 #endregion
 
-
-/**********************************************************************************************************************************************
-* Namespaces
-**********************************************************************************************************************************************/
-#region
+#region Namespaces
 
 using AForge.Video;
 using AForge.Video.DirectShow;
@@ -158,7 +154,6 @@ namespace SwarmRoboticsGUI
             //var what = ImageProcessing.TestImage;
             // TEMP: display overlay on starup for debugging
             overlayWindow.Show();
-            camera1.Process += new EventHandler(DrawCameraFrame);
 
             // BRAE: Default setup for testing
             overlayWindow.Display1.Source = SourceType.CAMERA;
@@ -239,9 +234,9 @@ namespace SwarmRoboticsGUI
 
                 // loops through cameras and adds them to menu
                 //for (int i = 0; i < VideoDevices.Count; i++)
-                for (int i = VideoDevices.Count; i > 0; i--)
+                for (int i = 0; i < VideoDevices.Count; i++)
                 {
-                    MenuItem item = new MenuItem { Header = VideoDevices[i-1].Name };
+                    MenuItem item = new MenuItem { Header = VideoDevices[i].Name };
                     item.Click += new RoutedEventHandler(menuCameraListItem_Click);
                     item.IsCheckable = true;
                     menuCameraList.Items.Add(item);
@@ -467,42 +462,6 @@ namespace SwarmRoboticsGUI
             statusFPS.Text = camera1.Fps.ToString();
 
             DisplayTime();
-        }
-
-        private void DrawCameraFrame(object sender, EventArgs e)
-        {
-            var Frame = sender as UMat;
-
-            switch (overlayWindow.Display1.Source)
-            {
-                case SourceType.NONE:
-                    break;
-                case SourceType.CAMERA:
-                    // Make sure there is a frame
-                    if (Frame != null)
-                    {
-                        //Apply the currently selected filter
-                        if (camera1.Filter != FilterType.NONE)
-                        {
-                            var proc = new Mat();
-                            ImageProcessing.ProcessFilter(Frame, proc, camera1.Filter, HueLower, HueUpper);
-                            if (proc != null)
-                                captureImageBox.Image = proc;
-                        }
-                        else
-                            captureImageBox.Image = Frame;
-                    }
-                    break;
-                case SourceType.CUTOUTS:
-                    // Draw the testimage to the overlay imagebox
-                    if (ImageProcessing.TestImage != null)
-                    {
-                        captureImageBox.Image = (UMat)ImageProcessing.TestImage;
-                    }
-                    break;
-                default:
-                    break;
-            }
         }
         
         #endregion
@@ -820,7 +779,7 @@ namespace SwarmRoboticsGUI
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            camera1.CloseCapture();
+            //camera1.CloseCapture();
         }          
 	}
 }

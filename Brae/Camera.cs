@@ -22,11 +22,14 @@ namespace SwarmRoboticsGUI
         // Camera Properties
         public string Name { get; set; }
         public int Index { get; set; }
-        public StatusType Status { get; private set; }
-        public FilterType Filter { get; set; }
         public int CapabilityIndex { get; set; }
+        public FilterType Filter { get; set; }
+        public StatusType Status { get; private set; }       
         public int Fps { get; private set; }
         public TimeSpan RecordingTime { get; private set; }
+
+
+        public EventHandler Process { get; set; }
         #endregion
 
         #region Private Properties
@@ -54,7 +57,8 @@ namespace SwarmRoboticsGUI
         {
             return string.Format("[{0}]{1}", Index, Name);
         }
-        //Capture Methods
+
+        // Capture
         public void Resize(Size Size)
         {
             if (Status == StatusType.PLAYING)
@@ -63,7 +67,6 @@ namespace SwarmRoboticsGUI
             }
 
         }
-
         public void StartCapture()
         {
             if (Status != StatusType.PLAYING)
@@ -78,48 +81,43 @@ namespace SwarmRoboticsGUI
                 //videoCapture.SetCaptureProperty(CapProp.Exposure, -6);
                 videoCapture.Start();
 
-                Status = StatusType.PLAYING;
                 fpsTimer.Start();
+
+                Status = StatusType.PLAYING;
             }
         }
-
         public void StopCapture()
         {
             if (Status != StatusType.STOPPED)
             {
                 videoCapture.Stop();
                 videoCapture.ImageGrabbed -= GetFrame;
-                Status = StatusType.STOPPED;
-            }
-        }
-
-        public void CloseCapture()
-        {
-            if (Status == StatusType.PLAYING)
-            {
-                if (videoCapture.IsOpened)
-                {
-                    videoCapture.Stop();
-                }
-                videoCapture.ImageGrabbed -= GetFrame;
+                videoCapture.Dispose();
                 fpsTimer.Stop();
                 Status = StatusType.STOPPED;
             }
         }
         public void PauseCapture()
         {
-            videoCapture.Pause();
-            Status = StatusType.PAUSED;
+            if (Status == StatusType.PLAYING)
+            {
+                videoCapture.Pause();
+                Status = StatusType.PAUSED;
+            }
         }
         public void ResumeCapture()
         {
-            videoCapture.Start();
-            Status = StatusType.PLAYING;          
-        }
-        // Video Methods
-        // TODO: Recording methods for camera
+            if (Status == StatusType.PAUSED)
+            {
+                videoCapture.Start();
+                Status = StatusType.PLAYING;
+            }    
+        }     
+
+        // Video
         public void StartReplaying(string path)
         {
+            // TODO: Recording methods for camera
             //if (videoCapture != null)
             //{
             //    videoCapture.Dispose();
@@ -149,7 +147,8 @@ namespace SwarmRoboticsGUI
             videoWriter.Dispose();
             Status = StatusType.PLAYING;
         }
-        // Other Methods
+
+        // Controls
         public void FlipVertical()
         {
             if (videoCapture != null)
@@ -190,16 +189,13 @@ namespace SwarmRoboticsGUI
 
             Fps = frameCount;
             frameCount = 0;
-        }
-        #endregion
-        
+        }  
         private void GetFrame(object sender, EventArgs e)
         {
             frameCount++;
             videoCapture.Retrieve(Frame);
             Process(Frame, e);
         }
-
-        public EventHandler Process { get; set; }
+        #endregion
     }
 }

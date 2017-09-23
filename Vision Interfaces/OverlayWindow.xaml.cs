@@ -44,6 +44,8 @@ namespace SwarmRoboticsGUI
         public List<RobotItem> RobotList { get; set; }
         public Arena RobotArena { get; set; }
 
+        private Camera camera1;
+
         public OverlayWindow(MainWindow mainWindow)
         {
             InitializeComponent();
@@ -54,19 +56,20 @@ namespace SwarmRoboticsGUI
             ColourC = 1000;
             // Default lower saturation cutoff
             LowerS = 25;
-
             LowerH = 0;
             UpperH = 130;
 
             // Create 100ms timer to drive interface changes
             InitializeTimer();
 
-            RobotArena = new Arena(); 
+            RobotArena = new Arena();         
+            // TEMP: reference mainWindow camera
+            camera1 = mainWindow.camera1;
             // Create event driven by new frames from the camera
-            mainWindow.camera1.Process += new EventHandler(DrawOverlayFrame);
+            camera1.Process += new EventHandler(DrawOverlayFrame);
 
             //Creates a local copy of the robotlist only containing the robots themselves
-            RobotList =  mainWindow.ItemList.Where(R => R is RobotItem).Cast<RobotItem>().ToList<RobotItem>();
+            RobotList =  mainWindow.ItemList.Where(R => R is RobotItem).Cast<RobotItem>().ToList();
         }
 
         #region Public Methods
@@ -76,13 +79,6 @@ namespace SwarmRoboticsGUI
         }
         #endregion
 
-        private void InitializeTimer()
-        {
-            // Create 100ms timer to drive interface changes
-            InterfaceTimer = new System.Timers.Timer(100);
-            InterfaceTimer.Elapsed += Interface_Tick;
-            InterfaceTimer.Start();
-        }
 
         #region Time Events
         private void Interface_Tick(object sender, ElapsedEventArgs e)
@@ -103,10 +99,9 @@ namespace SwarmRoboticsGUI
 
         
         private int counter { get; set; }
-
         private void DrawOverlayFrame(object sender, EventArgs e)
         {
-            UMat Frame = sender as UMat;
+            var Frame = sender as UMat;
 
             switch (Display1.Source)
             {
@@ -116,9 +111,20 @@ namespace SwarmRoboticsGUI
                     // Make sure there is a frame
                     if (Frame != null)
                     {
+                        //Apply the currently selected filter
+                        if (camera1.Filter != FilterType.NONE)
+                        {
+                            var proc = new Mat();
+                            ImageProcessing.ProcessFilter(Frame, proc, camera1.Filter, LowerH, UpperH);
+                            if (proc != null)
+                                    CameraDisplay1.Image = Frame;
+                        }
+                        else
+                            CameraDisplay1.Image = Frame;
+
                         // TEMP: Counter to get the arena every 30 frames
                         counter++;
-                        if (counter > 1)
+                        if (counter > 30)
                         {
                             ImageProcessing.GetArena(Frame, RobotArena);
 
@@ -134,16 +140,30 @@ namespace SwarmRoboticsGUI
                 case SourceType.CUTOUTS:
                     // Apply image processing to find the robots
                     ImageProcessing.GetRobots(ImageProcessing.TestImage, RobotList, RobotArena);
+
+                    //// Draw the testimage to the overlay imagebox
+                    //if (ImageProcessing.TestImage != null)
+                    //{
+                    //    captureImageBox.Image = (UMat)ImageProcessing.TestImage;
+                    //}
+
+
                     break;
                 default:
                     break;
             }
         }
 
-        
         #endregion
 
         #region Private Events 
+        private void InitializeTimer()
+        {
+            // Create 100ms timer to drive interface changes
+            InterfaceTimer = new System.Timers.Timer(100);
+            InterfaceTimer.Elapsed += Interface_Tick;
+            InterfaceTimer.Start();
+        }
         private void Overlay_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (InterfaceTimer != null)
@@ -151,6 +171,9 @@ namespace SwarmRoboticsGUI
                 InterfaceTimer.Stop();
                 InterfaceTimer.Dispose();
             }
+            camera1.StopCapture();
+            camera1.Process -= new EventHandler(DrawOverlayFrame);
+            CameraDisplay1.Image = null;
         }
 
         //private void Button_Click(object sender, RoutedEventArgs e)
@@ -170,5 +193,23 @@ namespace SwarmRoboticsGUI
         //    RobotList[RobotIndex].Battery = 50;
         //}
         #endregion
+
+        private void OverlaySelect_Click(object sender, RoutedEventArgs e)
+        {
+            Display1.Visibility = Visibility.Visible;
+            CameraDisplay1.Visibility = Visibility.Collapsed;
+        }
+
+        private void OverlayCameraSelect_Click(object sender, RoutedEventArgs e)
+        {
+            Display1.Visibility = Visibility.Visible;
+            CameraDisplay1.Visibility = Visibility.Visible;
+        }
+
+        private void CameraSelect_Click(object sender, RoutedEventArgs e)
+        {
+            Display1.Visibility = Visibility.Collapsed;
+            CameraDisplay1.Visibility = Visibility.Visible;
+        }
     }
 }

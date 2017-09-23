@@ -772,9 +772,9 @@
             <GridSplitter x:Name="cameraGridSplitter" Grid.Column="2" Width="5" HorizontalAlignment="Center">
             </GridSplitter>
 
-            <WindowsFormsHost Grid.Column="3" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,5,0,201" Visibility="Visible" Grid.RowSpan="2">
+            <!--<WindowsFormsHost Grid.Column="3" Name="host1" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" Margin="0,5,0,201" Visibility="Visible" Grid.RowSpan="2">
                 <em:ImageBox x:Name="captureImageBox" Height="240" Width="320" SizeMode="StretchImage" FunctionalMode="Minimum"/>
-            </WindowsFormsHost>
+            </WindowsFormsHost>-->
             <Slider x:Name="HueLowerSlider" Value="{Binding HueLower, Mode=TwoWay}" Grid.Column="3" HorizontalAlignment="Left" Margin="100,680,0,0" VerticalAlignment="Top" Height="20" Width="260" Maximum="360" SmallChange="1"/>
             <Slider x:Name="HueUpperSlider" Value="{Binding HueUpper, Mode=TwoWay}" Grid.Column="3" HorizontalAlignment="Left" Margin="100,720,0,0" VerticalAlignment="Top" Height="20" Width="260" Maximum="360" SmallChange="1"/>
             <TextBox Grid.Column="3" HorizontalAlignment="Left" Height="23" Margin="378,678,0,0" TextWrapping="Wrap" Text="{Binding Value, ElementName=HueLowerSlider}" VerticalAlignment="Top" Width="120"/>

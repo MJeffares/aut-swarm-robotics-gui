@@ -132,8 +132,6 @@ namespace SwarmRoboticsGUI
             //const double REAL_DISTANCE = 840;
             //const double REAL_DISTANCE = 297;
 
-            var Hexagons = new VectorOfVectorOfPoint();
-
             if (Arena.Contour == null) return;
             
             var Bounds = CvInvoke.BoundingRectangle(new VectorOfPoint(Arena.Contour));           
@@ -142,6 +140,8 @@ namespace SwarmRoboticsGUI
             // DEBUG: Draw arena contour on frame
             //var Input = Frame as UMat;
             //CvInvoke.DrawContours(Input, new VectorOfVectorOfPoint(new VectorOfPoint(Arena.Contour)), -1, new MCvScalar(255, 0, 0), 3);
+
+            var Hexagons = new VectorOfVectorOfPoint();
 
             using (var Contours = new VectorOfVectorOfPoint())
             using (var FilteredContours = new VectorOfVectorOfPoint())
