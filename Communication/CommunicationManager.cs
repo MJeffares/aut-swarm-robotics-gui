@@ -934,304 +934,304 @@ namespace SwarmRoboticsGUI
 	}
 
 
-	public partial class MainWindow : Window
-	{
-		public delegate void RefreshListViewCallback();
+	//public partial class MainWindow : Window
+	//{
+	//	public delegate void RefreshListViewCallback();
 
-		public void RefreshListView()
-		{
-			lvCommunicatedMessages.Dispatcher.Invoke(new RefreshListViewCallback(this.Refresh));
+	//	public void RefreshListView()
+	//	{
+	//		lvCommunicatedMessages.Dispatcher.Invoke(new RefreshListViewCallback(this.Refresh));
 
-		}
+	//	}
 
-		private GridViewColumnHeader lvCommunicatedMessagesSortCol = null;
-		private SortAdorner lvCommunicatedMessagesSortAdorner = null;
+	//	private GridViewColumnHeader lvCommunicatedMessagesSortCol = null;
+	//	private SortAdorner lvCommunicatedMessagesSortAdorner = null;
 
-		private void Refresh()
-		{
-			if (lvCommunicatedMessagesSortAdorner != null && lvCommunicatedMessagesSortCol != null)
-			{
-				lvCommunicatedMessages.Items.SortDescriptions.Add(new SortDescription(lvCommunicatedMessagesSortCol.Tag.ToString(), lvCommunicatedMessagesSortAdorner.Direction));
-			}
+	//	private void Refresh()
+	//	{
+	//		if (lvCommunicatedMessagesSortAdorner != null && lvCommunicatedMessagesSortCol != null)
+	//		{
+	//			lvCommunicatedMessages.Items.SortDescriptions.Add(new SortDescription(lvCommunicatedMessagesSortCol.Tag.ToString(), lvCommunicatedMessagesSortAdorner.Direction));
+	//		}
 
             
-			lvCommunicatedMessages.Items.Refresh();
-		}
+	//		lvCommunicatedMessages.Items.Refresh();
+	//	}
 
 
-		//this stuff is temporary XXXX
+	//	//this stuff is temporary XXXX
 
-		private void receivedDataRemove_Click(object sender, RoutedEventArgs e)
-		{
-			gvCommunicatedMessages.Columns.Remove(gvcTimeStamp);
-		}
+	//	private void receivedDataRemove_Click(object sender, RoutedEventArgs e)
+	//	{
+	//		gvCommunicatedMessages.Columns.Remove(gvcTimeStamp);
+	//	}
 
-		private void receivedDataAdd_Click(object sender, RoutedEventArgs e)
-		{
-			gvCommunicatedMessages.Columns.Add(gvcTimeStamp);
-		}
+	//	private void receivedDataAdd_Click(object sender, RoutedEventArgs e)
+	//	{
+	//		gvCommunicatedMessages.Columns.Add(gvcTimeStamp);
+	//	}
 
 
 
-		private void GridViewColumnHeader_Click(object sender, RoutedEventArgs e)
-		{
-			GridViewColumnHeader column = (sender as GridViewColumnHeader);
-			string sortBy = column.Tag.ToString();
+	//	private void GridViewColumnHeader_Click(object sender, RoutedEventArgs e)
+	//	{
+	//		GridViewColumnHeader column = (sender as GridViewColumnHeader);
+	//		string sortBy = column.Tag.ToString();
 
-			if (lvCommunicatedMessagesSortCol != null)
-			{
-				AdornerLayer.GetAdornerLayer(lvCommunicatedMessagesSortCol).Remove(lvCommunicatedMessagesSortAdorner);
-				lvCommunicatedMessages.Items.SortDescriptions.Clear();
-			}
+	//		if (lvCommunicatedMessagesSortCol != null)
+	//		{
+	//			AdornerLayer.GetAdornerLayer(lvCommunicatedMessagesSortCol).Remove(lvCommunicatedMessagesSortAdorner);
+	//			lvCommunicatedMessages.Items.SortDescriptions.Clear();
+	//		}
 
-			ListSortDirection newDir = ListSortDirection.Ascending;
-			if (lvCommunicatedMessagesSortCol == column && lvCommunicatedMessagesSortAdorner.Direction == newDir)
-				newDir = ListSortDirection.Descending;
+	//		ListSortDirection newDir = ListSortDirection.Ascending;
+	//		if (lvCommunicatedMessagesSortCol == column && lvCommunicatedMessagesSortAdorner.Direction == newDir)
+	//			newDir = ListSortDirection.Descending;
 
-			lvCommunicatedMessagesSortCol = column;
-			lvCommunicatedMessagesSortAdorner = new SortAdorner(lvCommunicatedMessagesSortCol, newDir);
-			AdornerLayer.GetAdornerLayer(lvCommunicatedMessagesSortCol).Add(lvCommunicatedMessagesSortAdorner);
-			lvCommunicatedMessages.Items.SortDescriptions.Add(new SortDescription(sortBy, newDir));
-			//column.Width = column.ActualWidth + 10;
-			lvCommunicatedMessages.Items.Refresh();
-		}
+	//		lvCommunicatedMessagesSortCol = column;
+	//		lvCommunicatedMessagesSortAdorner = new SortAdorner(lvCommunicatedMessagesSortCol, newDir);
+	//		AdornerLayer.GetAdornerLayer(lvCommunicatedMessagesSortCol).Add(lvCommunicatedMessagesSortAdorner);
+	//		lvCommunicatedMessages.Items.SortDescriptions.Add(new SortDescription(sortBy, newDir));
+	//		//column.Width = column.ActualWidth + 10;
+	//		lvCommunicatedMessages.Items.Refresh();
+	//	}
 
-		public class SortAdorner : Adorner
-		{
-			private static Geometry ascGeometry =
-					Geometry.Parse("M 0 4 L 3.5 0 L 7 4 Z");
+	//	public class SortAdorner : Adorner
+	//	{
+	//		private static Geometry ascGeometry =
+	//				Geometry.Parse("M 0 4 L 3.5 0 L 7 4 Z");
 
-			private static Geometry descGeometry =
-					Geometry.Parse("M 0 0 L 3.5 4 L 7 0 Z");
+	//		private static Geometry descGeometry =
+	//				Geometry.Parse("M 0 0 L 3.5 4 L 7 0 Z");
 
-			public ListSortDirection Direction { get; private set; }
+	//		public ListSortDirection Direction { get; private set; }
 
-			public SortAdorner(UIElement element, ListSortDirection dir)
-					: base(element)
-			{
-				this.Direction = dir;
-			}
+	//		public SortAdorner(UIElement element, ListSortDirection dir)
+	//				: base(element)
+	//		{
+	//			this.Direction = dir;
+	//		}
 
-			protected override void OnRender(DrawingContext drawingContext)
-			{
-				base.OnRender(drawingContext);
+	//		protected override void OnRender(DrawingContext drawingContext)
+	//		{
+	//			base.OnRender(drawingContext);
 
-				if (AdornedElement.RenderSize.Width < 20)
-					return;
+	//			if (AdornedElement.RenderSize.Width < 20)
+	//				return;
 
-				TranslateTransform transform = new TranslateTransform
-						(
-								AdornedElement.RenderSize.Width - 15,
-								(AdornedElement.RenderSize.Height - 5) / 2
-						);
-				drawingContext.PushTransform(transform);
+	//			TranslateTransform transform = new TranslateTransform
+	//					(
+	//							AdornedElement.RenderSize.Width - 15,
+	//							(AdornedElement.RenderSize.Height - 5) / 2
+	//					);
+	//			drawingContext.PushTransform(transform);
 
-				Geometry geometry = ascGeometry;
-				if (this.Direction == ListSortDirection.Descending)
-					geometry = descGeometry;
-				drawingContext.DrawGeometry(Brushes.Black, null, geometry);
+	//			Geometry geometry = ascGeometry;
+	//			if (this.Direction == ListSortDirection.Descending)
+	//				geometry = descGeometry;
+	//			drawingContext.DrawGeometry(Brushes.Black, null, geometry);
 
-				drawingContext.Pop();
-			}
-		}
+	//			drawingContext.Pop();
+	//		}
+	//	}
 
 
 
 
 
 
-		public delegate void UpdateListViewBindingCallback(List<XbeeAPIFrame> messages);
+	//	public delegate void UpdateListViewBindingCallback(List<XbeeAPIFrame> messages);
 
-		public void UpdateListViewBinding(List<XbeeAPIFrame> messages)
-		{
-			lvCommunicatedMessages.Dispatcher.Invoke(new UpdateListViewBindingCallback(this.UpdateBinding), new object[] { messages });
-		}
+	//	public void UpdateListViewBinding(List<XbeeAPIFrame> messages)
+	//	{
+	//		lvCommunicatedMessages.Dispatcher.Invoke(new UpdateListViewBindingCallback(this.UpdateBinding), new object[] { messages });
+	//	}
 
-		private void UpdateBinding(List<XbeeAPIFrame> messages)
-		{
-			DataContext = this;
-			lvCommunicatedMessages.ItemsSource = messages;
-			lvCommunicatedMessages.Items.Refresh();
-		}
+	//	private void UpdateBinding(List<XbeeAPIFrame> messages)
+	//	{
+	//		DataContext = this;
+	//		lvCommunicatedMessages.ItemsSource = messages;
+	//		lvCommunicatedMessages.Items.Refresh();
+	//	}
 
 
 
-		private void Button_Click(object sender, RoutedEventArgs e)
-		{
-			if (serial._serialPort.IsOpen)
-			{
-				rtbSendBuffer.SelectAll();
-				string text = rtbSendBuffer.Selection.Text.ToString();
-				string textToSend = text;
+	//	private void Button_Click(object sender, RoutedEventArgs e)
+	//	{
+	//		if (serial._serialPort.IsOpen)
+	//		{
+	//			rtbSendBuffer.SelectAll();
+	//			string text = rtbSendBuffer.Selection.Text.ToString();
+	//			string textToSend = text;
 
-				textToSend = textToSend.Replace("\r", string.Empty);
-				textToSend = textToSend.Replace("\n", string.Empty);
-				textToSend = textToSend.Replace(" ", string.Empty);
-				textToSend = textToSend.Replace("-", string.Empty);
-				textToSend = textToSend.Replace("0x", string.Empty);
+	//			textToSend = textToSend.Replace("\r", string.Empty);
+	//			textToSend = textToSend.Replace("\n", string.Empty);
+	//			textToSend = textToSend.Replace(" ", string.Empty);
+	//			textToSend = textToSend.Replace("-", string.Empty);
+	//			textToSend = textToSend.Replace("0x", string.Empty);
 
-				text = text.Replace("\n", string.Empty);
-				text = text.Replace(" ", "-");
+	//			text = text.Replace("\n", string.Empty);
+	//			text = text.Replace(" ", "-");
 
-				try
-				{
-					byte[] bytes = bytes = Enumerable.Range(0, textToSend.Length).Where(x => x % 2 == 0).Select(x => Convert.ToByte(textToSend.Substring(x, 2), 16)).ToArray();
+	//			try
+	//			{
+	//				byte[] bytes = bytes = Enumerable.Range(0, textToSend.Length).Where(x => x % 2 == 0).Select(x => Convert.ToByte(textToSend.Substring(x, 2), 16)).ToArray();
 
 
-					//test = xbee.CalculateChecksum(bytes); //			
+	//				//test = xbee.CalculateChecksum(bytes); //			
 
-					//bytes = xbee.Escape(bytes); //escapes bytes
+	//				//bytes = xbee.Escape(bytes); //escapes bytes
 
 
-					serial._serialPort.Write(bytes, 0, bytes.Length);
-				}
-				catch (Exception excpt)
-				{
-					MessageBox.Show(excpt.Message);
-				}
+	//				serial._serialPort.Write(bytes, 0, bytes.Length);
+	//			}
+	//			catch (Exception excpt)
+	//			{
+	//				MessageBox.Show(excpt.Message);
+	//			}
 
 
-				rtbSerialSent.AppendText(text);
-				//rtbSerialSent.AppendText(test.ToString()); //
-				rtbSendBuffer.Document.Blocks.Clear();
-				rtbSerialSent.ScrollToEnd();
-			}
-			else
-			{
-				MessageBox.Show("Port not open");
-			}
-		}
+	//			rtbSerialSent.AppendText(text);
+	//			//rtbSerialSent.AppendText(test.ToString()); //
+	//			rtbSendBuffer.Document.Blocks.Clear();
+	//			rtbSerialSent.ScrollToEnd();
+	//		}
+	//		else
+	//		{
+	//			MessageBox.Show("Port not open");
+	//		}
+	//	}
 
 
-		public bool messageReceived = false;
+	//	public bool messageReceived = false;
 
-		private void btnXbeeSend_Click(object sender, RoutedEventArgs e)
-		{
-			if (serial._serialPort.IsOpen)
-			{
-				//byte test = 0; //
+	//	private void btnXbeeSend_Click(object sender, RoutedEventArgs e)
+	//	{
+	//		if (serial._serialPort.IsOpen)
+	//		{
+	//			//byte test = 0; //
 
-				rtbXbeeSendBuffer.SelectAll();
-				string text = rtbXbeeSendBuffer.Selection.Text.ToString();
-				string textToSend = text;
+	//			rtbXbeeSendBuffer.SelectAll();
+	//			string text = rtbXbeeSendBuffer.Selection.Text.ToString();
+	//			string textToSend = text;
 
-				textToSend = textToSend.Replace("\r", string.Empty);
-				textToSend = textToSend.Replace("\n", string.Empty);
-				textToSend = textToSend.Replace(" ", string.Empty);
-				textToSend = textToSend.Replace("-", string.Empty);
-				textToSend = textToSend.Replace("0x", string.Empty);
+	//			textToSend = textToSend.Replace("\r", string.Empty);
+	//			textToSend = textToSend.Replace("\n", string.Empty);
+	//			textToSend = textToSend.Replace(" ", string.Empty);
+	//			textToSend = textToSend.Replace("-", string.Empty);
+	//			textToSend = textToSend.Replace("0x", string.Empty);
 
-				text = text.Replace("\n", string.Empty);
-				text = text.Replace(" ", "-");
+	//			text = text.Replace("\n", string.Empty);
+	//			text = text.Replace(" ", "-");
 
-				try
-				{
-					byte[] bytes = bytes = Enumerable.Range(0, textToSend.Length).Where(x => x % 2 == 0).Select(x => Convert.ToByte(textToSend.Substring(x, 2), 16)).ToArray();
+	//			try
+	//			{
+	//				byte[] bytes = bytes = Enumerable.Range(0, textToSend.Length).Where(x => x % 2 == 0).Select(x => Convert.ToByte(textToSend.Substring(x, 2), 16)).ToArray();
 
 
-					//test = xbee.CalculateChecksum(bytes); //
+	//				//test = xbee.CalculateChecksum(bytes); //
 
 
 
-					//bytes = xbee.Escape(bytes); //escapes bytes
+	//				//bytes = xbee.Escape(bytes); //escapes bytes
 
-					xbee.SendTransmitRequest(XbeeAPI.DESTINATION.COORDINATOR, bytes);
+	//				xbee.SendTransmitRequest(XbeeAPI.DESTINATION.COORDINATOR, bytes);
 
-					//serial._serialPort.Write(bytes, 0, bytes.Length);
-				}
-				catch (Exception excpt)
-				{
-					MessageBox.Show(excpt.Message);
-				}
+	//				//serial._serialPort.Write(bytes, 0, bytes.Length);
+	//			}
+	//			catch (Exception excpt)
+	//			{
+	//				MessageBox.Show(excpt.Message);
+	//			}
 
 
-				rtbXbeeSent.AppendText(text);
-				//rtbSerialSent.AppendText(test.ToString()); 
-				rtbXbeeSendBuffer.Document.Blocks.Clear();
-				rtbXbeeSent.ScrollToEnd();
-			}
-			else
-			{
-				MessageBox.Show("Port not open");
-			}
-		}
+	//			rtbXbeeSent.AppendText(text);
+	//			//rtbSerialSent.AppendText(test.ToString()); 
+	//			rtbXbeeSendBuffer.Document.Blocks.Clear();
+	//			rtbXbeeSent.ScrollToEnd();
+	//		}
+	//		else
+	//		{
+	//			MessageBox.Show("Port not open");
+	//		}
+	//	}
 
 
-		public delegate void UpdateTextBoxCallback(TextBox control, string text);
+	//	public delegate void UpdateTextBoxCallback(TextBox control, string text);
 
-		public void UpdateTextBox(TextBox control, string text)
-		{
-			//control.Text = TextAlignment;
-			//lvCommunicatedMessages.Dispatcher.Invoke(new RefreshListViewCallback(this.Refresh));
-			//control.Dispatcher.Invoke(new UpdateTextBoxCallback(this.UpdateText),new object { control, text } );
-			control.Dispatcher.Invoke(new UpdateTextBoxCallback(this.UpdateText), new object[] { control, text });
-		}
+	//	public void UpdateTextBox(TextBox control, string text)
+	//	{
+	//		//control.Text = TextAlignment;
+	//		//lvCommunicatedMessages.Dispatcher.Invoke(new RefreshListViewCallback(this.Refresh));
+	//		//control.Dispatcher.Invoke(new UpdateTextBoxCallback(this.UpdateText),new object { control, text } );
+	//		control.Dispatcher.Invoke(new UpdateTextBoxCallback(this.UpdateText), new object[] { control, text });
+	//	}
 
 
-		private void UpdateText(TextBox control, string text)
-		{
-			control.Text = text;
-		}
+	//	private void UpdateText(TextBox control, string text)
+	//	{
+	//		control.Text = text;
+	//	}
 
 
 
-		/*
-		public delegate void UpdateTextCallback(string text);
+	//	/*
+	//	public delegate void UpdateTextCallback(string text);
 
-		public void UpdateSerialReceivedTextBox(string text)
-		{
-			rtbSerialReceived.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), new object[] { text });
-		}
+	//	public void UpdateSerialReceivedTextBox(string text)
+	//	{
+	//		rtbSerialReceived.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), new object[] { text });
+	//	}
 
-		public void UpdateSerialReceivedTextBox(byte[] message, int number)
-		{
-			string messageString = null;
+	//	public void UpdateSerialReceivedTextBox(byte[] message, int number)
+	//	{
+	//		string messageString = null;
 
-			for (int i = 0; i < number; i++)
-			{
+	//		for (int i = 0; i < number; i++)
+	//		{
 
-				string temp = message[i].ToString("X");
+	//			string temp = message[i].ToString("X");
 
-				if (temp == "7E")
-				{
-					messageString += "\r";
-					messageString += temp;
-				}
-				else if (message[i] < 0x10)
-				{
-					messageString += "0";
-					messageString += temp;
-				}
-				else
-				{
-					messageString += temp;
-				}
-			}
+	//			if (temp == "7E")
+	//			{
+	//				messageString += "\r";
+	//				messageString += temp;
+	//			}
+	//			else if (message[i] < 0x10)
+	//			{
+	//				messageString += "0";
+	//				messageString += temp;
+	//			}
+	//			else
+	//			{
+	//				messageString += temp;
+	//			}
+	//		}
 
-			rtbSerialReceived.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), new object[] { messageString });
+	//		rtbSerialReceived.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), new object[] { messageString });
 			
-		}
+	//	}
 		
-		private void UpdateText(string text)
-		{
-			rtbSerialReceived.AppendText(text);
-			rtbSerialReceived.ScrollToEnd();
-		}
+	//	private void UpdateText(string text)
+	//	{
+	//		rtbSerialReceived.AppendText(text);
+	//		rtbSerialReceived.ScrollToEnd();
+	//	}
 
-		private void receivedDataNewline_Click(object sender, RoutedEventArgs e)
-		{
-			rtbSerialReceived.AppendText("\r");
-			rtbSerialReceived.ScrollToEnd(); ;
-		}
+	//	private void receivedDataNewline_Click(object sender, RoutedEventArgs e)
+	//	{
+	//		rtbSerialReceived.AppendText("\r");
+	//		rtbSerialReceived.ScrollToEnd(); ;
+	//	}
 
 
-		private void receivedDataClear_Click(object sender, RoutedEventArgs e)
-		{
-			rtbSerialReceived.Document.Blocks.Clear();
-			rtbSerialReceived.ScrollToEnd(); ;
-		}
-		*/
-	}
+	//	private void receivedDataClear_Click(object sender, RoutedEventArgs e)
+	//	{
+	//		rtbSerialReceived.Document.Blocks.Clear();
+	//		rtbSerialReceived.ScrollToEnd(); ;
+	//	}
+	//	*/
+	//}
 }
 
 

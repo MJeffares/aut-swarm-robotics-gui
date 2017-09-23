@@ -46,7 +46,7 @@ namespace SwarmRoboticsGUI
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            mainWindow.ToggleCameraWindow();
+            //mainWindow.ToggleCameraWindow();
         }
 
         

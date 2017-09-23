@@ -136,6 +136,7 @@
     <Compile Include="General Controls\RangeSlider.xaml.cs">
       <DependentUpon>RangeSlider.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ManselsMainWindowCodePile.cs" />
     <Compile Include="ManualMode.cs" />
     <Compile Include="ProgressWindow.xaml.cs">
       <DependentUpon>ProgressWindow.xaml</DependentUpon>

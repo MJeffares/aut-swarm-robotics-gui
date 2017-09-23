@@ -121,8 +121,17 @@ namespace SwarmRoboticsGUI
 			camera1 = new Camera();
 			xbee = new XbeeAPI(this);
 			protocol = new ProtocolClass(this);
-			serial = new SerialUARTCommunication(this, menuCommunication);
-			commManger = new CommunicationManager(this, serial, xbee, protocol);			
+
+
+            // Serial communications
+			serial = new SerialUARTCommunication();
+            PopulateSerialSettings();
+            PopulateSerialPorts();
+            portList.MouseEnter += new MouseEventHandler(menuPopulateSerialPorts);
+            connectButton.Click += new RoutedEventHandler(menuCommunicationConnect_Click);
+
+
+            commManger = new CommunicationManager(this, serial, xbee, protocol);			
 
             //
             PopulateFilters();
@@ -164,59 +173,6 @@ namespace SwarmRoboticsGUI
             setupSystemTest();
             TowerControlSetup();
 		}
-
-        #region Public Methods
-
-        public void ToggleCameraWindow()
-        {
-            switch (WindowStatus)
-            {
-                case WindowStatusType.POPPED_OUT:
-                    popoutWindow.Close();
-                    //set window to the size it had been before it was minimised
-                    mainGrid.ColumnDefinitions[3].Width = new GridLength(WindowSize);
-                    //set variable/flag
-                    WindowStatus = WindowStatusType.MAXIMISED;
-                    //re-enable the grid splitter so its size can be changed
-                    cameraGridSplitter.IsEnabled = true;
-                    // update arrow direction
-                    displayArrowTop.Content = "   >";
-                    displayArrowBottom.Content = "   >";
-                    // TEMP: toggles the name of the button
-                    menuDisplayPopOut.Header = "Pop Out Window";
-
-                    break;
-                default:
-                    // set size of window to original
-                    WindowSize = mainGrid.ColumnDefinitions[3].ActualWidth;
-                    // minimise window (make width = 0)     
-                    mainGrid.ColumnDefinitions[3].Width = new GridLength((double)0);
-                    // change camera window status to popped out
-                    WindowStatus = WindowStatusType.POPPED_OUT;
-                    // disable the grid splitter so window cannont be changed size until it is expanded               
-                    cameraGridSplitter.IsEnabled = false;
-                    // update arrow direction
-                    displayArrowTop.Content = "  < ";
-                    displayArrowBottom.Content = "  <  ";
-                    // TEMP: toggles the name of the button
-                    menuDisplayPopOut.Header = "Pop In Window";
-                    // create and show the window
-                    if (camera1.Status == StatusType.PLAYING)
-                    {
-                        popoutWindow = new CameraPopOutWindow(this);
-                        popoutWindow.Show();
-                        camera1.StartCapture();
-                    }
-                    else
-                    {
-                        popoutWindow = new CameraPopOutWindow(this);
-                        popoutWindow.Show();
-                    }
-                    break;
-            }
-        }
-
-        #endregion
 
         #region Private Methods
 
@@ -539,12 +495,6 @@ namespace SwarmRoboticsGUI
             }
         }
 
-        private void menuDisplayPopOut_Click(object sender, RoutedEventArgs e)
-        {
-            ToggleCameraWindow();
-        }
-
-
         //Camera menu
         private void menuCameraListItem_Click(object sender, RoutedEventArgs e)
         {
@@ -724,45 +674,6 @@ namespace SwarmRoboticsGUI
             menuRecordStop.IsEnabled = false;
             statusRecordingText.Text = "Not Recording";
             statusRecordingDot.Foreground = System.Windows.Media.Brushes.Black;
-        }
-
-
-        private void btnCommunicationTest_Click(object sender, RoutedEventArgs e)
-        {
-            //protocol.SendMessage(ProtocolClass.MESSAGE_TYPES.COMMUNICATION_TEST);
-        }
-
-        private void btnCameraMinimise_Click(object sender, MouseButtonEventArgs e)
-        {
-            switch (WindowStatus)
-            {
-                case WindowStatusType.MAXIMISED:
-                    // set size of window when it was minimised
-                    WindowSize = mainGrid.ColumnDefinitions[3].ActualWidth;
-                    //minimise window (make width = 0)
-                    mainGrid.ColumnDefinitions[3].Width = new GridLength((double)0);
-                    //set variable/flag
-                    WindowStatus = WindowStatusType.MINIMISED;
-                    //disable the grid splitter so window cannont be changed size until it is expanded         
-                    cameraGridSplitter.IsEnabled = false;
-                    //update arrow direction
-                    displayArrowTop.Content = "  < ";
-                    displayArrowBottom.Content = "  <  ";
-                    break;
-                case WindowStatusType.MINIMISED:
-                    //set window to the size it had been before it was minimised
-                    mainGrid.ColumnDefinitions[3].Width = new GridLength(WindowSize);
-                    //set variable/flag
-                    WindowStatus = WindowStatusType.MAXIMISED;
-                    //re-enable the grid splitter so its size can be changed                
-                    cameraGridSplitter.IsEnabled = true;
-                    //update arrow direction
-                    displayArrowTop.Content = "   >";
-                    displayArrowBottom.Content = "   >";
-                    break;
-                default:
-                    break;
-            }
         }
 
         private void menuPlaceHolder_Click(object sender, RoutedEventArgs e)
