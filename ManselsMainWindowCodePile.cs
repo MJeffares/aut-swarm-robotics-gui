@@ -335,7 +335,7 @@ namespace SwarmRoboticsGUI
         {
             public static byte[] NORTH = { 0x00, 0x00 };
 
-            public static byte[] NORTHEAST = { 0x00, 0x3B };
+            public static byte[] NORTHEAST = { 0x00, 0x2D };
             public static byte[] EAST = { 0x00, 0x5A };
             public static byte[] SOUTHEAST = { 0x00, 0x87 };
             public static byte[] SOUTH = { 0x00, 0xB4 };
