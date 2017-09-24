@@ -77,15 +77,14 @@ namespace SwarmRoboticsGUI
 		// Declarations
 		#region Public Properties
 		// TODO: comment declarations
-		public Camera camera1;
-		public SerialUARTCommunication serial;
-		public XbeeAPI xbee;
-		public ProtocolClass protocol;
-		public CommunicationManager commManger { get; set; }
-		public CameraPopOutWindow popoutWindow;
-		public OverlayWindow overlayWindow;
-        public SwarmManager swarmManager;
-		public Dictionary<string, UInt64> robotsDictionary;
+		public Camera camera1 { get; set; }
+        public SerialUARTCommunication serial { get; set; }
+        public XbeeAPI xbee { get; set; }
+        public ProtocolClass protocol { get; set; }
+        public CommunicationManager commManger { get; set; }
+        public OverlayWindow overlayWindow { get; set; }
+        public SwarmManager swarmManager { get; set; }
+        public Dictionary<string, UInt64> robotsDictionary { get; set; }
 
         public List<Item> ItemList { get; set; }
         public List<XbeeAPIFrame> TestList { get; set; }

@@ -60,11 +60,11 @@ namespace SwarmRoboticsGUI
 	public class CommunicationManager
 	{
 
-        private SerialUARTCommunication primarySerialPort;
-        private XbeeAPI xbeeHandler;
+        private SerialUARTCommunication primarySerialPort { get; set; }
+        private XbeeAPI xbeeHandler { get; set; }
         public MainWindow window { get; set; }
-        private ProtocolClass swarmRoboticsProtocolHandler;
-        public UInt64 currentTargetRobot;
+        private ProtocolClass swarmRoboticsProtocolHandler { get; set; }
+        public UInt64 currentTargetRobot { get; set; }
 
         public List<byte[]> rxMessageBuffer { get; set; }
         public List<XbeeAPIFrame> rxXbeeMessageBuffer { get; set; }

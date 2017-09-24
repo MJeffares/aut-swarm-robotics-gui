@@ -149,7 +149,7 @@
                     <Button x:Name="receivedDataAdd" Content="Remove" Margin="5" Click="receivedDataRemove_Click"/>-->
                 </WrapPanel>
 
-                <ListView Name="lvCommunicatedMessages" Visibility="Collapsed" 
+                <!--<ListView Name="lvCommunicatedMessages" Visibility="Collapsed" 
                           Grid.Column="0" 
                           Grid.Row="2" 
                           Grid.RowSpan = "1" 
@@ -193,7 +193,7 @@
 
                         </GridView>
                     </ListView.View>
-                </ListView>
+                </ListView>-->
 
                 <DataGrid ItemsSource="{Binding commManger.rxXbeeMessageBuffer, RelativeSource={RelativeSource AncestorType=Window}}" 
                           AutoGenerateColumns="False" 
@@ -809,8 +809,6 @@
                 </TabControl>
 
             </DockPanel>
-
-
 
             <local:ItemList x:Name="ItemsList1"
                              Grid.Row="1" Grid.Column="2"

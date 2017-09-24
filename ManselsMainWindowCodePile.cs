@@ -628,106 +628,108 @@ namespace SwarmRoboticsGUI
         //}
         #endregion
 
+        // WIP
         #region Communications Manager    
-        public delegate void RefreshListViewCallback();
-        public void RefreshListView()
-        {
-            lvCommunicatedMessages.Dispatcher.Invoke(new RefreshListViewCallback(this.Refresh));
+        //public delegate void RefreshListViewCallback();
+        //public void RefreshListView()
+        //{
+        //    lvCommunicatedMessages.Dispatcher.Invoke(new RefreshListViewCallback(this.Refresh));
 
-        }
-        private GridViewColumnHeader lvCommunicatedMessagesSortCol = null;
-        private SortAdorner lvCommunicatedMessagesSortAdorner = null;
-        private void Refresh()
-        {
-            if (lvCommunicatedMessagesSortAdorner != null && lvCommunicatedMessagesSortCol != null)
-            {
-                lvCommunicatedMessages.Items.SortDescriptions.Add(new SortDescription(lvCommunicatedMessagesSortCol.Tag.ToString(), lvCommunicatedMessagesSortAdorner.Direction));
-            }
+        //}
+        //private GridViewColumnHeader lvCommunicatedMessagesSortCol { get; set; }
+        //private SortAdorner lvCommunicatedMessagesSortAdorner { get; set; }
+        //private void Refresh()
+        //{
+        //    if (lvCommunicatedMessagesSortAdorner != null && lvCommunicatedMessagesSortCol != null)
+        //    {
+        //        lvCommunicatedMessages.Items.SortDescriptions.Add(new SortDescription(lvCommunicatedMessagesSortCol.Tag.ToString(), lvCommunicatedMessagesSortAdorner.Direction));
+        //    }
 
 
-            lvCommunicatedMessages.Items.Refresh();
-        }
+        //    lvCommunicatedMessages.Items.Refresh();
+        //}
         //this stuff is temporary XXXX
-        private void receivedDataRemove_Click(object sender, RoutedEventArgs e)
-        {
-            gvCommunicatedMessages.Columns.Remove(gvcTimeStamp);
-        }
-        private void receivedDataAdd_Click(object sender, RoutedEventArgs e)
-        {
-            gvCommunicatedMessages.Columns.Add(gvcTimeStamp);
-        }
-        private void GridViewColumnHeader_Click(object sender, RoutedEventArgs e)
-        {
-            GridViewColumnHeader column = (sender as GridViewColumnHeader);
-            string sortBy = column.Tag.ToString();
+        //private void receivedDataRemove_Click(object sender, RoutedEventArgs e)
+        //{
+        //    gvCommunicatedMessages.Columns.Remove(gvcTimeStamp);
+        //}
+        //private void receivedDataAdd_Click(object sender, RoutedEventArgs e)
+        //{
+        //    gvCommunicatedMessages.Columns.Add(gvcTimeStamp);
+        //}
+        //private void GridViewColumnHeader_Click(object sender, RoutedEventArgs e)
+        //{
+        //    GridViewColumnHeader column = (sender as GridViewColumnHeader);
+        //    string sortBy = column.Tag.ToString();
 
-            if (lvCommunicatedMessagesSortCol != null)
-            {
-                AdornerLayer.GetAdornerLayer(lvCommunicatedMessagesSortCol).Remove(lvCommunicatedMessagesSortAdorner);
-                lvCommunicatedMessages.Items.SortDescriptions.Clear();
-            }
+        //    if (lvCommunicatedMessagesSortCol != null)
+        //    {
+        //        AdornerLayer.GetAdornerLayer(lvCommunicatedMessagesSortCol).Remove(lvCommunicatedMessagesSortAdorner);
+        //        lvCommunicatedMessages.Items.SortDescriptions.Clear();
+        //    }
 
-            // Swap sorting direction if previous sorting was this column
-            ListSortDirection newDir = ListSortDirection.Ascending;
-            if (lvCommunicatedMessagesSortCol == column && lvCommunicatedMessagesSortAdorner.Direction == newDir)
-                newDir = ListSortDirection.Descending;
+        //    // Swap sorting direction if previous sorting was this column
+        //    ListSortDirection newDir = ListSortDirection.Ascending;
+        //    if (lvCommunicatedMessagesSortCol == column && lvCommunicatedMessagesSortAdorner.Direction == newDir)
+        //        newDir = ListSortDirection.Descending;
 
-            lvCommunicatedMessagesSortCol = column;
-            lvCommunicatedMessagesSortAdorner = new SortAdorner(lvCommunicatedMessagesSortCol, newDir);
-            AdornerLayer.GetAdornerLayer(lvCommunicatedMessagesSortCol).Add(lvCommunicatedMessagesSortAdorner);
-            lvCommunicatedMessages.Items.SortDescriptions.Add(new SortDescription(sortBy, newDir));
-            //column.Width = column.ActualWidth + 10;
-            lvCommunicatedMessages.Items.Refresh();
-        }
-        public class SortAdorner : Adorner
-        {
-            private static Geometry ascGeometry =
-                    Geometry.Parse("M 0 4 L 3.5 0 L 7 4 Z");
+        //    lvCommunicatedMessagesSortCol = column;
+        //    lvCommunicatedMessagesSortAdorner = new SortAdorner(lvCommunicatedMessagesSortCol, newDir);
+        //    AdornerLayer.GetAdornerLayer(lvCommunicatedMessagesSortCol).Add(lvCommunicatedMessagesSortAdorner);
+        //    lvCommunicatedMessages.Items.SortDescriptions.Add(new SortDescription(sortBy, newDir));
+        //    //column.Width = column.ActualWidth + 10;
+        //    lvCommunicatedMessages.Items.Refresh();
+        //}
+        //public class SortAdorner : Adorner
+        //{
+        //    private static Geometry ascGeometry =
+        //            Geometry.Parse("M 0 4 L 3.5 0 L 7 4 Z");
 
-            private static Geometry descGeometry =
-                    Geometry.Parse("M 0 0 L 3.5 4 L 7 0 Z");
+        //    private static Geometry descGeometry =
+        //            Geometry.Parse("M 0 0 L 3.5 4 L 7 0 Z");
 
-            public ListSortDirection Direction { get; private set; }
+        //    public ListSortDirection Direction { get; private set; }
 
-            public SortAdorner(UIElement element, ListSortDirection dir)
-                    : base(element)
-            {
-                this.Direction = dir;
-            }
+        //    public SortAdorner(UIElement element, ListSortDirection dir)
+        //            : base(element)
+        //    {
+        //        this.Direction = dir;
+        //    }
 
-            protected override void OnRender(DrawingContext drawingContext)
-            {
-                base.OnRender(drawingContext);
+        //    protected override void OnRender(DrawingContext drawingContext)
+        //    {
+        //        base.OnRender(drawingContext);
 
-                if (AdornedElement.RenderSize.Width < 20)
-                    return;
+        //        if (AdornedElement.RenderSize.Width < 20)
+        //            return;
 
-                TranslateTransform transform = new TranslateTransform
-                        (
-                                AdornedElement.RenderSize.Width - 15,
-                                (AdornedElement.RenderSize.Height - 5) / 2
-                        );
-                drawingContext.PushTransform(transform);
+        //        TranslateTransform transform = new TranslateTransform
+        //                (
+        //                        AdornedElement.RenderSize.Width - 15,
+        //                        (AdornedElement.RenderSize.Height - 5) / 2
+        //                );
+        //        drawingContext.PushTransform(transform);
 
-                Geometry geometry = ascGeometry;
-                if (this.Direction == ListSortDirection.Descending)
-                    geometry = descGeometry;
-                drawingContext.DrawGeometry(Brushes.Black, null, geometry);
+        //        Geometry geometry = ascGeometry;
+        //        if (this.Direction == ListSortDirection.Descending)
+        //            geometry = descGeometry;
+        //        drawingContext.DrawGeometry(Brushes.Black, null, geometry);
 
-                drawingContext.Pop();
-            }
-        }
-        public delegate void UpdateListViewBindingCallback(List<XbeeAPIFrame> messages);
-        public void UpdateListViewBinding(List<XbeeAPIFrame> messages)
-        {
-            lvCommunicatedMessages.Dispatcher.Invoke(new UpdateListViewBindingCallback(this.UpdateBinding), new object[] { messages });
-        }
-        private void UpdateBinding(List<XbeeAPIFrame> messages)
-        {
-            DataContext = this;
-            lvCommunicatedMessages.ItemsSource = messages;
-            lvCommunicatedMessages.Items.Refresh();
-        }
+        //        drawingContext.Pop();
+        //    }
+        //}
+        //public delegate void UpdateListViewBindingCallback(List<XbeeAPIFrame> messages);
+        //public void UpdateListViewBinding(List<XbeeAPIFrame> messages)
+        //{
+        //    lvCommunicatedMessages.Dispatcher.Invoke(new UpdateListViewBindingCallback(this.UpdateBinding), new object[] { messages });
+        //}
+        //private void UpdateBinding(List<XbeeAPIFrame> messages)
+        //{
+        //    DataContext = this;
+        //    lvCommunicatedMessages.ItemsSource = messages;
+        //    lvCommunicatedMessages.Items.Refresh();
+        //}
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (serial._serialPort.IsOpen)
@@ -836,10 +838,6 @@ namespace SwarmRoboticsGUI
         private void UpdateText(TextBox control, string text)
         {
             control.Text = text;
-        }
-
-        public void Update(object message)
-        {
         }
 
 
