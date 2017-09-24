@@ -81,7 +81,7 @@ namespace SwarmRoboticsGUI
 		public SerialUARTCommunication serial;
 		public XbeeAPI xbee;
 		public ProtocolClass protocol;
-		public CommunicationManager commManger;
+		public CommunicationManager commManger { get; set; }
 		public CameraPopOutWindow popoutWindow;
 		public OverlayWindow overlayWindow;
         public SwarmManager swarmManager;
@@ -135,7 +135,6 @@ namespace SwarmRoboticsGUI
 
 
             commManger = new CommunicationManager(this, serial, xbee, protocol);			
-
             //
             PopulateFilters();
             PopulateOverlays();

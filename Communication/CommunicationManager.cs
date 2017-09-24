@@ -81,7 +81,7 @@ namespace SwarmRoboticsGUI
 
             primarySerialPort.DataReceived += new SerialUARTCommunication.SerialDataReceivedHandler(PrimarySerialPortDataReceived);
 
-            window.UpdateListViewBinding(rxXbeeMessageBuffer);
+            //window.UpdateListViewBinding(rxXbeeMessageBuffer);
         }
 
 
@@ -224,7 +224,7 @@ namespace SwarmRoboticsGUI
 			}
 			rxXbeeMessageBuffer.Add(message);
 
-			window.RefreshListView();
+			//window.RefreshListView();
 			return 0;
 		}
 	}
