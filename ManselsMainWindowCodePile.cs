@@ -975,14 +975,14 @@ namespace SwarmRoboticsGUI
                         connectButton.IsEnabled = true;
                     }
                 }
-            }
 
-            if (ports.Length == 0)
-            {
-                MenuItem nonefound = new MenuItem { Header = "No Com Ports Found" };
-                portList.Items.Add(nonefound);
-                nonefound.IsEnabled = false;
-                connectButton.IsEnabled = false;
+                if (ports.Length == 0)
+                {
+                    MenuItem nonefound = new MenuItem { Header = "No Com Ports Found" };
+                    portList.Items.Add(nonefound);
+                    nonefound.IsEnabled = false;
+                    connectButton.IsEnabled = false;
+                }
             }
         }
 
