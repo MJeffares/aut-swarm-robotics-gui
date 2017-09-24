@@ -27,6 +27,19 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
+        private string _Group { get; set; }
+        public string Group
+        {
+            get { return _Group; }
+            set
+            {
+                if (_Group != value)
+                {
+                    _Group = value;
+                    NotifyPropertyChanged("Group");
+                }
+            }
+        }
         private string _Text { get; set; }
         public string Text
         {
@@ -37,6 +50,32 @@ namespace SwarmRoboticsGUI
                 {
                     _Text = value;
                     NotifyPropertyChanged("Text");
+                }
+            }
+        }
+        private bool _IsSelected { get; set; }
+        public bool IsSelected
+        {
+            get { return _IsSelected; }
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    NotifyPropertyChanged("IsSelected");
+                }
+            }
+        }
+        private bool _IsExpanded { get; set; }
+        public bool IsExpanded
+        {
+            get { return _IsExpanded; }
+            set
+            {
+                if (_IsExpanded != value)
+                {
+                    _IsExpanded = value;
+                    NotifyPropertyChanged("IsExpanded");
                 }
             }
         }
@@ -97,19 +136,7 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-        private string _Group { get; set; }
-        public string Group
-        {
-            get { return _Group; }
-            set
-            {
-                if (_Group != value)
-                {
-                    _Group = value;
-                    NotifyPropertyChanged("Group");
-                }
-            }
-        }
+        
         private int _ID { get; set; }
         public int ID
         {
@@ -288,32 +315,6 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-        private bool _IsExpanded { get; set; }
-        public bool IsExpanded
-        {
-            get { return _IsExpanded; }
-            set
-            {
-                if (_IsExpanded != value)
-                {
-                    _IsExpanded = value;
-                    NotifyPropertyChanged("IsExpanded");
-                }
-            }
-        }
-        private bool _IsSelected { get; set; }
-        public bool IsSelected
-        {
-            get { return _IsSelected; }
-            set
-            {
-                if (_IsSelected != value)
-                {
-                    _IsSelected = value;
-                    NotifyPropertyChanged("IsSelected");
-                }
-            }
-        }
         #endregion
 
         public RobotItem(string Name, UInt64 MAC_Address, string Colour, int ID) : base(Name, MAC_Address, Colour)
@@ -398,6 +399,8 @@ namespace SwarmRoboticsGUI
             this.Name = Name;
             this.Address64 = MAC_Address;
             this.Colour = Colour;
+
+            Group = "Charging Stations";
         }
     }
 
@@ -451,6 +454,8 @@ namespace SwarmRoboticsGUI
             this.Address16 = 0xFFFE;
             this.Address64 = MAC_Address;
             this.Colour = Colour;
+
+            Group = "All";
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="SwarmRoboticsGUI.RobotList"
+﻿<UserControl x:Class="SwarmRoboticsGUI.ItemList"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -223,7 +223,7 @@
                             <Border x:Name="Bd" 
                                     Grid.Column="1" 
                                     Padding="0"
-                                    BorderThickness="0,1,0,1"
+                                    BorderThickness="0,0,0,1"
                                     BorderBrush="{StaticResource ListSpacerBrush}" 
                                     Background="{TemplateBinding Background}">
                                 <Grid>
@@ -288,10 +288,17 @@
             </Grid>
         </DataTemplate>
         <HierarchicalDataTemplate x:Key="RobotTemplate" AlternationCount="2"
-                                  DataType="{x:Type local:RobotGroup}" 
+                                  DataType="{x:Type local:RobotItem}" 
                                   ItemTemplate="{StaticResource ItemTemplate}" 
                                   ItemsSource="{Binding Children}" 
                                   ItemContainerStyle="{StaticResource ItemStyle}">
+            <TextBlock FontSize="20" Foreground="White" Text="{Binding Name}"/>
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate x:Key="DockTemplate" 
+                                  DataType="{x:Type local:ChargingDockItem}" 
+                                  ItemTemplate="{StaticResource RobotTemplate}" 
+                                  ItemsSource="{Binding Items}" 
+                                  ItemContainerStyle="{StaticResource RobotStyle}">
             <TextBlock FontSize="20" Foreground="White" Text="{Binding Name}"/>
         </HierarchicalDataTemplate>
         <HierarchicalDataTemplate x:Key="GroupTemplate" 
@@ -314,7 +321,7 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <TreeView x:Name="RobotTree" Grid.Column="1" Grid.Row="1" 
+        <TreeView x:Name="ItemTree" Grid.Column="1" Grid.Row="1" 
                   VirtualizingPanel.IsVirtualizing="True"
                   VirtualizingPanel.VirtualizationMode="Recycling"
                   Foreground="White" FontSize="20" Padding="0" BorderThickness="0"

@@ -60,6 +60,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using XbeeHandler;
+using XbeeHandler.XbeeFrames;
 
 #endregion
 
@@ -85,8 +86,10 @@ namespace SwarmRoboticsGUI
 		public OverlayWindow overlayWindow;
         public SwarmManager swarmManager;
 		public Dictionary<string, UInt64> robotsDictionary;
-        public List<Item> ItemList;
-        
+
+        public List<Item> ItemList { get; set; }
+        public List<XbeeAPIFrame> TestList { get; set; }
+
 
 
         public int HueLower { get; set; }
@@ -139,12 +142,13 @@ namespace SwarmRoboticsGUI
             PopulateCameras();
             PopulateSources();
             PopulateRobots();
+            DEBUGGING_PopulateTestList();
 
             swarmManager = new SwarmManager(this);
 
             overlayWindow = new OverlayWindow(this);
 
-			dispSelectRobot.ItemsSource = ItemList;
+			//dispSelectRobot.ItemsSource = ItemList;
 
 			//
 			openvideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
@@ -175,6 +179,14 @@ namespace SwarmRoboticsGUI
 		}
 
         #region Private Methods
+
+        private void DEBUGGING_PopulateTestList()
+        {
+            TestList = new List<XbeeAPIFrame>();
+            TestList.Add(new XbeeAPIFrame(new byte[] { 0x01,0x01,0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 }));
+            TestList.Add(new XbeeAPIFrame(new byte[] { 0x02,0x01,0x01, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02 }));
+            TestList.Add(new XbeeAPIFrame(new byte[] { 0x03,0x01, 0x03, 0x01, 0x03, 0x01, 0x01, 0x03, 0x01 }));
+        }
 
         private void PopulateCameras()
         {
@@ -324,18 +336,14 @@ namespace SwarmRoboticsGUI
         private void PopulateRobots()
         {
             ItemList = new List<Item>();
-            // BRAE: add drawing.color as "ID"
-            // MANSEL: add drawing.color as "ID"
-            // TODO: add drawing.color as "ID"
-            //System.Drawing.Color.SaddleBrown
             ItemList.Add(new RobotItem("Red Robot", 0x0013A2004147F9DD, "Red", 0));
             ItemList.Add(new RobotItem("Yellow Robot", 0x0013A200415B8C38, "Yellow", 1));
             ItemList.Add(new RobotItem("Purple Robot", 0x0013A200415B8BDD, "Purple", 2));
             ItemList.Add(new RobotItem("Light Blue Robot", 0x0013A2004152F256, "Cyan", 3));
             ItemList.Add(new RobotItem("Dark Blue Robot", 0x0013A200415B8C3A, "MidnightBlue", 4));
-			ItemList.Add(new RobotItem("Brown Robot", 0x0013A20041065FB3, "SaddleBrown", 5));
-            ItemList.Add(new RobotItem("Pink Robot", 0x0013A200415B8C18, "Plum", 6));		
-			ItemList.Add(new RobotItem("Orange Robot", 0x0013A200415B8BE5, "Orange", 7));
+            ItemList.Add(new RobotItem("Brown Robot", 0x0013A20041065FB3, "SaddleBrown", 5));
+            ItemList.Add(new RobotItem("Pink Robot", 0x0013A200415B8C18, "Plum", 6));
+            ItemList.Add(new RobotItem("Orange Robot", 0x0013A200415B8BE5, "Orange", 7));
 
             ItemList.Add(new ChargingDockItem("Tower Base Station", 0x0013A200415B8C2A, "Lime"));
             ItemList.Add(new CommunicationItem("Broadcast", 0x000000000000FFFF, "White"));
@@ -687,11 +695,23 @@ namespace SwarmRoboticsGUI
         }
 
 
-		#endregion
+        // Items list
+        private void ItemsList1_SelectedItemChanged(object sender, EventArgs e)
+        {
+            var itemList = sender as ItemList;
+            if (itemList != null)
+            {
+                var commsItem = itemList.SelectedItem as CommunicationItem;
+                if (commsItem != null)
+                    commManger.currentTargetRobot = commsItem.Address64;
+            }
+        }
+
+        #endregion
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             //camera1.CloseCapture();
-        }          
-	}
+        }
+    }
 }

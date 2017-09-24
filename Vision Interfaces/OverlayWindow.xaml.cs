@@ -41,7 +41,7 @@ namespace SwarmRoboticsGUI
         public int UpperV { get; set; }
         #endregion
         private System.Timers.Timer InterfaceTimer { get; set; }
-        public List<RobotItem> RobotList { get; set; }
+        public List<Item> RobotList { get; set; }
         public Arena RobotArena { get; set; }
 
         private Camera camera1;
@@ -69,11 +69,11 @@ namespace SwarmRoboticsGUI
             camera1.Process += new EventHandler(DrawOverlayFrame);
 
             //Creates a local copy of the robotlist only containing the robots themselves
-            RobotList =  mainWindow.ItemList.Where(R => R is RobotItem).Cast<RobotItem>().ToList();
+            RobotList = mainWindow.ItemList.Where(R => R is RobotItem).Cast<Item>().ToList();
         }
 
         #region Public Methods
-        public void ClearRobots(ObservableCollection<RobotItem> RobotList)
+        public void ClearRobots(ObservableCollection<Item> RobotList)
         {
             RobotList.Clear();
         }
@@ -117,7 +117,7 @@ namespace SwarmRoboticsGUI
                             var proc = new Mat();
                             ImageProcessing.ProcessFilter(Frame, proc, camera1.Filter, LowerH, UpperH);
                             if (proc != null)
-                                    CameraDisplay1.Image = Frame;
+                                    CameraDisplay1.Image = proc;
                         }
                         else
                             CameraDisplay1.Image = Frame;
@@ -134,12 +134,12 @@ namespace SwarmRoboticsGUI
                         //RobotArena.ScaleFactor = 1;
 
                         // Apply image processing to find the robots
-                        ImageProcessing.GetRobots(Frame, RobotList, RobotArena);
+                        ImageProcessing.GetRobots(Frame, RobotList.Cast<RobotItem>().ToList(), RobotArena);
                     }                   
                     break;
                 case SourceType.CUTOUTS:
                     // Apply image processing to find the robots
-                    ImageProcessing.GetRobots(ImageProcessing.TestImage, RobotList, RobotArena);
+                    ImageProcessing.GetRobots(ImageProcessing.TestImage, RobotList.Cast<RobotItem>().ToList(), RobotArena);
 
                     //// Draw the testimage to the overlay imagebox
                     //if (ImageProcessing.TestImage != null)

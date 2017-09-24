@@ -180,7 +180,7 @@ namespace SwarmRoboticsGUI.Settings
 
             // TEMP: Manually added items for testing
             var ColourSettings = new SettingsGroup("Colour Settings");
-            ColourSettings.Children.Add(new SettingsRange("Hue", 30,70, 0, 100));
+            ColourSettings.Children.Add(new SettingsRange("Hue", 30, 70, 0, 100));
             ColourSettings.Children.Add(new SettingsRange("Saturation", 10, 90, 0, 100));
             ColourSettings.Children.Add(new SettingsRange("Value", 20, 40, 0, 100));
             ColourSettings.Children.Add(new SettingsValue("Contrast", 20, -100, 100));

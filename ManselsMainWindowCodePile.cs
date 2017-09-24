@@ -595,35 +595,37 @@ namespace SwarmRoboticsGUI
         }
         #endregion
 
+        // DONE
         #region Communications
-        private void dispSelectBtnPrevious_Click(object sender, RoutedEventArgs e)
-        {
-            if (dispSelectRobot.SelectedIndex > 0)
-            {
-                dispSelectRobot.SelectedIndex--;
-            }
-            else if (dispSelectRobot.SelectedIndex == 0)
-            {
-                dispSelectRobot.SelectedIndex = dispSelectRobot.Items.Count - 1;
-            }
-        }
-        private void dispSelectBtnNext_Click(object sender, RoutedEventArgs e)
-        {
-            if (dispSelectRobot.SelectedIndex < dispSelectRobot.Items.Count - 1)
-            {
-                dispSelectRobot.SelectedIndex++;
-            }
-            else if (dispSelectRobot.SelectedIndex == dispSelectRobot.Items.Count - 1)
-            {
-                dispSelectRobot.SelectedIndex = 0;
-            }
-        }
-        private void dispSelectRobot_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ComboBox CBsender = sender as ComboBox;
-            CommunicationItem selected = (CommunicationItem)CBsender.SelectedItem;
-            commManger.currentTargetRobot = selected.Address64;
-        }
+        //private void dispSelectBtnPrevious_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (dispSelectRobot.SelectedIndex > 0)
+        //    {
+        //        dispSelectRobot.SelectedIndex--;
+        //    }
+        //    else if (dispSelectRobot.SelectedIndex == 0)
+        //    {
+        //        dispSelectRobot.SelectedIndex = dispSelectRobot.Items.Count - 1;
+        //    }
+        //}
+        //private void dispSelectBtnNext_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (dispSelectRobot.SelectedIndex < dispSelectRobot.Items.Count - 1)
+        //    {
+        //        dispSelectRobot.SelectedIndex++;
+        //    }
+        //    else if (dispSelectRobot.SelectedIndex == dispSelectRobot.Items.Count - 1)
+        //    {
+        //        dispSelectRobot.SelectedIndex = 0;
+        //    }
+        //}
+        //private void dispSelectRobot_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        //{
+        //    ComboBox CBsender = sender as ComboBox;
+        //    CommunicationItem selected = (CommunicationItem)CBsender.SelectedItem;
+        //    commManger.currentTargetRobot = selected.Address64;
+        //    var hello = ItemsList1.SelectedItem;
+        //}
         #endregion
 
         #region Communications Manager    
@@ -665,6 +667,7 @@ namespace SwarmRoboticsGUI
                 lvCommunicatedMessages.Items.SortDescriptions.Clear();
             }
 
+            // Swap sorting direction if previous sorting was this column
             ListSortDirection newDir = ListSortDirection.Ascending;
             if (lvCommunicatedMessagesSortCol == column && lvCommunicatedMessagesSortAdorner.Direction == newDir)
                 newDir = ListSortDirection.Descending;
@@ -918,7 +921,7 @@ namespace SwarmRoboticsGUI
         private MenuItem parityList = null;
         private MenuItem dataBitsList = null;
         private MenuItem stopBitsList = null;
-        private MenuItem handshakingList = null;
+        private MenuItem handshakingList { get; set; }
         private MenuItem connectButton { get; set; }
 
         private void PopulateSerialSettings()

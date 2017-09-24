@@ -65,14 +65,14 @@ namespace XbeeHandler.XbeeFrames
 
 	public class XbeeAPIFrame
 	{
-		public DateTime timeStamp;
-		public byte[] rawMessage;
-		public int length;
-		public byte frameCommand;
-		public byte[] frameData;
-		public int checksum;
+		public DateTime timeStamp { get; set; }
+		public byte[] rawMessage { get; set; }
+        public int length { get; set; }
+        public byte frameCommand { get; set; }
+        public byte[] frameData { get; set; }
+        public int checksum { get; set; }
 
-		public XbeeAPIFrame(byte[] frame)
+        public XbeeAPIFrame(byte[] frame)
 		{
 			timeStamp = DateTime.Now;
 			rawMessage = new byte[frame.Length];

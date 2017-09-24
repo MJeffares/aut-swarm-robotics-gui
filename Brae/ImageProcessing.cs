@@ -64,66 +64,74 @@ namespace SwarmRoboticsGUI
 
         public static void ProcessFilter(IInputArray Input, IOutputArray Output, FilterType Filter, int HueLower = 0, int HueUpper = 255)
         {
-            switch (Filter)
+            if (Input != null)
             {
-                case FilterType.NONE:
-                    Input.GetInputArray().CopyTo(Output);
-                    break;
-                case FilterType.GREYSCALE:
-                    using (var In = new UMat())
-                    {
-                        //CvInvoke.CvtColor(Input, Output, ColorConversion.Bgr2Gray);
-                        CvInvoke.CvtColor(Input, In, ColorConversion.Bgr2Hsv);
-                        CvInvoke.ExtractChannel(In, Output, 2);
-                    }
-                    break;
-                case FilterType.CANNY_EDGES:
-                    using (var Out = new UMat(Input.GetInputArray().GetSize(), Input.GetInputArray().GetDepth(), Input.GetInputArray().GetChannels()))
-                    {
-                        var In = new UMat();
-                        var Contours = new VectorOfVectorOfPoint();
-                        var ProcessedContours = new VectorOfVectorOfPoint();
+                switch (Filter)
+                {
+                    case FilterType.NONE:
+                        Input.GetInputArray().CopyTo(Output);
+                        break;
+                    case FilterType.GREYSCALE:
+                        using (var In = new UMat())
+                        {
+                            //CvInvoke.CvtColor(Input, Output, ColorConversion.Bgr2Gray);
+                            CvInvoke.CvtColor(Input, In, ColorConversion.Bgr2Hsv);
+                            CvInvoke.ExtractChannel(In, Output, 2);
+                        }
+                        break;
+                    case FilterType.CANNY_EDGES:
+                        using (var In = new UMat())
+                        using (var Out = new UMat(Input.GetInputArray().GetSize(), Input.GetInputArray().GetDepth(), Input.GetInputArray().GetChannels()))
+                        using (var Contours = new VectorOfVectorOfPoint())
+                        using (var ProcessedContours = new VectorOfVectorOfPoint())
+                        {
+                            // Convert to grayscale
+                            CvInvoke.CvtColor(Input, In, ColorConversion.Bgr2Gray);
+                            // Noise removal
+                            CvInvoke.GaussianBlur(In, In, new Size(3, 3), 0);
 
-                        // Convert to grayscale
-                        CvInvoke.CvtColor(Input, In, ColorConversion.Bgr2Gray);
-                        // Find every contour in the image
-                        //CvInvoke.Canny(In, In, 0, 255);
-                        CvInvoke.AdaptiveThreshold(In, In, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 3, 0);
-                        // Find only the external contours applying no shape approximations
-                        CvInvoke.FindContours(In, Contours, null, RetrType.List, ChainApproxMethod.ChainApproxSimple);
-                        // Filter out small and large contours
-                        FilterContourArea(Contours, ProcessedContours, 1000000, 2000000);
+                            //CvInvoke.DetailEnhance(Input, Input);
+                            // Find every contour in the image
+                            //CvInvoke.Canny(In, In, 0, 255);
+                            CvInvoke.AdaptiveThreshold(In, In, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
+                            // Find only the external contours applying no shape approximations
+                            CvInvoke.FindContours(In, Contours, null, RetrType.External, ChainApproxMethod.ChainApproxNone);
+                            // Filter out small and large contours
+                            //FilterContourArea(Contours, ProcessedContours, 1000000, 2000000);
+                            FilterContourArea(Contours, ProcessedContours, 200, 2000000);
+                            //
+                            CvInvoke.DrawContours(Out, ProcessedContours, -1, new MCvScalar(255, 255, 255), 2);
+                            //
+                            Out.GetOutputArray().CopyTo(Output);
 
-                        CvInvoke.DrawContours(Out, ProcessedContours, -1, new MCvScalar(255, 255, 255), -1);
-                        Out.CopyTo(Output);
-                        Output.GetOutputArray().GetUMat().CopyTo(Output);
-                    }
-                    break;
-                case FilterType.COLOUR:
-                    using (var Out = new Mat())
-                    using (var HOut = new Mat())
-                    using (var SOut = new Mat())
-                    using (ScalarArray lower = new ScalarArray(HueLower))
-                    using (ScalarArray upper = new ScalarArray(HueUpper))
-                    {
-                        //
-                        CvInvoke.CvtColor(Input, Out, ColorConversion.Bgr2Hsv);
-                        
-                        //
-                        CvInvoke.ExtractChannel(Out, HOut, 0);
-                        CvInvoke.InRange(HOut, lower, upper, HOut);
-                        //
-                        CvInvoke.ExtractChannel(Out, SOut, 1);
-                        CvInvoke.Threshold(SOut, SOut, 40, 230, ThresholdType.Binary);
-                        CvInvoke.BitwiseAnd(SOut, HOut, SOut);
-                        //
-                        CvInvoke.ExtractChannel(Out, Out, 2);
-                        CvInvoke.Threshold(Out, Out, 60, 195, ThresholdType.Binary);
-                        CvInvoke.BitwiseAnd(SOut, Out, Output);
-                    }
-                    break;
-                default:
-                    break;
+                        }
+                        break;
+                    case FilterType.COLOUR:
+                        using (var Out = new Mat())
+                        using (var HOut = new Mat())
+                        using (var SOut = new Mat())
+                        using (ScalarArray lower = new ScalarArray(HueLower))
+                        using (ScalarArray upper = new ScalarArray(HueUpper))
+                        {
+                            //
+                            CvInvoke.CvtColor(Input, Out, ColorConversion.Bgr2Hsv);
+
+                            //
+                            CvInvoke.ExtractChannel(Out, HOut, 0);
+                            CvInvoke.InRange(HOut, lower, upper, HOut);
+                            //
+                            CvInvoke.ExtractChannel(Out, SOut, 1);
+                            CvInvoke.Threshold(SOut, SOut, 40, 230, ThresholdType.Binary);
+                            CvInvoke.BitwiseAnd(SOut, HOut, SOut);
+                            //
+                            CvInvoke.ExtractChannel(Out, Out, 2);
+                            CvInvoke.Threshold(Out, Out, 60, 195, ThresholdType.Binary);
+                            CvInvoke.BitwiseAnd(SOut, Out, Output);
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         public static void GetRobots(IInputArray Frame, List<RobotItem> RobotList, Arena Arena)
@@ -163,6 +171,7 @@ namespace SwarmRoboticsGUI
             }
             int RobotCount = 0;
 
+            // Testing CLAHE
             //CvInvoke.Imwrite("arenaFrame.png", Input);
             //var InputHSV = new UMat();
             //CvInvoke.CvtColor(Input, InputHSV, ColorConversion.Bgr2Hsv);
@@ -173,6 +182,7 @@ namespace SwarmRoboticsGUI
             //CvInvoke.CvtColor(InputHSV, Input, ColorConversion.Hsv2Bgr);
             //CvInvoke.Imwrite("clahe result.png", Input);
 
+            // Testing Histogram equalization
             //VectorOfUMat Channels = new VectorOfUMat();
             //CvInvoke.Imwrite("zbefore.png", Input);    
             //CvInvoke.CvtColor(Input, Input, ColorConversion.Bgr2Hsv);           
@@ -278,14 +288,18 @@ namespace SwarmRoboticsGUI
             var Contours = new VectorOfVectorOfPoint();
             var ProcessedContours = new VectorOfVectorOfPoint();
 
-            // Find every contour in the image
+            // Convert to a single channel image
             CvInvoke.CvtColor(Frame, Input, ColorConversion.Bgr2Gray);
             // Noise removal
+            CvInvoke.GaussianBlur(Input, Input, new Size(3, 3), 0);
+
+            // BRAE: Test DetailEnhance
+            //CvInvoke.DetailEnhance(Input, Input);
+
             // Threshold the image to find the edges  
             //CvInvoke.Canny(Input, Input, 0, 255);
             CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 3, 0);
 
-            CvInvoke.GaussianBlur(Input, Input, new Size(3, 3), 0);
             // Find only the external contours applying no shape approximations
             CvInvoke.FindContours(Input, Contours, null, RetrType.List, ChainApproxMethod.ChainApproxSimple);
 
@@ -427,9 +441,12 @@ namespace SwarmRoboticsGUI
             return Output.Size;
         }
         private static bool IsShape(IInputArray Contour, Shape Shape)
-        {
-            var contour = Contour as VectorOfPoint;
+        {      
+            // 10 degrees of tolerance
             const int tolerance = 10;
+
+            var contour = Contour as VectorOfPoint;
+
             int sides = 0;
             switch(Shape)
             {

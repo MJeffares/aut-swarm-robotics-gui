@@ -66,8 +66,8 @@ namespace SwarmRoboticsGUI
         private ProtocolClass swarmRoboticsProtocolHandler;
         public UInt64 currentTargetRobot;
 
-        private List<byte[]> rxMessageBuffer;
-        private List<XbeeAPIFrame> rxXbeeMessageBuffer;
+        public List<byte[]> rxMessageBuffer { get; set; }
+        public List<XbeeAPIFrame> rxXbeeMessageBuffer { get; set; }
 
         public CommunicationManager(MainWindow main, SerialUARTCommunication mainSerialPort, XbeeAPI xbeeManager, ProtocolClass swarmManager)
         {
