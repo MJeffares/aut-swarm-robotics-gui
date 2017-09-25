@@ -291,17 +291,17 @@ namespace SwarmRoboticsGUI
             // Convert to a single channel image
             CvInvoke.CvtColor(Frame, Input, ColorConversion.Bgr2Gray);
             // Noise removal
-            CvInvoke.GaussianBlur(Input, Input, new Size(3, 3), 0);
+            //CvInvoke.GaussianBlur(Input, Input, new Size(3, 3), 0);
 
             // BRAE: Test DetailEnhance
             //CvInvoke.DetailEnhance(Input, Input);
 
             // Threshold the image to find the edges  
             //CvInvoke.Canny(Input, Input, 0, 255);
-            CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 3, 0);
+            CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
 
             // Find only the external contours applying no shape approximations
-            CvInvoke.FindContours(Input, Contours, null, RetrType.List, ChainApproxMethod.ChainApproxSimple);
+            CvInvoke.FindContours(Input, Contours, null, RetrType.External, ChainApproxMethod.ChainApproxSimple);
 
             //GetCountours(Frame, Contours, 0, RetrType.List, ChainApproxMethod.ChainApproxNone);
             // Filter out small and large contours
@@ -312,7 +312,7 @@ namespace SwarmRoboticsGUI
             {
                 VectorOfPoint ProcessedContour = ProcessedContours[i];
                 // Get approximate polygonal shape of contour
-                CvInvoke.ApproxPolyDP(ProcessedContour, ProcessedContour, CvInvoke.ArcLength(ProcessedContour, true) * 0.02, true);
+                CvInvoke.ApproxPolyDP(ProcessedContour, ProcessedContour, CvInvoke.ArcLength(ProcessedContour, true) * 0.08, true);
 
                 // If contour is not the right shape (square), check next shape
                 if (!IsShape(ProcessedContour, Shape.SQUARE)) continue;

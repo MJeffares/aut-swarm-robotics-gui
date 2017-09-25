@@ -134,12 +134,12 @@ namespace SwarmRoboticsGUI
                         //RobotArena.ScaleFactor = 1;
 
                         // Apply image processing to find the robots
-                        ImageProcessing.GetRobots(Frame, RobotList.Cast<RobotItem>().ToList(), RobotArena);
+                        ImageProcessing.GetRobots(Frame, RobotList.Where(R => R is RobotItem).Cast<RobotItem>().ToList(), RobotArena);
                     }                   
                     break;
                 case SourceType.CUTOUTS:
                     // Apply image processing to find the robots
-                    ImageProcessing.GetRobots(ImageProcessing.TestImage, RobotList.Cast<RobotItem>().ToList(), RobotArena);
+                    ImageProcessing.GetRobots(ImageProcessing.TestImage, RobotList.Where(R => R is RobotItem).Cast<RobotItem>().ToList(), RobotArena);
 
                     //// Draw the testimage to the overlay imagebox
                     //if (ImageProcessing.TestImage != null)
