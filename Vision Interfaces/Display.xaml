@@ -73,9 +73,9 @@
         <Viewbox Stretch="Uniform">
             <Grid>
                 <Canvas Background="{StaticResource ArenaBackgroundBrush}" Width="1177" Height="1177">
-                    <!--<Line Stroke="Black" StrokeThickness="10" X1="0" Y1="300" X2="1177" Y2="877" />-->
-                    <Line Stroke="Black" StrokeThickness="10" Y1="300" X1="578" Y2="877" X2="578" />
-                    <!--<Line Stroke="Black" StrokeThickness="10" X1="0" Y1="300" X2="1177" Y2="877" />-->
+                    <Line Stroke="Black" StrokeThickness="10" X1="260" Y1="760" X2="920" Y2="420" />
+                    <Line Stroke="Black" StrokeThickness="10" Y1="210" X1="600" Y2="967" X2="600" />
+                    <Line Stroke="Black" StrokeThickness="10" X1="290" Y1="390" X2="900" Y2="790" />
                 </Canvas>
                 <ItemsControl Name="Arena"
                           ItemsSource="{Binding Items, RelativeSource={RelativeSource AncestorType=UserControl}}">

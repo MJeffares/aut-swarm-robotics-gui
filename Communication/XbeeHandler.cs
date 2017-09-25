@@ -517,7 +517,7 @@ namespace XbeeHandler
 			{
 				serial.SendByteArray(XbeeFrame(frame_data));
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
 				//MessageBox.Show(excpt.Message);
 			}

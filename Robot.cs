@@ -113,11 +113,11 @@ namespace SwarmRoboticsGUI
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
-                var Value = GetType().GetProperty(PropertyName).GetValue(this, null);
-                var Child = Children.Where(f => f.Name == PropertyName).SingleOrDefault();
+                //var Value = GetType().GetProperty(PropertyName).GetValue(this, null);
+                //var Child = Children.Where(f => f.Name == PropertyName).SingleOrDefault();
 
-                if (Child != null)
-                    Children.ElementAt(Children.IndexOf(Child)).Text = Value.ToString();
+                //if (Child != null)
+                    //Children.ElementAt(Children.IndexOf(Child)).Text = Value.ToString();
             }
         }
     }
@@ -428,7 +428,7 @@ namespace SwarmRoboticsGUI
 
             IObstacle obstacle = this;
             // TEMP: Size of the displayed robots is fixed
-            obstacle.Radius = 40;
+            obstacle.Radius = 50;
             obstacle.Width = 2 * obstacle.Radius;
             obstacle.Height = (int)(Math.Sqrt(3) * obstacle.Radius);
             obstacle.IsVisible = false;
@@ -689,12 +689,12 @@ namespace SwarmRoboticsGUI
 
             IObstacle obstacle = this;
             // TEMP: Size of the displayed robots is fixed
-            obstacle.Radius = 80;
+            obstacle.Radius = 70;
             obstacle.Width = 2 * obstacle.Radius;
             obstacle.Height = (int)(Math.Sqrt(3) * obstacle.Radius);
             obstacle.IsVisible = true;
-            double X = (2 * 1177 - obstacle.Width - 120) / 4;
-            double Y = (2 * 1177 - obstacle.Height - 120) / 4;
+            double X = (2 * 1177 - obstacle.Width) / 4;
+            double Y = (2 * 1177 - obstacle.Height) / 4;
             obstacle.Location = new System.Windows.Point(X, Y);
         }
     }

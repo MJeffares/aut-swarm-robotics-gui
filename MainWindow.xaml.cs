@@ -121,12 +121,13 @@ namespace SwarmRoboticsGUI
 			CvInvoke.UseOpenCL = true;
 			//
 			camera1 = new Camera();
-			xbee = new XbeeAPI(this);
+			
 			protocol = new ProtocolClass(this);
 
 
             // Serial communications
 			serial = new SerialUARTCommunication();
+            xbee = new XbeeAPI(this);
             PopulateSerialSettings();
             PopulateSerialPorts();
             portList.MouseEnter += new MouseEventHandler(menuPopulateSerialPorts);
@@ -704,7 +705,7 @@ namespace SwarmRoboticsGUI
             var itemList = sender as ItemList;
             if (itemList != null)
             {
-                var commsItem = itemList.SelectedItem as CommunicationItem;
+                var commsItem = itemList.SelectedItem as ICommunicates;
                 if (commsItem != null)
                     commManger.currentTargetRobot = ((ICommunicates)commsItem).Address64;
             }
