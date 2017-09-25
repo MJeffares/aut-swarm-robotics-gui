@@ -197,6 +197,7 @@
 
                 <DataGrid ItemsSource="{Binding commManger.rxXbeeMessageBuffer, RelativeSource={RelativeSource AncestorType=Window}}" 
                           AutoGenerateColumns="False" 
+                          
                           Grid.Column="0" 
                           Grid.Row="2" 
                           Grid.RowSpan = "1" 

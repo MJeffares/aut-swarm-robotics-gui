@@ -181,9 +181,12 @@ namespace SwarmRoboticsGUI
         private void DEBUGGING_PopulateTestList()
         {
             TestList = new List<XbeeAPIFrame>();
-            TestList.Add(new XbeeAPIFrame(new byte[] { 0x01,0x01,0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 }));
-            TestList.Add(new XbeeAPIFrame(new byte[] { 0x02,0x01,0x01, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02 }));
-            TestList.Add(new XbeeAPIFrame(new byte[] { 0x03,0x01, 0x03, 0x01, 0x03, 0x01, 0x01, 0x03, 0x01 }));
+            for (int i = 0; i < 10; i++)
+            {
+                commManger.rxXbeeMessageBuffer.Add(new XbeeAPIFrame(new byte[] { 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 }));
+                commManger.rxXbeeMessageBuffer.Add(new XbeeAPIFrame(new byte[] { 0x02, 0x01, 0x01, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02 }));
+                commManger.rxXbeeMessageBuffer.Add(new XbeeAPIFrame(new byte[] { 0x03, 0x01, 0x03, 0x01, 0x03, 0x01, 0x01, 0x03, 0x01 }));
+            }
         }
 
         private void PopulateCameras()
@@ -376,6 +379,7 @@ namespace SwarmRoboticsGUI
         {
             // BRAE: You hate this block of code. Does it belong here? Maybe? Does it even work? It did. Replace its functionality elsewhere? somewhere more appropiate like imgproc?
             //serial._serialPort.Write("Test");
+            commManger.rxXbeeMessageBuffer.Add(new XbeeAPIFrame(new byte[] { 0x02, 0x01, 0x01, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02 }));
 
             /// Error message for zero frames
             ///if (camera.Status == Camera.StatusType.PLAYING || camera.Status == Camera.StatusType.RECORDING)
