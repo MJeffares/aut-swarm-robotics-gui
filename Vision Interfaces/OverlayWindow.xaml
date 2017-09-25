@@ -67,7 +67,7 @@
             <UniformGrid Background="{StaticResource CheckerBrush}" Rows="1">
                 <local:Display x:Name="Display1" 
                                VerticalAlignment="Center"
-                               Items="{Binding RobotList, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                               Items="{Binding Obstacles, RelativeSource={RelativeSource AncestorType=Window}}"/>
                 <local:CameraDisplay x:Name="CameraDisplay1" 
                                      VerticalAlignment="Center"
                                      Visibility="Collapsed"/>
@@ -101,7 +101,7 @@
         <!--Right Grid-->
         <local:ItemList x:Name="RobotList1" 
             Grid.Row="1" Grid.Column="2" 
-            Items="{Binding RobotList, RelativeSource={RelativeSource AncestorType=Window}}"/>
+            Items="{Binding ItemList, RelativeSource={RelativeSource AncestorType=Window}}"/>
         <!--<settings:SettingsList x:Name="Settings1" Grid.Row="1" Grid.Column="3"/>-->
 
         <GridSplitter Grid.Column="0"

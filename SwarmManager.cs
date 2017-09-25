@@ -57,7 +57,7 @@ namespace SwarmRoboticsGUI
 
            // RegisteredRobots = mainWindow.RobotList.Where(R => R is RobotItem && (R as RobotItem).IsTracked).Cast<RobotItem>().ToList<RobotItem>();
             RobotList = mainWindow.ItemList.Where(R => R is RobotItem).Cast<RobotItem>().ToList<RobotItem>();
-            RegisteredRobots = RobotList.Where(R => R.IsTracked).ToList<RobotItem>();
+            RegisteredRobots = RobotList.Where(R => (R as IObstacle).IsTracked).ToList<RobotItem>();
 
             //MANSEL: Test this line
             //RegisteredRobots = mainWindow.ItemList.Where(R => (R is RobotItem) && (R .IsTracked)).Cast
@@ -74,22 +74,24 @@ namespace SwarmRoboticsGUI
 
         private void PositioningTimer_Tick(object sender, EventArgs arg)
         {
-            RegisteredRobots = RobotList.Where(R => R.IsTracked).ToList<RobotItem>();
+            RegisteredRobots = RobotList.Where(R => (R as IObstacle).IsTracked).ToList<RobotItem>();
 
             foreach (RobotItem R in RegisteredRobots)
             {
+                ICommunicates comms = R as ICommunicates;
+                IObstacle obstacle = R as IObstacle;
                 byte[] data;
                 UInt16 num;
                 data = new byte[7];
 
                 data[0] = 0xA0;
 
-                num = (UInt16)R.Location.X;
+                num = (UInt16)obstacle.Location.X;
 
                 data[1] = (byte)(num >> 0x8);
                 data[2] = (byte)(num);
 
-                num = (UInt16)R.Location.Y;
+                num = (UInt16)obstacle.Location.Y;
 
                 data[3] = (byte)(num >> 0x8);
                 data[4] = (byte)(num);
@@ -100,7 +102,7 @@ namespace SwarmRoboticsGUI
                 data[5] = (byte)(num >> 0x8);
                 data[6] = (byte)(num);
 
-                xbee.SendTransmitRequest(R.Address64, data);
+                xbee.SendTransmitRequest(comms.Address64, data);
             }
         }
     }

@@ -706,7 +706,7 @@ namespace SwarmRoboticsGUI
             {
                 var commsItem = itemList.SelectedItem as CommunicationItem;
                 if (commsItem != null)
-                    commManger.currentTargetRobot = commsItem.Address64;
+                    commManger.currentTargetRobot = ((ICommunicates)commsItem).Address64;
             }
         }
 

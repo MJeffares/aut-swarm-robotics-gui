@@ -52,12 +52,12 @@ namespace SwarmRoboticsGUI
     {
         public static readonly DependencyProperty ItemsProperty =
             DependencyProperty.Register("Items",
-            typeof(List<Item>),
+            typeof(List<IObstacle>),
             typeof(Display),
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
-        public List<Item> Items
+        public List<IObstacle> Items
         {
-            get { return (List<Item>)GetValue(ItemsProperty); }
+            get { return (List<IObstacle>)GetValue(ItemsProperty); }
             set { SetValue(ItemsProperty, value); }
         }
 
@@ -78,13 +78,13 @@ namespace SwarmRoboticsGUI
                 if (Robot != null)
                 {
                     int index = Items.IndexOf(Robot);
-                    foreach (RobotItem R in Items)
+                    foreach (RobotItem R in Items.Where(R => R is RobotItem))
                     {
                         R.IsSelected = false;
                         R.IsExpanded = false;
                     }
-                    Items[index].IsSelected = true;
-                    Items[index].IsExpanded = true;
+                    Robot.IsSelected = true;
+                    Robot.IsExpanded = true;
                 }
             }
         }

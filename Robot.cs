@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Drawing;
 using Emgu.CV;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
+using System.Drawing;
+using System.Windows;
 
 namespace SwarmRoboticsGUI
 {
@@ -120,7 +121,33 @@ namespace SwarmRoboticsGUI
             }
         }
     }
-    public class RobotItem : CommunicationItem, INotifyPropertyChanged
+
+
+    public interface IObstacle
+    {
+        System.Windows.Point Location { get; set; }
+        System.Drawing.Point PixelLocation { get; set; }
+        System.Drawing.Point[] Contour { get; set; }
+
+        bool IsVisible { get; set; }
+        bool IsTracked { get; set; }
+
+        int Radius { get; set; }
+        int Height { get; set; }
+        int Width { get; set; }
+    }
+
+    public interface ICommunicates
+    {
+        UInt64 Address64 { get; set; }
+        UInt16 Address16 { get; set; }
+        bool IsCommunicating { get; set; }
+    }
+
+
+
+
+    public class RobotItem : Item, INotifyPropertyChanged, IObstacle, ICommunicates
     {
         #region Status Properties
         private int _Battery { get; set; }
@@ -176,92 +203,27 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-        private System.Windows.Point _Location { get; set; }
-        public System.Windows.Point Location
-        {
-            get { return _Location; }
-            set
-            {
-                if (_Location != value)
-                {
-                    _Location = value;
-                    NotifyPropertyChanged("Location");
-                }
-            }
-        }
-        public Point PreviousLocation { get; set; }
-        private bool _IsCommunicating { get; set; }
-        public bool IsCommunicating
-        {
-            get { return _IsCommunicating; }
-            set
-            {
-                if (_IsCommunicating != value)
-                {
-                    _IsCommunicating = value;
-                    NotifyPropertyChanged("IsCommunicating");
-                }
-            }
-        }
-        private bool _IsTracked { get; set; }
-        public bool IsTracked
-        {
-            get { return _IsTracked; }
-            set
-            {
-                if (_IsTracked != value)
-                {
-                    _IsTracked = value;
-                    NotifyPropertyChanged("IsTracked");
-                }
-            }
-        }
-        #endregion
+        
 
-        #region Dimension Properties
-        private int _Radius { get; set; }
-        public int Radius
-        {
-            get { return _Radius; }
-            set
-            {
-                if (_Radius != value)
-                {
-                    _Radius = value;
-                    NotifyPropertyChanged("Radius");
-                }
-            }
-        }
-        private int _Height { get; set; }
-        public int Height
-        {
-            get { return _Height; }
-            set
-            {
-                if (_Height != value)
-                {
-                    _Height = value;
-                    NotifyPropertyChanged("Height");
-                }
-            }
-        }
-        private int _Width { get; set; }
-        public int Width
-        {
-            get { return _Width; }
-            set
-            {
-                if (_Width != value)
-                {
-                    _Width = value;
-                    NotifyPropertyChanged("Width");
-                }
-            }
-        }
-        #endregion
+        public System.Drawing.Point PreviousLocation { get; set; }
 
+
+        #endregion
 
         #region Display Properties
+        private bool _HasFacing { get; set; }
+        public bool HasFacing
+        {
+            get { return _HasFacing; }
+            set
+            {
+                if (_HasFacing != value)
+                {
+                    _HasFacing = value;
+                    NotifyPropertyChanged("HasFacing");
+                }
+            }
+        }
         private double _FacingDeg { get; set; }
         public double FacingDeg
         {
@@ -288,8 +250,79 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-        private Point _PixelLocation { get; set; }
-        public Point PixelLocation
+        private string _Colour { get; set; }
+        public string Colour
+        {
+            get { return _Colour; }
+            set
+            {
+                if (_Colour != value)
+                {
+                    _Colour = value;
+                    NotifyPropertyChanged("Colour");
+                }
+            }
+        }
+        #endregion
+
+        #region Communication Properties
+        private ulong _Address64 { get; set; }
+        ulong ICommunicates.Address64
+        {
+            get { return _Address64; }
+            set
+            {
+                if (_Address64 != value)
+                {
+                    _Address64 = value;
+                    NotifyPropertyChanged("Address64");
+                }
+            }
+        }
+        private ushort _Address16 { get; set; }
+        ushort ICommunicates.Address16
+        {
+            get { return _Address16; }
+            set
+            {
+                if (_Address16 != value)
+                {
+                    _Address16 = value;
+                    NotifyPropertyChanged("Address16");
+                }
+            }
+        }
+        private bool _IsCommunicating { get; set; }
+        bool ICommunicates.IsCommunicating
+        {
+            get { return _IsCommunicating; }
+            set
+            {
+                if (_IsCommunicating != value)
+                {
+                    _IsCommunicating = value;
+                    NotifyPropertyChanged("IsCommunicating");
+                }
+            }
+        }
+        #endregion
+
+        #region Obstacle Properties
+        private System.Windows.Point _Location { get; set; }
+        System.Windows.Point IObstacle.Location
+        {
+            get { return _Location; }
+            set
+            {
+                if (_Location != value)
+                {
+                    _Location = value;
+                    NotifyPropertyChanged("Location");
+                }
+            }
+        }
+        private System.Drawing.Point _PixelLocation { get; set; }
+        System.Drawing.Point IObstacle.PixelLocation
         {
             get { return _PixelLocation; }
             set
@@ -300,10 +333,22 @@ namespace SwarmRoboticsGUI
                     NotifyPropertyChanged("PixelLocation");
                 }
             }
-        }              
-        public Point[] Contour { get; set; }              
+        }
+        private System.Drawing.Point[] _Contour { get; set; }
+        System.Drawing.Point[] IObstacle.Contour
+        {
+            get { return _Contour; }
+            set
+            {
+                if (_Contour != value)
+                {
+                    _Contour = value;
+                    NotifyPropertyChanged("Contour");
+                }
+            }
+        }
         private bool _IsVisible { get; set; }
-        public bool IsVisible
+        bool IObstacle.IsVisible
         {
             get { return _IsVisible; }
             set
@@ -315,23 +360,78 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
+        private bool _IsTracked { get; set; }
+        bool IObstacle.IsTracked
+        {
+            get { return _IsTracked; }
+            set
+            {
+                if (_IsTracked != value)
+                {
+                    _IsTracked = value;
+                    NotifyPropertyChanged("IsTracked");
+                }
+            }
+        }
+        private int _Radius { get; set; }
+        int IObstacle.Radius
+        {
+            get { return _Radius; }
+            set
+            {
+                if (_Radius != value)
+                {
+                    _Radius = value;
+                    NotifyPropertyChanged("Radius");
+                }
+            }
+        }
+        private int _Height { get; set; }
+        int IObstacle.Height
+        {
+            get { return _Height; }
+            set
+            {
+                if (_Height != value)
+                {
+                    _Height = value;
+                    NotifyPropertyChanged("Height");
+                }
+            }
+        }
+        private int _Width { get; set; }
+        int IObstacle.Width
+        {
+            get { return _Width; }
+            set
+            {
+                if (_Width != value)
+                {
+                    _Width = value;
+                    NotifyPropertyChanged("Width");
+                }
+            }
+        }
         #endregion
 
-        public RobotItem(string Name, UInt64 MAC_Address, string Colour, int ID) : base(Name, MAC_Address, Colour)
+        public RobotItem(string Name, ulong MAC_Address, string Colour, int ID) : base(Name)
         {
 			this.Name = Name;
             this.ID = ID;
-			this.Colour = Colour;
-			this.Address64 = MAC_Address;
-            Group = "Not Connected";
-            // TEMP: Size of the robots is fixed       
-            Radius = 40;
-            Width = 2 * Radius;
-            Height = (int)(Math.Sqrt(3) * Radius);
+            this.Colour = Colour;
+            this.Group = "Not Connected";
+            this.HasFacing = false;
 
-            // TEMP: Set position off the arena intially
-            Location = new System.Windows.Point(0, 0);
-            IsVisible = false;
+            ICommunicates comms = this;
+            comms.Address16 = 0xFFFE;
+            comms.Address64 = MAC_Address;
+
+            IObstacle obstacle = this;
+            // TEMP: Size of the displayed robots is fixed
+            obstacle.Radius = 40;
+            obstacle.Width = 2 * obstacle.Radius;
+            obstacle.Height = (int)(Math.Sqrt(3) * obstacle.Radius);
+            obstacle.IsVisible = false;
             
             // Create property labels
             Children.Add(new Item("ID"));
@@ -339,8 +439,7 @@ namespace SwarmRoboticsGUI
             Children.Add(new Item("Task"));
             Children.Add(new Item("Location"));
             Children.Add(new Item("FacingDeg"));
-        }
-        
+        }   
     }
 
     public class RobotGroup : Item, INotifyPropertyChanged
@@ -353,8 +452,8 @@ namespace SwarmRoboticsGUI
 
     public class Arena : Item, INotifyPropertyChanged
     {
-        private Point _Origin { get; set; }
-        public Point Origin
+        private System.Drawing.Point _Origin { get; set; }
+        public System.Drawing.Point Origin
         {
             get { return _Origin; }
             set
@@ -366,25 +465,32 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-
-        private Point _Opposite { get; set; }
-        public Point Opposite
+        public double _ScaleFactor { get; set; }
+        public double ScaleFactor
         {
-            get { return _Opposite; }
+            get { return _ScaleFactor; }
             set
             {
-                if (_Opposite != value)
+                if (_ScaleFactor != value)
                 {
-                    _Opposite = value;
-                    NotifyPropertyChanged("Opposite");
+                    _ScaleFactor = value;
+                    NotifyPropertyChanged("ScaleFactor");
                 }
             }
         }
-
-        public double ScaleFactor { get; set; }
-
-
-        public Point[] Contour { get; set; }
+        public System.Drawing.Point[] _Contour { get; set; }
+        public System.Drawing.Point[] Contour
+        {
+            get { return _Contour; }
+            set
+            {
+                if (_Contour != value)
+                {
+                    _Contour = value;
+                    NotifyPropertyChanged("Contour");
+                }
+            }
+        }
 
         public Arena() : base("Arena")
         {
@@ -392,19 +498,208 @@ namespace SwarmRoboticsGUI
         }
     }
 
-    public class ChargingDockItem : CommunicationItem, INotifyPropertyChanged
+    public class ChargingDockItem : Item, INotifyPropertyChanged, IObstacle, ICommunicates
     {
-        public ChargingDockItem(String Name, UInt64 MAC_Address, string Colour) : base(Name, MAC_Address, Colour)
+        #region Communication Properties
+        private ulong _Address64 { get; set; }
+        ulong ICommunicates.Address64
+        {
+            get { return _Address64; }
+            set
+            {
+                if (_Address64 != value)
+                {
+                    _Address64 = value;
+                    NotifyPropertyChanged("Address64");
+                }
+            }
+        }
+        private ushort _Address16 { get; set; }
+        ushort ICommunicates.Address16
+        {
+            get { return _Address16; }
+            set
+            {
+                if (_Address16 != value)
+                {
+                    _Address16 = value;
+                    NotifyPropertyChanged("Address16");
+                }
+            }
+        }
+        private bool _IsCommunicating { get; set; }
+        bool ICommunicates.IsCommunicating
+        {
+            get { return _IsCommunicating; }
+            set
+            {
+                if (_IsCommunicating != value)
+                {
+                    _IsCommunicating = value;
+                    NotifyPropertyChanged("IsCommunicating");
+                }
+            }
+        }
+        #endregion
+
+        #region Obstacle Properties
+        private System.Windows.Point _Location { get; set; }
+        System.Windows.Point IObstacle.Location
+        {
+            get { return _Location; }
+            set
+            {
+                if (_Location != value)
+                {
+                    _Location = value;
+                    NotifyPropertyChanged("Location");
+                }
+            }
+        }
+        private System.Drawing.Point _PixelLocation { get; set; }
+        System.Drawing.Point IObstacle.PixelLocation
+        {
+            get { return _PixelLocation; }
+            set
+            {
+                if (_PixelLocation != value)
+                {
+                    _PixelLocation = value;
+                    NotifyPropertyChanged("PixelLocation");
+                }
+            }
+        }
+        private System.Drawing.Point[] _Contour { get; set; }
+        System.Drawing.Point[] IObstacle.Contour
+        {
+            get { return _Contour; }
+            set
+            {
+                if (_Contour != value)
+                {
+                    _Contour = value;
+                    NotifyPropertyChanged("Contour");
+                }
+            }
+        }
+        private bool _IsVisible { get; set; }
+        bool IObstacle.IsVisible
+        {
+            get { return _IsVisible; }
+            set
+            {
+                if (_IsVisible != value)
+                {
+                    _IsVisible = value;
+                    NotifyPropertyChanged("IsVisible");
+                }
+            }
+        }
+        private bool _IsTracked { get; set; }
+        bool IObstacle.IsTracked
+        {
+            get { return _IsTracked; }
+            set
+            {
+                if (_IsTracked != value)
+                {
+                    _IsTracked = value;
+                    NotifyPropertyChanged("IsTracked");
+                }
+            }
+        }
+        private int _Radius { get; set; }
+        int IObstacle.Radius
+        {
+            get { return _Radius; }
+            set
+            {
+                if (_Radius != value)
+                {
+                    _Radius = value;
+                    NotifyPropertyChanged("Radius");
+                }
+            }
+        }
+        private int _Height { get; set; }
+        int IObstacle.Height
+        {
+            get { return _Height; }
+            set
+            {
+                if (_Height != value)
+                {
+                    _Height = value;
+                    NotifyPropertyChanged("Height");
+                }
+            }
+        }
+        private int _Width { get; set; }
+        int IObstacle.Width
+        {
+            get { return _Width; }
+            set
+            {
+                if (_Width != value)
+                {
+                    _Width = value;
+                    NotifyPropertyChanged("Width");
+                }
+            }
+        }
+        #endregion
+
+        private double _FacingDeg { get; set; }
+        public double FacingDeg
+        {
+            get { return _FacingDeg; }
+            set
+            {
+                if (_FacingDeg != value)
+                {
+                    _FacingDeg = value;
+                    NotifyPropertyChanged("FacingDeg");
+                }
+            }
+        }
+        private String _Colour { get; set; }
+        public String Colour
+        {
+            get { return _Colour; }
+            set
+            {
+                if (_Colour != value)
+                {
+                    _Colour = value;
+                    NotifyPropertyChanged("Colour");
+                }
+            }
+        }
+
+        public ChargingDockItem(String Name, UInt64 MAC_Address, string Colour) : base(Name)
         {
             this.Name = Name;
-            this.Address64 = MAC_Address;
-            this.Colour = Colour;
+            this.Group = "Charging Stations";
+            this.Colour = "Green";
+            this.FacingDeg = 30;
 
-            Group = "Charging Stations";
+            ICommunicates comms = this;
+            comms.Address16 = 0xFFFE;
+            comms.Address64 = MAC_Address;
+
+            IObstacle obstacle = this;
+            // TEMP: Size of the displayed robots is fixed
+            obstacle.Radius = 80;
+            obstacle.Width = 2 * obstacle.Radius;
+            obstacle.Height = (int)(Math.Sqrt(3) * obstacle.Radius);
+            obstacle.IsVisible = true;
+            double X = (2 * 1177 - obstacle.Width - 120) / 4;
+            double Y = (2 * 1177 - obstacle.Height - 120) / 4;
+            obstacle.Location = new System.Windows.Point(X, Y);
         }
     }
 
-    public class CommunicationItem : Item, INotifyPropertyChanged
+    public class CommunicationItem : Item, INotifyPropertyChanged, ICommunicates
     {
         private String _Colour { get; set; }
         public String Colour
@@ -420,8 +715,9 @@ namespace SwarmRoboticsGUI
             }
         }
 
-        private UInt64 _Address64 { get; set; }
-        public UInt64 Address64
+        #region Communication Properties
+        private ulong _Address64 { get; set; }
+        ulong ICommunicates.Address64
         {
             get { return _Address64; }
             set
@@ -433,9 +729,8 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-
-        private UInt16 _Address16 { get; set; }
-        public UInt16 Address16
+        private ushort _Address16 { get; set; }
+        ushort ICommunicates.Address16
         {
             get { return _Address16; }
             set
@@ -447,15 +742,30 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
+        private bool _IsCommunicating { get; set; }
+        bool ICommunicates.IsCommunicating
+        {
+            get { return _IsCommunicating; }
+            set
+            {
+                if (_IsCommunicating != value)
+                {
+                    _IsCommunicating = value;
+                    NotifyPropertyChanged("IsCommunicating");
+                }
+            }
+        }
+        #endregion
 
         public CommunicationItem(String Name, UInt64 MAC_Address, string Colour) : base(Name)
         {
             this.Name = Name;
-            this.Address16 = 0xFFFE;
-            this.Address64 = MAC_Address;
+            this.Group = "All";
             this.Colour = Colour;
 
-            Group = "All";
+            ICommunicates comms = this;
+            comms.Address16 = 0xFFFE;
+            comms.Address64 = MAC_Address;
         }
     }
 }

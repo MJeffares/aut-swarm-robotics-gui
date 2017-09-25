@@ -263,15 +263,18 @@ namespace SwarmRoboticsGUI
                 // DEBUG: Robot counter
                 RobotCount++;
 
-                RobotList[index].IsTracked = true;
+                RobotItem robot = RobotList[index];
+                IObstacle obstacle = RobotList[index];
+
+                obstacle.IsTracked = true;
                 // DEBUG: Store the vertices of the hexagonal shape
-                RobotList[index].Contour = Hexagon.ToArray();
+                obstacle.Contour = Hexagon.ToArray();
 
                 // Get the robots center
                 MCvPoint2D64f COM = CvInvoke.Moments(Hexagon).GravityCenter;
 
                 // Store the robots pixel location
-                RobotList[index].PixelLocation = new Point((int)COM.X, (int)COM.Y);
+                obstacle.PixelLocation = new Point((int)COM.X, (int)COM.Y);
 
                 // Use the arena's size and location in frame to scale robots location to real world
                 if (Arena.ScaleFactor != 0 && !Arena.Origin.IsEmpty)
@@ -283,9 +286,9 @@ namespace SwarmRoboticsGUI
                     //RobotList[index].Width /= 2;
                     // Calulate height using sqrt(3)*radius
                     //RobotList[index].Height = (int)(RobotList[index].Width / 2 * Math.Sqrt(3));
-                    RobotList[index].IsVisible = true;
+                    obstacle.IsVisible = true;
                     // Store the robots real-world location
-                    RobotList[index].Location = new System.Windows.Point((COM.X - Arena.Origin.X) * Arena.ScaleFactor,
+                    obstacle.Location = new System.Windows.Point((COM.X - Arena.Origin.X) * Arena.ScaleFactor,
                         (COM.Y - Arena.Origin.Y) * Arena.ScaleFactor);
                 }
 
@@ -294,13 +297,14 @@ namespace SwarmRoboticsGUI
                 double Facing = FindFacing(RobotFrame, RobotFrameLocation);
                 if (Facing == 0) continue;
 
-                if (RobotList[index].PixelLocation.X > 0 && RobotList[index].PixelLocation.Y > 0)
+                if (obstacle.PixelLocation.X > 0 && obstacle.PixelLocation.Y > 0)
                 {
-                    RobotList[index].Facing = Facing;
-                    RobotList[index].FacingDeg = Facing * 180 / Math.PI;
+                    robot.HasFacing = true;
+                    robot.Facing = Facing;
+                    robot.FacingDeg = Facing * 180 / Math.PI;
 
-                    int DirectionX = (int)(RobotList[index].Width * 0.4);
-                    RobotList[index].FacingMarker = DirectionX;
+                    int DirectionX = (int)(obstacle.Width * 0.4);
+                    robot.FacingMarker = DirectionX;
                 }
             }
         }

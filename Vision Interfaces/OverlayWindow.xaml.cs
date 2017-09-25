@@ -42,7 +42,9 @@ namespace SwarmRoboticsGUI
         public int UpperV { get; set; }
         #endregion
         private System.Timers.Timer InterfaceTimer { get; set; }
-        public List<Item> RobotList { get; set; }
+        public List<RobotItem> RobotList { get; set; }
+        public List<IObstacle> Obstacles { get; set; }
+        public List<Item> ItemList { get; set; }
         public Arena RobotArena { get; set; }
 
         private Camera camera1;
@@ -70,7 +72,9 @@ namespace SwarmRoboticsGUI
             camera1.Process += new EventHandler(DrawOverlayFrame);
 
             //Creates a local copy of the robotlist only containing the robots themselves
-            RobotList = mainWindow.ItemList.Where(R => R is RobotItem).ToList();
+            ItemList = mainWindow.ItemList;
+            Obstacles = mainWindow.ItemList.Where(R => R is IObstacle).Cast<IObstacle>().ToList();
+            RobotList = mainWindow.ItemList.Where(R => R is RobotItem).Cast<RobotItem>().ToList();
         }
 
         #region Public Methods
@@ -146,12 +150,12 @@ namespace SwarmRoboticsGUI
                         //RobotArena.ScaleFactor = 1;
 
                         // Apply image processing to find the robots
-                        ImageProcessing.GetRobots(Frame, RobotList.Where(R => R is RobotItem).Cast<RobotItem>().ToList(), RobotArena);
+                        ImageProcessing.GetRobots(Frame, RobotList, RobotArena);
                     }                   
                     break;
                 case SourceType.CUTOUTS:
                     // Apply image processing to find the robots
-                    ImageProcessing.GetRobots(ImageProcessing.TestImage, RobotList.Where(R => R is RobotItem).Cast<RobotItem>().ToList(), RobotArena);
+                    ImageProcessing.GetRobots(ImageProcessing.TestImage, RobotList, RobotArena);
 
                     //// Draw the testimage to the overlay imagebox
                     //if (ImageProcessing.TestImage != null)

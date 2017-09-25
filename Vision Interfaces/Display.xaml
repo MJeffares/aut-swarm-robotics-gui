@@ -69,25 +69,35 @@
     </UserControl.Resources>
 
     <Grid>
+        
         <Viewbox Stretch="Uniform">
-            <ItemsControl Name="Arena"
+            <Grid>
+                <Canvas Background="{StaticResource ArenaBackgroundBrush}" Width="1177" Height="1177">
+                    <!--<Line Stroke="Black" StrokeThickness="10" X1="0" Y1="300" X2="1177" Y2="877" />-->
+                    <Line Stroke="Black" StrokeThickness="10" Y1="300" X1="578" Y2="877" X2="578" />
+                    <!--<Line Stroke="Black" StrokeThickness="10" X1="0" Y1="300" X2="1177" Y2="877" />-->
+                </Canvas>
+                <ItemsControl Name="Arena"
                           ItemsSource="{Binding Items, RelativeSource={RelativeSource AncestorType=UserControl}}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <Canvas Background="{StaticResource ArenaBackgroundBrush}" Width="1177" Height="1177"/>
+                        <Canvas Background="Transparent" Width="1177" Height="1177"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemContainerStyle>
                     <Style TargetType="ContentPresenter">
-                        <Setter Property="Canvas.Left" Value="{Binding Location.X}"/>
+                        <Setter Property="Canvas.Left" Value="{Binding Path=(local:IObstacle.Location).X}"/>
+                        <!--<Setter Property="Canvas.Left" Value="{Binding Location.X}"/>-->
                         <Setter Property="Canvas.Margin" Value="-40,-40,0,0"/>
-                        <Setter Property="Canvas.Top" Value="{Binding Location.Y}"/>
-                        <Setter Property="Canvas.Visibility" Value="{Binding Path=IsVisible, Converter={StaticResource BoolToVis}}"/>
+                        <Setter Property="Canvas.Top" Value="{Binding Path=(local:IObstacle.Location).Y}"/>
+                        <!--<Setter Property="Canvas.Top" Value="{Binding Location.Y}"/>-->
+                        <Setter Property="Canvas.Visibility" Value="{Binding Path=(local:IObstacle.IsVisible), Converter={StaticResource BoolToVis}}"/>
+                        <!--<Setter Property="Canvas.Visibility" Value="{Binding IsVisible, Converter={StaticResource BoolToVis}}"/>-->
                     </Style>
                 </ItemsControl.ItemContainerStyle>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid>
+                        <Grid Background="Transparent">
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
@@ -97,7 +107,7 @@
                             </Grid.ColumnDefinitions>
 
                             <Polygon Name="Hexagon" Style="{StaticResource Hexagon}"
-                                     Height="{Binding Width}" Width="{Binding Height}"
+                                     Height="{Binding Path=(local:IObstacle.Width)}" Width="{Binding Path=(local:IObstacle.Height)}"
                                      MouseLeftButtonDown="Robot_MouseLeftButtonDown"
                                      RenderTransformOrigin="0.5,0.5">
                                 <Polygon.LayoutTransform>
@@ -110,7 +120,8 @@
                             <Polygon Style="{StaticResource Triangle}"
                                      Height="20" Width="20" 
                                      RenderTransformOrigin="0.5,0.5"
-                                     IsHitTestVisible="False">
+                                     IsHitTestVisible="False"
+                                     Visibility="{Binding HasFacing, Converter={StaticResource BoolToVis}, FallbackValue=Hidden}">
                                 <Polygon.RenderTransform>
                                     <TransformGroup>
                                         <TranslateTransform X="{Binding FacingMarker}"/>
@@ -145,6 +156,7 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+            </Grid>
         </Viewbox>
     </Grid>
 </UserControl>

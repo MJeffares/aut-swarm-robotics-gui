@@ -57,7 +57,7 @@ namespace SwarmRoboticsGUI
             data[2] = lightsensor[0];
 
             ChargingDockItem Dock = (ChargingDockItem)ItemList.First(D => D is ChargingDockItem);
-            xbee.SendTransmitRequest(Dock.Address64, data);
+            xbee.SendTransmitRequest(((ICommunicates)Dock).Address64, data);
         }
         #endregion
 
