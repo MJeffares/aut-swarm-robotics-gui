@@ -52,12 +52,12 @@ namespace SwarmRoboticsGUI
     {
         public static readonly DependencyProperty ItemsProperty =
             DependencyProperty.Register("Items",
-            typeof(List<RobotItem>),
+            typeof(List<Item>),
             typeof(Display),
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
-        public List<RobotItem> Items
+        public List<Item> Items
         {
-            get { return (List<RobotItem>)GetValue(ItemsProperty); }
+            get { return (List<Item>)GetValue(ItemsProperty); }
             set { SetValue(ItemsProperty, value); }
         }
 

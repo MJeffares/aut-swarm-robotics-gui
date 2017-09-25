@@ -80,7 +80,7 @@
                 <ItemsControl.ItemContainerStyle>
                     <Style TargetType="ContentPresenter">
                         <Setter Property="Canvas.Left" Value="{Binding Location.X}"/>
-                        <Setter Property="Canvas.Margin" Value="0,0,0,0"/>
+                        <Setter Property="Canvas.Margin" Value="-40,-40,0,0"/>
                         <Setter Property="Canvas.Top" Value="{Binding Location.Y}"/>
                         <Setter Property="Canvas.Visibility" Value="{Binding Path=IsVisible, Converter={StaticResource BoolToVis}}"/>
                     </Style>
@@ -125,6 +125,7 @@
                                        Foreground="#000" FontSize="20"
                                        IsHitTestVisible="False">
                             </TextBlock>
+                            
                             <!--<Grid Grid.Row="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
@@ -139,6 +140,7 @@
                                        IsHitTestVisible="False">
                                 </TextBlock>
                             </Grid>-->
+                            
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

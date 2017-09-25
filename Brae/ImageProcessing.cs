@@ -47,6 +47,11 @@ namespace SwarmRoboticsGUI
         public static IInputArray TestImage { get; set; } 
         #endregion
 
+        #region Private Properties
+        private static Range SaturationRange = new Range(25, 250);
+        private static Range ValueRange = new Range(25, 250);
+        #endregion
+
         #region Public Methods
         static ImageProcessing()
         {
@@ -110,23 +115,47 @@ namespace SwarmRoboticsGUI
                         using (var Out = new Mat())
                         using (var HOut = new Mat())
                         using (var SOut = new Mat())
+                        using (var VOut = new Mat())
                         using (ScalarArray lower = new ScalarArray(HueLower))
                         using (ScalarArray upper = new ScalarArray(HueUpper))
                         {
                             //
                             CvInvoke.CvtColor(Input, Out, ColorConversion.Bgr2Hsv);
 
+                            //Range SaturationRange = new Range(20, 200);
+                            //Range ValueRange = new Range(10, 200);
+                            //CvInvoke.Imwrite("MaskedHSV.png", Masked);
+
+                            CvInvoke.ExtractChannel(Out, SOut, 1);
+                            CvInvoke.ExtractChannel(Out, VOut, 2);
+                            CvInvoke.Threshold(SOut, SOut, SaturationRange.Start, SaturationRange.End, ThresholdType.Binary);
+                            //CvInvoke.Imwrite("SOut.png", SOut);
+                            CvInvoke.Threshold(VOut, VOut, ValueRange.Start, ValueRange.End, ThresholdType.Binary);
+                            //CvInvoke.Imwrite("VOut.png", VOut);
+                            //CvInvoke.AdaptiveThreshold(SOut, SOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
+                            //CvInvoke.AdaptiveThreshold(VOut, VOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
+
+                            CvInvoke.BitwiseAnd(SOut, VOut, SOut);
                             //
                             CvInvoke.ExtractChannel(Out, HOut, 0);
                             CvInvoke.InRange(HOut, lower, upper, HOut);
-                            //
-                            CvInvoke.ExtractChannel(Out, SOut, 1);
-                            CvInvoke.Threshold(SOut, SOut, 40, 230, ThresholdType.Binary);
-                            CvInvoke.BitwiseAnd(SOut, HOut, SOut);
-                            //
-                            CvInvoke.ExtractChannel(Out, Out, 2);
-                            CvInvoke.Threshold(Out, Out, 60, 195, ThresholdType.Binary);
-                            CvInvoke.BitwiseAnd(SOut, Out, Output);
+
+
+                            CvInvoke.BitwiseAnd(SOut, HOut, Output);
+
+
+                            ////
+                            //CvInvoke.ExtractChannel(Out, SOut, 1);
+                            //CvInvoke.Threshold(SOut, SOut, 40, 230, ThresholdType.Binary);
+                            //CvInvoke.BitwiseAnd(SOut, HOut, SOut);
+                            ////
+                            //CvInvoke.ExtractChannel(Out, Out, 2);
+                            //CvInvoke.Threshold(Out, Out, 60, 195, ThresholdType.Binary);
+                            //CvInvoke.BitwiseAnd(SOut, Out, Output);
+                            ////
+                            //CvInvoke.ExtractChannel(Out, HOut, 0);
+                            //CvInvoke.InRange(HOut, lower, upper, HOut);
+                            
                         }
                         break;
                     default:
@@ -290,15 +319,17 @@ namespace SwarmRoboticsGUI
 
             // Convert to a single channel image
             CvInvoke.CvtColor(Frame, Input, ColorConversion.Bgr2Gray);
+
             // Noise removal
-            //CvInvoke.GaussianBlur(Input, Input, new Size(3, 3), 0);
+            CvInvoke.GaussianBlur(Input, Input, new Size(3, 3), 0);
+            CvInvoke.Dilate(Input,Input,null,new Point(-1,-1),1,BorderType.Default,new MCvScalar(0));
 
             // BRAE: Test DetailEnhance
             //CvInvoke.DetailEnhance(Input, Input);
 
             // Threshold the image to find the edges  
             //CvInvoke.Canny(Input, Input, 0, 255);
-            CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
+            CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 3, 0);
 
             // Find only the external contours applying no shape approximations
             CvInvoke.FindContours(Input, Contours, null, RetrType.External, ChainApproxMethod.ChainApproxSimple);
@@ -340,6 +371,11 @@ namespace SwarmRoboticsGUI
                     Arena.Contour = ArenaContour.ToArray();
                 }
             }
+        }
+
+        public static void WhiteBalance()
+        {
+            // WHERE IS WHITEBALANCE
         }
         #endregion
 
@@ -489,40 +525,40 @@ namespace SwarmRoboticsGUI
             switch (TargetColour)
             {
                 case KnownColor.Orange:
-                    //HueRange.Start = 5;
-                    //HueRange.End = 10;
-                    HueRange.Start = 10;
-                    HueRange.End = 19;
+                    HueRange.Start = 4;
+                    HueRange.End = 12;
+                    //HueRange.Start = 10;
+                    //HueRange.End = 19;
                     break;
                 case KnownColor.Yellow:
-                    //HueRange.Start = 20;
+                    HueRange.Start = 17;
+                    HueRange.End = 32;
+                    //HueRange.Start = 25;
                     //HueRange.End = 30;
-                    HueRange.Start = 25;
-                    HueRange.End = 30;
                     break;
                 case KnownColor.Green:
-                    //HueRange.Start = 30;
-                    //HueRange.End = 100;
-                    HueRange.Start = 31;
-                    HueRange.End = 80;
+                    HueRange.Start = 40;
+                    HueRange.End = 87;
+                    //HueRange.Start = 31;
+                    //HueRange.End = 80;
                     break;
                 case KnownColor.LightBlue:
-                    //HueRange.Start = 100;
+                    HueRange.Start = 99;
+                    HueRange.End = 105;
+                    //HueRange.Start = 98;
                     //HueRange.End = 110;
-                    HueRange.Start = 98;
-                    HueRange.End = 110;
                     break;
                 case KnownColor.DarkBlue:
+                    HueRange.Start = 107;
+                    HueRange.End = 116;
                     //HueRange.Start = 110;
-                    //HueRange.End = 130;
-                    HueRange.Start = 110;
-                    HueRange.End = 160;
+                    //HueRange.End = 160;
                     break;
                 case KnownColor.Red:
-                    //HueRange.Start = 150;
-                    //HueRange.End = 190;
-                    HueRange.Start = 160;
-                    HueRange.End = 180;
+                    HueRange.Start = 172;
+                    HueRange.End = 179;
+                    //HueRange.Start = 160;
+                    //HueRange.End = 180;
                     break;
                 default:
                     HueRange.Start = 0;
@@ -608,13 +644,13 @@ namespace SwarmRoboticsGUI
             var Mask = new Mat(Image.GetSize(), Image.GetDepth(), Image.GetChannels());
             Mask.SetTo(new MCvScalar(0, 0, 0));
             CvInvoke.DrawContours(Mask, new VectorOfVectorOfPoint(hexagon), -1, new MCvScalar(255, 255, 255), -1);
-
+            CvInvoke.Erode(Mask, Mask, null, new Point(-1, -1), 3, BorderType.Constant, new MCvScalar(0));
             //CvInvoke.Imwrite("Mask.png", Mask);
 
             var Masked = new Mat();
             Image.CopyTo(Masked, Mask);
 
-            CvInvoke.Imwrite("Masked.png", Masked);
+            //CvInvoke.Imwrite("Masked.png", Masked);
             
             //CvInvoke.Imwrite("frame.png", Masked);
             //CvInvoke.CvtColor(Masked, img, ColorConversion.Bgr2Hsv);
@@ -625,8 +661,8 @@ namespace SwarmRoboticsGUI
             //var hist = new DenseHistogram(256, histrange);
             //CvInvoke.CalcHist(Masked, 0, Mask, hist, 256, histrange, false);
 
-            Range SaturationRange = new Range(25, 200);
-            Range ValueRange = new Range(30, 200);
+            //Range SaturationRange = new Range(20, 200);
+            //Range ValueRange = new Range(10, 200);
             var SOut = new Mat();
             var VOut = new Mat();
             //
@@ -644,19 +680,23 @@ namespace SwarmRoboticsGUI
 
             CvInvoke.BitwiseAnd(SOut, VOut, SOut);
 
-            Masked.CopyTo(Masked, SOut);
+            var Result = new Mat();
+            Masked.CopyTo(Result, SOut);
+            
+
+            CvInvoke.Imwrite("SOut+VOut.png", SOut);
 
             var robotcheck = new Mat();
-            CvInvoke.CvtColor(Masked, robotcheck, ColorConversion.Hsv2Bgr);
+            CvInvoke.CvtColor(Result, robotcheck, ColorConversion.Hsv2Bgr);
             //CvInvoke.Imwrite("robot.png", robotcheck);
-
+            CvInvoke.Imwrite("MaskedFiltered.png", robotcheck);
             // Look for colours on the robot
-            IsOrange = HasHueRange(Masked, GetHueRange(KnownColor.Orange));
-            IsYellow = HasHueRange(Masked, GetHueRange(KnownColor.Yellow));
-            IsGreen = HasHueRange(Masked, GetHueRange(KnownColor.Green));
-            IsLightBlue = HasHueRange(Masked, GetHueRange(KnownColor.LightBlue));
-            IsDarkBlue = HasHueRange(Masked, GetHueRange(KnownColor.DarkBlue));
-            IsRed = HasHueRange(Masked, GetHueRange(KnownColor.Red));
+            IsOrange = HasHueRange(Result, GetHueRange(KnownColor.Orange));
+            IsYellow = HasHueRange(Result, GetHueRange(KnownColor.Yellow));
+            IsGreen = HasHueRange(Result, GetHueRange(KnownColor.Green));
+            IsLightBlue = HasHueRange(Result, GetHueRange(KnownColor.LightBlue));
+            IsDarkBlue = HasHueRange(Result, GetHueRange(KnownColor.DarkBlue));
+            IsRed = HasHueRange(Result, GetHueRange(KnownColor.Red));
 
             // LIGHTBLUE GREEN RED
             if (!IsOrange && !IsYellow && IsGreen && IsLightBlue && !IsDarkBlue && IsRed) RobotID = 0;       // RED

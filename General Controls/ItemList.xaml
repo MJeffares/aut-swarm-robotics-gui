@@ -284,7 +284,7 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <TextBlock FontSize="10" Foreground="White" Text="{Binding Name}"/>
-                <TextBlock Grid.Column="1" FontSize="10" Foreground="White" Text="{Binding Text, StringFormat=N0}"/>
+                <TextBlock Grid.Column="1" FontSize="10" Foreground="White" Text="{Binding Text, StringFormat='{}{0:#,0}'}"/>
             </Grid>
         </DataTemplate>
         <HierarchicalDataTemplate x:Key="RobotTemplate" AlternationCount="2"

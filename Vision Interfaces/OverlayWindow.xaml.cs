@@ -3,6 +3,7 @@ using Emgu.CV;
 using Emgu.CV.Cuda;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using Emgu.CV.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -69,11 +70,11 @@ namespace SwarmRoboticsGUI
             camera1.Process += new EventHandler(DrawOverlayFrame);
 
             //Creates a local copy of the robotlist only containing the robots themselves
-            RobotList = mainWindow.ItemList.Where(R => R is RobotItem).Cast<Item>().ToList();
+            RobotList = mainWindow.ItemList.Where(R => R is RobotItem).ToList();
         }
 
         #region Public Methods
-        public void ClearRobots(ObservableCollection<Item> RobotList)
+        public void ClearRobots(List<Item> RobotList)
         {
             RobotList.Clear();
         }
@@ -117,10 +118,21 @@ namespace SwarmRoboticsGUI
                             var proc = new Mat();
                             ImageProcessing.ProcessFilter(Frame, proc, camera1.Filter, LowerH, UpperH);
                             if (proc != null)
-                                    CameraDisplay1.Image = proc;
+                                CameraDisplay1.Image = proc;
                         }
                         else
-                            CameraDisplay1.Image = Frame;
+                        {
+                            if (RobotArena.Contour != null)
+                            {
+                                var rect = CvInvoke.BoundingRectangle(new VectorOfPoint(RobotArena.Contour));
+                                var proc = new UMat(Frame, rect);
+                                CvInvoke.Circle(proc, RobotArena.Origin, 10, new MCvScalar(0, 0, 255), -1);
+
+                                CameraDisplay1.Image = proc;
+                            }
+                            else
+                                CameraDisplay1.Image = Frame;
+                        }
 
                         // TEMP: Counter to get the arena every 30 frames
                         counter++;

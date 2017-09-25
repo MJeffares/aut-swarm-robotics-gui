@@ -140,7 +140,7 @@ namespace SwarmRoboticsGUI
             PopulateCameras();
             PopulateSources();
             PopulateRobots();
-            DEBUGGING_PopulateTestList();
+            //DEBUGGING_PopulateTestList();
 
             swarmManager = new SwarmManager(this);
 

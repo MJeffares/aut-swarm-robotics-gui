@@ -85,6 +85,17 @@
                              Width="100" 
                              Style="{StaticResource {x:Type ToggleButton}}" 
                              Click="CameraSelect_Click">Camera</RadioButton>
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <local:RangeSlider x:Name="HueSlider" LowerValue="{Binding LowerH, Mode=TwoWay}" UpperValue="{Binding UpperH, Mode=TwoWay}" Minimum="0" Maximum="255" Width="200"/>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal">
+                        <TextBox Text="{Binding LowerValue, ElementName=HueSlider}"/>
+                        <TextBox Text="{Binding UpperValue, ElementName=HueSlider}"/>
+                    </StackPanel>
+                </Grid>
             </StackPanel>
         </Grid>
         <!--Right Grid-->
