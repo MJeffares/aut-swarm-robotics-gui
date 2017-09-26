@@ -65,23 +65,23 @@ namespace XbeeHandler.XbeeFrames
 
 	public class XbeeAPIFrame
 	{
-		public DateTime timeStamp { get; set; }
-		public byte[] rawMessage { get; set; }
-        public int length { get; set; }
-        public byte frameCommand { get; set; }
-        public byte[] frameData { get; set; }
-        public int checksum { get; set; }
+		public DateTime TimeStamp { get; set; }
+		public byte[] RawMessage { get; set; }
+        public int Length { get; set; }
+        public byte FrameCommand { get; set; }
+        public byte[] FrameData { get; set; }
+        public int Checksum { get; set; }
 
         public XbeeAPIFrame(byte[] frame)
 		{
-			timeStamp = DateTime.Now;
-			rawMessage = new byte[frame.Length];
-			Array.Copy(frame, rawMessage, frame.Length);
-			length = 256 * frame[1] + frame[2];
-			frameCommand = frame[3];
-			frameData = new byte[frame.Length - 5];
-			Array.Copy(frame, 4, frameData, 0, frame.Length - 5);
-			checksum = frame[frame.Length - 1];
+			TimeStamp = DateTime.Now;
+			RawMessage = new byte[frame.Length];
+			Array.Copy(frame, RawMessage, frame.Length);
+			Length = 256 * frame[1] + frame[2];
+			FrameCommand = frame[3];
+			FrameData = new byte[frame.Length - 5];
+			Array.Copy(frame, 4, FrameData, 0, frame.Length - 5);
+			Checksum = frame[frame.Length - 1];
 		}
 
 
@@ -89,7 +89,7 @@ namespace XbeeHandler.XbeeFrames
 		{
 			get
 			{
-				return timeStamp.ToString("HH:mm:ss:fff");
+				return TimeStamp.ToString("HH:mm:ss:fff");
 			}
 		}
 
@@ -97,7 +97,7 @@ namespace XbeeHandler.XbeeFrames
 		{
 			get
 			{
-				return MJLib.HexToString(rawMessage, 0, rawMessage.Length, true);
+				return MJLib.HexToString(RawMessage, 0, RawMessage.Length, true);
 			}
 		}
 
@@ -105,7 +105,7 @@ namespace XbeeHandler.XbeeFrames
 		{
 			get
 			{
-				return MJLib.HexToString(BitConverter.GetBytes(length), 0, 1, true) + " (" + length.ToString() + ")";
+				return MJLib.HexToString(BitConverter.GetBytes(Length), 0, 1, true) + " (" + Length.ToString() + ")";
 			}
 		}
 
@@ -121,7 +121,7 @@ namespace XbeeHandler.XbeeFrames
 		{
 			get
 			{
-				return MJLib.HexToString(frameData, 0, length, true);
+				return MJLib.HexToString(FrameData, 0, Length, true);
 			}
 		}
 
@@ -258,11 +258,11 @@ namespace XbeeHandler.XbeeFrames
 
 		public ZigbeeTransmitStatus(byte[] frame) : base(frame)
 		{
-			frameID = frameData[0];
-			destinationAddress16 = MJLib.ByteArrayToUInt16(frameData, 1);
-			transmitRetryCount = frameData[3];
-			deliveryStatus = frameData[4];
-			discoveryStatus = frameData[5];
+			frameID = FrameData[0];
+			destinationAddress16 = MJLib.ByteArrayToUInt16(FrameData, 1);
+			transmitRetryCount = FrameData[3];
+			deliveryStatus = FrameData[4];
+			discoveryStatus = FrameData[5];
 		}
 
 		public override string FrameCommandDisplay
@@ -277,7 +277,7 @@ namespace XbeeHandler.XbeeFrames
 		{
 			get
 			{
-				return MJLib.HexToString(frameData, 0, length, true);
+				return MJLib.HexToString(FrameData, 0, Length, true);
 			}
 		}
 
@@ -294,11 +294,11 @@ namespace XbeeHandler.XbeeFrames
 
 		public ZigbeeReceivePacket(byte[] frame) : base(frame)
 		{
-			sourceAddress64 = MJLib.ByteArrayToUInt64(frameData, 0);
-			sourceAddress16 = MJLib.ByteArrayToUInt16(frameData, 8);
-			receiveOptions = frameData[10];
-			receivedData = new byte[frameData.Length - 11];
-			Array.Copy(frameData, 11, receivedData, 0, frameData.Length - 11);
+			sourceAddress64 = MJLib.ByteArrayToUInt64(FrameData, 0);
+			sourceAddress16 = MJLib.ByteArrayToUInt16(FrameData, 8);
+			receiveOptions = FrameData[10];
+			receivedData = new byte[FrameData.Length - 11];
+			Array.Copy(FrameData, 11, receivedData, 0, FrameData.Length - 11);
 		}
 
 		public override string SourceDisplay

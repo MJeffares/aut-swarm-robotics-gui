@@ -165,6 +165,7 @@ namespace SwarmRoboticsGUI
         }
         public static void GetRobots(IInputArray Frame, List<RobotItem> RobotList, Arena Arena)
         {
+            // DEBUG: Real corner-to-corner distance in millimetres
             //const double REAL_DISTANCE = 1664.882954;
             //const double REAL_DISTANCE = 840;
             //const double REAL_DISTANCE = 297;
@@ -173,6 +174,9 @@ namespace SwarmRoboticsGUI
             
             var Bounds = CvInvoke.BoundingRectangle(new VectorOfPoint(Arena.Contour));           
             var Input = new UMat(Frame as UMat, Bounds);
+
+            // DEBUG: Report image - Frame cropped to arena
+            //CvInvoke.Imwrite("Arena-Cropped.png", Input);
 
             // DEBUG: Draw arena contour on frame
             //var Input = Frame as UMat;
@@ -185,22 +189,34 @@ namespace SwarmRoboticsGUI
             {
                 // Find every contour in the image
                 GetCountours(Input, Contours, 1, RetrType.List, ChainApproxMethod.ChainApproxSimple);
+
+
+                // DEBUG: Report images - Arena cropped with all internal contours
+                //var ContourMat = new Mat(Input.Size, Input.Depth, Input.NumberOfChannels);
+                //ContourMat.SetTo(new MCvScalar(0, 0, 0));
+                //CvInvoke.DrawContours(ContourMat, Contours, -1, new MCvScalar(255, 255, 255), 2);
+                //CvInvoke.Imwrite("Arena-CroppedAllContours.png", ContourMat);
+
+
                 // Filter out small and large contours
                 FilterContourArea(Contours, FilteredContours, 1000, 5000);
 
+                // DEBUG: Report images - Arena cropped with internal contours filtered by area
+                //var ContourMat = new Mat(Input.Size, Input.Depth, Input.NumberOfChannels);
+                //ContourMat.SetTo(new MCvScalar(0, 0, 0));
+                //CvInvoke.DrawContours(ContourMat, FilteredContours, -1, new MCvScalar(255, 255, 255), 2);
+                //CvInvoke.Imwrite("Arena-CroppedFilteredContours.png", ContourMat);
+
                 int HexCount = GetHexagons(FilteredContours, Hexagons);
 
-                /*
-                 * //used to check sizes
-                for (int i = 0; i < Hexagons.Size; i++)
-                {
-                    var size = CvInvoke.ContourArea(Hexagons[i]);
-                }
-                 * */
-            }
-            int RobotCount = 0;
+                // DEBUG: Report images - Arena cropped with hexagon contours
+                //var ContourMat = new Mat(Input.Size, Input.Depth, Input.NumberOfChannels);
+                //ContourMat.SetTo(new MCvScalar(0, 0, 0));
+                //CvInvoke.DrawContours(ContourMat, Hexagons, -1, new MCvScalar(255, 255, 255), 2);
+                //CvInvoke.Imwrite("Arena-CroppedHexagons.png", ContourMat);
+            }           
 
-            // Testing CLAHE
+            // DEBUG: Testing CLAHE
             //CvInvoke.Imwrite("arenaFrame.png", Input);
             //var InputHSV = new UMat();
             //CvInvoke.CvtColor(Input, InputHSV, ColorConversion.Bgr2Hsv);
@@ -211,7 +227,7 @@ namespace SwarmRoboticsGUI
             //CvInvoke.CvtColor(InputHSV, Input, ColorConversion.Hsv2Bgr);
             //CvInvoke.Imwrite("clahe result.png", Input);
 
-            // Testing Histogram equalization
+            // DEBUG: Testing Histogram equalization
             //VectorOfUMat Channels = new VectorOfUMat();
             //CvInvoke.Imwrite("zbefore.png", Input);    
             //CvInvoke.CvtColor(Input, Input, ColorConversion.Bgr2Hsv);           
@@ -223,16 +239,7 @@ namespace SwarmRoboticsGUI
             //CvInvoke.CvtColor(Input, Input, ColorConversion.Hsv2Bgr);
             //CvInvoke.Imwrite("zafter.png", Input);
 
-            //var hist = new Mat();
-            //Input.ConvertTo(hist, DepthType.Cv8U);
-            //int[] all = { 0, 1, 2 };
-            //int[] size = { 8, 8, 8 };
-            //float[] range = {0.0f, 256.0f, 0.0f, 256.0f, 0.0f, 256.0f };            
-            
-            //CvInvoke.CalcHist(Channels, all, null, hist, size, range, false);
-            //HistogramViewer.Show(hist);
-            //CvInvoke.Imwrite("zafter.png", hist );
-
+            int RobotCount = 0;
             // Loop through the hexagons in the frame
             for (int i = 0; i < Hexagons.Size; i++)
             {
@@ -240,8 +247,9 @@ namespace SwarmRoboticsGUI
                 var RobotFrame = new UMat();
                 var RobotFrameOffset = GetRobotFrame(Input, Hexagon, RobotFrame);
 
-                // DEBUG: Get robot frame image
-                //CvInvoke.Imwrite("frame.png", RobotFrame);
+                // DEBUG: Report images - Robot input image
+                //CvInvoke.Imwrite("Robot-Frame.png", RobotFrame);
+
                 VectorOfPoint RelativeHex = new VectorOfPoint();
                 Point[] Points = new Point[Hexagon.Size];
                 for (int h = 0; h < Hexagon.Size; h++)
@@ -287,6 +295,7 @@ namespace SwarmRoboticsGUI
                     // Calulate height using sqrt(3)*radius
                     //RobotList[index].Height = (int)(RobotList[index].Width / 2 * Math.Sqrt(3));
                     obstacle.IsVisible = true;
+                    obstacle.LastVisible = DateTime.Now;
                     // Store the robots real-world location
                     obstacle.Location = new System.Windows.Point((COM.X - Arena.Origin.X) * Arena.ScaleFactor,
                         (COM.Y - Arena.Origin.Y) * Arena.ScaleFactor);
@@ -326,21 +335,38 @@ namespace SwarmRoboticsGUI
 
             // Noise removal
             CvInvoke.GaussianBlur(Input, Input, new Size(3, 3), 0);
-            CvInvoke.Dilate(Input,Input,null,new Point(-1,-1),1,BorderType.Default,new MCvScalar(0));
+            CvInvoke.Dilate(Input, Input, null, new Point(-1, -1), 1, BorderType.Default, new MCvScalar(0));
 
-            // BRAE: Test DetailEnhance
-            //CvInvoke.DetailEnhance(Input, Input);
+            // DEBUG: Report images - Arena dilated image
+            //CvInvoke.Imwrite("Arena-BlurDilate.png", Input);
 
-            // Threshold the image to find the edges  
-            //CvInvoke.Canny(Input, Input, 0, 255);
+            // Threshold the image to find the edges             
             CvInvoke.AdaptiveThreshold(Input, Input, 255, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 3, 0);
+            //CvInvoke.Canny(Input, Input, 0, 255);
+
+            // DEBUG: Report images - Arena threshold image
+            //CvInvoke.Imwrite("Arena-Threshold.png", Input);
 
             // Find only the external contours applying no shape approximations
             CvInvoke.FindContours(Input, Contours, null, RetrType.External, ChainApproxMethod.ChainApproxSimple);
+            //GetCountours(Frame, Contours, 0, RetrType.External, ChainApproxMethod.ChainApproxNone);
 
-            //GetCountours(Frame, Contours, 0, RetrType.List, ChainApproxMethod.ChainApproxNone);
+            // DEBUG: Report images - Arena all contours
+            //var ContourMat = new Mat(Input.Size, Input.Depth, Input.NumberOfChannels);
+            //ContourMat.SetTo(new MCvScalar(0, 0, 0));
+            //CvInvoke.DrawContours(ContourMat, Contours, -1, new MCvScalar(255, 255, 255), 3);
+            //CvInvoke.Imwrite("Arena-AllContours.png", ContourMat);
+
             // Filter out small and large contours
             FilterContourArea(Contours, ProcessedContours, 1000000, 1500000);
+
+
+            // DEBUG: Report images - Arena filtered contours based on area
+            //var ContourMat = new Mat(Input.Size, Input.Depth, Input.NumberOfChannels);
+            //ContourMat.SetTo(new MCvScalar(0,0,0));
+            //CvInvoke.DrawContours(ContourMat, ProcessedContours, -1, new MCvScalar(255, 255, 255), 3);
+            //CvInvoke.Imwrite("Arena-FilteredContours.png", ContourMat);
+
 
             // Loop through the filtered contours in the frame
             for (int i = 0; i < ProcessedContours.Size; i++)
@@ -354,12 +380,21 @@ namespace SwarmRoboticsGUI
 
                 factor = GetScaleFactor(Frame, ProcessedContour);
 
+                // DEBUG: Report images - Arena contour approximation
+                //ContourMat.SetTo(new MCvScalar(0,0,0));
+                //CvInvoke.DrawContours(ContourMat, ProcessedContours, i, new MCvScalar(255, 255, 255), 3);
+                //CvInvoke.Imwrite("Arena-ApproxContour.png", ContourMat);
+
                 ArenaContour.Push(ProcessedContour);
                 break;
             }
             // Test square is 210x210mm with area 44100mm^2
             // this area = square area / factor^2
-            // for desk2floor setup this should roughly be 140,000
+            // for desk2floor setup this should roughly be 140,000 area
+
+            // Arena is 1177x1177mm with area 1,385,329mm^2
+            // this area = square area / factor^2
+
             //var area = CvInvoke.ContourArea(ArenaContour);
 
             // If the arena was identified and a distance factor was calculated, find the origin point
@@ -643,57 +678,65 @@ namespace SwarmRoboticsGUI
             var hexagon = Contour as VectorOfPoint;
             var Image = Frame.GetInputArray();
 
-            //CvInvoke.Imwrite("Input.png", Frame);
+            // DEBUG: Report Images - Robot input frame
+            //CvInvoke.Imwrite("Robot-Frame.png", Frame);
 
             var Mask = new Mat(Image.GetSize(), Image.GetDepth(), Image.GetChannels());
             Mask.SetTo(new MCvScalar(0, 0, 0));
             CvInvoke.DrawContours(Mask, new VectorOfVectorOfPoint(hexagon), -1, new MCvScalar(255, 255, 255), -1);
+
+            // DEBUG: Report Images - Robot mask without erode
+            //CvInvoke.Imwrite("Robot-MaskNoErode.png", Mask);
+            // DEBUG: Report Images - Robot image masked with mask that has no erode passes
+            //var MaskedNoErode = new Mat();
+            //Image.CopyTo(MaskedNoErode, Mask);
+            //CvInvoke.Imwrite("Robot-FrameMaskedNoErode.png", MaskedNoErode);
+
+            // Apply three passes of erode to remove edges where the colour of the robot has bled
             CvInvoke.Erode(Mask, Mask, null, new Point(-1, -1), 3, BorderType.Constant, new MCvScalar(0));
-            //CvInvoke.Imwrite("Mask.png", Mask);
+
+            // DEBUG: Report Images - Robot mask with erode
+            //CvInvoke.Imwrite("Robot-MaskEroded.png", Mask);
+            // DEBUG: Report Images - Robot image masked with mask that has erode passes
+            //var MaskedEroded = new Mat();
+            //Image.CopyTo(MaskedEroded, Mask);
+            //CvInvoke.Imwrite("Robot-FrameMaskedEroded.png", MaskedEroded);
 
             var Masked = new Mat();
             Image.CopyTo(Masked, Mask);
 
-            //CvInvoke.Imwrite("Masked.png", Masked);
-            
-            //CvInvoke.Imwrite("frame.png", Masked);
-            //CvInvoke.CvtColor(Masked, img, ColorConversion.Bgr2Hsv);
-
-            //HistogramViewer.Show(img);
-
-            //RangeF histrange = new RangeF(0, 256);
-            //var hist = new DenseHistogram(256, histrange);
-            //CvInvoke.CalcHist(Masked, 0, Mask, hist, 256, histrange, false);
-
-            //Range SaturationRange = new Range(20, 200);
-            //Range ValueRange = new Range(10, 200);
             var SOut = new Mat();
             var VOut = new Mat();
             //
             CvInvoke.CvtColor(Masked, Masked, ColorConversion.Bgr2Hsv);
+
+            // DEBUG: Report Images
             //CvInvoke.Imwrite("MaskedHSV.png", Masked);
 
             CvInvoke.ExtractChannel(Masked, SOut, 1);
             CvInvoke.ExtractChannel(Masked, VOut, 2);
-            CvInvoke.Threshold(SOut, SOut, SaturationRange.Start, SaturationRange.End, ThresholdType.Binary);
-            //CvInvoke.Imwrite("SOut.png", SOut);
+            CvInvoke.Threshold(SOut, SOut, SaturationRange.Start, SaturationRange.End, ThresholdType.Binary);        
             CvInvoke.Threshold(VOut, VOut, ValueRange.Start, ValueRange.End, ThresholdType.Binary);
-            //CvInvoke.Imwrite("VOut.png", VOut);
             //CvInvoke.AdaptiveThreshold(SOut, SOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
             //CvInvoke.AdaptiveThreshold(VOut, VOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
+
+            // DEBUG: Report Images
+            //CvInvoke.Imwrite("SOut.png", SOut);
+            //CvInvoke.Imwrite("VOut.png", VOut);  
 
             CvInvoke.BitwiseAnd(SOut, VOut, SOut);
 
             var Result = new Mat();
             Masked.CopyTo(Result, SOut);
-            
 
-            CvInvoke.Imwrite("SOut+VOut.png", SOut);
+            // DEBUG: Report Images - Robot masked with saturation and value is HSV colourspace
+            CvInvoke.Imwrite("Robot-FrameHSVColourMasked.png", Result);
 
-            var robotcheck = new Mat();
-            CvInvoke.CvtColor(Result, robotcheck, ColorConversion.Hsv2Bgr);
-            //CvInvoke.Imwrite("robot.png", robotcheck);
-            CvInvoke.Imwrite("MaskedFiltered.png", robotcheck);
+            // DEBUG: Report Images - Robot masked with saturation and value is RGB colourspace
+            var ResultBGR = new Mat();
+            CvInvoke.CvtColor(Result, ResultBGR, ColorConversion.Hsv2Bgr);
+            CvInvoke.Imwrite("Robot-FrameRGBColourMasked.png", ResultBGR);
+
             // Look for colours on the robot
             IsOrange = HasHueRange(Result, GetHueRange(KnownColor.Orange));
             IsYellow = HasHueRange(Result, GetHueRange(KnownColor.Yellow));

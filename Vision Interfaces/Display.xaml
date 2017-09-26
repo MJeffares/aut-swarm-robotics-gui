@@ -88,7 +88,7 @@
                     <Style TargetType="ContentPresenter">
                         <Setter Property="Canvas.Left" Value="{Binding Path=(local:IObstacle.Location).X}"/>
                         <!--<Setter Property="Canvas.Left" Value="{Binding Location.X}"/>-->
-                        <Setter Property="Canvas.Margin" Value="-40,-40,0,0"/>
+                        <Setter Property="Canvas.Margin" Value="0,0,0,0"/>
                         <Setter Property="Canvas.Top" Value="{Binding Path=(local:IObstacle.Location).Y}"/>
                         <!--<Setter Property="Canvas.Top" Value="{Binding Location.Y}"/>-->
                         <Setter Property="Canvas.Visibility" Value="{Binding Path=(local:IObstacle.IsVisible), Converter={StaticResource BoolToVis}}"/>
@@ -97,8 +97,8 @@
                 </ItemsControl.ItemContainerStyle>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid Background="Transparent">
-                            <Grid.RowDefinitions>
+                            <Grid Background="Transparent">
+                                <Grid.RowDefinitions>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
@@ -112,14 +112,17 @@
                                      RenderTransformOrigin="0.5,0.5">
                                 <Polygon.LayoutTransform>
                                     <TransformGroup>
-                                        <RotateTransform Angle="{Binding FacingDeg}"/>
-                                    </TransformGroup>
+                                            <ScaleTransform ScaleX="-1"/>
+                                            <TranslateTransform X="{Binding Path=(local:IObstacle.Location).X}"/>
+                                            <ScaleTransform ScaleX="-1"/>
+                                            <RotateTransform Angle="{Binding FacingDeg}"/>
+                                        </TransformGroup>
                                 </Polygon.LayoutTransform>
                             </Polygon>
 
                             <Polygon Style="{StaticResource Triangle}"
                                      Height="20" Width="20" 
-                                     RenderTransformOrigin="0.5,0.5"
+                                     RenderTransformOrigin="-0.5,-0.5"
                                      IsHitTestVisible="False"
                                      Visibility="{Binding HasFacing, Converter={StaticResource BoolToVis}, FallbackValue=Hidden}">
                                 <Polygon.RenderTransform>

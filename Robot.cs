@@ -128,7 +128,7 @@ namespace SwarmRoboticsGUI
         System.Windows.Point Location { get; set; }
         System.Drawing.Point PixelLocation { get; set; }
         System.Drawing.Point[] Contour { get; set; }
-
+        DateTime LastVisible { get; set; }
         bool IsVisible { get; set; }
         bool IsTracked { get; set; }
 
@@ -344,6 +344,19 @@ namespace SwarmRoboticsGUI
                 {
                     _Contour = value;
                     NotifyPropertyChanged("Contour");
+                }
+            }
+        }
+        private DateTime _LastVisible { get; set; }
+        DateTime IObstacle.LastVisible
+        {
+            get { return _LastVisible; }
+            set
+            {
+                if (_LastVisible != value)
+                {
+                    _LastVisible = value;
+                    NotifyPropertyChanged("LastVisible");
                 }
             }
         }
@@ -582,6 +595,19 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
+        private DateTime _LastVisible { get; set; }
+        DateTime IObstacle.LastVisible
+        {
+            get { return DateTime.Now; }
+            set
+            {
+                if (_LastVisible != value)
+                {
+                    _LastVisible = value;
+                    NotifyPropertyChanged("LastVisible");
+                }
+            }
+        }
         private bool _IsVisible { get; set; }
         bool IObstacle.IsVisible
         {
@@ -693,8 +719,10 @@ namespace SwarmRoboticsGUI
             obstacle.Width = 2 * obstacle.Radius;
             obstacle.Height = (int)(Math.Sqrt(3) * obstacle.Radius);
             obstacle.IsVisible = true;
-            double X = (2 * 1177 - obstacle.Width) / 4;
-            double Y = (2 * 1177 - obstacle.Height) / 4;
+            //double X = (2 * 1177 - obstacle.Width) / 4;
+            //double Y = (2 * 1177 - obstacle.Height) / 4;
+            double X = (double)1177 / 2;
+            double Y = (double)1177 / 2;
             obstacle.Location = new System.Windows.Point(X, Y);
         }
     }

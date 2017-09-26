@@ -64,9 +64,37 @@ namespace SwarmRoboticsGUI
         public OverlayType Overlay { get; set; }
         public SourceType Source { get; set; }
 
+        private System.Windows.Threading.DispatcherTimer TimeoutTimer = new System.Windows.Threading.DispatcherTimer();
+
         public Display()
         {
             InitializeComponent();
+            InitializeTimer();
+        }
+
+        private void InitializeTimer()
+        {
+            // Create 100ms timer to drive interface changes
+            //TimeoutTimer = new System.Windows.Threading.DispatcherTimer();
+            TimeoutTimer.Interval = new TimeSpan(0,0,1);
+            TimeoutTimer.Tick += Timeout_Tick;
+            TimeoutTimer.Start();
+        }
+
+        private void Timeout_Tick(object sender, EventArgs e)
+        {
+            if (Items != null)
+            {
+                foreach (IObstacle Obstacle in Items.Where(O => O is IObstacle))
+                {
+                    if (Obstacle.LastVisible != null)
+                    {
+                        TimeSpan Delta = DateTime.Now - Obstacle.LastVisible;
+                        if (Delta.TotalSeconds > 5)
+                            Obstacle.IsVisible = false;
+                    }
+                }
+            }
         }
 
         private void Robot_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

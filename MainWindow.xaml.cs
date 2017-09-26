@@ -45,6 +45,7 @@ using folderHack;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -87,9 +88,7 @@ namespace SwarmRoboticsGUI
         public Dictionary<string, UInt64> robotsDictionary { get; set; }
 
         public List<Item> ItemList { get; set; }
-        public List<XbeeAPIFrame> TestList { get; set; }
-
-
+        public ObservableCollection<XbeeAPIFrame> TestList { get; set; }
 
         public int HueLower { get; set; }
         public int HueUpper { get; set; }
@@ -133,8 +132,8 @@ namespace SwarmRoboticsGUI
             portList.MouseEnter += new MouseEventHandler(menuPopulateSerialPorts);
             connectButton.Click += new RoutedEventHandler(menuCommunicationConnect_Click);
 
-
-            commManger = new CommunicationManager(this, serial, xbee, protocol);			
+            commManger = new CommunicationManager(this, serial, xbee, protocol);
+            TestList = commManger.rxXbeeMessageBuffer;
             //
             PopulateFilters();
             PopulateOverlays();
@@ -181,15 +180,14 @@ namespace SwarmRoboticsGUI
 
         private void DEBUGGING_PopulateTestList()
         {
-            TestList = new List<XbeeAPIFrame>();
-            for (int i = 0; i < 10; i++)
+            //TestList = new List<XbeeAPIFrame>();
+            for (int i = 0; i < 1; i++)
             {
-                commManger.rxXbeeMessageBuffer.Add(new XbeeAPIFrame(new byte[] { 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 }));
-                commManger.rxXbeeMessageBuffer.Add(new XbeeAPIFrame(new byte[] { 0x02, 0x01, 0x01, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02 }));
-                commManger.rxXbeeMessageBuffer.Add(new XbeeAPIFrame(new byte[] { 0x03, 0x01, 0x03, 0x01, 0x03, 0x01, 0x01, 0x03, 0x01 }));
+                TestList.Add(new XbeeAPIFrame(new byte[] { 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 }));
+                TestList.Add(new XbeeAPIFrame(new byte[] { 0x02, 0x01, 0x01, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02 }));
+                TestList.Add(new XbeeAPIFrame(new byte[] { 0x03, 0x01, 0x03, 0x01, 0x03, 0x01, 0x01, 0x03, 0x01 }));
             }
         }
-
         private void PopulateCameras()
         {
             // we dont want to update this if we are connected to a camera
@@ -230,7 +228,6 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-
         private void PopulateCameraCapabilities()
         {
             // we dont want to update this if we are connected to a camera
@@ -262,7 +259,6 @@ namespace SwarmRoboticsGUI
                     (menuCameraCapabilityList.Items[camera1.CapabilityIndex] as MenuItem).IsChecked = true;
             }
         }
-
         private void PopulateFilters()
         {
             //loops through our filters and adds them to our menu
@@ -286,7 +282,6 @@ namespace SwarmRoboticsGUI
             menuFilterList.Items.Add(settingsmenuitem);
             settingsmenuitem.Click += menuPlaceHolder_Click;
         }
-
         private void PopulateOverlays()
         {
             //loops through our filters and adds them to our menu
@@ -310,7 +305,6 @@ namespace SwarmRoboticsGUI
             menuOverlayList.Items.Add(settingsmenuitem);
             settingsmenuitem.Click += menuPlaceHolder_Click;
         }
-
         private void PopulateSources()
         {
             //loops through our filters and adds them to our menu
@@ -334,7 +328,6 @@ namespace SwarmRoboticsGUI
             menuSourceList.Items.Add(settingsmenuitem);
             settingsmenuitem.Click += menuPlaceHolder_Click;
         }
-
         private void PopulateRobots()
         {
             ItemList = new List<Item>();
@@ -350,7 +343,6 @@ namespace SwarmRoboticsGUI
             ItemList.Add(new ChargingDockItem("Tower Base Station", 0x0013A200415B8C2A, "Lime"));
             ItemList.Add(new CommunicationItem("Broadcast", 0x000000000000FFFF, "White"));
         }
-
         private void DisplayTime()
         {
             switch (TimeDisplayMode)
@@ -716,6 +708,11 @@ namespace SwarmRoboticsGUI
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             //camera1.CloseCapture();
+        }
+
+        private void receivedDataClear_Click(object sender, RoutedEventArgs e)
+        {
+            DEBUGGING_PopulateTestList();
         }
     }
 }

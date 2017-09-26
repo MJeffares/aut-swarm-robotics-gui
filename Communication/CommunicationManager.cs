@@ -46,6 +46,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using XbeeHandler;
 using XbeeHandler.XbeeFrames;
+using System.Collections.ObjectModel;
 
 #endregion
 
@@ -67,7 +68,7 @@ namespace SwarmRoboticsGUI
         public UInt64 currentTargetRobot { get; set; }
 
         public List<byte[]> rxMessageBuffer { get; set; }
-        public List<XbeeAPIFrame> rxXbeeMessageBuffer { get; set; }
+        public ObservableCollection<XbeeAPIFrame> rxXbeeMessageBuffer { get; set; }
 
         public CommunicationManager(MainWindow main, SerialUARTCommunication mainSerialPort, XbeeAPI xbeeManager, ProtocolClass swarmManager)
         {
@@ -76,7 +77,7 @@ namespace SwarmRoboticsGUI
             xbeeHandler = xbeeManager;
             swarmRoboticsProtocolHandler = swarmManager;
             rxMessageBuffer = new List<byte[]>();
-            rxXbeeMessageBuffer = new List<XbeeAPIFrame>();
+            rxXbeeMessageBuffer = new ObservableCollection<XbeeAPIFrame>();
             WaitForMessage.MessagesToWaitFor = new List<WaitForMessage>();
 
             primarySerialPort.DataReceived += new SerialUARTCommunication.SerialDataReceivedHandler(PrimarySerialPortDataReceived);
@@ -179,54 +180,67 @@ namespace SwarmRoboticsGUI
 		{
 			byte[] frame = xbeeHandler.FindFrames(primarySerialPort.rxByteBuffer);
 
-			if (frame != null)
-			{
-				rxMessageBuffer.Add(frame);
+            if (frame != null)
+            {
+                rxMessageBuffer.Add(frame);
 
-
-				new Thread(() =>
-				{
-					Thread.CurrentThread.Name = "Received Frame Working Thread";
-					Thread.CurrentThread.IsBackground = true;
-					//Thread.CurrentThread.SetApartmentState(ApartmentState.STA);
-					MyThread(frame);
-				}).Start();
-
-				//t.Start();
-			}
+                var T = Task<XbeeAPIFrame>.Factory.StartNew(() => ReadFrame(frame));
+                var message = T.Result;
+                if (message != null)
+                    Application.Current.Dispatcher.Invoke(() => rxXbeeMessageBuffer.Add(message));
+            }
 		}
 
+        private XbeeAPIFrame ReadFrame(byte[] frame)
+        {
+            byte[] data = xbeeHandler.EscapeReceivedByteArray(frame);
 
-
-		private uint MyThread(byte[] frame)
-		{
-			byte[] data = data = xbeeHandler.EscapeReceivedByteArray(frame);
-
-			if (xbeeHandler.ValidateChecksum(data) == 1)
-			{
+            if (xbeeHandler.ValidateChecksum(data) == 1)
+            {
                 //MANSEL: index out of range error
-				primarySerialPort.rxByteBuffer.RemoveAt(0);
-				return 1;
-			}
+                primarySerialPort.rxByteBuffer.RemoveAt(0);
+                return null;
+            }
+            XbeeAPIFrame message = xbeeHandler.ParseXbeeFrame(data);
 
-			XbeeAPIFrame message = xbeeHandler.ParseXbeeFrame(data);
+            if (message is ZigbeeReceivePacket)
+            {
+                message = ProtocolClass.ParseSwarmProtocolMessage(message);
+                swarmRoboticsProtocolHandler.InterperateSwarmRoboticsMessage(message as SwarmProtocolMessage);
+            }
+            return message;
+        }
 
-			if(message is ZigbeeReceivePacket)
-			{
-				message = ProtocolClass.ParseSwarmProtocolMessage(message);
-				//InterperateSwarmProtocolMessage(message);
-				swarmRoboticsProtocolHandler.InterperateSwarmRoboticsMessage(message as SwarmProtocolMessage);
+        //private uint MyThread(byte[] frame)
+        //{
+        //    byte[] data = data = xbeeHandler.EscapeReceivedByteArray(frame);
+
+        //    if (xbeeHandler.ValidateChecksum(data) == 1)
+        //    {
+        //        //MANSEL: index out of range error
+        //        primarySerialPort.rxByteBuffer.RemoveAt(0);
+        //        return 1;
+        //    }
+
+        //    XbeeAPIFrame message = xbeeHandler.ParseXbeeFrame(data);
+
+        //    if(message is ZigbeeReceivePacket)
+        //    {
+        //        message = ProtocolClass.ParseSwarmProtocolMessage(message);
+        //        //InterperateSwarmProtocolMessage(message);
+        //        swarmRoboticsProtocolHandler.InterperateSwarmRoboticsMessage(message as SwarmProtocolMessage);
                 
-			}
-			else
-			{
-				//InterperateXbeeFrame(message);
-			}
-			rxXbeeMessageBuffer.Add(message);
+        //    }
+        //    else
+        //    {
+        //        //InterperateXbeeFrame(message);
+        //    }
 
-			//window.RefreshListView();
-			return 0;
-		}
+        //    //rxXbeeMessageBuffer.Add(message);
+         
+        //    //window.RefreshListView();
+        //    return 0;
+        //}
 	}
     
 
@@ -592,39 +606,39 @@ namespace SwarmRoboticsGUI
 
 		public static SwarmProtocolMessage ParseSwarmProtocolMessage(XbeeAPIFrame receivedPacket)
 		{
-			SwarmProtocolMessage swarmMessage = new SwarmProtocolMessage(receivedPacket.rawMessage);
+			SwarmProtocolMessage swarmMessage = new SwarmProtocolMessage(receivedPacket.RawMessage);
 
 			switch(swarmMessage.messageID)
 			{
 				case MESSAGE_TYPES.SYSTEM_TEST_PROXIMITY_SENSORS:
-					swarmMessage = new ProximitySensorTestData(swarmMessage.rawMessage);
+					swarmMessage = new ProximitySensorTestData(swarmMessage.RawMessage);
 					break;
 
 				case MESSAGE_TYPES.SYSTEM_TEST_LIGHT_SENSORS:
-                    swarmMessage = new LightSensorTestData(swarmMessage.rawMessage);
+                    swarmMessage = new LightSensorTestData(swarmMessage.RawMessage);
 					break;
 
 				case MESSAGE_TYPES.SYSTEM_TEST_LINE_FOLLOWERS:
-                    swarmMessage = new LineSensorTestData(swarmMessage.rawMessage);
+                    swarmMessage = new LineSensorTestData(swarmMessage.RawMessage);
 					break;
 
                 case MESSAGE_TYPES.SYSTEM_TEST_MOUSE:
-                    swarmMessage = new MouseSensorTestData(swarmMessage.rawMessage);
+                    swarmMessage = new MouseSensorTestData(swarmMessage.RawMessage);
                     break;
 
                 case MESSAGE_TYPES.SYSTEM_TEST_IMU:
-                    swarmMessage = new IMUSensorTestData(swarmMessage.rawMessage);
+                    swarmMessage = new IMUSensorTestData(swarmMessage.RawMessage);
                     break;
 
 
                 case MESSAGE_TYPES.SYSTEM_TEST_TWI_MUX:
-                    swarmMessage = new TWIMuxTestData(swarmMessage.rawMessage);
+                    swarmMessage = new TWIMuxTestData(swarmMessage.RawMessage);
                     break;
 
                     //MANSEL: Common issue with new receive
 
                 case MESSAGE_TYPES.TOWER_LIGHT_SENSORS:
-                    swarmMessage = new TowerDockingLightSensorData(swarmMessage.rawMessage);
+                    swarmMessage = new TowerDockingLightSensorData(swarmMessage.RawMessage);
                     break;
 
 				default:

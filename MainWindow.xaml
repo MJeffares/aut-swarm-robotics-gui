@@ -10,6 +10,17 @@
     mc:Ignorable="d"
     Title="Swarm Robotics Graphics User Interface" Height="900" Width="1600" MinHeight="300" MinWidth="500" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
 
+    <Window.Resources>
+        <!--Solid Brushes-->
+        <SolidColorBrush x:Key="ListSpacerBrush" Color="#222"/>
+        <SolidColorBrush x:Key="ListItemBrush" Color="#444"/>
+        <SolidColorBrush x:Key="ListRobotBrush" Color="#111"/>
+        <SolidColorBrush x:Key="ListGroupBrush" Color="#333"/>
+        <SolidColorBrush x:Key="GridSplitterBackgroundBrush" Color="#444"/>
+        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#222"/>
+        <SolidColorBrush x:Key="WindowForegroundBrush" Color="#333"/>
+        <SolidColorBrush x:Key="WindowAccentBrush" Color="IndianRed"/>
+    </Window.Resources>
     <DockPanel x:Name="innerWin">
         <Menu DockPanel.Dock="Top" Height="21" MinWidth="300">
 
@@ -144,7 +155,7 @@
                 <WrapPanel Grid.Row="1">
                     <!--<Button x:Name="receivedDataNewline" Content="/n" Margin="10" Click="receivedDataNewline_Click"/>-->
                     <!--<Button x:Name="receivedDataClear" Content="clear" Margin="5" Click="receivedDataClear_Click"/>-->
-                    <Button x:Name="receivedDataClear" Content="clear" Margin="5"/>
+                    <Button x:Name="receivedDataClear" Content="clear" Margin="5" Click="receivedDataClear_Click"/>
                     <!--<Button x:Name="receivedDataRemove" Content="Add" Margin="5" Click="receivedDataAdd_Click"/>
                     <Button x:Name="receivedDataAdd" Content="Remove" Margin="5" Click="receivedDataRemove_Click"/>-->
                 </WrapPanel>
@@ -195,7 +206,7 @@
                     </ListView.View>
                 </ListView>-->
 
-                <DataGrid ItemsSource="{Binding commManger.rxXbeeMessageBuffer, RelativeSource={RelativeSource AncestorType=Window}}" 
+                <DataGrid x:Name="RxDataGrid" ItemsSource="{Binding TestList, RelativeSource={RelativeSource AncestorType=Window}, UpdateSourceTrigger=PropertyChanged}" 
                           AutoGenerateColumns="False" 
                           
                           Grid.Column="0" 
@@ -211,7 +222,7 @@
                                                 IsReadOnly="True" SortMemberPath="timeStamp">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding timeStamp, StringFormat=HH:mm:ss:fff}" />
+                                    <TextBlock Text="{Binding TimeStamp, StringFormat=HH:mm:ss:fff}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -812,9 +823,18 @@
             </DockPanel>
 
             <local:ItemList x:Name="ItemsList1"
-                             Grid.Row="1" Grid.Column="2"
-                            
+                             Grid.Row="1" Grid.Column="2"             
                              Items="{Binding ItemList, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItemChanged="ItemsList1_SelectedItemChanged"/>
+            <GridSplitter Grid.Column="0"
+                      Grid.Row="1"
+                      Width="5" 
+                      HorizontalAlignment="Right"
+                      Background="{StaticResource GridSplitterBackgroundBrush}"/>
+            <GridSplitter Grid.Column="2"
+                      Grid.Row="1"
+                      Width="5" 
+                      HorizontalAlignment="Left"
+                      Background="{StaticResource GridSplitterBackgroundBrush}"/>
         </Grid>
     </DockPanel>
 </Window>
