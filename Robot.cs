@@ -15,6 +15,7 @@ namespace SwarmRoboticsGUI
 {
     public class Item: INotifyPropertyChanged
     {
+        #region Properties
         private string _Name { get; set; }
         public string Name
         {
@@ -80,19 +81,6 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-
-        public Item(string Name)
-        {
-            this.Name = Name;
-            Children = new List<Item>();
-        }
-        public Item(string Name, string Text)
-        {
-            this.Name = Name;
-            this.Text = Text;
-            Children = new List<Item>();
-        }
-
         private List<Item> _Children { get; set; }
         public List<Item> Children
         {
@@ -106,6 +94,20 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
+        #endregion
+
+        public Item(string Name)
+        {
+            this.Name = Name;
+            Children = new List<Item>();
+        }
+        public Item(string Name, string Text)
+        {
+            this.Name = Name;
+            this.Text = Text;
+            Children = new List<Item>();
+        }
+       
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string PropertyName)
@@ -455,6 +457,7 @@ namespace SwarmRoboticsGUI
         }   
     }
 
+    // Deprecated
     public class RobotGroup : Item, INotifyPropertyChanged
     {
         public RobotGroup(string Name) : base(Name)
@@ -714,7 +717,7 @@ namespace SwarmRoboticsGUI
             comms.Address64 = MAC_Address;
 
             IObstacle obstacle = this;
-            // TEMP: Size of the displayed robots is fixed
+            // TEMP: Size of the displayed charging dock is fixed
             obstacle.Radius = 70;
             obstacle.Width = 2 * obstacle.Radius;
             obstacle.Height = (int)(Math.Sqrt(3) * obstacle.Radius);
@@ -729,20 +732,6 @@ namespace SwarmRoboticsGUI
 
     public class CommunicationItem : Item, INotifyPropertyChanged, ICommunicates
     {
-        private String _Colour { get; set; }
-        public String Colour
-        {
-            get { return _Colour; }
-            set
-            {
-                if (_Colour != value)
-                {
-                    _Colour = value;
-                    NotifyPropertyChanged("Colour");
-                }
-            }
-        }
-
         #region Communication Properties
         private ulong _Address64 { get; set; }
         ulong ICommunicates.Address64
@@ -784,6 +773,20 @@ namespace SwarmRoboticsGUI
             }
         }
         #endregion
+
+        private String _Colour { get; set; }
+        public String Colour
+        {
+            get { return _Colour; }
+            set
+            {
+                if (_Colour != value)
+                {
+                    _Colour = value;
+                    NotifyPropertyChanged("Colour");
+                }
+            }
+        }
 
         public CommunicationItem(String Name, UInt64 MAC_Address, string Colour) : base(Name)
         {

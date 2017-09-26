@@ -400,18 +400,23 @@ namespace SwarmRoboticsGUI
             // If the arena was identified and a distance factor was calculated, find the origin point
             if (factor != 0)
             {
+                // Find the origin by looking for the point that is top-left most in the frame
                 Origin = FindOrigin(Frame, ArenaContour);                
                 if (!Origin.IsEmpty)
                 {
+                    // Bounds of arena contour used as reference frame for further pixel locations
                     var Bounds = CvInvoke.BoundingRectangle(ArenaContour);
                     
                     Arena.ScaleFactor = factor;
+                    // Store origin point relative to bounds
                     Arena.Origin = new Point(Origin.X - Bounds.X, Origin.Y - Bounds.Y);
+                    // Store the arena contour
                     Arena.Contour = ArenaContour.ToArray();
                 }
             }
         }
 
+        // TODO: Implement auto white balance that actually works unlike the built-in camera one
         public static void WhiteBalance()
         {
             // WHERE IS WHITEBALANCE

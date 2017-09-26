@@ -111,10 +111,7 @@
                                      MouseLeftButtonDown="Robot_MouseLeftButtonDown"
                                      RenderTransformOrigin="0.5,0.5">
                                 <Polygon.LayoutTransform>
-                                    <TransformGroup>
-                                            <ScaleTransform ScaleX="-1"/>
-                                            <TranslateTransform X="{Binding Path=(local:IObstacle.Location).X}"/>
-                                            <ScaleTransform ScaleX="-1"/>
+                                        <TransformGroup>
                                             <RotateTransform Angle="{Binding FacingDeg}"/>
                                         </TransformGroup>
                                 </Polygon.LayoutTransform>
