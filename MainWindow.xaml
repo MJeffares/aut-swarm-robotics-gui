@@ -77,7 +77,6 @@
         <Style TargetType="TabItem">
             <Setter Property="Foreground" Value="{StaticResource FontDarkBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Canvas.Background" Value="#000"/>
             <Setter Property="Height" Value="30"/>
             
         </Style>
