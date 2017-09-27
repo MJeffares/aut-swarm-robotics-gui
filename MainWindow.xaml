@@ -15,39 +15,6 @@
     Closing="Window_Closing">
 
     <Window.Resources>
-        <!--Solid Brushes-->
-        <SolidColorBrush x:Key="ListSpacerBrush" Color="#222"/>
-        <SolidColorBrush x:Key="ListItemBrush" Color="#444"/>
-        <SolidColorBrush x:Key="ListRobotBrush" Color="#111"/>
-        <SolidColorBrush x:Key="ListGroupBrush" Color="#333"/>
-        <SolidColorBrush x:Key="GridSplitterBackgroundBrush" Color="#444"/>
-        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#222"/>
-        <SolidColorBrush x:Key="WindowForegroundBrush" Color="#333"/>
-        <SolidColorBrush x:Key="WindowAccentBrush" Color="IndianRed"/>
-        <SolidColorBrush x:Key="FontLightBrush" Color="White"/>
-        <SolidColorBrush x:Key="FontDarkBrush" Color="Black"/>
-
-        <!--Visual Brushes-->
-        <VisualBrush x:Key="CheckerBrush" 
-                     TileMode="Tile" 
-                     Viewport="0,0,16,16" ViewportUnits="Absolute" 
-                     Viewbox="0,0,16,16" ViewboxUnits="Absolute">
-            <VisualBrush.Visual>
-                <Grid Background="#181818">
-                    <Path Data="M0,0 L0,8 L8,8 L8,0" Fill="#141414" StrokeThickness="0"/>
-                    <Path Data="M16,16 L16,8 L8,8 L8,16" Fill="#141414" StrokeThickness="0"/>
-                </Grid>
-            </VisualBrush.Visual>
-        </VisualBrush>
-
-        <!--Radial Gradient Brushes-->
-        <RadialGradientBrush x:Key="RadialBrush" Center="0.4,0.4" GradientOrigin="0.4,0.4">
-            <RadialGradientBrush.GradientStops>
-                <GradientStop Color="#7FA0A0A0" Offset="0"/>
-                <GradientStop Color="#7F646464" Offset="1"/>
-            </RadialGradientBrush.GradientStops>
-        </RadialGradientBrush>
-
         <!--Styles-->
         <Style TargetType="Label">
             <Setter Property="Foreground" Value="{StaticResource FontLightBrush}"/>
@@ -62,7 +29,7 @@
             <Setter Property="Background" Value="{StaticResource WindowForegroundBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource WindowBackgroundBrush}"/>
         </Style>
-        <Style  TargetType="MenuItem">
+        <Style TargetType="MenuItem">
             <Setter Property="Foreground" Value="{StaticResource FontDarkBrush}"/>
             <Setter Property="Background" Value="{x:Null}"/>
         </Style>
@@ -84,7 +51,10 @@
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Background" Value="{StaticResource CheckerBrush}"/>
         </Style>
-        
+        <Style TargetType="Separator">
+            <Setter Property="Background" Value="{StaticResource ListItemBrush}"/>
+        </Style>
+
         <Style x:Key="TempMenuItemStyle" TargetType="MenuItem">
             <Setter Property="Foreground" Value="{StaticResource FontLightBrush}"/>
             <Setter Property="FontSize" Value="18"/>
@@ -92,11 +62,17 @@
             <Setter Property="Padding" Value="10,0"/>
         </Style>
         
+        <!--<Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="{StaticResource ListGroupBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource FontLightBrush}"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ListSpacerBrush}"/>
+            <Setter Property="BorderThickness" Value="0,0,1,0"/>
+        </Style>-->
     </Window.Resources>
 
     <DockPanel x:Name="innerWin" Background="{StaticResource WindowBackgroundBrush}">
         <Menu DockPanel.Dock="Top" Height="40" MinWidth="300" VerticalContentAlignment="Stretch">
-
             <MenuItem Style="{StaticResource TempMenuItemStyle}" Header="File" VerticalAlignment="Stretch" Height="40">
                 <MenuItem x:Name="menuRecordNew" Header="New Recording" IsEnabled="False" Click="menuRecordNew_Click" />
                 <MenuItem x:Name="menuRecordPause" Header="Pause Recording" IsCheckable="True" IsEnabled="False"/>
@@ -197,15 +173,12 @@
         </StatusBar>
 
         <Grid x:Name="mainGrid">
-
-
             <Grid.ColumnDefinitions>
-                <ColumnDefinition x:Name="Column0" Width="*" MinWidth="150"/>
+                <ColumnDefinition x:Name="Column0" Width="2*" MinWidth="150"/>
                 <ColumnDefinition x:Name="Column1" Width="2*" MinWidth="300"/>
                 <ColumnDefinition Width="300" MinWidth="250" MaxWidth="400"/>
-                <ColumnDefinition x:Name="Column2" Width="5"/>
+                <!--<ColumnDefinition x:Name="Column2" Width="5"/>-->
             </Grid.ColumnDefinitions>
-
             <Grid.RowDefinitions>
                 <RowDefinition x:Name="Row0" Height="3*"/>
             </Grid.RowDefinitions>
@@ -280,19 +253,19 @@
                     </ListView.View>
                 </ListView>-->
 
-                <DataGrid x:Name="RxDataGrid" ItemsSource="{Binding TestList, RelativeSource={RelativeSource AncestorType=Window}, UpdateSourceTrigger=PropertyChanged}" 
-                          AutoGenerateColumns="False" 
-                          
+                <DataGrid x:Name="RxDataGrid" 
+                          ItemsSource="{Binding TestList, RelativeSource={RelativeSource AncestorType=Window}, UpdateSourceTrigger=PropertyChanged}" 
+                          AutoGenerateColumns="False"      
                           Grid.Column="0" 
                           Grid.Row="2" 
-                          Grid.RowSpan = "1" 
-                          Margin="5"
+                          Grid.RowSpan = "1"                     
                           CanUserReorderColumns="True" 
                           CanUserResizeColumns="True" 
                           CanUserResizeRows="False" 
                           CanUserSortColumns="True">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="TimeStamp" Width="SizeToHeader" 
+                                                
                                                 IsReadOnly="True" SortMemberPath="timeStamp">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -359,8 +332,6 @@
             </Grid>
 
             <DockPanel Grid.Column="1">
-
-
                 <!--<StackPanel DockPanel.Dock="Top" Margin="5">
                     <StackPanel Height="90"  Width="220" HorizontalAlignment="Left" >
                         <Label Content="Communication" HorizontalAlignment="Center" Margin="0,0,0,0"/>
@@ -387,7 +358,6 @@
                     </StackPanel>
                 </StackPanel>-->
 
-
                 <TabControl x:Name="tcCenter" Margin="0,20,0,0">
                     <TabItem Header="No Connection" x:Name="nc">
                         <TextBlock HorizontalAlignment="Center" 
@@ -396,48 +366,129 @@
                                    VerticalAlignment="Center" 
                                    FontSize="18" 
                                    Foreground="White"
-                                   FontWeight="Bold"
-                                   
+                                   FontWeight="Bold"       
                                    Text="Please connect to an Xbee module before continuing"/>
                     </TabItem>
 
-                    <!--
-                    <TabItem Header="Swarm Control" IsEnabled="False">
-                    </TabItem>
-                    -->
+                    <!--<TabItem Header="Swarm Control" IsEnabled="False"/>-->
 
                     <TabItem Header="Robot Control" IsEnabled="False">
                         <WrapPanel>
-                            <Border BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5">
-                                <StackPanel Margin="10">
-                                    <Label Margin="5" 
+                            <Border BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0">
+                                <StackPanel Width="180" Margin="5">
+                                    <Label Content="Robot Tasks" 
+                                           Margin="5" 
                                            FontWeight="Bold" 
-                                           Content="Robot Tasks" 
                                            HorizontalAlignment="Center"/>
-                                    <CheckBox Margin="5" HorizontalAlignment="Center" x:Name="robotTaskObstacleAvoidance" Click="robotTaskObstacleAvoidance_Click">Obstacle Avoidance</CheckBox>
-                                    <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskStopMoving" Click="robotTaskStopMoving_Click">Stop Moving</Button>
-                                    <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskMoveRandomly" Click="robotTaskMoveRandomly_Click">Move Randomly</Button>
-                                    <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskDock" Click="robotTaskDock_Click">Dock</Button>
-                                    <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskReleaseDock" Click="robotTaskReleaseDock_Click">ReleaseDock</Button>
-                                    <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskMoveTowardsLight" Click="robotTaskMoveTowardsLight_Click">Move Towards Light</Button>
-                                    <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskFollowLine" Click="robotTaskFollowLine_Click">Follow Line</Button>
-
-                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="5">
-                                        <Button x:Name="robotTaskRotateToHeading" Margin="0,0,5,5" Click="robotTaskRotateToHeading_Click">Turn to Facing</Button>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Label Content="FACE: " Height="20" Padding="0,-5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                            <TextBox x:Name="tbRotateToHeading"  Width="35" Height="20" Text="000" TextAlignment="Center" PreviewTextInput="tbRotateToHeading_PreviewTextInput" />
-                                            <StackPanel Orientation="Vertical">
-                                                <Button x:Name="btnRotateToHeadingUp" Content="˄" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" Click="btnRotateToHeadingUp_Click" />
-                                                <Button x:Name="btnRotateToHeadingDown" Content="˅" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" Click="btnRotateToHeadingDown_Click" />
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </StackPanel>
-
-
+                                    <Grid Background="{StaticResource WindowForegroundBrush}">
+                                        <CheckBox x:Name="robotTaskObstacleAvoidance"
+                                              Content="Obstacle Avoidance"
+                                              Height="25"
+                                              HorizontalAlignment="Center"  
+                                              HorizontalContentAlignment="Center"
+                                              VerticalContentAlignment="Center"
+                                              Click="robotTaskObstacleAvoidance_Click"/>
+                                    </Grid>
+                                    <Separator Padding="0" Margin="0"/>
+                                    <Button x:Name="robotTaskStopMoving" 
+                                            Height="25"
+                                            HorizontalAlignment="Stretch" 
+                                            Content="Stop Moving"
+                                            Click="robotTaskStopMoving_Click"/>
+                                    <Separator Padding="0" Margin="0"/>
+                                    <Button x:Name="robotTaskMoveRandomly" 
+                                            Height="25"
+                                            HorizontalAlignment="Stretch" 
+                                            Content="Move Randomly"
+                                            Click="robotTaskMoveRandomly_Click"/>
+                                    <Separator Padding="0" Margin="0"/>
+                                    <Button x:Name="robotTaskDock"
+                                            Height="25"
+                                            HorizontalAlignment="Stretch" 
+                                            Content="Dock"
+                                            Click="robotTaskDock_Click"/>
+                                    <Separator Padding="0" Margin="0"/>
+                                    <Button x:Name="robotTaskReleaseDock" 
+                                            Height="25"
+                                            HorizontalAlignment="Stretch" 
+                                            Content="Release Dock"
+                                            Click="robotTaskReleaseDock_Click"/>
+                                    <Separator Padding="0" Margin="0"/>
+                                    <Button  x:Name="robotTaskMoveTowardsLight"
+                                            Height="25"
+                                            HorizontalAlignment="Stretch" 
+                                            Content="Move Towards Light"
+                                            Click="robotTaskMoveTowardsLight_Click"/>
+                                    <Separator Padding="0" Margin="0"/>
+                                    <Button x:Name="robotTaskFollowLine"
+                                            Height="25"
+                                            HorizontalAlignment="Stretch" 
+                                            Content="Follow Line"
+                                            Click="robotTaskFollowLine_Click"/>
+                                    <Separator Padding="0" Margin="0"/>
                                     <StackPanel Orientation="Vertical">
-                                        <Button Margin="5" Height="20" x:Name="robotTaskMoveToPosition">Move to Position</Button>
-                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                        <Button x:Name="robotTaskRotateToHeading" 
+                                                Height="25"
+                                                HorizontalAlignment="Stretch" 
+                                                Click="robotTaskRotateToHeading_Click"
+                                                Content="Turn to Facing"/>
+                                        <Separator Padding="0" Margin="0"/>
+                                        <local:IntegerUpDown Text="Facing" 
+                                                             Maximum="100" 
+                                                             Minimum="0" 
+                                                             Height="30"
+                                                             HorizontalAlignment="Stretch"/>
+                                        <!--Old RotateToHeading-->
+                                        <!--<StackPanel Orientation="Horizontal" 
+                                                    HorizontalAlignment="Center" 
+                                                    Width="150">
+                                            <Label Content="Facing: " 
+                                                   Background="White"
+                                                   Foreground="{StaticResource FontDarkBrush}"
+                                                   VerticalAlignment="Stretch"/>
+                                            <TextBox x:Name="tbRotateToHeading"  
+                                                     Text="000" 
+                                                     Width="70"
+                                                     BorderThickness="0"
+                                                     VerticalContentAlignment="Center"
+                                                     TextAlignment="Center" 
+                                                     PreviewTextInput="tbRotateToHeading_PreviewTextInput" />
+                                            <StackPanel Orientation="Vertical" 
+                                                        Width="30">
+                                                <Button x:Name="btnRotateToHeadingUp" 
+                                                        Content="˄" 
+                                                        Height="12.5" 
+                                                        HorizontalContentAlignment="Center" 
+                                                        Click="btnRotateToHeadingUp_Click" />
+
+                                                <Button x:Name="btnRotateToHeadingDown" 
+                                                        Content="˅" 
+                                                        Height="12.5" 
+                                                        HorizontalContentAlignment="Center" 
+                                                        Click="btnRotateToHeadingDown_Click" />
+                                            </StackPanel>
+                                        </StackPanel>-->
+                                    </StackPanel>
+                                    <Separator Padding="0" Margin="0"/>
+                                    <StackPanel Orientation="Vertical">
+                                        <Button x:Name="robotTaskMoveToPosition"
+                                                Height="25"
+                                                HorizontalAlignment="Stretch" 
+                                                Content="Move to Position"/>
+                                        <Separator Padding="0" Margin="0"/>
+                                        <local:IntegerUpDown Text="X" 
+                                                             Maximum="100" 
+                                                             Minimum="0" 
+                                                             Height="30"
+                                                             HorizontalAlignment="Stretch"/>
+                                        <Separator Padding="0" Margin="0"/>
+                                        <local:IntegerUpDown Text="Y"
+                                                             Maximum="100" 
+                                                             Minimum="0" 
+                                                             Height="30"
+                                                             HorizontalAlignment="Stretch"/>
+                                        <!--Old MoveToPosition-->
+                                        <!--<StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                                 <Label Content="X: " Height="20" Padding="0,-5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
                                                 <TextBox x:Name="tbMoveToPositionX"  Width="35" Height="20" Text="0" TextAlignment="Center"/>
@@ -456,19 +507,40 @@
                                                 </StackPanel>
                                                 <Label Content="mm" Height="20" Padding="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
                                             </StackPanel>
-                                        </StackPanel>
+                                        </StackPanel>-->
                                     </StackPanel>
-
+                                    <Separator Padding="0" Margin="0"/>
                                     <StackPanel Orientation="Vertical">
-                                        <Button Margin="5" Height="20" x:Name="robotTaskMoveToPositionAtHeading">Move to Position With Facing</Button>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5">
+                                        <Button x:Name="robotTaskMoveToPositionAtHeading"
+                                                Height="25"
+                                                HorizontalAlignment="Stretch" 
+                                                Content="Move to Position With Facing"/>
+                                        <Separator Padding="0" Margin="0"/>
+                                        <local:IntegerUpDown Text="Facing" 
+                                                             Maximum="100" 
+                                                             Minimum="0" 
+                                                             Height="30"
+                                                             HorizontalAlignment="Stretch"/>
+                                        <Separator Padding="0" Margin="0"/>
+                                        <local:IntegerUpDown Text="X" 
+                                                             Maximum="100" 
+                                                             Minimum="0" 
+                                                             Height="30"
+                                                             HorizontalAlignment="Stretch"/>
+                                        <Separator Padding="0" Margin="0"/>
+                                        <local:IntegerUpDown Text="Y"
+                                                             Maximum="100" 
+                                                             Minimum="0" 
+                                                             Height="30"
+                                                             HorizontalAlignment="Stretch"/>
+                                        <!--Old MoveToPositionAtHeadingHDGUp-->
+                                        <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5">
                                             <Label Content="FACE: " Height="20" Padding="0,-5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
                                             <TextBox x:Name="tbMoveToPositionAtHeadingHDG"  Width="35" Height="20" Text="000" TextAlignment="Center"/>
                                             <StackPanel Orientation="Vertical">
                                                 <Button x:Name="btnMoveToPositionAtHeadingHDGUp" Content="˄" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
                                                 <Button x:Name="btnHDGDown" Content="˅" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
                                             </StackPanel>
-
                                         </StackPanel>
                                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
@@ -489,15 +561,23 @@
                                                 </StackPanel>
                                                 <Label Content="mm" Height="20" Padding="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
                                             </StackPanel>
-                                        </StackPanel>
+                                        </StackPanel>-->
                                     </StackPanel>
-
-
                                 </StackPanel>
                             </Border>
-                            <Border BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5">
-                                <Canvas Height="200" Width="200" VerticalAlignment="Top" HorizontalAlignment="Left">
-                                    <Ellipse Fill="Transparent" Width="100" Height="100" Canvas.Top="50" Canvas.Left="50" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                            <Border BorderThickness="2" 
+                                    HorizontalAlignment="Left" 
+                                    VerticalAlignment="Top" 
+                                    Margin="10,10,0,0">
+                                <Canvas Height="200" Width="200" 
+                                        VerticalAlignment="Top" 
+                                        HorizontalAlignment="Left">
+                                    <Ellipse Fill="Transparent" 
+                                             Width="100" Height="100" 
+                                             Canvas.Top="50" Canvas.Left="50" 
+                                             HorizontalAlignment="Center" 
+                                             VerticalAlignment="Center"/>
                                     <CheckBox x:Name="checkboxManualModeEnable" Width="160" Canvas.Left="20" Canvas.Top="10" Content="Enable Manual Movement"/>
 
                                     <Button x:Name="btManualModeN"  Content="N"     Height="20" Width="40" Canvas.Left="80"     Canvas.Top="50"     IsEnabled="{Binding IsChecked, ElementName=checkboxManualModeEnable}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
@@ -902,12 +982,12 @@
                     </TabItem>
 
                 </TabControl>
-
             </DockPanel>
 
             <local:ItemList x:Name="ItemsList1"
                              Grid.Row="1" Grid.Column="2"             
                              Items="{Binding ItemList, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItemChanged="ItemsList1_SelectedItemChanged"/>
+            
             <GridSplitter Grid.Column="0"
                       Grid.Row="1"
                       Width="5" 

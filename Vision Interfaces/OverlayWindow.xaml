@@ -11,36 +11,7 @@
         Title="Overlay" MinHeight="740" MinWidth="800" 
         Closing="Overlay_Closing" Height="800" Width="1200">
     <Window.Resources>
-        <!--Solid Brushes-->
-        <SolidColorBrush x:Key="ListSpacerBrush" Color="#222"/>
-        <SolidColorBrush x:Key="ListItemBrush" Color="#444"/>
-        <SolidColorBrush x:Key="ListRobotBrush" Color="#111"/>
-        <SolidColorBrush x:Key="ListGroupBrush" Color="#333"/>
-        <SolidColorBrush x:Key="GridSplitterBackgroundBrush" Color="#444"/>
-        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#222"/>
-        <SolidColorBrush x:Key="WindowForegroundBrush" Color="#333"/>
-        <SolidColorBrush x:Key="WindowAccentBrush" Color="IndianRed"/>
 
-        <!--Visual Brushes-->
-        <VisualBrush x:Key="CheckerBrush" 
-                     TileMode="Tile" 
-                     Viewport="0,0,16,16" ViewportUnits="Absolute" 
-                     Viewbox="0,0,16,16" ViewboxUnits="Absolute">
-            <VisualBrush.Visual>
-                <Grid Background="#181818">
-                    <Path Data="M0,0 L0,8 L8,8 L8,0" Fill="#141414" StrokeThickness="0"/>
-                    <Path Data="M16,16 L16,8 L8,8 L8,16" Fill="#141414" StrokeThickness="0"/>
-                </Grid>
-            </VisualBrush.Visual>
-        </VisualBrush>
-
-        <!--Radial Gradient Brushes-->
-        <RadialGradientBrush x:Key="RadialBrush" Center="0.4,0.4" GradientOrigin="0.4,0.4">
-            <RadialGradientBrush.GradientStops>
-                <GradientStop Color="#7FA0A0A0" Offset="0"/>
-                <GradientStop Color="#7F646464" Offset="1"/>
-            </RadialGradientBrush.GradientStops>
-        </RadialGradientBrush>
     </Window.Resources>
 
     <Grid Background="{StaticResource WindowBackgroundBrush}">

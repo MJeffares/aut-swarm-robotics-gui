@@ -115,9 +115,8 @@ namespace SwarmRoboticsGUI
 		{
 			InitializeComponent();
 			DataContext = this;
-
-			//
-			CvInvoke.UseOpenCL = true;
+            //
+            CvInvoke.UseOpenCL = true;
 			//
 			camera1 = new Camera();
 			
@@ -699,10 +698,30 @@ namespace SwarmRoboticsGUI
             {
                 var commsItem = itemList.SelectedItem as ICommunicates;
                 if (commsItem != null)
-                    commManger.currentTargetRobot = ((ICommunicates)commsItem).Address64;
+                    commManger.currentTargetRobot = commsItem.Address64;
             }
         }
 
+
+        // BRAE: Mansels newer stuff
+        // MANSEL: Mansels newer stuff
+        // TODO: Mansels newer stuff
+        private void receivedDataClear_Click(object sender, RoutedEventArgs e)
+        {
+            DEBUGGING_PopulateTestList();
+        }
+        private void updnRotateToHeading_ValueChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            int value = (int)e.NewValue;
+        }
+        private void updnMoveToPositionX_ValueChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            int value = (int)e.NewValue;
+        }
+        private void updnMoveToPositionY_ValueChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            int value = (int)e.NewValue;
+        }
         #endregion
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -710,9 +729,6 @@ namespace SwarmRoboticsGUI
             //camera1.CloseCapture();
         }
 
-        private void receivedDataClear_Click(object sender, RoutedEventArgs e)
-        {
-            DEBUGGING_PopulateTestList();
-        }
+        
     }
 }

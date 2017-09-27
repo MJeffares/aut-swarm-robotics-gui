@@ -512,23 +512,25 @@ namespace SwarmRoboticsGUI
         {
 
         }
-        private void tbRotateToHeading_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-            int num;
 
-            if (int.TryParse(((TextBox)sender).Text + e.Text, out num))
-            {
-                if (num >= 0)
-                {
-                    if (num > 360)
-                    {
-                        num = 360;
-                    }
-                    ((TextBox)sender).Text = num.ToString();
-                }
-                e.Handled = true;
-            }
-        }
+        //private void tbRotateToHeading_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        //{
+        //    int num;
+
+        //    if (int.TryParse(((TextBox)sender).Text + e.Text, out num))
+        //    {
+        //        if (num >= 0)
+        //        {
+        //            if (num > 360)
+        //            {
+        //                num = 360;
+        //            }
+        //            ((TextBox)sender).Text = num.ToString();
+        //        }
+        //        e.Handled = true;
+        //    }
+        //}
+
         /*
         private void btnRotateToHeadingUp_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -559,40 +561,41 @@ namespace SwarmRoboticsGUI
             tbRotateToHeading.Text = num.ToString();
         }
         */
-        private void btnRotateToHeadingUp_Click(object sender, RoutedEventArgs e)
-        {
-            int num;
 
-            int.TryParse(tbRotateToHeading.Text, out num);
+        //private void btnRotateToHeadingUp_Click(object sender, RoutedEventArgs e)
+        //{
+        //    int num;
 
-            if (num == 360)
-            {
-                num = 0;
-            }
-            else
-            {
-                num++;
-            }
+        //    int.TryParse(tbRotateToHeading.Text, out num);
 
-            tbRotateToHeading.Text = num.ToString();
-        }
-        private void btnRotateToHeadingDown_Click(object sender, RoutedEventArgs e)
-        {
-            int num;
+        //    if (num == 360)
+        //    {
+        //        num = 0;
+        //    }
+        //    else
+        //    {
+        //        num++;
+        //    }
 
-            int.TryParse(tbRotateToHeading.Text, out num);
+        //    tbRotateToHeading.Text = num.ToString();
+        //}
+        //private void btnRotateToHeadingDown_Click(object sender, RoutedEventArgs e)
+        //{
+        //    int num;
 
-            if (num == 0)
-            {
-                num = 360;
-            }
-            else
-            {
-                num--;
-            }
+        //    int.TryParse(tbRotateToHeading.Text, out num);
 
-            tbRotateToHeading.Text = num.ToString();
-        }
+        //    if (num == 0)
+        //    {
+        //        num = 360;
+        //    }
+        //    else
+        //    {
+        //        num--;
+        //    }
+
+        //    tbRotateToHeading.Text = num.ToString();
+        //}
         #endregion
 
         // DONE

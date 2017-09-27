@@ -94,6 +94,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationFramework.Aero" />
+    <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -136,6 +137,9 @@
     <Compile Include="General Controls\RangeSlider.xaml.cs">
       <DependentUpon>RangeSlider.xaml</DependentUpon>
     </Compile>
+    <Compile Include="General Controls\IntegerUpDown.xaml.cs">
+      <DependentUpon>IntegerUpDown.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ManselsMainWindowCodePile.cs" />
     <Compile Include="ManualMode.cs" />
     <Compile Include="ProgressWindow.xaml.cs">
@@ -166,9 +170,17 @@
     <Compile Include="General Controls\ItemList.xaml.cs">
       <DependentUpon>ItemList.xaml</DependentUpon>
     </Compile>
+    <Page Include="BraesDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="General Controls\RangeSlider.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="General Controls\IntegerUpDown.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ProgressWindow.xaml">
       <SubType>Designer</SubType>

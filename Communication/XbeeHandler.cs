@@ -519,7 +519,7 @@ namespace XbeeHandler
 			}
 			catch (Exception e)
 			{
-				//MessageBox.Show(excpt.Message);
+				MessageBox.Show(e.Message + "\n \"This error message is useless\" -XbeeHandler.cs");
 			}
 		}
 
