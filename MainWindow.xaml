@@ -5,10 +5,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:SwarmRoboticsGUI"
     xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
-    xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
-    
+    xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"   
     mc:Ignorable="d"
-    Title="Swarm Robotics Graphics User Interface" Height="900" Width="1600" MinHeight="300" MinWidth="500" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+        
+    Title="Swarm Robotics Graphics User Interface" 
+    Height="900" Width="1600" 
+    MinHeight="300" MinWidth="500"
+    WindowStartupLocation="CenterScreen" 
+    Closing="Window_Closing">
 
     <Window.Resources>
         <!--Solid Brushes-->
@@ -20,11 +24,81 @@
         <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#222"/>
         <SolidColorBrush x:Key="WindowForegroundBrush" Color="#333"/>
         <SolidColorBrush x:Key="WindowAccentBrush" Color="IndianRed"/>
-    </Window.Resources>
-    <DockPanel x:Name="innerWin">
-        <Menu DockPanel.Dock="Top" Height="21" MinWidth="300">
+        <SolidColorBrush x:Key="FontLightBrush" Color="White"/>
+        <SolidColorBrush x:Key="FontDarkBrush" Color="Black"/>
 
-            <MenuItem Header="File" >
+        <!--Visual Brushes-->
+        <VisualBrush x:Key="CheckerBrush" 
+                     TileMode="Tile" 
+                     Viewport="0,0,16,16" ViewportUnits="Absolute" 
+                     Viewbox="0,0,16,16" ViewboxUnits="Absolute">
+            <VisualBrush.Visual>
+                <Grid Background="#181818">
+                    <Path Data="M0,0 L0,8 L8,8 L8,0" Fill="#141414" StrokeThickness="0"/>
+                    <Path Data="M16,16 L16,8 L8,8 L8,16" Fill="#141414" StrokeThickness="0"/>
+                </Grid>
+            </VisualBrush.Visual>
+        </VisualBrush>
+
+        <!--Radial Gradient Brushes-->
+        <RadialGradientBrush x:Key="RadialBrush" Center="0.4,0.4" GradientOrigin="0.4,0.4">
+            <RadialGradientBrush.GradientStops>
+                <GradientStop Color="#7FA0A0A0" Offset="0"/>
+                <GradientStop Color="#7F646464" Offset="1"/>
+            </RadialGradientBrush.GradientStops>
+        </RadialGradientBrush>
+
+        <!--Styles-->
+        <Style TargetType="Label">
+            <Setter Property="Foreground" Value="{StaticResource FontLightBrush}"/>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource FontLightBrush}"/>
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{StaticResource FontLightBrush}"/>
+        </Style>
+        <Style TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource WindowForegroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource WindowBackgroundBrush}"/>
+        </Style>
+        <Style  TargetType="MenuItem">
+            <Setter Property="Foreground" Value="{StaticResource FontDarkBrush}"/>
+            <Setter Property="Background" Value="{x:Null}"/>
+        </Style>
+        <Style TargetType="Menu">
+            <Setter Property="Foreground" Value="{StaticResource FontLightBrush}"/>
+            <Setter Property="Background" Value="{StaticResource WindowAccentBrush}"/>
+        </Style>
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="{StaticResource WindowForegroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource WindowForegroundBrush}"/>
+        </Style>
+        <Style TargetType="TabItem">
+            <Setter Property="Foreground" Value="{StaticResource FontDarkBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Canvas.Background" Value="#000"/>
+            <Setter Property="Height" Value="30"/>
+            
+        </Style>
+        <Style TargetType="TabControl">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="{StaticResource CheckerBrush}"/>
+        </Style>
+        
+        <Style x:Key="TempMenuItemStyle" TargetType="MenuItem">
+            <Setter Property="Foreground" Value="{StaticResource FontLightBrush}"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Canvas.Background" Value="{StaticResource WindowAccentBrush}"/>
+            <Setter Property="Padding" Value="10,0"/>
+        </Style>
+        
+    </Window.Resources>
+
+    <DockPanel x:Name="innerWin" Background="{StaticResource WindowBackgroundBrush}">
+        <Menu DockPanel.Dock="Top" Height="40" MinWidth="300" VerticalContentAlignment="Stretch">
+
+            <MenuItem Style="{StaticResource TempMenuItemStyle}" Header="File" VerticalAlignment="Stretch" Height="40">
                 <MenuItem x:Name="menuRecordNew" Header="New Recording" IsEnabled="False" Click="menuRecordNew_Click" />
                 <MenuItem x:Name="menuRecordPause" Header="Pause Recording" IsCheckable="True" IsEnabled="False"/>
                 <MenuItem x:Name="menuRecordStop" Header="Stop Recording" IsEnabled="False" Click="menuRecordStop_Click" />
@@ -32,7 +106,7 @@
                 <MenuItem x:Name="menuRecordingSettings" Header="Recording Settings" />
             </MenuItem>
 
-            <MenuItem Header="Display" >
+            <MenuItem Style="{StaticResource TempMenuItemStyle}" Header="Display" >
                 <MenuItem x:Name="menuViewList" Header="View"/>
                 <MenuItem x:Name="menuFilterList" Header="Camera Filters" />
                 <MenuItem x:Name="menuOverlayList" Header="Overlays" />
@@ -41,7 +115,7 @@
                 <MenuItem x:Name="menuFilterFlipHorizontal" Header="Flip Horizontal" Click="menuFilterFlipHorizontal_Click"/>
             </MenuItem>
 
-            <MenuItem Header="Camera" >
+            <MenuItem Style="{StaticResource TempMenuItemStyle}" Header="Camera" >
                 <MenuItem x:Name="menuCameraList" Header="Connected Cameras"/>
                 <MenuItem x:Name="menuCameraCapabilityList" Header="Camera Resolution"/>
                 <MenuItem x:Name="menuCameraConnect" Header="Start Capture" IsEnabled="False" IsCheckable="True"  Click="menuCameraConnect_Click"/>
@@ -50,10 +124,10 @@
                 <MenuItem x:Name="menuCameraOptions" Header="Camera Options" Click="menuCameraOptions_Click"/>
             </MenuItem>
 
-            <MenuItem x:Name="menuCommunication" Header="Serial Communications">
+            <MenuItem Style="{StaticResource TempMenuItemStyle}" x:Name="menuCommunication" Header="Communications">
             </MenuItem>
 
-            <MenuItem Header="Replay" >
+            <MenuItem Style="{StaticResource TempMenuItemStyle}" Header="Replay" >
                 <MenuItem x:Name="menuReplayOpen" Header="Open Replay" Click="menuReplayOpen_Click"/>
                 <MenuItem x:Name="menuReplayPause" Header="Pause Replay" IsCheckable="True" IsEnabled="False"/>
                 <Separator/>
@@ -61,7 +135,7 @@
             </MenuItem>
         </Menu>
 
-        <StatusBar DockPanel.Dock="Bottom">
+        <StatusBar DockPanel.Dock="Bottom" Background="{StaticResource WindowAccentBrush}">
             <StatusBar.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Grid>
@@ -137,10 +211,10 @@
                 <RowDefinition x:Name="Row0" Height="3*"/>
             </Grid.RowDefinitions>
 
-            <Grid  Grid.Column="0" 
+            <Grid Background="{StaticResource WindowForegroundBrush}"
+                Grid.Column="0" 
                    Grid.Row="0" 
-                   Grid.RowSpan = "2" 
-                   Margin="5">
+                   Grid.RowSpan = "2">
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -149,13 +223,14 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" 
+                           Foreground="{StaticResource FontLightBrush}"
                            Text="Received Data" 
                            HorizontalAlignment="Center" 
                            VerticalAlignment="Top" Margin="10,10,10,0"/>
                 <WrapPanel Grid.Row="1">
                     <!--<Button x:Name="receivedDataNewline" Content="/n" Margin="10" Click="receivedDataNewline_Click"/>-->
                     <!--<Button x:Name="receivedDataClear" Content="clear" Margin="5" Click="receivedDataClear_Click"/>-->
-                    <Button x:Name="receivedDataClear" Content="clear" Margin="5" Click="receivedDataClear_Click"/>
+                    <!--<Button x:Name="receivedDataClear" Content="clear" Margin="5" Click="receivedDataClear_Click"/>-->
                     <!--<Button x:Name="receivedDataRemove" Content="Add" Margin="5" Click="receivedDataAdd_Click"/>
                     <Button x:Name="receivedDataAdd" Content="Remove" Margin="5" Click="receivedDataRemove_Click"/>-->
                 </WrapPanel>
@@ -314,9 +389,17 @@
                 </StackPanel>-->
 
 
-                <TabControl x:Name="tcCenter" Background="{x:Null}">
+                <TabControl x:Name="tcCenter" Margin="0,20,0,0">
                     <TabItem Header="No Connection" x:Name="nc">
-                        <Label HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold">Please connect to an Xbee module before continuing</Label>
+                        <TextBlock HorizontalAlignment="Center" 
+                                   TextWrapping="WrapWithOverflow"
+                                   TextAlignment="Center"
+                                   VerticalAlignment="Center" 
+                                   FontSize="18" 
+                                   Foreground="White"
+                                   FontWeight="Bold"
+                                   
+                                   Text="Please connect to an Xbee module before continuing"/>
                     </TabItem>
 
                     <!--
@@ -326,9 +409,12 @@
 
                     <TabItem Header="Robot Control" IsEnabled="False">
                         <WrapPanel>
-                            <Border BorderBrush="Gainsboro" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5">
+                            <Border BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5">
                                 <StackPanel Margin="10">
-                                    <Label Margin="5" FontWeight="Bold" Content="Robot Tasks" HorizontalAlignment="Center"/>
+                                    <Label Margin="5" 
+                                           FontWeight="Bold" 
+                                           Content="Robot Tasks" 
+                                           HorizontalAlignment="Center"/>
                                     <CheckBox Margin="5" HorizontalAlignment="Center" x:Name="robotTaskObstacleAvoidance" Click="robotTaskObstacleAvoidance_Click">Obstacle Avoidance</CheckBox>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskStopMoving" Click="robotTaskStopMoving_Click">Stop Moving</Button>
                                     <Button Margin="5" HorizontalAlignment="Center" x:Name="robotTaskMoveRandomly" Click="robotTaskMoveRandomly_Click">Move Randomly</Button>
@@ -393,7 +479,7 @@
                                                     <Button x:Name="btnMoveToPositionAtHeadingXUp" Content="˄" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
                                                     <Button x:Name="btnMoveToPositionAtHeadingXDown" Content="˅" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
                                                 </StackPanel>
-                                                <Label Content="mm" Height="20" Padding="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
+                                                <Label  Content="mm" Height="20" Padding="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal">
                                                 <Label Content="Y: " Height="20" Padding="0,-5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
@@ -410,28 +496,26 @@
 
                                 </StackPanel>
                             </Border>
+                            <Border BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5">
+                                <Canvas Height="200" Width="200" VerticalAlignment="Top" HorizontalAlignment="Left">
+                                    <Ellipse Fill="Transparent" Width="100" Height="100" Canvas.Top="50" Canvas.Left="50" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <CheckBox x:Name="checkboxManualModeEnable" Width="160" Canvas.Left="20" Canvas.Top="10" Content="Enable Manual Movement"/>
 
+                                    <Button x:Name="btManualModeN"  Content="N"     Height="20" Width="40" Canvas.Left="80"     Canvas.Top="50"     IsEnabled="{Binding IsChecked, ElementName=checkboxManualModeEnable}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <Button x:Name="btManualModeNE" Content="NE"    Height="24" Width="24" Canvas.Left="120"    Canvas.Top="56"     IsEnabled="{Binding IsChecked, ElementName=checkboxManualModeEnable}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <Button x:Name="btManualModeE"  Content="E"     Height="40" Width="20" Canvas.Left="130"    Canvas.Top="80"     IsEnabled="{Binding IsChecked, ElementName=checkboxManualModeEnable}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <Button x:Name="btManualModeSE" Content="SE"    Height="24" Width="24" Canvas.Left="120"    Canvas.Top="120"    IsEnabled="{Binding IsChecked, ElementName=checkboxManualModeEnable}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <Button x:Name="btManualModeS"  Content="S"     Height="20" Width="40" Canvas.Left="80"     Canvas.Top="130"    IsEnabled="{Binding IsChecked, ElementName=checkboxManualModeEnable}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <Button x:Name="btManualModeSW" Content="SW"    Height="24" Width="24" Canvas.Left="56"     Canvas.Top="120"    IsEnabled="{Binding IsChecked, ElementName=checkboxManualModeEnable}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <Button x:Name="btManualModeW"  Content="W"     Height="40" Width="20" Canvas.Left="50"     Canvas.Top="80"     IsEnabled="{Binding IsChecked, ElementName=checkboxManualModeEnable}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <Button x:Name="btManualModeNW" Content="NW"    Height="24" Width="24" Canvas.Left="56"     Canvas.Top="56"     IsEnabled="{Binding IsChecked, ElementName=checkboxManualModeEnable}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
 
-                            <Border BorderBrush="Gainsboro" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5">
-                                <Canvas Height="200" Width="260" Background="AliceBlue" VerticalAlignment="Top" HorizontalAlignment="Left">
-                                    <CheckBox x:Name="checkboxManualModeEnable" Width="160" Canvas.Left="50" Canvas.Top="5">Enable Manual Movement</CheckBox>
+                                    <!--<WrapPanel Orientation="Horizontal" Width="80" Canvas.Left="90" Canvas.Top="160"/>-->
 
-                                    <Button x:Name="btManualModeN"  Content="N"     Height="20" Width="40" Canvas.Left="80"     Canvas.Top="30"     IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
-                                    <Button x:Name="btManualModeNE" Content="NE"    Height="20" Width="40" Canvas.Left="115"    Canvas.Top="55"     IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
-                                    <Button x:Name="btManualModeE"  Content="E"     Height="20" Width="40" Canvas.Left="140"    Canvas.Top="80"     IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
-                                    <Button x:Name="btManualModeSE" Content="SE"    Height="20" Width="40" Canvas.Left="115"    Canvas.Top="105"    IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
-                                    <Button x:Name="btManualModeS"  Content="S"     Height="20" Width="40" Canvas.Left="80"     Canvas.Top="130"    IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
-                                    <Button x:Name="btManualModeSW" Content="SW"    Height="20" Width="40" Canvas.Left="45"     Canvas.Top="105"    IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
-                                    <Button x:Name="btManualModeW"  Content="W"     Height="20" Width="40" Canvas.Left="20"     Canvas.Top="80"     IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
-                                    <Button x:Name="btManualModeNW" Content="NW"    Height="20" Width="40" Canvas.Left="45"     Canvas.Top="55"     IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeDirectionMouseEnter" MouseLeave="ManualModeMouseLeave"/>
-
-                                    <WrapPanel Orientation="Horizontal" Width="80" Canvas.Left="90" Canvas.Top="160">
-                                        <Label Content="Speed"/>
-                                        <TextBox x:Name="tbManualModeSpeed" Width="35" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" PreviewTextInput="tbManualModeSpeed_PreviewTextInput">50</TextBox>
-                                    </WrapPanel>
-
-                                    <Button x:Name="btManualModeCW"     Content="CW"     Height="20" Width="40" Canvas.Left="200" Canvas.Top="60" IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeRotateMouseEnter" MouseLeave="ManualModeMouseLeave"/>
-                                    <Button x:Name="btManualModeCCW"    Content="CCW"    Height="20" Width="40" Canvas.Left="200" Canvas.Top="100" IsEnabled="{Binding ElementName=checkboxManualModeEnable, Path=IsChecked}" MouseEnter="ManualModeRotateMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <Button x:Name="btManualModeCW"     Content="CW"     Height="20" Width="40" Canvas.Left="10" Canvas.Top="173" IsEnabled="{Binding IsChecked, ElementName=checkboxManualModeEnable}" MouseEnter="ManualModeRotateMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <Button x:Name="btManualModeCCW"    Content="CCW"    Height="20" Width="40" Canvas.Left="55" Canvas.Top="173" IsEnabled="{Binding IsChecked, ElementName=checkboxManualModeEnable}" MouseEnter="ManualModeRotateMouseEnter" MouseLeave="ManualModeMouseLeave"/>
+                                    <TextBox x:Name="tbManualModeSpeed" Width="35" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" PreviewTextInput="tbManualModeSpeed_PreviewTextInput" Canvas.Left="155" Text="50" Canvas.Top="174"/>
+                                    <Label Content="Speed" Canvas.Left="112" Canvas.Top="170"/>
                                 </Canvas>
                             </Border>
                         </WrapPanel>
@@ -443,7 +527,7 @@
                         <StackPanel Margin = "5">
 
                             <WrapPanel>
-                                <Border BorderBrush="Gainsboro" BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Padding="2" Width="500" Height="86">
+                                <Border BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Padding="2" Width="500" Height="86">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
@@ -484,7 +568,7 @@
                             </WrapPanel>
 
 
-                            <Border BorderBrush="Gainsboro" BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Padding="2" Width="130" Height="150">
+                            <Border BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Padding="2" Width="130" Height="150">
                                 <StackPanel Orientation="Vertical" Margin="0">
                                     <Label FontWeight="Bold" HorizontalAlignment="Center" >Docking Lights</Label>
                                     <CheckBox Margin="20,0,0,0">Front</CheckBox>
@@ -496,7 +580,7 @@
                                 </StackPanel>
                             </Border>
 
-                            <Border BorderBrush="Gainsboro" BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Padding="2" Width="180" Height="150">
+                            <Border BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Padding="2" Width="180" Height="150">
                                 <StackPanel Orientation="Vertical" Margin="0">
                                     <Label FontWeight="Bold" HorizontalAlignment="Center" >Docking Pad Power Enable</Label>
                                     <CheckBox Margin="50,0,0,0">Front</CheckBox>
@@ -524,7 +608,7 @@
 
 
                             <WrapPanel>
-                                <Border BorderBrush="Gainsboro" BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Padding="2" Width="500" Height="86">
+                                <Border BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Padding="2" Width="500" Height="86">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
@@ -567,7 +651,7 @@
                             </WrapPanel>
 
                             <WrapPanel>
-                                <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="2" Width="210" Height="86">
+                                <Border BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="2" Width="210" Height="86">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
@@ -589,7 +673,7 @@
                                         <TextBox Grid.Row="2" Grid.Column="1" x:Name="tbSysTestLightSensorRHS" IsReadOnly="True" Margin="2"/>
                                     </Grid>
                                 </Border>
-                                <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="1" >
+                                <Border BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="1" >
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
@@ -625,7 +709,7 @@
 
                             <WrapPanel>
                                 <StackPanel HorizontalAlignment="Left">
-                                    <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="1" >
+                                    <Border BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="1" >
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
@@ -642,9 +726,9 @@
 
                                             <ToggleButton Grid.Row="1" Grid.Column="0" x:Name="btnSysTestMouse" Content = "Mouse" Tag="Mouse" Style="{DynamicResource ButtonStyle1}" />
                                             <WrapPanel Grid.Row="2" Grid.Column="0">
-                                                <Label Content="DX:"/>
+                                                <Label Foreground="{StaticResource FontLightBrush}" Content="DX:"/>
                                                 <TextBox x:Name="tbSysTestMouseDX" IsReadOnly="True" Width="30" Margin="2"/>
-                                                <Label Content="DY:"/>
+                                                <Label Foreground="{StaticResource FontLightBrush}" Content="DY:"/>
                                                 <TextBox x:Name="tbSysTestMouseDY" IsReadOnly="True" Width="30" Margin="2"/>
                                             </WrapPanel>
 
@@ -673,7 +757,7 @@
 
 
                                     <WrapPanel>
-                                        <Border BorderBrush="Gainsboro" BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Width="240" Height="90" >
+                                        <Border BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Width="240" Height="90" >
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="4*" />
@@ -703,7 +787,7 @@
                                     </WrapPanel>
                                 </StackPanel>
 
-                                <Border BorderBrush="Gainsboro" BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="0" >
+                                <Border BorderThickness="2" MaxWidth="505" HorizontalAlignment="Left" Margin="5" Padding="0" >
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
@@ -736,7 +820,7 @@
 
                             </WrapPanel>
 
-                            <Label Background="Red">To Add: Camera, Fast Charge Chip, External/Robot->Robot TWI</Label>
+                            <!--<Label Background="Red">To Add: Camera, Fast Charge Chip, External/Robot->Robot TWI</Label>-->
 
                         </StackPanel>
                     </TabItem>
