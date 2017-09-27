@@ -41,34 +41,15 @@
             <Setter Property="Background" Value="{StaticResource WindowForegroundBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource WindowForegroundBrush}"/>
         </Style>
-        <Style TargetType="TabItem">
-            <Setter Property="Foreground" Value="{StaticResource FontDarkBrush}"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Height" Value="30"/>
-            
-        </Style>
-        <Style TargetType="TabControl">
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Background" Value="{StaticResource CheckerBrush}"/>
-        </Style>
         <Style TargetType="Separator">
             <Setter Property="Background" Value="{StaticResource ListItemBrush}"/>
         </Style>
-
         <Style x:Key="TempMenuItemStyle" TargetType="MenuItem">
             <Setter Property="Foreground" Value="{StaticResource FontLightBrush}"/>
             <Setter Property="FontSize" Value="18"/>
             <Setter Property="Canvas.Background" Value="{StaticResource WindowAccentBrush}"/>
             <Setter Property="Padding" Value="10,0"/>
         </Style>
-        
-        <!--<Style TargetType="DataGridColumnHeader">
-            <Setter Property="Background" Value="{StaticResource ListGroupBrush}"/>
-            <Setter Property="Foreground" Value="{StaticResource FontLightBrush}"/>
-            <Setter Property="Padding" Value="10,0"/>
-            <Setter Property="BorderBrush" Value="{StaticResource ListSpacerBrush}"/>
-            <Setter Property="BorderThickness" Value="0,0,1,0"/>
-        </Style>-->
     </Window.Resources>
 
     <DockPanel x:Name="innerWin" Background="{StaticResource WindowBackgroundBrush}">
@@ -180,25 +161,23 @@
                 <!--<ColumnDefinition x:Name="Column2" Width="5"/>-->
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition x:Name="Row0" Height="3*"/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
 
             <Grid Background="{StaticResource WindowForegroundBrush}"
-                Grid.Column="0" 
-                   Grid.Row="0" 
-                   Grid.RowSpan = "2">
-
+                  VerticalAlignment="Stretch">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="2*"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" 
+                <TextBlock Text="Received Data" 
                            Foreground="{StaticResource FontLightBrush}"
-                           Text="Received Data" 
+                           FontSize="20"
+                           FontWeight="DemiBold"
                            HorizontalAlignment="Center" 
-                           VerticalAlignment="Top" Margin="10,10,10,0"/>
+                           VerticalAlignment="Center"
+                           TextAlignment="Center"/>
                 <WrapPanel Grid.Row="1">
                     <!--<Button x:Name="receivedDataNewline" Content="/n" Margin="10" Click="receivedDataNewline_Click"/>-->
                     <!--<Button x:Name="receivedDataClear" Content="clear" Margin="5" Click="receivedDataClear_Click"/>-->
@@ -257,15 +236,15 @@
                           ItemsSource="{Binding TestList, RelativeSource={RelativeSource AncestorType=Window}, UpdateSourceTrigger=PropertyChanged}" 
                           AutoGenerateColumns="False"      
                           Grid.Column="0" 
-                          Grid.Row="2" 
-                          Grid.RowSpan = "1"                     
+                          Grid.Row="2"   
+                          Margin="0,0,5,0"
+                          BorderThickness="0"
                           CanUserReorderColumns="True" 
                           CanUserResizeColumns="True" 
                           CanUserResizeRows="False" 
                           CanUserSortColumns="True">
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="TimeStamp" Width="SizeToHeader" 
-                                                
+                        <DataGridTemplateColumn Header="TimeStamp" Width="SizeToHeader"     
                                                 IsReadOnly="True" SortMemberPath="timeStamp">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -358,15 +337,14 @@
                     </StackPanel>
                 </StackPanel>-->
 
-                <TabControl x:Name="tcCenter" Margin="0,20,0,0">
+                <TabControl x:Name="tcCenter" Margin="0,40,0,0">
                     <TabItem Header="No Connection" x:Name="nc">
                         <TextBlock HorizontalAlignment="Center" 
                                    TextWrapping="WrapWithOverflow"
                                    TextAlignment="Center"
                                    VerticalAlignment="Center" 
-                                   FontSize="18" 
-                                   Foreground="White"
-                                   FontWeight="Bold"       
+                                   FontWeight="DemiBold"   
+                                   FontSize="20"
                                    Text="Please connect to an Xbee module before continuing"/>
                     </TabItem>
 
@@ -433,7 +411,7 @@
                                                 Click="robotTaskRotateToHeading_Click"
                                                 Content="Turn to Facing"/>
                                         <Separator Padding="0" Margin="0"/>
-                                        <local:IntegerUpDown Text="Facing" 
+                                        <local:IntegerUpDown Text="Facing (Degrees)" 
                                                              Maximum="100" 
                                                              Minimum="0" 
                                                              Height="30"
@@ -476,13 +454,13 @@
                                                 HorizontalAlignment="Stretch" 
                                                 Content="Move to Position"/>
                                         <Separator Padding="0" Margin="0"/>
-                                        <local:IntegerUpDown Text="X" 
+                                        <local:IntegerUpDown Text="X (mm)" 
                                                              Maximum="100" 
                                                              Minimum="0" 
                                                              Height="30"
                                                              HorizontalAlignment="Stretch"/>
                                         <Separator Padding="0" Margin="0"/>
-                                        <local:IntegerUpDown Text="Y"
+                                        <local:IntegerUpDown Text="Y (mm)"
                                                              Maximum="100" 
                                                              Minimum="0" 
                                                              Height="30"
@@ -516,19 +494,19 @@
                                                 HorizontalAlignment="Stretch" 
                                                 Content="Move to Position With Facing"/>
                                         <Separator Padding="0" Margin="0"/>
-                                        <local:IntegerUpDown Text="Facing" 
+                                        <local:IntegerUpDown Text="Facing (Degrees)" 
                                                              Maximum="100" 
                                                              Minimum="0" 
                                                              Height="30"
                                                              HorizontalAlignment="Stretch"/>
                                         <Separator Padding="0" Margin="0"/>
-                                        <local:IntegerUpDown Text="X" 
+                                        <local:IntegerUpDown Text="X (mm)" 
                                                              Maximum="100" 
                                                              Minimum="0" 
                                                              Height="30"
                                                              HorizontalAlignment="Stretch"/>
                                         <Separator Padding="0" Margin="0"/>
-                                        <local:IntegerUpDown Text="Y"
+                                        <local:IntegerUpDown Text="Y (mm)"
                                                              Maximum="100" 
                                                              Minimum="0" 
                                                              Height="30"

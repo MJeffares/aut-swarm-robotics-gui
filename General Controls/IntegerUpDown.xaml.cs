@@ -86,8 +86,10 @@ namespace SwarmRoboticsGUI
             base.OnApplyTemplate();
             _UpButton = Template.FindName("PART_UpButton", this) as RepeatButton;
             _DownButton = Template.FindName("PART_DownButton", this) as RepeatButton;
-            _UpButton.Click += btup_Click;
-            _DownButton.Click += btdown_Click;
+            if (_UpButton != null)
+                _UpButton.Click += btup_Click;
+            if (_DownButton != null)
+                _DownButton.Click += btdown_Click;
         }
 
 

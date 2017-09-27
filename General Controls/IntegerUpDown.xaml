@@ -27,8 +27,8 @@
     </UserControl.Resources>
     <Grid VerticalAlignment="Stretch">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -39,7 +39,8 @@
                VerticalAlignment="Stretch"/>
         <TextBox Grid.Column="1"
                  Text="{Binding  ElementName=root, Path=Value}"
-                 BorderThickness="0"
+                 BorderThickness="1,0,0,0"
+                 BorderBrush="#EEE"
                  VerticalContentAlignment="Center"
                  TextAlignment="Center"/>
         <Grid Grid.Column="2">
@@ -47,7 +48,7 @@
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Button x:Name="btnup" 
+            <RepeatButton x:Name="btnup" 
                     Background="{StaticResource Button.Background}"
                     BorderThickness="0"
                     HorizontalContentAlignment="Center" 
@@ -66,8 +67,8 @@
                     
                     <ContentControl Grid.Row="1" Grid.Column="1" ContentTemplate="{StaticResource UpArrow}"/>
                 </Grid>
-            </Button>
-            <Button x:Name="btndown"
+            </RepeatButton>
+            <RepeatButton x:Name="btndown"
                     Background="{StaticResource Button.Background}"
                     BorderThickness="0"
                     Grid.Row="1"
@@ -87,7 +88,7 @@
 
                     <ContentControl Grid.Row="1" Grid.Column="1" ContentTemplate="{StaticResource DownArrow}"/>
                 </Grid>
-            </Button>
+            </RepeatButton>
         </Grid>
     </Grid>
 </UserControl>

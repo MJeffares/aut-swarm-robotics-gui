@@ -55,19 +55,6 @@
 
             <SolidColorBrush x:Key="ButtonNormalBorder" Color="#777"/>
 
-            <!--Visual Brushes-->
-            <VisualBrush x:Key="CheckerBrush" 
-                TileMode="Tile" 
-                Viewport="0,0,16,16" ViewportUnits="Absolute" 
-                Viewbox="0,0,16,16" ViewboxUnits="Absolute">
-                <VisualBrush.Visual>
-                    <Grid Background="#181818">
-                        <Path Data="M0,0 L0,8 L8,8 L8,0" Fill="#141414" StrokeThickness="0"/>
-                        <Path Data="M16,16 L16,8 L8,8 L8,16" Fill="#141414" StrokeThickness="0"/>
-                    </Grid>
-                </VisualBrush.Visual>
-            </VisualBrush>
-
             <!--Mansels Button-->
             <Style x:Key="ButtonFocusVisual">
                 <Setter Property="Control.Template">
@@ -171,36 +158,6 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-
-            <!-- Braes Button -->
-            
-
-
-            <!--DataView Header Style-->
-            <!--<Style x:Key="DataGridColumnHeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
-                <Setter Property="VerticalContentAlignment" Value="Center" />
-                <Setter Property="Height" Value="35" />
-                <Setter Property="SeparatorBrush" Value="DarkRed" />
-                <Setter Property="Foreground" Value="{StaticResource FontLightBrush}" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
-                            <Grid>
-                                <Border x:Name="columnHeaderBorder"
-                                    BorderThickness="1"
-                                    Padding="3,0,3,0"
-                                    Background="{StaticResource ListGroupBrush}"
-                                    BorderBrush="{StaticResource ListSpacerBrush}">
-                                    <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                                </Border>
-                            </Grid>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>-->
-
         </ResourceDictionary>
 
     </Application.Resources>

@@ -14,6 +14,7 @@
         <SolidColorBrush x:Key="ListRobotBrush" Color="#333"/>
         <SolidColorBrush x:Key="ListGroupBrush" Color="#666"/>
         <SolidColorBrush x:Key="ListBrush" Color="#333"/>
+        <SolidColorBrush x:Key="ListRobotSelectedBrush" Color="#CCC"/>
 
         <!--Shapes-->
         <DataTemplate x:Key="Plus">
@@ -188,7 +189,7 @@
                                 <Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
                             </Trigger>
                             <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                <Setter Property="Background" TargetName="Bd" Value="Silver"/>
+                                <Setter Property="Background" TargetName="Bd" Value="{StaticResource ListRobotSelectedBrush}"/>
                             </DataTrigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
