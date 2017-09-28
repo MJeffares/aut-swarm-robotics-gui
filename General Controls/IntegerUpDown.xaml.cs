@@ -65,7 +65,8 @@ namespace SwarmRoboticsGUI
         public event EventHandler<DependencyPropertyChangedEventArgs> ValueChanged;
         private void RaiseValueChangedEvent(DependencyPropertyChangedEventArgs e)
         {
-            ValueChanged?.Invoke(this, e);
+            if (ValueChanged != null)
+                ValueChanged(this, e);
         }
 
 
