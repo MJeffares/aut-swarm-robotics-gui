@@ -8,6 +8,7 @@
         xmlns:settings="clr-namespace:SwarmRoboticsGUI.Settings"
         xmlns:em="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
         mc:Ignorable="d"
+        Icon="..\sr-icon.ico"
         Title="Overlay" MinHeight="740" MinWidth="800" 
         Closing="Overlay_Closing" Height="800" Width="1200">
     <Window.Resources>
