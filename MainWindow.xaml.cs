@@ -88,7 +88,7 @@ namespace SwarmRoboticsGUI
         public Dictionary<string, UInt64> robotsDictionary { get; set; }
 
         public List<Item> ItemList { get; set; }
-        public ObservableCollection<XbeeAPIFrame> TestList { get; set; }
+        public ObservableCollection<XbeeAPIFrame> XbeeMessages { get; set; }
 
         public int HueLower { get; set; }
         public int HueUpper { get; set; }
@@ -132,7 +132,7 @@ namespace SwarmRoboticsGUI
             connectButton.Click += new RoutedEventHandler(menuCommunicationConnect_Click);
 
             commManger = new CommunicationManager(this, serial, xbee, protocol);
-            TestList = commManger.rxXbeeMessageBuffer;
+            XbeeMessages = commManger.rxXbeeMessageBuffer;
             //
             PopulateFilters();
             PopulateOverlays();
@@ -177,14 +177,14 @@ namespace SwarmRoboticsGUI
 
         #region Private Methods
 
-        private void DEBUGGING_PopulateTestList()
+        private void DEBUGGING_PopulateXbeeMessages()
         {
             //TestList = new List<XbeeAPIFrame>();
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 10; i++)
             {
-                TestList.Add(new XbeeAPIFrame(new byte[] { 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 }));
-                TestList.Add(new XbeeAPIFrame(new byte[] { 0x02, 0x01, 0x01, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02 }));
-                TestList.Add(new XbeeAPIFrame(new byte[] { 0x03, 0x01, 0x03, 0x01, 0x03, 0x01, 0x01, 0x03, 0x01 }));
+                XbeeMessages.Add(new XbeeAPIFrame(new byte[] { 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 }));
+                XbeeMessages.Add(new XbeeAPIFrame(new byte[] { 0x02, 0x01, 0x01, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02 }));
+                XbeeMessages.Add(new XbeeAPIFrame(new byte[] { 0x03, 0x01, 0x03, 0x01, 0x03, 0x01, 0x01, 0x03, 0x01 }));
             }
         }
         private void PopulateCameras()
@@ -708,7 +708,7 @@ namespace SwarmRoboticsGUI
         // TODO: Mansels newer stuff
         private void receivedDataClear_Click(object sender, RoutedEventArgs e)
         {
-            DEBUGGING_PopulateTestList();
+            DEBUGGING_PopulateXbeeMessages();
         }
         private void updnRotateToHeading_ValueChanged(object sender, DependencyPropertyChangedEventArgs e)
         {

@@ -88,7 +88,7 @@
                     <Style TargetType="ContentPresenter">
                         <Setter Property="Canvas.Left" Value="{Binding Path=(local:IObstacle.Location).X}"/>
                         <!--<Setter Property="Canvas.Left" Value="{Binding Location.X}"/>-->
-                        <Setter Property="Canvas.Margin" Value="0,0,0,0"/>
+                        <Setter Property="Canvas.Margin" Value="-20,-40,0,0"/>
                         <Setter Property="Canvas.Top" Value="{Binding Path=(local:IObstacle.Location).Y}"/>
                         <!--<Setter Property="Canvas.Top" Value="{Binding Location.Y}"/>-->
                         <Setter Property="Canvas.Visibility" Value="{Binding Path=(local:IObstacle.IsVisible), Converter={StaticResource BoolToVis}}"/>

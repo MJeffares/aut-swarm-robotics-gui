@@ -21,13 +21,14 @@
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" MinWidth="100" MaxWidth="400"/>
+            <ColumnDefinition Width="230" MinWidth="100" MaxWidth="230"/>
             <ColumnDefinition/>
             <ColumnDefinition Width="300" MinWidth="250" MaxWidth="600"/>
         </Grid.ColumnDefinitions>
 
         <!--Placeholder Left Grid-->
-        <Grid Grid.Row="1" Background="{StaticResource WindowForegroundBrush}"/>
+        <!--<Grid Grid.Row="1" Background="{StaticResource WindowForegroundBrush}"/>-->
+        <settings:SettingsList x:Name="Settings1" Grid.Row="1"/>
 
         <!--Middle Grid-->
         <Grid Grid.Row="1" Grid.Column="1">
@@ -56,24 +57,12 @@
                              Width="100" 
                              Style="{StaticResource {x:Type ToggleButton}}" 
                              Click="CameraSelect_Click">Camera</RadioButton>
-                <Grid Grid.Row="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <local:RangeSlider x:Name="HueSlider" LowerValue="{Binding LowerH, Mode=TwoWay}" UpperValue="{Binding UpperH, Mode=TwoWay}" Minimum="0" Maximum="255" Width="200"/>
-                    <StackPanel Grid.Row="1" Orientation="Horizontal">
-                        <TextBox Text="{Binding LowerValue, ElementName=HueSlider}"/>
-                        <TextBox Text="{Binding UpperValue, ElementName=HueSlider}"/>
-                    </StackPanel>
-                </Grid>
             </StackPanel>
         </Grid>
         <!--Right Grid-->
         <local:ItemList x:Name="RobotList1" 
             Grid.Row="1" Grid.Column="2" 
             Items="{Binding ItemList, RelativeSource={RelativeSource AncestorType=Window}}"/>
-        <!--<settings:SettingsList x:Name="Settings1" Grid.Row="1" Grid.Column="3"/>-->
 
         <GridSplitter Grid.Column="0"
                       Grid.Row="1"

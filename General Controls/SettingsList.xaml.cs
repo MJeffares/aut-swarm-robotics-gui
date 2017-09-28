@@ -141,50 +141,9 @@ namespace SwarmRoboticsGUI.Settings
     /// </summary>
     public partial class SettingsList : UserControl
     {
-
-        public static readonly DependencyProperty ItemsProperty =
-            DependencyProperty.Register("Items",
-            typeof(ObservableCollection<Item>),
-            typeof(SettingsList),
-            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
-
-        public static readonly DependencyProperty GroupsProperty =
-            DependencyProperty.Register("Groups",
-            typeof(ObservableCollection<SettingsGroup>),
-            typeof(SettingsList),
-            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
-
-
-        public ObservableCollection<Item> Items
-        {
-            get { return (ObservableCollection<Item>)GetValue(ItemsProperty); }
-            set { SetValue(ItemsProperty, value); }
-        }
-
-        public ObservableCollection<SettingsGroup> Groups
-        {
-            get { return (ObservableCollection<SettingsGroup>)GetValue(GroupsProperty); }
-            set { SetValue(GroupsProperty, value); }
-        }
-
-
-
-        private SynchronizationContext uiContext { get; set; }
-
-
         public SettingsList()
         {
             InitializeComponent();
-
-            Groups = new ObservableCollection<SettingsGroup>();
-
-            // TEMP: Manually added items for testing
-            var ColourSettings = new SettingsGroup("Colour Settings");
-            ColourSettings.Children.Add(new SettingsRange("Hue", 30, 70, 0, 100));
-            ColourSettings.Children.Add(new SettingsRange("Saturation", 10, 90, 0, 100));
-            ColourSettings.Children.Add(new SettingsRange("Value", 20, 40, 0, 100));
-            ColourSettings.Children.Add(new SettingsValue("Contrast", 20, -100, 100));
-            Groups.Add(ColourSettings);
         }
     }
 }

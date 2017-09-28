@@ -722,10 +722,10 @@ namespace SwarmRoboticsGUI
             obstacle.Width = 2 * obstacle.Radius;
             obstacle.Height = (int)(Math.Sqrt(3) * obstacle.Radius);
             obstacle.IsVisible = true;
-            //double X = (2 * 1177 - obstacle.Width) / 4;
-            //double Y = (2 * 1177 - obstacle.Height) / 4;
-            double X = (double)1177 / 2;
-            double Y = (double)1177 / 2;
+            double X = (600 - obstacle.Width/2);
+            double Y = (600 - obstacle.Height/2);
+            //double X = (double)1177 / 2;
+            //double Y = (double)1177 / 2;
             obstacle.Location = new System.Windows.Point(X, Y);
         }
     }

@@ -233,7 +233,7 @@
                 </ListView>-->
 
                 <DataGrid x:Name="RxDataGrid" 
-                          ItemsSource="{Binding TestList, RelativeSource={RelativeSource AncestorType=Window}, UpdateSourceTrigger=PropertyChanged}" 
+                          ItemsSource="{Binding XbeeMessages, RelativeSource={RelativeSource AncestorType=Window}, UpdateSourceTrigger=PropertyChanged}" 
                           AutoGenerateColumns="False"      
                           Grid.Column="0" 
                           Grid.Row="2"   

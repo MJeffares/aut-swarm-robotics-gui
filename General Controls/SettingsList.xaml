@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SwarmRoboticsGUI.Settings"
              xmlns:e="clr-namespace:SwarmRoboticsGUI"
+             xmlns:p="clr-namespace:SwarmRoboticsGUI.Properties"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
@@ -54,7 +55,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <Rectangle x:Name="PART_SelectionRange"/>
+                    <Rectangle Grid.Row="1" Width="100" Height="4" Fill="{TemplateBinding Background}"/>
 
                     <Track x:Name="PART_Track" Grid.Row="1">
                         <Track.Thumb>
@@ -214,6 +215,9 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        <Style TargetType="ListBoxItem">
+            
+        </Style>
 
     </UserControl.Resources>
     <Grid Background="{StaticResource ListBrush}">
@@ -223,83 +227,77 @@
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300"/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-
-        <TreeView x:Name="RobotTree" Grid.Row="1" 
+        <TextBlock Text="Settings" 
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   TextAlignment="Center"
+                   FontSize="20" 
+                   Foreground="{StaticResource FontLightBrush}"/>
+        <ListBox x:Name="RobotTree" Grid.Row="1" 
                   VirtualizingPanel.IsVirtualizing="True"
                   VirtualizingPanel.VirtualizationMode="Recycling"
                   Foreground="White" FontSize="20" Padding="0" BorderThickness="0"
                   Background="Transparent"
                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                  ItemContainerStyle="{StaticResource GroupStyle}"
-                  ItemsSource="{Binding Groups, RelativeSource={RelativeSource AncestorType=UserControl}}">
-
-            <TreeView.Resources>
-                <DataTemplate DataType="{x:Type e:Item}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="80"/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock FontSize="10" Padding="10,0,0,0" Foreground="White" Text="{Binding Name}"/>
-                        <TextBlock Grid.Column="1" FontSize="10" Foreground="White" Text="{Binding Text}"/>
-                        <!--<Slider Width="100" Grid.Column="1" Value="{Binding Value}" Maximum="255"/>-->
-                    </Grid>
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type local:SettingsRange}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="60"/>
-                            <ColumnDefinition Width="160"/>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="40"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock VerticalAlignment="Center" FontSize="10" Padding="10,0,0,0" Foreground="White" Text="{Binding Name}"/>
-                        <e:RangeSlider x:Name="Range" Width="150" Grid.Column="1"
-                                       LowerValue="{Binding Lower}" UpperValue="{Binding Upper}" 
-                                       Minimum="{Binding Minimum}" Maximum="{Binding Maximum}"/>
-                        <TextBlock VerticalAlignment="Center" Margin="0,0,0,0" HorizontalAlignment="Stretch" Grid.Column="2" 
-                                   Text="{Binding LowerValue, ElementName=Range, StringFormat=N0}"/>
-                        <TextBlock VerticalAlignment="Center" Margin="0,0,0,0" HorizontalAlignment="Stretch" Grid.Column="3" 
-                                   Text="{Binding UpperValue,ElementName=Range, StringFormat=N0}"/>
-                    </Grid>
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type local:SettingsValue}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="60"/>
-                            <ColumnDefinition Width="160"/>
-                            <ColumnDefinition Width="80"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock VerticalAlignment="Center" FontSize="10" Padding="10,0,0,0" Foreground="White" Text="{Binding Name}"/>
-                        <Grid Grid.Column="1" Width="150">
-                            <Border Margin="8,0,8,0" Background="#222" VerticalAlignment="Center"
-                                Height="4" SnapsToDevicePixels="True"/>
-                            <Slider x:Name="Slide" VerticalAlignment="Center" Grid.Column="1" Value="{Binding Value}"
-                                Minimum="{Binding Minimum}" Maximum="{Binding Maximum}"
-                                Template="{StaticResource SuperSlider}"/>
-                        </Grid>
-                        <TextBlock VerticalAlignment="Center" Grid.Column="2" Text="{Binding Value, ElementName=Slide, StringFormat=N2}" />
-                    </Grid>
-                </DataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type local:SettingsGroup}" ItemsSource="{Binding Children}" ItemContainerStyle="{StaticResource ItemStyle}">
-                    <TextBlock FontSize="20" Foreground="White" Text="{Binding Name}"/>
-                    <!--<TextBlock Text="{Binding Source={StaticResource Settings},Path=Default.CV_Colour_Red_HueLower}"/>-->
-                </HierarchicalDataTemplate>
-            </TreeView.Resources>
-            <!--<TreeViewItem ItemContainerStyle="{StaticResource ItemStyle}">
+                  HorizontalAlignment="Stretch">
+            <ListBoxItem HorizontalAlignment="Stretch">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Hue"/>
-                    <TextBlock Grid.Column="1" Text="{Binding Source={StaticResource Settings}, Path=CV_Colour_Blue_HueLower}"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Filter Hue"/>
+                    <e:RangeSlider x:Name="HueSlider" 
+                                   Width="100"
+                                   Grid.Row="1"
+                                   Margin="5,0"
+                                   Minimum="0" Maximum="255" 
+                                   LowerValue="{Binding Source={x:Static p:Settings.Default}, Path=CV_Filter_HueLower, Mode=TwoWay}"
+                                   UpperValue="{Binding Source={x:Static p:Settings.Default}, Path=CV_Filter_HueUpper, Mode=TwoWay}"/>
+                    <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal">
+                        <TextBox Text="{Binding LowerValue, ElementName=HueSlider}" 
+                                 Width="50" 
+                                 BorderThickness="0"/>
+                        <TextBox Text="{Binding UpperValue, ElementName=HueSlider}" 
+                                 Width="50" 
+                                 BorderThickness="0"/>
+                    </StackPanel>
                 </Grid>
-            </TreeViewItem>-->
-        </TreeView>
+            </ListBoxItem>
+            <ListBoxItem HorizontalAlignment="Stretch">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="White Balance"/>
+                    <Slider x:Name="WhiteBalanceSlider" 
+                            Value="{Binding Source={x:Static p:Settings.Default}, Path=CV_WhiteBalance, Mode=TwoWay}"
+                            Template="{StaticResource SuperSlider}" 
+                            Width="125"
+                            Grid.Row="1"
+                            Margin="5,0"
+                            Background="#222"
+                            Minimum="0" Maximum="10000"/>
+                    <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal">
+                        <TextBox Text="{Binding Value, ElementName=WhiteBalanceSlider}" 
+                                 Width="75" 
+                                 BorderThickness="0"/>
+                    </StackPanel>
+                </Grid>
+            </ListBoxItem>
+        </ListBox>
     </Grid>
 
-    
+
 </UserControl>

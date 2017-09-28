@@ -164,9 +164,17 @@ namespace SwarmRoboticsGUI
         }      
         public void OpenSettings()
         {
-            if (Name != null)
+            if (videoCapture != null)
             {
                 videoCapture.SetCaptureProperty(CapProp.Settings,0);
+            }
+        }
+        public void SetWhiteBalance(int value)
+        {
+            if (videoCapture != null)
+            {
+                videoCapture.SetCaptureProperty(CapProp.WhiteBalanceBlueU, value);
+                var check = videoCapture.GetCaptureProperty(CapProp.WhiteBalanceBlueU);
             }
         }
         #endregion

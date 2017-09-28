@@ -50,5 +50,14 @@
     <Setting Name="CV_Colour_DarkBlue_HueLower" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
+    <Setting Name="CV_Filter_HueLower" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="CV_Filter_HueUpper" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">255</Value>
+    </Setting>
+    <Setting Name="CV_WhiteBalance" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">3317</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

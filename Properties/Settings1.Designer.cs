@@ -214,5 +214,41 @@ namespace SwarmRoboticsGUI.Properties {
                 this["CV_Colour_DarkBlue_HueLower"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CV_Filter_HueLower {
+            get {
+                return ((int)(this["CV_Filter_HueLower"]));
+            }
+            set {
+                this["CV_Filter_HueLower"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("255")]
+        public int CV_Filter_HueUpper {
+            get {
+                return ((int)(this["CV_Filter_HueUpper"]));
+            }
+            set {
+                this["CV_Filter_HueUpper"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3317")]
+        public int CV_WhiteBalance {
+            get {
+                return ((int)(this["CV_WhiteBalance"]));
+            }
+            set {
+                this["CV_WhiteBalance"] = value;
+            }
+        }
     }
 }
