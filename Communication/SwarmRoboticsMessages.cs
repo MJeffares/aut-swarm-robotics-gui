@@ -54,6 +54,16 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		*/
 	}
 
+    public class RobotStatus : SwarmProtocolMessage
+    {
+        public UInt16 batteryVoltage;
+
+        public RobotStatus(byte[] frame) : base(frame)
+        {
+            batteryVoltage = (UInt16) (256 * messageData[0] + messageData[1]);
+        }
+    }
+
 	public class SystemTestMessage : SwarmProtocolMessage
 	{
 		protected byte testMode;

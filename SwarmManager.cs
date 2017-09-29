@@ -60,7 +60,7 @@ namespace SwarmRoboticsGUI
             RegisteredRobots = RobotList.Where(R => (R as IObstacle).IsTracked).ToList<RobotItem>();
 
             //MANSEL: Test this line
-            //RegisteredRobots = mainWindow.ItemList.Where(R => (R is RobotItem) && (R .IsTracked)).Cast
+            //RegisteredRobots = mainWindow.ItemList.Where(R => (R is RobotItem) && ((R as IObstacle).IsTracked)).Cast<RobotItem>().ToList<RobotItem>();
         }
 
 
