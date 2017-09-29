@@ -630,9 +630,6 @@ namespace SwarmRoboticsGUI
 			string returnMessage = null;
 			switch (messageType)
 			{
-				case MESSAGE_TYPES.COMMUNICATION_TEST:
-					return "Sucessful";
-
 				/*
 				case MESSAGE_TYPES.BATTERY_VOLTAGE:
 					float voltage = (float)(messageData[0] * 256 + messageData[1]) * 5 / 1000;
