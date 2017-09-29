@@ -83,16 +83,11 @@ namespace SwarmRoboticsGUI
         public XbeeAPI xbee { get; set; }
         public ProtocolClass protocol { get; set; }
         public CommunicationManager commManger { get; set; }
-        public OverlayWindow overlayWindow { get; set; }
+        public OverlayWindow Overlay { get; set; }
         public SwarmManager swarmManager { get; set; }
-        public Dictionary<string, UInt64> robotsDictionary { get; set; }
 
         public List<Item> ItemList { get; set; }
         public ObservableCollection<XbeeAPIFrame> XbeeMessages { get; set; }
-
-        public int HueLower { get; set; }
-        public int HueUpper { get; set; }
-
 
 		public WindowStatusType WindowStatus { get; set; }
 		public TimeDisplayModeType TimeDisplayMode { get; set; }
@@ -109,8 +104,7 @@ namespace SwarmRoboticsGUI
 		private VideoCaptureDevice VideoDevice { get; set; }
 	#endregion
 
-
-		// Main
+		// Constructor
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -119,8 +113,7 @@ namespace SwarmRoboticsGUI
             CvInvoke.UseOpenCL = true;
 			//
 			camera1 = new Camera();
-			
-           
+
             //
             PopulateFilters();
             PopulateOverlays();
@@ -129,57 +122,46 @@ namespace SwarmRoboticsGUI
             PopulateRobots();
             //DEBUGGING_PopulateTestList();
 
-            
-
             protocol = new ProtocolClass(this);
             serial = new SerialUARTCommunication();
             xbee = new XbeeAPI(this);
             
             commManger = new CommunicationManager(this, serial, xbee, protocol);
+            XbeeMessages = commManger.rxXbeeMessageBuffer;
             swarmManager = new SwarmManager(this);
 
             PopulateSerialSettings();
             PopulateSerialPorts();
+
             portList.MouseEnter += new MouseEventHandler(menuPopulateSerialPorts);
             connectButton.Click += new RoutedEventHandler(menuCommunicationConnect_Click);
 
-
-            XbeeMessages = commManger.rxXbeeMessageBuffer;
-
-            overlayWindow = new OverlayWindow(this);
-
-			//dispSelectRobot.ItemsSource = ItemList;
-
-			//
-			openvideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
-            savevideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
-            savevideodialog.Title = "Record: Save As";
+            Overlay = new OverlayWindow(this);
+            Overlay.Show();
+            // BRAE: Default setup for testing
+            Overlay.display1.Source = SourceType.CAMERA;
             //
+            openvideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
+            savevideodialog.Filter = "Video Files|*.avi;*.mp4;*.mpg";
+            savevideodialog.Title = "Record: Save As";           
+            //
+            TimeDisplayMode = TimeDisplayModeType.CURRENT;
+            WindowStatus = WindowStatusType.MAXIMISED;
+            //
+            SetupSystemTest();
+            TowerControlSetup();
+            //
+            InitializeInterfaceTimer();
+        }
+
+        #region Private Methods
+        private void InitializeInterfaceTimer()
+        {
             InterfaceTimer = new DispatcherTimer();
             InterfaceTimer.Tick += Interface_Tick;
             InterfaceTimer.Interval = new TimeSpan(0, 0, 1);
             InterfaceTimer.Start();
-            //
-            TimeDisplayMode = TimeDisplayModeType.CURRENT;
-            WindowStatus = WindowStatusType.MAXIMISED;
-
-
-            //var what = ImageProcessing.TestImage;
-            // TEMP: display overlay on starup for debugging
-            overlayWindow.Show();
-
-            // BRAE: Default setup for testing
-            overlayWindow.Display1.Source = SourceType.CAMERA;
-            //camera1.Index = 1;
-            // This will run the camera at 640x480
-            //camera1.StartCapture();
-
-            setupSystemTest();
-            TowerControlSetup();
-		}
-
-        #region Private Methods
-
+        }
         private void DEBUGGING_PopulateXbeeMessages()
         {
             //TestList = new List<XbeeAPIFrame>();
@@ -367,12 +349,9 @@ namespace SwarmRoboticsGUI
 
         #endregion
 
-
         #region Time Events
-
         private void Interface_Tick(object sender, EventArgs arg)
         {
-            // BRAE: You hate this block of code. Does it belong here? Maybe? Does it even work? It did. Replace its functionality elsewhere? somewhere more appropiate like imgproc?
             //serial._serialPort.Write("Test");
 
             //commManger.rxXbeeMessageBuffer.Add(new XbeeAPIFrame(new byte[] { 0x02, 0x01, 0x01, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02 }));
@@ -424,12 +403,10 @@ namespace SwarmRoboticsGUI
             statusFPS.Text = camera1.Fps.ToString();
 
             DisplayTime();
-        }
-        
+        }    
         #endregion
 
         #region Input Handlers
-
         //Display Menu
         private void menuFilterListItem_Click(object sender, RoutedEventArgs e)
         {
@@ -466,7 +443,7 @@ namespace SwarmRoboticsGUI
             MenuItem menusender = (MenuItem)sender;
             string menusenderstring = menusender.ToString();
 
-            if (menusenderstring != EnumUtils<OverlayType>.GetDescription(overlayWindow.Display1.Overlay))
+            if (menusenderstring != EnumUtils<OverlayType>.GetDescription(Overlay.display1.Overlay))
             {
                 MenuItem[] allitems = menuOverlayList.Items.OfType<MenuItem>().ToArray();
 
@@ -475,8 +452,8 @@ namespace SwarmRoboticsGUI
                     item.IsChecked = false;
                 }
                 menusender.IsChecked = true;
-                overlayWindow.Display1.Overlay = (OverlayType)menuOverlayList.Items.IndexOf(menusender);
-                // TODO: Not sure where to display this right now
+                Overlay.display1.Overlay = (OverlayType)menuOverlayList.Items.IndexOf(menusender);
+                // TODO: Not sure where to display statusDisplayFilter right now
                 //statusDisplayFilter.Text = ImageDisplay.ToString(overlayWindow.Display.Overlay);
             }
         }
@@ -486,7 +463,7 @@ namespace SwarmRoboticsGUI
             MenuItem menusender = (MenuItem)sender;
             string menusenderstring = menusender.ToString();
 
-            if (menusenderstring != EnumUtils<SourceType>.GetDescription(overlayWindow.Display1.Source))
+            if (menusenderstring != EnumUtils<SourceType>.GetDescription(Overlay.display1.Source))
             {
                 MenuItem[] allitems = menuSourceList.Items.OfType<MenuItem>().ToArray();
 
@@ -495,9 +472,7 @@ namespace SwarmRoboticsGUI
                     item.IsChecked = false;
                 }
                 menusender.IsChecked = true;
-                overlayWindow.Display1.Source = (SourceType)menuSourceList.Items.IndexOf(menusender);
-                // TODO: Not sure where to display this right now
-                //statusDisplayFilter.Text = ImageDisplay.ToString(overlayWindow.Display.Overlay);
+                Overlay.display1.Source = (SourceType)menuSourceList.Items.IndexOf(menusender);
             }
         }
 
@@ -552,7 +527,7 @@ namespace SwarmRoboticsGUI
                     foreach (var item in allitems) item.IsChecked = false;
                     // Display feedback to user
                     menusender.IsChecked = true;
-                    // BRAE: Set selected resolution here
+                    // Set the camera resolution and framerate via capability index
                     camera1.CapabilityIndex = menuCameraCapabilityList.Items.IndexOf(menusender);
                 }
             }
@@ -588,7 +563,7 @@ namespace SwarmRoboticsGUI
                 camera1.StartCapture();
                 //
                 menuCameraConnect.Header = "Stop Capture";          // Update the header on our connect/disconnect button
-                // TODO: What should this say?
+                // TODO: What should the pause button say?
                 menuCameraFreeze.Header = "Freeze";
                 menuCameraFreeze.IsEnabled = true;                  // enable the freeze frame button
                 menuRecordNew.IsEnabled = true;
@@ -706,9 +681,7 @@ namespace SwarmRoboticsGUI
         }
 
 
-        // BRAE: Mansels newer stuff
-        // MANSEL: Mansels newer stuff
-        // TODO: Mansels newer stuff
+        // MANSEL: RotateToHeading, MoveToPosition events
         private void receivedDataClear_Click(object sender, RoutedEventArgs e)
         {
             DEBUGGING_PopulateXbeeMessages();

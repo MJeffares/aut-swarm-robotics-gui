@@ -135,11 +135,11 @@ namespace XbeeHandler.XbeeFrames
 		}
 
 	}
-	/*
+    /*
 
 	class ATCommand : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the ATCommand class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -151,7 +151,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class ATCommandQueue : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the ATCommandQueue class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -163,7 +163,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class ZigbeeTransmitRequest : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the ZigbeeTransmitRequest class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -186,7 +186,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class RemoteCommandRequest : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the RemoteCommandRequest class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -198,7 +198,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class CreateSourceRoute : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the CreateSourceRoute class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -210,7 +210,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class ATCommandResponse : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the ATCommandResponse class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -222,7 +222,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class ModemStatus : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the ModemStatus class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -233,7 +233,7 @@ namespace XbeeHandler.XbeeFrames
 	}
 	*/
 
-	class ZigbeeTransmitStatus : XbeeAPIFrame
+    class ZigbeeTransmitStatus : XbeeAPIFrame
 	{
 		public byte frameID;
 		public UInt16 destinationAddress16;
@@ -282,7 +282,7 @@ namespace XbeeHandler.XbeeFrames
 	}
 
 
-	/*
+    /*
 	class ZigbeeExplicitRXIndicator : XbeeAPIFrame
 	{
 		public override string FrameCommandDisplay
@@ -318,7 +318,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class NodeIdentificationIndicator : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the NodeIdentificationIndicator class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -330,7 +330,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class RemoteCommandResponse : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the RemoteCommandResponse class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -342,7 +342,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class ExtendedModemStatus : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the ExtendedModemStatus class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -365,7 +365,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class RouteRecordIndicator : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the RouteRecordIndicator class
 
 		public override string FrameCommandDisplay
 		{
@@ -378,7 +378,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class ManyToOneRouteRequestIndicator : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the ManyToOneRouteRequestIndicator class
 
 		public override string FrameCommandDisplay
 		{

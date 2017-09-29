@@ -68,7 +68,7 @@ namespace SwarmRoboticsGUI
         int currentTestItem = 0;
         bool doublecommandlockout = false;
         public Dictionary<string, byte> twiMuxAddresses;
-        public void setupSystemTest()
+        public void SetupSystemTest()
         {
             EstablishingCommunicationsWindow = new ProgressWindow("Establishing Communications", "Please wait while communications are tested.");
 

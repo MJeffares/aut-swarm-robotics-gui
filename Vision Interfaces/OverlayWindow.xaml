@@ -38,7 +38,7 @@
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
             <UniformGrid Background="{StaticResource CheckerBrush}" Rows="1">
-                <local:Display x:Name="Display1" 
+                <local:Display x:Name="display1" 
                                VerticalAlignment="Center"
                                Items="{Binding Obstacles, RelativeSource={RelativeSource AncestorType=Window}}"/>
                 <local:CameraDisplay x:Name="CameraDisplay1" 

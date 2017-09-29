@@ -42,8 +42,6 @@ namespace SwarmRoboticsGUI
         RandomMovement = 11
     };
 
-
-
     public class Item: INotifyPropertyChanged
     {
         #region Properties
@@ -191,7 +189,6 @@ namespace SwarmRoboticsGUI
         }
     }
 
-
     public interface IObstacle
     {
         System.Windows.Point Location { get; set; }
@@ -212,9 +209,6 @@ namespace SwarmRoboticsGUI
         UInt16 Address16 { get; set; }
         bool IsCommunicating { get; set; }
     }
-
-
-
 
     public class RobotItem : Item, INotifyPropertyChanged, IObstacle, ICommunicates
     {

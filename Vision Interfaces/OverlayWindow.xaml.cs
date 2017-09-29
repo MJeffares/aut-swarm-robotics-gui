@@ -66,7 +66,7 @@ namespace SwarmRoboticsGUI
             InitializeTimer();
 
             RobotArena = new Arena();         
-            // TEMP: reference mainWindow camera
+            // TEMP: reference mainWindow camera until setup is moved to overlay
             camera1 = mainWindow.camera1;
             // Create event driven by new frames from the camera
             camera1.Process += new EventHandler(DrawOverlayFrame);
@@ -89,7 +89,7 @@ namespace SwarmRoboticsGUI
         private void Interface_Tick(object sender, ElapsedEventArgs e)
         {
             // Update the display with the interface when using the cutouts
-            switch (Display1.Source)
+            switch (display1.Source)
             {
                 case SourceType.NONE:
                     break;
@@ -112,7 +112,7 @@ namespace SwarmRoboticsGUI
         {
             var Frame = sender as UMat;
 
-            switch (Display1.Source)
+            switch (display1.Source)
             {
                 case SourceType.NONE:
                     break;
@@ -216,19 +216,19 @@ namespace SwarmRoboticsGUI
 
         private void OverlaySelect_Click(object sender, RoutedEventArgs e)
         {
-            Display1.Visibility = Visibility.Visible;
+            display1.Visibility = Visibility.Visible;
             CameraDisplay1.Visibility = Visibility.Collapsed;
         }
 
         private void OverlayCameraSelect_Click(object sender, RoutedEventArgs e)
         {
-            Display1.Visibility = Visibility.Visible;
+            display1.Visibility = Visibility.Visible;
             CameraDisplay1.Visibility = Visibility.Visible;
         }
 
         private void CameraSelect_Click(object sender, RoutedEventArgs e)
         {
-            Display1.Visibility = Visibility.Collapsed;
+            display1.Visibility = Visibility.Collapsed;
             CameraDisplay1.Visibility = Visibility.Visible;
         }
     }

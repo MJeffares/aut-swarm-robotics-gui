@@ -128,7 +128,7 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		{
 			get
 			{
-				//MANSEL: Improve this
+				//MANSEL: Improve the message data display method
 				return (256 * sensorData[0] + sensorData[1]).ToString();
 			}
 		}
@@ -162,8 +162,8 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		{
 			get
 			{
-				//MANSEL: Improve this
-				return (256 * sensorData[0] + sensorData[1]).ToString();
+                //MANSEL: Improve the message data display method
+                return (256 * sensorData[0] + sensorData[1]).ToString();
 			}
 		}
 
@@ -198,8 +198,8 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		{
 			get
 			{
-				//MANSEL: Improve this
-				return (256 * sensorData[0] + sensorData[1]).ToString();
+                //MANSEL: Improve the message data display method
+                return (256 * sensorData[0] + sensorData[1]).ToString();
 			}
 		}
 
@@ -229,8 +229,8 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		{
 			get
 			{
-				//MANSEL: Improve this
-				return "dX: " + dXDisplay + " dY: " + dYDisplay;
+                //MANSEL: Improve the message data display method
+                return "dX: " + dXDisplay + " dY: " + dYDisplay;
 			}
 		}
 
@@ -283,8 +283,8 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		{
 			get
 			{
-				//MANSEL: Improve this
-				return "Pitch: " + pitchDisplay + " Roll: " + rollDisplay + " Yaw: " + yawDisplay;
+                //MANSEL: Improve the message data display method
+                return "Pitch: " + pitchDisplay + " Roll: " + rollDisplay + " Yaw: " + yawDisplay;
 			}
 		}
 
@@ -328,8 +328,8 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		{
 			get
 			{
-				//MANSEL: Improve this
-				return address.ToString();
+                //MANSEL: Improve the message data display method
+                return address.ToString();
 			}
 		}
 	}
@@ -362,7 +362,7 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
         {
             get
             {
-                //MANSEL: Improve this
+                //MANSEL: Improve the message data display method
                 return sensorData.ToString();
             }
         }
