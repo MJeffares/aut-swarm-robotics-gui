@@ -86,7 +86,7 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-        prvate object _Data {get;set;}
+        private object _Data {get;set;}
         public object Data
         {
             get { return _Data; }
