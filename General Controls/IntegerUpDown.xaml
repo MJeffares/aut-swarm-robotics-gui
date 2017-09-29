@@ -38,6 +38,7 @@
                VerticalContentAlignment="Center"
                VerticalAlignment="Stretch"/>
         <TextBox Grid.Column="1"
+                 IsReadOnly="True"
                  Text="{Binding  ElementName=root, Path=Value}"
                  BorderThickness="1,0,0,0"
                  BorderBrush="#EEE"
@@ -52,7 +53,7 @@
                     Background="{StaticResource Button.Background}"
                     BorderThickness="0"
                     HorizontalContentAlignment="Center" 
-                    Click="btup_Click" >
+                    Click="btup_Click" Delay="300" Interval="16" >
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
@@ -73,7 +74,7 @@
                     BorderThickness="0"
                     Grid.Row="1"
                     HorizontalContentAlignment="Center"
-                    Click="btdown_Click">
+                    Click="btdown_Click" Delay="300" Interval="16">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>

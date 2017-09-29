@@ -57,8 +57,6 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 
     public class RobotStatus : SwarmProtocolMessage
     {
-
-        
         public UInt16 batteryVoltage;
         public byte task;
 
@@ -66,6 +64,17 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
         {
             task = messageData[0];
             batteryVoltage = (UInt16) (256 * messageData[1] + messageData[2]);
+        }
+    }
+
+    public class DebugString : SwarmProtocolMessage
+    {
+        public string msg;
+
+        public DebugString(byte[] frame) : base(frame)
+        {
+            msg = System.Text.Encoding.ASCII.GetString(messageData);
+            dispMessageData = msg;
         }
     }
 

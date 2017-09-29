@@ -72,6 +72,14 @@ namespace XbeeHandler.XbeeFrames
         public byte[] FrameData { get; set; }
         public int Checksum { get; set; }
 
+        //Displayed attributes
+        protected string dispTimeStamp;
+        protected string dispSource;
+        protected string dispMessageType;
+        protected string dispMessageData;
+        protected string dispRawMessage;
+        
+
         public XbeeAPIFrame(byte[] frame)
 		{
 			TimeStamp = DateTime.Now;
@@ -82,9 +90,10 @@ namespace XbeeHandler.XbeeFrames
 			FrameData = new byte[frame.Length - 5];
 			Array.Copy(frame, 4, FrameData, 0, frame.Length - 5);
 			Checksum = frame[frame.Length - 1];
+
+            dispRawMessage = MJLib.HexToString(RawMessage, 0, RawMessage.Length, true);
 		}
-
-
+        
 		public string TimeStampDisplay
 		{
 			get
@@ -93,59 +102,35 @@ namespace XbeeHandler.XbeeFrames
 			}
 		}
 
+        public virtual string SourceDisplay
+        {
+            get
+            {
+                return dispSource;
+            }
+        }
+
+        public virtual string MessageTypeDisplay
+        {
+            get
+            {
+                return dispMessageType;
+            }
+        }
+
+        public virtual string MessageDataDisplay
+        {
+            get
+            {
+                return dispMessageData;
+            }
+        }
+
 		public string RawMessageDisplay
 		{
 			get
 			{
 				return MJLib.HexToString(RawMessage, 0, RawMessage.Length, true);
-			}
-		}
-
-		public string FrameLengthDisplay
-		{
-			get
-			{
-				return MJLib.HexToString(BitConverter.GetBytes(Length), 0, 1, true) + " (" + Length.ToString() + ")";
-			}
-		}
-
-		public virtual string FrameCommandDisplay
-		{
-			get
-			{
-				return "WARNING: unhandled xbee frame received";
-			}
-		}
-
-		public virtual string FrameDataDisplay
-		{
-			get
-			{
-				return MJLib.HexToString(FrameData, 0, Length, true);
-			}
-		}
-
-		public virtual string SourceDisplay
-		{
-			get
-			{
-				return "";
-			}
-		}
-
-		public virtual string MessageTypeDisplay
-		{
-			get
-			{
-				return "";
-			}
-		}
-
-		public virtual string MessageDataDisplay
-		{
-			get
-			{
-				return "";
 			}
 		}
 
@@ -264,23 +249,6 @@ namespace XbeeHandler.XbeeFrames
 			deliveryStatus = FrameData[4];
 			discoveryStatus = FrameData[5];
 		}
-
-		public override string FrameCommandDisplay
-		{
-			get
-			{
-				return "WARNING: unhandled swarm message received";
-			}
-		}
-
-		public override string FrameDataDisplay
-		{
-			get
-			{
-				return MJLib.HexToString(FrameData, 0, Length, true);
-			}
-		}
-
 	}
 
 

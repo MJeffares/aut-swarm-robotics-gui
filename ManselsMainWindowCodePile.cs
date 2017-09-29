@@ -510,7 +510,10 @@ namespace SwarmRoboticsGUI
         }
         private void robotTaskRotateToHeading_Click(object sender, RoutedEventArgs e)
         {
-
+            byte[] data;
+            data = new byte[2];
+            data[0] = ROBOT_CONTROL_MESSAGE.RotateToHeading;
+            //data[1] = 
         }
 
         //private void tbRotateToHeading_PreviewTextInput(object sender, TextCompositionEventArgs e)
