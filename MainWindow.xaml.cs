@@ -129,13 +129,14 @@ namespace SwarmRoboticsGUI
             PopulateRobots();
             //DEBUGGING_PopulateTestList();
 
-            swarmManager = new SwarmManager(this);
-
             
+
+            protocol = new ProtocolClass(this);
             serial = new SerialUARTCommunication();
             xbee = new XbeeAPI(this);
-            protocol = new ProtocolClass(this);
+            
             commManger = new CommunicationManager(this, serial, xbee, protocol);
+            swarmManager = new SwarmManager(this);
 
             PopulateSerialSettings();
             PopulateSerialPorts();

@@ -25,6 +25,7 @@
 
 
 using System;
+using System.ComponentModel;
 using XbeeHandler.XbeeFrames;
 
 namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationProtocolMessages
@@ -56,11 +57,15 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 
     public class RobotStatus : SwarmProtocolMessage
     {
+
+        
         public UInt16 batteryVoltage;
+        public byte task;
 
         public RobotStatus(byte[] frame) : base(frame)
         {
-            batteryVoltage = (UInt16) (256 * messageData[0] + messageData[1]);
+            task = messageData[0];
+            batteryVoltage = (UInt16) (256 * messageData[1] + messageData[2]);
         }
     }
 

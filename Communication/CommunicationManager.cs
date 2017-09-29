@@ -296,6 +296,8 @@ namespace SwarmRoboticsGUI
 
                     case MESSAGE_TYPES.ROBOT_STATUS:
                         var robot = RobotList.Find(R => (R as ICommunicates).Address64 == message.sourceAddress64);
+                        //robot.Task = (TaskType)((message as RobotStatus).task);
+                        robot.Task = EnumUtils<TaskType>.GetDescription((TaskType)((message as RobotStatus).task));
                         robot.Battery = (message as RobotStatus).batteryVoltage;
                         break;
                 }
@@ -524,6 +526,10 @@ namespace SwarmRoboticsGUI
 
 			switch(swarmMessage.messageID)
 			{
+                case MESSAGE_TYPES.ROBOT_STATUS:
+                    swarmMessage = new RobotStatus(swarmMessage.RawMessage);
+                    break;
+
 				case MESSAGE_TYPES.SYSTEM_TEST_PROXIMITY_SENSORS:
 					swarmMessage = new ProximitySensorTestData(swarmMessage.RawMessage);
 					break;

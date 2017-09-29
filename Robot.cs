@@ -14,6 +14,36 @@ using System.Windows.Data;
 
 namespace SwarmRoboticsGUI
 {
+    public enum TaskType
+    {
+        [Description("Testing")]
+        Test = 0,
+        [Description("Testing Everything")]
+        TestAll = 1,
+        [Description("Manual Control")]
+        Manual = 2,
+        [Description("Formation")]
+        Formation = 3,
+        [Description("Docking")]
+        Docking = 4,
+        [Description("Avoiding Obstacles")]
+        ObstacleAvoidance = 5,
+        [Description("Avoiding Obstacles")]
+        ObstacleAvoidanceDemo = 6,
+        [Description("Idling")]
+        Idle = 7,
+        [Description("Charging")]
+        Charging = 8,
+        [Description("Line Following")]
+        LineFollower = 9,
+        [Description("Light Following")]
+        LightFollow = 10,
+        [Description("Moving Random")]
+        RandomMovement = 11
+    };
+
+
+
     public class Item: INotifyPropertyChanged
     {
         #region Properties
@@ -56,7 +86,19 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-
+        prvate object _Data {get;set;}
+        public object Data
+        {
+            get { return _Data; }
+            set
+            {
+                if (_Data != value)
+                {
+                    _Data = value;
+                    NotifyPropertyChanged("Data");
+                }
+            }
+        }
         private bool _IsSelected { get; set; }
         public bool IsSelected
         {
@@ -177,8 +219,8 @@ namespace SwarmRoboticsGUI
     public class RobotItem : Item, INotifyPropertyChanged, IObstacle, ICommunicates
     {
         #region Status Properties
-        private int _Battery { get; set; }
-        public int Battery
+        private UInt16 _Battery { get; set; }
+        public UInt16 Battery
         {
             get { return _Battery; }
             set
