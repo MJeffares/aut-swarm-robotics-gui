@@ -104,7 +104,11 @@
                                     <ToggleButton x:Name="Expander" ClickMode="Press" Grid.ColumnSpan="2" 
                                                   IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" 
                                                   Style="{StaticResource ExpandCollapseToggleStyle}"/>
-                                    <ContentPresenter x:Name="PART_Header" Grid.Column="1" ContentSource="Header" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                    <ContentPresenter x:Name="PART_Header" 
+                                                      Grid.Column="1" 
+                                                      ContentSource="Header" 
+                                                      VerticalAlignment="Center" 
+                                                      HorizontalAlignment="Left"/>
                                 </Grid>
                             </Border>
                             <ItemsPresenter x:Name="ItemsHost" Grid.Row="1" Margin="0"/>
@@ -284,8 +288,8 @@
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <TextBlock FontSize="10" Foreground="White" Text="{Binding Name}"/>
-                <TextBlock Grid.Column="1" FontSize="10" Foreground="White" Text="{Binding Text, StringFormat='{}{0:#,0}'}"/>
+                <TextBlock FontSize="15" Foreground="White" Text="{Binding Name}"/>
+                <TextBlock Grid.Column="1" FontSize="15" Foreground="White" Text="{Binding Text}"/>
             </Grid>
         </DataTemplate>
         <HierarchicalDataTemplate x:Key="RobotTemplate" AlternationCount="2"

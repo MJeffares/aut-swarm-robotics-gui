@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Drawing;
 using System.Windows;
+using System.Windows.Data;
 
 namespace SwarmRoboticsGUI
 {
@@ -55,6 +56,7 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
+
         private bool _IsSelected { get; set; }
         public bool IsSelected
         {
@@ -105,9 +107,9 @@ namespace SwarmRoboticsGUI
         {
             this.Name = Name;
             this.Text = Text;
+
             Children = new List<Item>();
         }
-       
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string PropertyName)
@@ -115,6 +117,29 @@ namespace SwarmRoboticsGUI
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
+
+                
+
+                foreach (var Child in Children)
+                {
+                    if (Child.Name == PropertyName)
+                    {
+                        var ThisType = typeof(IObstacle).GetProperty(PropertyName);
+                        if (ThisType != null)
+                        {
+                            var Value = ThisType.GetValue(this, null);
+                            Child.Text = Value.ToString();
+                        }
+                        else
+                        {
+                            ThisType = GetType().GetProperty(PropertyName);
+                            var Value = ThisType.GetValue(this, null);
+                            Child.Text = Value.ToString();
+                        }
+                    }
+                }
+
+
                 //var Value = GetType().GetProperty(PropertyName).GetValue(this, null);
                 //var Child = Children.Where(f => f.Name == PropertyName).SingleOrDefault();
 
@@ -449,7 +474,7 @@ namespace SwarmRoboticsGUI
             obstacle.IsVisible = false;
             
             // Create property labels
-            Children.Add(new Item("ID"));
+            //Children.Add(new Item("ID"));
             Children.Add(new Item("Battery"));
             Children.Add(new Item("Task"));
             Children.Add(new Item("Location"));
