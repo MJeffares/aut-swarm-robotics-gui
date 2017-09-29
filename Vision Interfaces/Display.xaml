@@ -99,45 +99,65 @@
                     <DataTemplate>
                             <Grid Background="Transparent">
                                 <Grid.RowDefinitions>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
 
-                            <Polygon Name="Hexagon" Style="{StaticResource Hexagon}"
+                                <Polygon Name="Hexagon" Style="{StaticResource Hexagon}"
                                      Height="{Binding Path=(local:IObstacle.Width)}" Width="{Binding Path=(local:IObstacle.Height)}"
                                      MouseLeftButtonDown="Robot_MouseLeftButtonDown"
                                      RenderTransformOrigin="0.5,0.5">
-                                <Polygon.LayoutTransform>
+                                    <Polygon.LayoutTransform>
                                         <TransformGroup>
                                             <RotateTransform Angle="{Binding FacingDeg}"/>
                                         </TransformGroup>
-                                </Polygon.LayoutTransform>
-                            </Polygon>
+                                    </Polygon.LayoutTransform>
+                                </Polygon>
 
-                            <Polygon Style="{StaticResource Triangle}"
+                                <Polygon Style="{StaticResource Triangle}"
                                      Height="20" Width="20" 
                                      RenderTransformOrigin="-0.5,-0.5"
                                      IsHitTestVisible="False"
                                      Visibility="{Binding HasFacing, Converter={StaticResource BoolToVis}, FallbackValue=Hidden}">
-                                <Polygon.RenderTransform>
-                                    <TransformGroup>
-                                        <TranslateTransform X="{Binding FacingMarker}"/>
-                                        <RotateTransform Angle="{Binding FacingDeg}"/>
-                                    </TransformGroup>
-                                </Polygon.RenderTransform>
-                            </Polygon>
+                                    <Polygon.RenderTransform>
+                                        <TransformGroup>
+                                            <TranslateTransform X="{Binding FacingMarker}"/>
+                                            <RotateTransform Angle="{Binding FacingDeg}"/>
+                                        </TransformGroup>
+                                    </Polygon.RenderTransform>
+                                </Polygon>
 
-                            <TextBlock Grid.Column="1" Text="{Binding Name}" 
-                                       VerticalAlignment="Center" HorizontalAlignment="Left"
-                                       Padding="5,0,0,0"
+                                <Grid Grid.Column="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="{Binding Name}" 
+                                               VerticalAlignment="Center" HorizontalAlignment="Left"
+                                               Padding="5,0,0,0"
+                                               Foreground="#000" FontSize="20"
+                                               IsHitTestVisible="False">
+                                    </TextBlock>
+                                    <TextBlock Grid.Row="1" Text="{Binding FacingDeg, StringFormat=N0}" 
                                        Foreground="#000" FontSize="20"
                                        IsHitTestVisible="False">
-                            </TextBlock>
-                            
-                            <!--<Grid Grid.Row="1">
+                                    </TextBlock>
+                                    <TextBlock Grid.Row="2" Text="{Binding Path=(local:IObstacle.Location).X, StringFormat=N0}" 
+                                       Foreground="#000" FontSize="20"
+                                       IsHitTestVisible="False">
+                                    </TextBlock>
+                                    <TextBlock Grid.Row="3" Text="{Binding Path=(local:IObstacle.Location).Y, StringFormat=N0}" 
+                                       Foreground="#000" FontSize="20"
+                                       IsHitTestVisible="False">
+                                    </TextBlock>
+                                </Grid>
+
+                                <!--<Grid Grid.Row="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
                                     <ColumnDefinition/>
@@ -151,9 +171,9 @@
                                        IsHitTestVisible="False">
                                 </TextBlock>
                             </Grid>-->
-                            
-                        </Grid>
-                    </DataTemplate>
+
+                            </Grid>
+                        </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
             </Grid>

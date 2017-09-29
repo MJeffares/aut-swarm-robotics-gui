@@ -96,7 +96,7 @@ namespace SwarmRoboticsGUI
                 case SourceType.CAMERA:
                     LowerH = Properties.Settings.Default.CV_Filter_HueLower;
                     UpperH = Properties.Settings.Default.CV_Filter_HueUpper;
-                    if (camera1 != null)
+                    if (camera1 != null && camera1.Status == StatusType.PLAYING)
                         camera1.SetWhiteBalance(Properties.Settings.Default.CV_WhiteBalance);
                     break;
                 case SourceType.CUTOUTS:
