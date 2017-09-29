@@ -208,141 +208,44 @@ namespace SwarmRoboticsGUI
                 message = ProtocolClass.ParseSwarmProtocolMessage(message);
                 swarmRoboticsProtocolHandler.InterperateSwarmRoboticsMessage(message as SwarmProtocolMessage);
             }
+            //else
+            //{
+            //    InterperateXbeeFrame(message);
+            //}
             return message;
         }
-
-        //private uint MyThread(byte[] frame)
-        //{
-        //    byte[] data = data = xbeeHandler.EscapeReceivedByteArray(frame);
-
-        //    if (xbeeHandler.ValidateChecksum(data) == 1)
-        //    {
-        //        //MANSEL: index out of range error
-        //        primarySerialPort.rxByteBuffer.RemoveAt(0);
-        //        return 1;
-        //    }
-
-        //    XbeeAPIFrame message = xbeeHandler.ParseXbeeFrame(data);
-
-        //    if(message is ZigbeeReceivePacket)
-        //    {
-        //        message = ProtocolClass.ParseSwarmProtocolMessage(message);
-        //        //InterperateSwarmProtocolMessage(message);
-        //        swarmRoboticsProtocolHandler.InterperateSwarmRoboticsMessage(message as SwarmProtocolMessage);
-                
-        //    }
-        //    else
-        //    {
-        //        //InterperateXbeeFrame(message);
-        //    }
-
-        //    //rxXbeeMessageBuffer.Add(message);
-         
-        //    //window.RefreshListView();
-        //    return 0;
-        //}
 	}
     
 
-
-	/*
-
-	public class communicated_message
-	{
-		public DateTime time_stamp { get; set; }
-
-		public byte[] raw_message { get; set; }
-
-		public int frame_length { get; set; }
-		public byte frame_ID { get; set; }
-		public byte[] frame_data { get; set; }
-
-		public byte[] source16 { get; set; }
-		public byte[] source64 { get; set; }
-
-		public byte message_type { get; set; }
-		public byte[] message_data { get; set; }
-
-		public string TimeStampDisplay
-		{
-			get
-			{
-				return time_stamp.ToString("HH:mm:ss");
-			}
-		}
-
-		public string RawMessageDisplay
-		{
-			get
-			{
-				return MJLib.HexToString(raw_message, 0, frame_length + 1, true);
-			}
-		}
-
-		public string FrameLengthDisplay
-		{
-			get
-			{
-				return MJLib.HexToString(BitConverter.GetBytes(frame_length), 0, 1, true) + " (" + frame_length.ToString() + ")";
-			}
-		}
-
-		public string FrameIDDisplay
-		{
-			get
-			{
-				return XbeeHandler.GetXbeeFrameType(frame_ID) + " (" + MJLib.HexToString(frame_ID, true) + ")";
-			}
-		}
-
-		public string FrameDataDisplay
-		{
-			get
-			{
-				return MJLib.HexToString(frame_data, 0, frame_length, true);
-			}
-		}
-
-		public string SourceDisplay
-		{
-			get
-			{
-				//return XbeeHandler.DESTINATION.ToString(BitConverter.ToUInt64(source64, 0)) + " (" + MJLib.HexToString(source64, 0, 8, true) + " , " + MJLib.HexToString(source16, 0, 2, true) + ")";
-				return "FIX";
-			}
-		}
-
-		public string MessageTypeDisplay
-		{
-			get
-			{
-				return ProtocolClass.GetMessageType(message_type) + " (" + MJLib.HexToString(message_type, true) + ")";
-			}
-		}
-
-		public string MessageDataDisplay
-		{
-			get
-			{
-				return ProtocolClass.GetMessageData(message_type, message_data, true) + " (" + MJLib.HexToString(message_data, 0, frame_length - 13, true) + ")";
-			}
-		}
-	}
-
-
-	*/
 
 	public class ProtocolClass
 	{
 		// variables
 		private MainWindow window { get; set; }
+        private List<RobotItem> RobotList;
 
 		public static class MESSAGE_TYPES
 		{
-			public const byte COMMUNICATION_TEST = 0x00;
-			public const byte BATTERY_VOLTAGE = 0x01;
+            //Status Messages 0xA0 -> 0xAF
+            public const byte ROBOT_POSITION = 0xA0;
+            public const byte ROBOT_STATUS = 0xA1;
 
+            //Robot Manual Control Messages 0xD0 -> 0xDF
+            public const byte ROBOT_CONTROL_STOP = 0xD0;
+            public const byte ROBOT_CONTROL_MOVE = 0xD1;
+            public const byte ROBOT_CONTROL_ROTATE_CLOCKWISE = 0xD2;
+            public const byte ROBOT_CONTROL_ROTATE_COUNTERCLOCKWISE = 0xD3;
+            public const byte ROBOT_CONTROL_MOVE_RANDOMLY = 0xD4;
+            public const byte ROBOT_CONTROL_RELEASE_DOCK = 0xD6;
+            public const byte ROBOT_CONTROL_DOCK = 0xD7;
+            public const byte ROBOT_CONTROL_STOP_OBSTACLE_AVOIDANCE = 0xD8;
+            public const byte ROBOT_CONTROL_START_OBSTACLE_AVOIDANCE = 0xD9;
+            public const byte ROBOT_CONTROL_FOLLOW_LIGHT = 0xDA;
+            public const byte ROBOT_CONTROL_FOLLOW_LINE = 0xDB;
+            public const byte ROBOT_CONTROL_ROTATE_TO_HEADING = 0xDC;
+            public const byte ROBOT_CONTROL_MOVE_TO_POSITION = 0xDD;
 
+            //Robot Systems Test Messages 0xE0 -> 0xEF
 			public const byte SYSTEM_TEST_COMMUNICATION = 0xE1;
 			public const byte SYSTEM_TEST_PROXIMITY_SENSORS = 0xE4;
 			public const byte SYSTEM_TEST_LIGHT_SENSORS = 0xE5;
@@ -358,13 +261,13 @@ namespace SwarmRoboticsGUI
             public const byte TOWER_LIGHT_SENSORS = 0xF0;
             public const byte TOWER_LEDS = 0xF1;
             public const byte TOWER_DOCK_ENABLE = 0xF2;
-
 		}
 
 		// constructor
 		public ProtocolClass(MainWindow main)
 		{
 			window = main;
+            RobotList = window.ItemList.Where(R => R is RobotItem).Cast<RobotItem>().ToList<RobotItem>();
 		}
 
 		public TaskCompletionSource<SwarmProtocolMessage> MessageReceivedTask = new TaskCompletionSource<SwarmProtocolMessage>();
@@ -386,7 +289,18 @@ namespace SwarmRoboticsGUI
 				}
 			}
             
-            if(message.messageID > 0xDF && message.messageID < 0xF0)
+            if(message.messageID >= 0xA0 && message.messageID <= 0xAF)
+            {
+                switch(message.messageID)
+                {
+
+                    case MESSAGE_TYPES.ROBOT_STATUS:
+                        var robot = RobotList.Find(R => (R as ICommunicates).Address64 == message.sourceAddress64);
+                        robot.Battery = (message as RobotStatus).batteryVoltage;
+                        break;
+                }
+            }
+            else if(message.messageID > 0xDF && message.messageID < 0xF0)
             {
                 switch(message.messageID)
                 {
