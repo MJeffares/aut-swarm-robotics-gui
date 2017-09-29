@@ -120,19 +120,7 @@ namespace SwarmRoboticsGUI
 			//
 			camera1 = new Camera();
 			
-			protocol = new ProtocolClass(this);
-
-
-            // Serial communications
-			serial = new SerialUARTCommunication();
-            xbee = new XbeeAPI(this);
-            PopulateSerialSettings();
-            PopulateSerialPorts();
-            portList.MouseEnter += new MouseEventHandler(menuPopulateSerialPorts);
-            connectButton.Click += new RoutedEventHandler(menuCommunicationConnect_Click);
-
-            commManger = new CommunicationManager(this, serial, xbee, protocol);
-            XbeeMessages = commManger.rxXbeeMessageBuffer;
+           
             //
             PopulateFilters();
             PopulateOverlays();
@@ -142,6 +130,20 @@ namespace SwarmRoboticsGUI
             //DEBUGGING_PopulateTestList();
 
             swarmManager = new SwarmManager(this);
+
+            
+            serial = new SerialUARTCommunication();
+            xbee = new XbeeAPI(this);
+            protocol = new ProtocolClass(this);
+            commManger = new CommunicationManager(this, serial, xbee, protocol);
+
+            PopulateSerialSettings();
+            PopulateSerialPorts();
+            portList.MouseEnter += new MouseEventHandler(menuPopulateSerialPorts);
+            connectButton.Click += new RoutedEventHandler(menuCommunicationConnect_Click);
+
+
+            XbeeMessages = commManger.rxXbeeMessageBuffer;
 
             overlayWindow = new OverlayWindow(this);
 
