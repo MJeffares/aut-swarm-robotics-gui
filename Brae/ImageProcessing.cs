@@ -271,7 +271,9 @@ namespace SwarmRoboticsGUI
                 // DEBUG: Robot counter
                 RobotCount++;
 
+                // Get the robot reference as a RobotItem
                 RobotItem robot = RobotList[index];
+                // Get the robot reference as an object that implements IObstacle
                 IObstacle obstacle = RobotList[index];
 
                 obstacle.IsTracked = true;
@@ -600,12 +602,13 @@ namespace SwarmRoboticsGUI
         }
         private static bool HasHueRange(IInputArray Frame, Range HueRange)
         {
+            const int ColourFraction = 20;      // 1/20=5% of the image needs to be within HueRange
             int Count = 0;
             //Range SaturationRange = new Range(25, 230);
             //Range ValueRange = new Range(60, 195);
             int Width = Frame.GetInputArray().GetSize().Width;
             int Height = Frame.GetInputArray().GetSize().Height;
-            int ColourCount = Width * Height / 20;
+            int ColourCount = Width * Height / ColourFraction;
 
             var HOut = new Mat();
 
