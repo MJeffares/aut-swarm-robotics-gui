@@ -189,7 +189,7 @@ namespace SwarmRoboticsGUI
         {
             string[] ports = null;
 
-            if (!_serialPort.IsOpen)
+            //if (!_serialPort.IsOpen)
                 ports = SerialPort.GetPortNames();
 
             return ports;
@@ -329,7 +329,8 @@ namespace SwarmRoboticsGUI
             {
                 try
                 {
-                    _serialPort.Close();
+					IsConnected = false;
+					_serialPort.Close();
                 }
                 catch (Exception excpt)
                 {
