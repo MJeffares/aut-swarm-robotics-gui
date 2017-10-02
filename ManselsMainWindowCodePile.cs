@@ -38,11 +38,12 @@ namespace SwarmRoboticsGUI
     {
 
         #region Tower Control
+
         public List<ToggleButton> dockLightControls;
+
+        //Constructor
         public void TowerControlSetup()
         {
-
-
             dockLightControls = new List<ToggleButton>()
             {
                  btnDockLightA, btnDockLightB, btnDockLightC, btnDockLightD, btnDockLightE, btnDockLightF
@@ -54,13 +55,15 @@ namespace SwarmRoboticsGUI
                 toggleButton.Click += new RoutedEventHandler(btnDockLight_Click);
             }
         }
+
+        //Button handlers
         private void btnDockLight_Click(object sender, RoutedEventArgs e)
         {
             var senderToggleButton = sender as ToggleButton;
             byte[] data;
 
             data = new byte[3];
-            data[0] = ProtocolClass.MESSAGE_TYPES.TOWER_LIGHT_SENSORS;
+            data[0] = ProtocolClass.MESSAGE_TYPES.CHARGING_STATION_LIGHT_SENSORS;
             byte[] lightsensor = MJLib.StringToByteArrayFastest(senderToggleButton.Tag.ToString());
 
             if (senderToggleButton.IsChecked == true)
@@ -78,6 +81,34 @@ namespace SwarmRoboticsGUI
             ChargingDockItem Dock = (ChargingDockItem)ItemList.First(D => D is ChargingDockItem);
             xbee.SendTransmitRequest(((ICommunicates)Dock).Address64, data);
         }
+
+        private void TowerDockingLights_Update(object sender, RoutedEventArgs e)
+        {
+            var senderCheckBox = sender as CheckBox;
+
+            byte[] led = MJLib.StringToByteArrayFastest(senderCheckBox.Tag.ToString());
+
+            ChargingDockItem Dock = (ChargingDockItem)ItemList.First(D => D is ChargingDockItem);
+
+            if(senderCheckBox.IsChecked == true)
+            {
+                Dock.DockingLights &= (byte)~(byte)(1 << led[0]);
+            }
+            else
+            {
+                Dock.DockingLights |= (byte)(1 << led[0]);
+            }
+
+            byte[] data;
+            data = new byte[3];
+            data[0] = ProtocolClass.MESSAGE_TYPES.CHARGING_STATION_LEDS;
+            data[1] = 0x01;
+            data[2] = Dock.DockingLights;
+
+            xbee.SendTransmitRequest(((ICommunicates)Dock).Address64, data);            
+        }
+
+
         #endregion
 
         #region System Test

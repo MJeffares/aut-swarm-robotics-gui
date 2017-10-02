@@ -261,9 +261,10 @@ namespace SwarmRoboticsGUI
 			public const byte SYSTEM_TEST_TWI_EXTERNAL = 0xEC;
 			public const byte SYSTEM_TEST_CAMERA = 0xED;
 
-            public const byte TOWER_LIGHT_SENSORS = 0xF0;
-            public const byte TOWER_LEDS = 0xF1;
-            public const byte TOWER_DOCK_ENABLE = 0xF2;
+            public const byte CHARGING_STATION_LIGHT_SENSORS = 0xF0;
+            public const byte CHARGING_STATION_LEDS = 0xF1;
+            public const byte CHARGING_STATION_DOCK_ENABLE = 0xF2;
+            public const byte CHARGING_STATION_ROBOT_STATUS_REPORT = 0xF3;
             
 		}
 
@@ -362,16 +363,21 @@ namespace SwarmRoboticsGUI
             {
                 switch(message.messageID)
                 {
-                    case MESSAGE_TYPES.TOWER_LIGHT_SENSORS:
-                            DisplayTowerLightData(message as TowerDockingLightSensorData);
-                            break;
+                    case MESSAGE_TYPES.CHARGING_STATION_LIGHT_SENSORS:
+                        DisplayTowerLightData(message as TowerDockingLightSensorData);
+                        break;
 
-                    case MESSAGE_TYPES.TOWER_LEDS:
+                    case MESSAGE_TYPES.CHARGING_STATION_LEDS:
+                        
+                        break;
+
+                    case MESSAGE_TYPES.CHARGING_STATION_DOCK_ENABLE:
 
                         break;
 
-                    case MESSAGE_TYPES.TOWER_DOCK_ENABLE:
-
+                    case MESSAGE_TYPES.CHARGING_STATION_ROBOT_STATUS_REPORT:
+                        ChargingDockItem dock = (ChargingDockItem)window.ItemList.First(D => D is ChargingDockItem);
+                        dock.DockingLights = message.messageData[2];
                         break;
 
                 }
@@ -575,7 +581,7 @@ namespace SwarmRoboticsGUI
 
                     //MANSEL: Common issue with new receive
 
-                case MESSAGE_TYPES.TOWER_LIGHT_SENSORS:
+                case MESSAGE_TYPES.CHARGING_STATION_LIGHT_SENSORS:
                     swarmMessage = new TowerDockingLightSensorData(swarmMessage.RawMessage);
                     break;
 

@@ -564,15 +564,16 @@
                             <Border BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Padding="2" Width="130" Height="150">
                                 <StackPanel Orientation="Vertical" Margin="0">
                                     <Label FontWeight="Bold" HorizontalAlignment="Center" >Docking Lights</Label>
-                                    <CheckBox Margin="20,0,0,0">Front</CheckBox>
-                                    <CheckBox Margin="20,0,0,0">Front Right</CheckBox>
-                                    <CheckBox Margin="20,0,0,0">Rear Right</CheckBox>
-                                    <CheckBox Margin="20,0,0,0">Rear</CheckBox>
-                                    <CheckBox Margin="20,0,0,0">Rear Left</CheckBox>
-                                    <CheckBox Margin="20,0,0,0">Front Left</CheckBox>
+                                    <CheckBox Margin="20,0,0,0" Tag="0">Front</CheckBox>
+                                    <CheckBox Margin="20,0,0,0" Tag="1">Front Right</CheckBox>
+                                    <CheckBox Margin="20,0,0,0" Tag="2">Rear Right</CheckBox>
+                                    <CheckBox Margin="20,0,0,0" Tag="3">Rear</CheckBox>
+                                    <CheckBox Margin="20,0,0,0" Tag="4">Rear Left</CheckBox>
+                                    <CheckBox Margin="20,0,0,0" Tag="5">Front Left</CheckBox>
                                 </StackPanel>
                             </Border>
 
+                            <!--
                             <Border BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Padding="2" Width="180" Height="150">
                                 <StackPanel Orientation="Vertical" Margin="0">
                                     <Label FontWeight="Bold" HorizontalAlignment="Center" >Docking Pad Power Enable</Label>
@@ -584,6 +585,7 @@
                                     <CheckBox Margin="50,0,0,0">Front Left</CheckBox>
                                 </StackPanel>
                             </Border>
+                            -->
 
 
                         </StackPanel>

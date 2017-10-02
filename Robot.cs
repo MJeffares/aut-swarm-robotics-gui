@@ -766,6 +766,20 @@ namespace SwarmRoboticsGUI
             }
         }
 
+        private byte _DockingLights { get; set; }
+        public byte DockingLights
+        {
+            get { return _DockingLights; }
+            set
+            {
+                if (_DockingLights != value)
+                {
+                    _DockingLights = value;
+                    NotifyPropertyChanged("DockingLights");
+                }
+            }
+        }
+
         public ChargingDockItem(String Name, UInt64 MAC_Address, string Colour) : base(Name)
         {
             this.Name = Name;
@@ -785,6 +799,7 @@ namespace SwarmRoboticsGUI
             obstacle.IsVisible = true;
             double X = (600 - obstacle.Width/2);
             double Y = (600 - obstacle.Height/2);
+            DockingLights = 0;
             //double X = (double)1177 / 2;
             //double Y = (double)1177 / 2;
             obstacle.Location = new System.Windows.Point(X, Y);
