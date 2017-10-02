@@ -77,6 +77,7 @@ namespace SwarmRoboticsGUI
         private void PositioningTimer_Tick(object sender, EventArgs arg)
         {
             byte[] data;
+			byte[] datatorobot;
             RegisteredRobots = RobotList.Where(R => (R as IObstacle).IsTracked).ToList<RobotItem>();
 
             foreach (RobotItem R in RegisteredRobots)
@@ -89,7 +90,6 @@ namespace SwarmRoboticsGUI
                 UInt16 facing = (UInt16)R.FacingDeg;
 
                 data = new byte[7];
-
                 data[0] = 0xA0;
                 data[1] = (byte)(positionX >> 0x8);
                 data[2] = (byte)(positionX);
@@ -101,7 +101,7 @@ namespace SwarmRoboticsGUI
                 xbee.SendTransmitRequest(comms.Address64, data);
 
 
-                data = new byte[20];
+                datatorobot = new byte[20];
                 data[0] = ProtocolClass.MESSAGE_TYPES.CHARGING_STATION_ROBOT_STATUS_REPORT;
                 data[1] = 0x00; //read
 
