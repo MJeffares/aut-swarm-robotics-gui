@@ -87,7 +87,7 @@ namespace SwarmRoboticsGUI
         int currentTestItem = 0;
         bool doublecommandlockout = false;
         public Dictionary<string, byte> twiMuxAddresses;
-        public void setupSystemTest()
+        public void SetupSystemTest()
         {
             EstablishingCommunicationsWindow = new ProgressWindow("Establishing Communications", "Please wait while communications are tested.");
 
@@ -1021,6 +1021,7 @@ namespace SwarmRoboticsGUI
             if (ports != null)
             {
                 portList.Items.Clear();
+
                 foreach (string port in ports)
                 {
                     MenuItem item = new MenuItem { Header = port };
@@ -1034,17 +1035,22 @@ namespace SwarmRoboticsGUI
                         item.IsChecked = true;
                         connectButton.IsEnabled = true;
                     }
+
+					if(serial.IsConnected)
+					{
+						item.IsEnabled = false;
+					}
                 }
 
-                if (ports.Length == 0)
-                {
-                    MenuItem nonefound = new MenuItem { Header = "No Com Ports Found" };
-                    portList.Items.Add(nonefound);
-                    nonefound.IsEnabled = false;
-                    connectButton.IsEnabled = false;
-                }
-            }
-        }
+				if (ports.Length == 0)
+				{
+					MenuItem nonefound = new MenuItem { Header = "No Com Ports Found" };
+					portList.Items.Add(nonefound);
+					nonefound.IsEnabled = false;
+					connectButton.IsEnabled = false;
+				}
+			}
+		}
 
         public void menuPopulateSerialPorts(object sender, MouseEventArgs e)
         {
@@ -1073,7 +1079,31 @@ namespace SwarmRoboticsGUI
             else
             {
                 serial.Disconnect();
-                connectButton.Header = "Connect";
+
+				////creates a list with all settings in it
+				MenuItem[] ports = portList.Items.OfType<MenuItem>().ToArray();
+				MenuItem[] bauds = baudList.Items.OfType<MenuItem>().ToArray();
+				MenuItem[] paritys = parityList.Items.OfType<MenuItem>().ToArray();
+				MenuItem[] datas = dataBitsList.Items.OfType<MenuItem>().ToArray();
+				MenuItem[] stops = stopBitsList.Items.OfType<MenuItem>().ToArray();
+				MenuItem[] handshakes = handshakingList.Items.OfType<MenuItem>().ToArray();
+
+				List<MenuItem> itemList = new List<MenuItem>(ports.Concat<MenuItem>(ports));
+				itemList.AddRange(bauds);
+				itemList.AddRange(paritys);
+				itemList.AddRange(datas);
+				itemList.AddRange(stops);
+				itemList.AddRange(handshakes);
+
+				MenuItem[] finalArray = itemList.ToArray();
+
+				//re-enables all settings
+				foreach (var item in finalArray)
+				{
+					item.IsEnabled = true;
+				}
+
+				connectButton.Header = "Connect";
             }
             connectButton.IsChecked = false;
 

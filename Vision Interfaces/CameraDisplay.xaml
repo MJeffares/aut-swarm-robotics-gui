@@ -8,28 +8,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition Height="40"/>
-        </Grid.RowDefinitions>
         <WindowsFormsHost Name="host1" Visibility="Visible">
-            <em:ImageBox x:Name="captureImageBox" Height="480" Width="640" SizeMode="Zoom" FunctionalMode="Minimum"/>
+            <em:ImageBox x:Name="captureImageBox" SizeMode="Zoom" FunctionalMode="Minimum"/>
         </WindowsFormsHost>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="200"/>
-                <ColumnDefinition Width="50"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <!--<StackPanel Grid.Column="1">
-            <Slider x:Name="HueLowerSlider" Value="{Binding HueLower, Mode=TwoWay}" HorizontalAlignment="Stretch" Maximum="360" SmallChange="1"/>
-                <Slider x:Name="HueUpperSlider" Value="{Binding HueUpper, Mode=TwoWay}" HorizontalAlignment="Stretch" Maximum="360" SmallChange="1"/>
-            </StackPanel>
-            <StackPanel Grid.Column="2">
-                <TextBox HorizontalAlignment="Stretch" TextWrapping="Wrap" Text="{Binding Value, ElementName=HueLowerSlider}"/>
-                <TextBox HorizontalAlignment="Stretch" TextWrapping="Wrap" Text="{Binding Value, ElementName=HueUpperSlider}"/>
-            </StackPanel>-->
-        </Grid>
     </Grid>
 </UserControl>

@@ -487,7 +487,7 @@ namespace XbeeHandler
 
 		public void SendFrame(byte api_frame, byte[] data)
 		{
-			//MANSEL: Why is this empty
+			//MANSEL: SendFrame is empty... Why is this empty
 		}
 
 
@@ -518,7 +518,7 @@ namespace XbeeHandler
             destination_address_64[7] = BitConverter.GetBytes(destination)[0]; 
 
 
-            //MANSEL: YOU TWAT FIX THIS
+            //MANSEL: YOU TWAT FIX SendTransmitRequest!
 			//byte[] destination_address_64 = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF };
 			destination_address_64.CopyTo(frame_data, 2);
 			byte[] destination_address_16 = { 0xFF, 0xFE };

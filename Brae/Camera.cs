@@ -136,7 +136,7 @@ namespace SwarmRoboticsGUI
             // BRAE: The recording size is set to 0,0... what on earth does that solve.
             Size recordsize = new Size(0,0);
 
-            // TODO: Fix recording
+            // TODO: Fix camera recording
             videoWriter = new VideoWriter(path, -1, 30, recordsize, true);
 
             Status = StatusType.RECORDING;
