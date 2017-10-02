@@ -732,6 +732,8 @@ namespace SwarmRoboticsGUI
             //camera1.CloseCapture();
         }
 
+       
+
         
     }
 }

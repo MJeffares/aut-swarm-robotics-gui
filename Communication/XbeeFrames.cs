@@ -91,14 +91,16 @@ namespace XbeeHandler.XbeeFrames
 			Array.Copy(frame, 4, FrameData, 0, frame.Length - 5);
 			Checksum = frame[frame.Length - 1];
 
+            dispTimeStamp = TimeStamp.ToString("HH:mm:ss:fff");
             dispRawMessage = MJLib.HexToString(RawMessage, 0, RawMessage.Length, true);
-		}
+            dispMessageType = "XBEE";
+        }
         
 		public string TimeStampDisplay
 		{
 			get
 			{
-				return TimeStamp.ToString("HH:mm:ss:fff");
+                return dispRawMessage;
 			}
 		}
 
@@ -130,7 +132,7 @@ namespace XbeeHandler.XbeeFrames
 		{
 			get
 			{
-				return MJLib.HexToString(RawMessage, 0, RawMessage.Length, true);
+                return dispRawMessage;
 			}
 		}
 
@@ -248,6 +250,23 @@ namespace XbeeHandler.XbeeFrames
 			transmitRetryCount = FrameData[3];
 			deliveryStatus = FrameData[4];
 			discoveryStatus = FrameData[5];
+
+            dispMessageType = "Xbee Transmit Status";
+
+            if(deliveryStatus == 0x00)
+            {
+                dispMessageData = "Success";
+            }
+            else if(deliveryStatus == 0x24)
+            {
+                dispMessageData = "Address Not Found";
+            }
+            else
+            {
+                dispMessageData = "Failure";
+            }
+
+            dispMessageData += " Retries:" + transmitRetryCount.ToString();
 		}
 	}
 
@@ -267,17 +286,10 @@ namespace XbeeHandler.XbeeFrames
 			receiveOptions = FrameData[10];
 			receivedData = new byte[FrameData.Length - 11];
 			Array.Copy(FrameData, 11, receivedData, 0, FrameData.Length - 11);
-		}
 
-		public override string SourceDisplay
-		{
-			get
-			{
-				//MANSEL: need to add UInt64 -> byte array
-				//return XbeeHandler.DESTINATION.ToString(sourceAddress64) + " (" + MJLib.HexToString(source64, 0, 8, true) + " , " + MJLib.HexToString(source16, 0, 2, true) + ")";
-
-				return XbeeAPI.DESTINATION.ToString(sourceAddress64) + " (" + sourceAddress64.ToString() + ")";
-			}
+            //dispSource = XbeeAPI.DESTINATION.ToString(sourceAddress64) + " (" + sourceAddress64.ToString() + ")";
+            dispSource = XbeeAPI.DESTINATION.ToString(sourceAddress64);
+            
 		}
 	}
 

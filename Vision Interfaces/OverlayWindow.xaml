@@ -40,7 +40,8 @@
             <UniformGrid Background="{StaticResource CheckerBrush}" Rows="1">
                 <local:Display x:Name="Display1" 
                                VerticalAlignment="Center"
-                               Items="{Binding Obstacles, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                               Items="{Binding Obstacles, RelativeSource={RelativeSource AncestorType=Window}}" TargetChanged="Display1_TargetChanged"
+                               />
                 <local:CameraDisplay x:Name="CameraDisplay1" 
                                      VerticalAlignment="Center"
                                      Visibility="Collapsed"/>

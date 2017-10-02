@@ -46,6 +46,7 @@ namespace SwarmRoboticsGUI
         public List<IObstacle> Obstacles { get; set; }
         public List<Item> ItemList { get; set; }
         public Arena RobotArena { get; set; }
+        public XbeeHandler.XbeeAPI Xbee { get; set; }
 
         private Camera camera1;
 
@@ -75,6 +76,8 @@ namespace SwarmRoboticsGUI
             ItemList = mainWindow.ItemList;
             Obstacles = mainWindow.ItemList.Where(R => R is IObstacle).Cast<IObstacle>().ToList();
             RobotList = mainWindow.ItemList.Where(R => R is RobotItem).Cast<RobotItem>().ToList();
+
+            Xbee = mainWindow.xbee;
         }
 
         #region Public Methods
@@ -96,8 +99,7 @@ namespace SwarmRoboticsGUI
                 case SourceType.CAMERA:
                     LowerH = Properties.Settings.Default.CV_Filter_HueLower;
                     UpperH = Properties.Settings.Default.CV_Filter_HueUpper;
-                    if (camera1 != null && camera1.Status == StatusType.PLAYING)
-                        camera1.SetWhiteBalance(Properties.Settings.Default.CV_WhiteBalance);
+                    
                     break;
                 case SourceType.CUTOUTS:
                     break;
@@ -146,6 +148,9 @@ namespace SwarmRoboticsGUI
                         counter++;
                         if (counter > 30)
                         {
+                            if (camera1 != null)
+                                camera1.SetWhiteBalance(Properties.Settings.Default.CV_WhiteBalance);
+
                             ImageProcessing.GetArena(Frame, RobotArena);
 
                             counter = 0;
@@ -230,6 +235,23 @@ namespace SwarmRoboticsGUI
         {
             Display1.Visibility = Visibility.Collapsed;
             CameraDisplay1.Visibility = Visibility.Visible;
+        }
+
+        private void Display1_TargetChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            var pos = ((System.Windows.Point)e.NewValue);
+            if (pos != null && Display1.SelectedItem != null)
+            {
+                byte[] data;
+                data = new byte[5];
+                data[0] = ROBOT_CONTROL_MESSAGE.MoveToPosition;
+                data[1] = (byte)((int)pos.X >> 8);
+                data[2] = (byte)((int)pos.X);
+                data[3] = (byte)((int)pos.Y >> 8);
+                data[4] = (byte)((int)pos.Y);
+
+                Xbee.SendTransmitRequest(((ICommunicates)Display1.SelectedItem).Address64, data);
+            }
         }
     }
 }

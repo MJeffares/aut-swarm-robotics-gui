@@ -42,6 +42,24 @@ namespace SwarmRoboticsGUI
         public readonly static DependencyProperty MinimumProperty = DependencyProperty.Register(
             "Minimum", typeof(int), typeof(IntegerUpDown), new UIPropertyMetadata(int.MinValue));
 
+
+        public int Interval
+        {
+            get { return (int)GetValue(IntervalProperty); }
+            set { SetValue(IntervalProperty, value); }
+        }
+        public readonly static DependencyProperty IntervalProperty = DependencyProperty.Register(
+            "Interval", typeof(int), typeof(IntegerUpDown), new UIPropertyMetadata(33));
+
+        public int Delay
+        {
+            get { return (int)GetValue(DelayProperty); }
+            set { SetValue(DelayProperty, value); }
+        }
+        public readonly static DependencyProperty DelayProperty = DependencyProperty.Register(
+            "Delay", typeof(int), typeof(IntegerUpDown), new UIPropertyMetadata(500));
+
+
         public string Text
         {
             get { return (string)GetValue(TextProperty); }

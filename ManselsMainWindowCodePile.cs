@@ -16,8 +16,27 @@ using XbeeHandler.XbeeFrames;
 
 namespace SwarmRoboticsGUI
 {
+    public static class ROBOT_CONTROL_MESSAGE
+    {
+        public const byte Stop = 0xD0;
+        public const byte MoveDirection = 0xD1;
+        public const byte RotateClockWise = 0xD2;
+        public const byte RotateCounterClockWise = 0xD3;
+        public const byte MoveRandomly = 0xD4;
+        public const byte ReleaseDock = 0xD6;
+        public const byte Dock = 0xD7;
+        public const byte StopObstacleAvoidance = 0xD8;
+        public const byte StartObstacleAvoidance = 0xD9;
+        public const byte FollowLight = 0xDA;
+        public const byte FollowLine = 0xDB;
+        public const byte RotateToHeading = 0xDC;
+        public const byte MoveToPosition = 0xDD;
+        public const byte MoveAtHeading = 0xDE;
+    }
+
     public partial class MainWindow : Window
     {
+
         #region Tower Control
         public List<ToggleButton> dockLightControls;
         public void TowerControlSetup()
@@ -343,23 +362,23 @@ namespace SwarmRoboticsGUI
             public static byte[] WEST = { 0x01, 0x0E };
             public static byte[] NORTHWEST = { 0x01, 0x2D };
         }
-        private static class ROBOT_CONTROL_MESSAGE
-        {
-            public const byte Stop = 0xD0;
-            public const byte MoveDirection = 0xD1;
-            public const byte RotateClockWise = 0xD2;
-            public const byte RotateCounterClockWise = 0xD3;
-            public const byte MoveRandomly = 0xD4;
-            public const byte ReleaseDock = 0xD6;
-            public const byte Dock = 0xD7;
-            public const byte StopObstacleAvoidance = 0xD8;
-            public const byte StartObstacleAvoidance = 0xD9;
-            public const byte FollowLight = 0xDA;
-            public const byte FollowLine = 0xDB;
-            public const byte RotateToHeading = 0xDC;
-            public const byte MoveToPosition = 0xDD;
-            public const byte MoveAtHeading = 0xDE;
-        }
+        //private static class ROBOT_CONTROL_MESSAGE
+        //{
+        //    public const byte Stop = 0xD0;
+        //    public const byte MoveDirection = 0xD1;
+        //    public const byte RotateClockWise = 0xD2;
+        //    public const byte RotateCounterClockWise = 0xD3;
+        //    public const byte MoveRandomly = 0xD4;
+        //    public const byte ReleaseDock = 0xD6;
+        //    public const byte Dock = 0xD7;
+        //    public const byte StopObstacleAvoidance = 0xD8;
+        //    public const byte StartObstacleAvoidance = 0xD9;
+        //    public const byte FollowLight = 0xDA;
+        //    public const byte FollowLine = 0xDB;
+        //    public const byte RotateToHeading = 0xDC;
+        //    public const byte MoveToPosition = 0xDD;
+        //    public const byte MoveAtHeading = 0xDE;
+        //}
         private void ManualModeDirectionMouseEnter(object sender, MouseEventArgs e)
         {
             Button control = sender as Button;
@@ -426,6 +445,26 @@ namespace SwarmRoboticsGUI
             data[1] = (byte)Convert.ToInt16(tbManualModeSpeed.Text);
             xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
         }
+
+        private void tbManualModeSpeed_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            int num;
+
+            if (int.TryParse(((TextBox)sender).Text, out num))
+            {
+                if (num >= 0)
+                {
+                    if (num > 100)
+                    {
+                        num = 100;
+                    }
+                    ((TextBox)sender).Text = num.ToString();
+                }
+            }
+        }
+
+
+        /*
         private void tbManualModeSpeed_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             int num;
@@ -443,6 +482,7 @@ namespace SwarmRoboticsGUI
                 e.Handled = true;
             }
         }
+         * */
         private void robotTaskObstacleAvoidance_Click(object sender, RoutedEventArgs e)
         {
             CheckBox checkboxsender = sender as CheckBox;
@@ -511,9 +551,25 @@ namespace SwarmRoboticsGUI
         private void robotTaskRotateToHeading_Click(object sender, RoutedEventArgs e)
         {
             byte[] data;
-            data = new byte[2];
+            data = new byte[3];
             data[0] = ROBOT_CONTROL_MESSAGE.RotateToHeading;
-            //data[1] = 
+            data[1] = (byte)(UDrobotTaskRotateToHeading.Value >> 8);
+            data[2] = (byte)(UDrobotTaskRotateToHeading.Value);
+
+            xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
+        }
+
+        private void robotTaskMoveToPosition_Click(object sender, RoutedEventArgs e)
+        {
+            byte[] data;
+            data = new byte[5];
+            data[0] = ROBOT_CONTROL_MESSAGE.MoveToPosition;
+            data[1] = (byte)(UBrobotTaskMoveToPositionX.Value >> 8);
+            data[2] = (byte)(UBrobotTaskMoveToPositionX.Value);
+            data[3] = (byte)(UBrobotTaskMoveToPositionY.Value >> 8);
+            data[4] = (byte)(UBrobotTaskMoveToPositionY.Value);
+
+            xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
         }
 
         //private void tbRotateToHeading_PreviewTextInput(object sender, TextCompositionEventArgs e)

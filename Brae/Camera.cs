@@ -171,7 +171,7 @@ namespace SwarmRoboticsGUI
         }
         public void SetWhiteBalance(int value)
         {
-            if (videoCapture != null)
+            if (videoCapture != null && Status == StatusType.PLAYING)
             {
                 videoCapture.SetCaptureProperty(CapProp.WhiteBalanceBlueU, value);
                 var check = videoCapture.GetCaptureProperty(CapProp.WhiteBalanceBlueU);

@@ -81,7 +81,7 @@
                           ItemsSource="{Binding Items, RelativeSource={RelativeSource AncestorType=UserControl}}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <Canvas Background="Transparent" Width="1177" Height="1177"/>
+                            <Canvas Background="Transparent" Width="1177" Height="1177" MouseUp="Canvas_MouseUp"  MouseDown="Canvas_MouseDown" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemContainerStyle>
@@ -109,7 +109,9 @@
                                 <Polygon Name="Hexagon" Style="{StaticResource Hexagon}"
                                      Height="{Binding Path=(local:IObstacle.Width)}" Width="{Binding Path=(local:IObstacle.Height)}"
                                      MouseLeftButtonDown="Robot_MouseLeftButtonDown"
-                                     RenderTransformOrigin="0.5,0.5">
+                                         
+                                     RenderTransformOrigin="0.5,0.5" MouseDown="Hexagon_MouseDown">
+                                    
                                     <Polygon.LayoutTransform>
                                         <TransformGroup>
                                             <RotateTransform Angle="{Binding FacingDeg}"/>

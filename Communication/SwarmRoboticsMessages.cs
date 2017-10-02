@@ -27,10 +27,10 @@
 using System;
 using System.ComponentModel;
 using XbeeHandler.XbeeFrames;
+using SwarmRoboticsGUI;
 
 namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationProtocolMessages
 {
-
 
 	public class SwarmProtocolMessage : ZigbeeReceivePacket
 	{
@@ -42,7 +42,10 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 			messageID = receivedData[0];
 			messageData = new byte[receivedData.Length - 1];
 			Array.Copy(receivedData, 1, messageData, 0, receivedData.Length - 1);
+
+            dispMessageType = "Swarm Message";
 		}
+        
 		//MANSEL: remove here and add to classes
 		/*
 		public override string MessageTypeDisplay
@@ -59,11 +62,17 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
     {
         public UInt16 batteryVoltage;
         public byte task;
+        public string disptask;
 
         public RobotStatus(byte[] frame) : base(frame)
         {
             task = messageData[0];
             batteryVoltage = (UInt16) (256 * messageData[1] + messageData[2]);
+
+            disptask = EnumUtils<TaskType>.GetDescription((TaskType)(task));
+
+            dispMessageType = "Robot Status";
+            dispMessageData = "Task :" + disptask + ", Battery Voltage: " + batteryVoltage.ToString() + "mV";            
         }
     }
 
@@ -75,6 +84,10 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
         {
             msg = System.Text.Encoding.ASCII.GetString(messageData);
             dispMessageData = msg;
+
+            dispMessageType = "Debug String";
+            dispMessageData = msg;  
+
         }
     }
 
@@ -88,6 +101,7 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 			testMode = messageData[0];
 			testMessage = new byte[messageData.Length - 1];
 			Array.Copy(messageData, 1, testMessage, 0, messageData.Length - 1);
+
 		}
 	}
 
@@ -98,6 +112,9 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		public CommunicationTest(byte[] frame) : base(frame)
 		{
 			communicationTestResult = testMessage[0];
+
+            dispMessageType = "Communication Test";
+            dispMessageData = "Successful";
 		}
 	}
 
