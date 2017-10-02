@@ -362,7 +362,7 @@
                                            FontWeight="Bold" 
                                            HorizontalAlignment="Center"/>
                                     <Grid Background="{StaticResource WindowForegroundBrush}">
-                                        <CheckBox x:Name="robotTaskObstacleAvoidance"
+                                        <Button x:Name="robotTaskObstacleAvoidance"
                                               Content="Obstacle Avoidance"
                                               Height="25"
                                               HorizontalAlignment="Center"  

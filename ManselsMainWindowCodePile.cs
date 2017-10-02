@@ -485,19 +485,13 @@ namespace SwarmRoboticsGUI
          * */
         private void robotTaskObstacleAvoidance_Click(object sender, RoutedEventArgs e)
         {
-            CheckBox checkboxsender = sender as CheckBox;
+            Button checkboxsender = sender as Button;
 
             byte[] data;
             data = new byte[1];
 
-            if (checkboxsender.IsChecked == true)
-            {
-                data[0] = ROBOT_CONTROL_MESSAGE.StartObstacleAvoidance;
-            }
-            else
-            {
-                data[0] = ROBOT_CONTROL_MESSAGE.StopObstacleAvoidance;
-            }
+            data[0] = ROBOT_CONTROL_MESSAGE.StartObstacleAvoidance;
+
             xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
         }
         private void robotTaskStopMoving_Click(object sender, RoutedEventArgs e)
