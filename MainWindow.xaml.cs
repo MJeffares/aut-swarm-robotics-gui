@@ -490,8 +490,7 @@ namespace SwarmRoboticsGUI
                     MenuItem[] allitems = menuCameraList.Items.OfType<MenuItem>().ToArray();
 
                     foreach (var item in allitems) item.IsChecked = false;
-                    // Display feedback to user
-                    menusender.IsChecked = true;
+                    
                     statusCameraName.Text = menusender.Header.ToString();
                     // Capture can be started
                     menuCameraConnect.IsEnabled = true;
@@ -509,6 +508,9 @@ namespace SwarmRoboticsGUI
 
                     // Populate resolution options
                     PopulateCameraCapabilities();
+
+                    // Display feedback to user
+                    menusender.IsChecked = true;
                 }
             }
         }
