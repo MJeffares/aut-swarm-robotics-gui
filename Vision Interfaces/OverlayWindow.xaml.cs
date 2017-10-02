@@ -240,7 +240,8 @@ namespace SwarmRoboticsGUI
         private void Display1_TargetChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             var pos = ((System.Windows.Point)e.NewValue);
-            if (pos != null && Display1.SelectedItem != null)
+
+            if (pos != null && display1.SelectedItem != null)
             {
                 byte[] data;
                 data = new byte[5];
@@ -250,7 +251,7 @@ namespace SwarmRoboticsGUI
                 data[3] = (byte)((int)pos.Y >> 8);
                 data[4] = (byte)((int)pos.Y);
 
-                Xbee.SendTransmitRequest(((ICommunicates)Display1.SelectedItem).Address64, data);
+                Xbee.SendTransmitRequest(((ICommunicates)display1.SelectedItem).Address64, data);
             }
         }
     }
