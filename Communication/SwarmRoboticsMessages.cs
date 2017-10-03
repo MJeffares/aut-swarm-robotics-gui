@@ -102,6 +102,9 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 			testMessage = new byte[messageData.Length - 1];
 			Array.Copy(messageData, 1, testMessage, 0, messageData.Length - 1);
 
+
+			dispMessageType = "System Test Message";
+			dispMessageData = "No Data";
 		}
 	}
 
@@ -133,23 +136,18 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 
 		public byte sensor;
 		public byte[] sensorData = new byte[2];
+		public UInt16 sensorValue;
 
 		public ProximitySensorTestData(byte[] frame) : base(frame)
 		{
 			sensor = testMessage[0];
 			sensorData[0] = testMessage[1];
 			sensorData[1] = testMessage[2];
-		}
 
-		public override string MessageDataDisplay
-		{
-			get
-			{
-				//MANSEL: Improve the message data display method
-				return (256 * sensorData[0] + sensorData[1]).ToString();
-			}
+			sensorValue = (UInt16)(256 * sensorData[0] + sensorData[1]);
+			dispMessageType = "Proximity Sensor Data";
+			dispMessageData = "Sensor: " + MJLib.HexToString(testMessage, 0, 1, true) + " Value: " + sensorValue.ToString();
 		}
-
 	}
 
 	public class LightSensorTestData : SystemTestMessage
@@ -162,8 +160,7 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 
 		public byte sensor;
 		public byte[] sensorData = new byte[2];
-
-		//public override string MessageDataDisplay;
+		public UInt16 sensorValue;
 
 		public LightSensorTestData(byte[] frame) : base(frame)
 		{
@@ -171,19 +168,10 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 			sensorData[0] = testMessage[1];
 			sensorData[1] = testMessage[2];
 
-			//MessageDataDisplay = (256 * sensorData[0] + sensorData[1]).ToString();
+			sensorValue = (UInt16)(256 * sensorData[0] + sensorData[1]);
+			dispMessageType = "Light Sensor Data";
+			dispMessageData = "Sensor: " + MJLib.HexToString(testMessage, 0, 1, true) + " Value: " + sensorValue.ToString();
 		}
-
-
-		public override string MessageDataDisplay
-		{
-			get
-			{
-                //MANSEL: Improve the message data display method
-                return (256 * sensorData[0] + sensorData[1]).ToString();
-			}
-		}
-
 	}
 
 	public class LineSensorTestData : SystemTestMessage
@@ -199,8 +187,7 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 
 		public byte sensor;
 		public byte[] sensorData = new byte[2];
-
-		//public override string MessageDataDisplay;
+		public UInt16 sensorValue;
 
 		public LineSensorTestData(byte[] frame) : base(frame)
 		{
@@ -208,18 +195,10 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 			sensorData[0] = testMessage[1];
 			sensorData[1] = testMessage[2];
 
-			//MessageDataDisplay = (256 * sensorData[0] + sensorData[1]).ToString();
+			sensorValue = (UInt16)(256 * sensorData[0] + sensorData[1]);
+			dispMessageType = "Line Sensor Data";
+			dispMessageData = "Sensor: " + MJLib.HexToString(testMessage, 0, 1, true) + " Value: " + sensorValue.ToString();
 		}
-
-		public override string MessageDataDisplay
-		{
-			get
-			{
-                //MANSEL: Improve the message data display method
-                return (256 * sensorData[0] + sensorData[1]).ToString();
-			}
-		}
-
 	}
 
 	public class MouseSensorTestData : SystemTestMessage
@@ -229,7 +208,6 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 
 		public string dXDisplay;
 		public string dYDisplay;
-		//public override string MessageDataDisplay;
 
 		public MouseSensorTestData(byte[] frame) : base(frame)
 		{
@@ -238,19 +216,10 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 
 			dXDisplay = dX.ToString();
 			dYDisplay = dY.ToString();
-			//MessageDataDisplay = "dX: " + dXDisplay + " dY: " + dYDisplay;
+
+			dispMessageType = "Mouse Sensor Data";
+			dispMessageData = "X: " + dXDisplay + " Y: " + dYDisplay;
 		}
-
-
-		public override string MessageDataDisplay
-		{
-			get
-			{
-                //MANSEL: Improve the message data display method
-                return "dX: " + dXDisplay + " dY: " + dYDisplay;
-			}
-		}
-
 	}
 
 	public class IMUSensorTestData : SystemTestMessage
@@ -266,8 +235,6 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		public string pitchDisplay;
 		public string rollDisplay;
 		public string yawDisplay;
-
-		//public override string MessageDataDisplay;
 
 		public IMUSensorTestData(byte[] frame) : base(frame)
 		{
@@ -293,18 +260,9 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 			rollDisplay = roll.ToString();
 			yawDisplay = yaw.ToString();
 
-			//MessageDataDisplay = "W: " + wDisplay + " X: " + xDisplay + " Y: " + yDisplay + " Z: " + zDisplay;
+			dispMessageType = "IMU Data";
+			dispMessageData = "Pitch: " + pitchDisplay + " Roll: " + rollDisplay + " Yaw: " + yawDisplay;
 		}
-
-		public override string MessageDataDisplay
-		{
-			get
-			{
-                //MANSEL: Improve the message data display method
-                return "Pitch: " + pitchDisplay + " Roll: " + rollDisplay + " Yaw: " + yawDisplay;
-			}
-		}
-
 	}
 
 	public class MotorTestData : SystemTestMessage
@@ -312,6 +270,7 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		public byte motor;
 		public int motorSpeed;
 		public bool motorDir;
+		public string motorDirection;
 
 		public MotorTestData(byte[] frame) : base(frame)
 		{
@@ -320,15 +279,18 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 			if (testMessage[1] > 0x80)
 			{
 				motorDir = true;
+				motorDirection = " Forwards";
 				motorSpeed = testMessage[1] - 0x80;
 			}
 			else
 			{
 				motorDir = false;
+				motorDirection = " Backwards";
 				motorSpeed = testMessage[1];
 			}
 
-			//MANSEL: test motor conversion
+			dispMessageType = "Motor Test Data";
+			dispMessageData = "Motor: " + motor.ToString() + " Speed:" + motorSpeed.ToString() + motorDirection;
 		}
 	}
 
@@ -339,15 +301,9 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		public TWIMuxTestData(byte[] frame) : base(frame)
 		{
 			address = testMessage[0];
-		}
 
-		public override string MessageDataDisplay
-		{
-			get
-			{
-                //MANSEL: Improve the message data display method
-                return address.ToString();
-			}
+			dispMessageType = "TWI Test";
+			dispMessageData = "Address: " + address.ToString();
 		}
 	}
 
@@ -365,23 +321,17 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 
 
         public byte sensor;
-        //public byte[] sensorData = new byte[2];
         public byte sensorData;
 
         public TowerDockingLightSensorData(byte[] frame) : base(frame)
         {
             sensor = testMessage[0];
             sensorData = testMessage[1];
-        }
 
-        public override string MessageDataDisplay
-        {
-            get
-            {
-                //MANSEL: Improve the message data display method
-                return sensorData.ToString();
-            }
-        }
+			dispMessageType = "Charging Station Light Sensors";
+			dispMessageData = "Sensor: " + sensor.ToString() + " Value: " + sensorData.ToString();
+		}
+
     }
 
 	public class TowerRobotReport : SwarmProtocolMessage

@@ -289,8 +289,13 @@ namespace XbeeHandler.XbeeFrames
 
             //dispSource = XbeeAPI.DESTINATION.ToString(sourceAddress64) + " (" + sourceAddress64.ToString() + ")";
             dispSource = XbeeAPI.DESTINATION.ToString(sourceAddress64);
-            
+
+			dispMessageType = "Xbee Received Message";
+			dispMessageData = MJLib.HexToString(receivedData, 0, receivedData.Length, true);
 		}
+
+
+
 	}
 
 
