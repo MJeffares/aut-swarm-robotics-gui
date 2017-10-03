@@ -57,12 +57,12 @@ namespace SwarmRoboticsGUI
             PositioningTimer.Start();
 
            // RegisteredRobots = mainWindow.RobotList.Where(R => R is RobotItem && (R as RobotItem).IsTracked).Cast<RobotItem>().ToList<RobotItem>();
-            RobotList = mainWindow.ItemList.Where(R => R is RobotItem).Cast<RobotItem>().ToList<RobotItem>();
-            RegisteredRobots = RobotList.Where(R => (R as IObstacle).IsTracked).ToList<RobotItem>();
+            //RobotList = mainWindow.ItemList.Where(R => R is RobotItem).Cast<RobotItem>().ToList<RobotItem>();
+            //RegisteredRobots = RobotList.Where(R => (R as IObstacle).IsTracked).ToList<RobotItem>();
 
             dock = (ChargingDockItem)mainWindow.ItemList.First(D => D is ChargingDockItem);
             //MANSEL: Test this line
-            //RegisteredRobots = mainWindow.ItemList.Where(R => (R is RobotItem) && ((R as IObstacle).IsTracked)).Cast<RobotItem>().ToList<RobotItem>();
+            RegisteredRobots = mainWindow.ItemList.Where(R => (R is RobotItem) && ((R as IObstacle).IsTracked)).Cast<RobotItem>().ToList<RobotItem>();
         }
 
 
@@ -102,34 +102,34 @@ namespace SwarmRoboticsGUI
 
 
                 datatorobot = new byte[20];
-                data[0] = ProtocolClass.MESSAGE_TYPES.CHARGING_STATION_ROBOT_STATUS_REPORT;
-                data[1] = 0x00; //read
+				datatorobot[0] = ProtocolClass.MESSAGE_TYPES.CHARGING_STATION_ROBOT_STATUS_REPORT;
+				datatorobot[1] = 0x00; //read
 
                 UInt64 destination = ((ICommunicates)R).Address64;
 
-                data[2] = BitConverter.GetBytes(destination)[7];
-                data[3] = BitConverter.GetBytes(destination)[6];
-                data[4] = BitConverter.GetBytes(destination)[5];
-                data[5] = BitConverter.GetBytes(destination)[4];
-                data[6] = BitConverter.GetBytes(destination)[3];
-                data[7] = BitConverter.GetBytes(destination)[2];
-                data[8] = BitConverter.GetBytes(destination)[1];
-                data[9] = BitConverter.GetBytes(destination)[0];
+				datatorobot[2] = BitConverter.GetBytes(destination)[7];
+				datatorobot[3] = BitConverter.GetBytes(destination)[6];
+				datatorobot[4] = BitConverter.GetBytes(destination)[5];
+				datatorobot[5] = BitConverter.GetBytes(destination)[4];
+				datatorobot[6] = BitConverter.GetBytes(destination)[3];
+				datatorobot[7] = BitConverter.GetBytes(destination)[2];
+				datatorobot[8] = BitConverter.GetBytes(destination)[1];
+				datatorobot[9] = BitConverter.GetBytes(destination)[0];
 
-                data[10] =  (byte)EnumUtils<TaskType>.FromDescription(R.Task);
+				datatorobot[10] =  (byte)EnumUtils<TaskType>.FromDescription(R.Task);
 
-                data[11] = (byte)(R.Battery >> 0x8);
-                data[12] = (byte)(R.Battery);
+				datatorobot[11] = (byte)(R.Battery >> 0x8);
+				datatorobot[12] = (byte)(R.Battery);
 
-                data[13] = (byte)(positionX >> 0x8);
-                data[14] = (byte)(positionX);
-                data[15] = (byte)(positionY >> 0x8);
-                data[16] = (byte)(positionY);
-                data[17] = (byte)(facing >> 0x8);
-                data[18] = (byte)(facing);
+				datatorobot[13] = (byte)(positionX >> 0x8);
+				datatorobot[14] = (byte)(positionX);
+				datatorobot[15] = (byte)(positionY >> 0x8);
+				datatorobot[16] = (byte)(positionY);
+				datatorobot[17] = (byte)(facing >> 0x8);
+				datatorobot[18] = (byte)(facing);
 
 
-                xbee.SendTransmitRequest(((ICommunicates)dock).Address64, data);
+                xbee.SendTransmitRequest(((ICommunicates)dock).Address64, datatorobot);
             }            
         }
     }
