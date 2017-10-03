@@ -629,7 +629,7 @@ namespace SwarmRoboticsGUI
 				//MANSEL: Common issue with new receive
 
 				default:
-					MessageBox.Show("Error with unhandled type in communicationmanger.cs ParseSwarmProtocolMessage")
+                    MessageBox.Show("Error with unhandled type in communicationmanger.cs ParseSwarmProtocolMessage");
 					break;
 			}
 			return swarmMessage;

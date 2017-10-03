@@ -158,35 +158,33 @@ namespace SwarmRoboticsGUI
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
 
-                
-
                 foreach (var Child in Children)
                 {
                     if (Child.Name == PropertyName)
                     {
-                        var ThisProperty = typeof(IObstacle).GetProperty(PropertyName);
-                        if (ThisProperty != null)
+                        var ChangedProperty = typeof(IObstacle).GetProperty(PropertyName);
+                        if (ChangedProperty != null)
                         {
-                            var Value = ThisProperty.GetValue(this, null);
-                            var type = Value.GetType();
+                            var ChangedValue = ChangedProperty.GetValue(this, null);
+                            var type = ChangedValue.GetType();
                             if (type == typeof(System.Windows.Point))
                             {
-                                var point = (System.Windows.Point)Value;
-                                Child.Text = string.Format("{0,-10:N0} {1,10:N0}", point.X, point.Y);
+                                var ChangedPoint = (System.Windows.Point)ChangedValue;
+                                Child.Text = string.Format("{0,-10:N0} {1,10:N0}", ChangedPoint.X, ChangedPoint.Y);
                             }
                             else
-                                Child.Text = string.Format("{0,-10:N0}", Value);
+                                Child.Text = string.Format("{0,-10:N0}", ChangedValue);
                         }
                         else
                         {
-                            ThisProperty = GetType().GetProperty(PropertyName);
-                            var Value = ThisProperty.GetValue(this, null);
+                            ChangedProperty = GetType().GetProperty(PropertyName);
+                            var ChangedValue = ChangedProperty.GetValue(this, null);
                             if (PropertyName == "Battery")
-                                Child.Text = string.Format("{0,-3:N0} mV", Value);
+                                Child.Text = string.Format("{0,-3:N0} mV", ChangedValue);
                             else if (PropertyName == "FacingDeg")
-                                Child.Text = string.Format("{0,-4:N1} °", Value);
+                                Child.Text = string.Format("{0,-4:N1} °", ChangedValue);
                             else
-                                Child.Text = string.Format("{0,-10:N0}", Value);
+                                Child.Text = string.Format("{0,-10:N0}", ChangedValue);
                         }
                     }
                 }
