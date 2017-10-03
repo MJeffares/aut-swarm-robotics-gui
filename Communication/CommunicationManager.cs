@@ -186,18 +186,13 @@ namespace SwarmRoboticsGUI
 
                 var T = Task<XbeeAPIFrame>.Factory.StartNew(() => ReadFrame(frame));
 
-				if (T.IsFaulted)
-				{
 
-				}
-				else
+				var message = T.Result;
+				if (message != null)
 				{
-					var message = T.Result;
-					if (message != null)
-					{
-						Application.Current.Dispatcher.Invoke(() => rxXbeeMessageBuffer.Add(message));
-					}
+					Application.Current.Dispatcher.Invoke(() => rxXbeeMessageBuffer.Add(message));
 				}
+
             }
 		}
 
