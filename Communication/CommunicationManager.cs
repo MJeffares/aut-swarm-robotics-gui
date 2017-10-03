@@ -617,14 +617,19 @@ namespace SwarmRoboticsGUI
                     swarmMessage = new TWIMuxTestData(swarmMessage.RawMessage);
                     break;
 
-                    //MANSEL: Common issue with new receive
 
                 case MESSAGE_TYPES.CHARGING_STATION_LIGHT_SENSORS:
                     swarmMessage = new TowerDockingLightSensorData(swarmMessage.RawMessage);
                     break;
 
-				default:
+				case MESSAGE_TYPES.CHARGING_STATION_ROBOT_STATUS_REPORT:
+					swarmMessage = new TowerRobotReport(swarmMessage.RawMessage);
+					break;
 
+				//MANSEL: Common issue with new receive
+
+				default:
+					MessageBox.Show("Error with unhandled type in communicationmanger.cs ParseSwarmProtocolMessage")
 					break;
 			}
 			return swarmMessage;
