@@ -81,7 +81,7 @@
                           ItemsSource="{Binding Items, RelativeSource={RelativeSource AncestorType=UserControl}}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <Canvas Background="Transparent" Width="1177" Height="1177"/>
+                            <Canvas Background="Transparent" Width="1177" Height="1177" MouseDown="Canvas_MouseDown" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemContainerStyle>
@@ -109,7 +109,9 @@
                                 <Polygon Name="Hexagon" Style="{StaticResource Hexagon}"
                                      Height="{Binding Path=(local:IObstacle.Width)}" Width="{Binding Path=(local:IObstacle.Height)}"
                                      MouseLeftButtonDown="Robot_MouseLeftButtonDown"
+                                         
                                      RenderTransformOrigin="0.5,0.5">
+                                    
                                     <Polygon.LayoutTransform>
                                         <TransformGroup>
                                             <RotateTransform Angle="{Binding FacingDeg}"/>
@@ -137,13 +139,13 @@
                                         <RowDefinition/>
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <TextBlock Text="{Binding Name}" 
+                                    <!--<TextBlock Text="{Binding Name}" 
                                                VerticalAlignment="Center" HorizontalAlignment="Left"
                                                Padding="5,0,0,0"
                                                Foreground="#000" FontSize="20"
                                                IsHitTestVisible="False">
-                                    </TextBlock>
-                                    <TextBlock Grid.Row="1" Text="{Binding FacingDeg, StringFormat=N0}" 
+                                    </TextBlock>-->
+                                    <!--<TextBlock Grid.Row="1" Text="{Binding FacingDeg, StringFormat=N0}" 
                                        Foreground="#000" FontSize="20"
                                        IsHitTestVisible="False">
                                     </TextBlock>
@@ -154,7 +156,7 @@
                                     <TextBlock Grid.Row="3" Text="{Binding Path=(local:IObstacle.Location).Y, StringFormat=N0}" 
                                        Foreground="#000" FontSize="20"
                                        IsHitTestVisible="False">
-                                    </TextBlock>
+                                    </TextBlock>-->
                                 </Grid>
 
                                 <!--<Grid Grid.Row="1">

@@ -27,10 +27,10 @@
 using System;
 using System.ComponentModel;
 using XbeeHandler.XbeeFrames;
+using SwarmRoboticsGUI;
 
 namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationProtocolMessages
 {
-
 
 	public class SwarmProtocolMessage : ZigbeeReceivePacket
 	{
@@ -42,7 +42,10 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 			messageID = receivedData[0];
 			messageData = new byte[receivedData.Length - 1];
 			Array.Copy(receivedData, 1, messageData, 0, receivedData.Length - 1);
+
+            dispMessageType = "Swarm Message";
 		}
+        
 		//MANSEL: remove here and add to classes
 		/*
 		public override string MessageTypeDisplay
@@ -57,15 +60,34 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 
     public class RobotStatus : SwarmProtocolMessage
     {
-
-        
         public UInt16 batteryVoltage;
         public byte task;
+        public string disptask;
 
         public RobotStatus(byte[] frame) : base(frame)
         {
             task = messageData[0];
             batteryVoltage = (UInt16) (256 * messageData[1] + messageData[2]);
+
+            disptask = EnumUtils<TaskType>.GetDescription((TaskType)(task));
+
+            dispMessageType = "Robot Status";
+            dispMessageData = "Task :" + disptask + ", Battery Voltage: " + batteryVoltage.ToString() + "mV";            
+        }
+    }
+
+    public class DebugString : SwarmProtocolMessage
+    {
+        public string msg;
+
+        public DebugString(byte[] frame) : base(frame)
+        {
+            msg = System.Text.Encoding.ASCII.GetString(messageData);
+            dispMessageData = msg;
+
+            dispMessageType = "Debug String";
+            dispMessageData = msg;  
+
         }
     }
 
@@ -79,6 +101,7 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 			testMode = messageData[0];
 			testMessage = new byte[messageData.Length - 1];
 			Array.Copy(messageData, 1, testMessage, 0, messageData.Length - 1);
+
 		}
 	}
 
@@ -89,6 +112,9 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		public CommunicationTest(byte[] frame) : base(frame)
 		{
 			communicationTestResult = testMessage[0];
+
+            dispMessageType = "Communication Test";
+            dispMessageData = "Successful";
 		}
 	}
 
@@ -119,7 +145,7 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		{
 			get
 			{
-				//MANSEL: Improve this
+				//MANSEL: Improve the message data display method
 				return (256 * sensorData[0] + sensorData[1]).ToString();
 			}
 		}
@@ -153,8 +179,8 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		{
 			get
 			{
-				//MANSEL: Improve this
-				return (256 * sensorData[0] + sensorData[1]).ToString();
+                //MANSEL: Improve the message data display method
+                return (256 * sensorData[0] + sensorData[1]).ToString();
 			}
 		}
 
@@ -189,8 +215,8 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		{
 			get
 			{
-				//MANSEL: Improve this
-				return (256 * sensorData[0] + sensorData[1]).ToString();
+                //MANSEL: Improve the message data display method
+                return (256 * sensorData[0] + sensorData[1]).ToString();
 			}
 		}
 
@@ -220,8 +246,8 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		{
 			get
 			{
-				//MANSEL: Improve this
-				return "dX: " + dXDisplay + " dY: " + dYDisplay;
+                //MANSEL: Improve the message data display method
+                return "dX: " + dXDisplay + " dY: " + dYDisplay;
 			}
 		}
 
@@ -274,8 +300,8 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		{
 			get
 			{
-				//MANSEL: Improve this
-				return "Pitch: " + pitchDisplay + " Roll: " + rollDisplay + " Yaw: " + yawDisplay;
+                //MANSEL: Improve the message data display method
+                return "Pitch: " + pitchDisplay + " Roll: " + rollDisplay + " Yaw: " + yawDisplay;
 			}
 		}
 
@@ -319,8 +345,8 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		{
 			get
 			{
-				//MANSEL: Improve this
-				return address.ToString();
+                //MANSEL: Improve the message data display method
+                return address.ToString();
 			}
 		}
 	}
@@ -353,7 +379,7 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
         {
             get
             {
-                //MANSEL: Improve this
+                //MANSEL: Improve the message data display method
                 return sensorData.ToString();
             }
         }

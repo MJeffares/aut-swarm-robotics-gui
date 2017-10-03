@@ -72,6 +72,14 @@ namespace XbeeHandler.XbeeFrames
         public byte[] FrameData { get; set; }
         public int Checksum { get; set; }
 
+        //Displayed attributes
+        protected string dispTimeStamp;
+        protected string dispSource;
+        protected string dispMessageType;
+        protected string dispMessageData;
+        protected string dispRawMessage;
+        
+
         public XbeeAPIFrame(byte[] frame)
 		{
 			TimeStamp = DateTime.Now;
@@ -82,79 +90,58 @@ namespace XbeeHandler.XbeeFrames
 			FrameData = new byte[frame.Length - 5];
 			Array.Copy(frame, 4, FrameData, 0, frame.Length - 5);
 			Checksum = frame[frame.Length - 1];
-		}
 
-
+            dispTimeStamp = TimeStamp.ToString("HH:mm:ss:fff");
+            dispRawMessage = MJLib.HexToString(RawMessage, 0, RawMessage.Length, true);
+            dispMessageType = "XBEE";
+        }
+        
 		public string TimeStampDisplay
 		{
 			get
 			{
-				return TimeStamp.ToString("HH:mm:ss:fff");
+                return dispRawMessage;
 			}
 		}
+
+        public virtual string SourceDisplay
+        {
+            get
+            {
+                return dispSource;
+            }
+        }
+
+        public virtual string MessageTypeDisplay
+        {
+            get
+            {
+                return dispMessageType;
+            }
+        }
+
+        public virtual string MessageDataDisplay
+        {
+            get
+            {
+                return dispMessageData;
+            }
+        }
 
 		public string RawMessageDisplay
 		{
 			get
 			{
-				return MJLib.HexToString(RawMessage, 0, RawMessage.Length, true);
-			}
-		}
-
-		public string FrameLengthDisplay
-		{
-			get
-			{
-				return MJLib.HexToString(BitConverter.GetBytes(Length), 0, 1, true) + " (" + Length.ToString() + ")";
-			}
-		}
-
-		public virtual string FrameCommandDisplay
-		{
-			get
-			{
-				return "WARNING: unhandled xbee frame received";
-			}
-		}
-
-		public virtual string FrameDataDisplay
-		{
-			get
-			{
-				return MJLib.HexToString(FrameData, 0, Length, true);
-			}
-		}
-
-		public virtual string SourceDisplay
-		{
-			get
-			{
-				return "";
-			}
-		}
-
-		public virtual string MessageTypeDisplay
-		{
-			get
-			{
-				return "";
-			}
-		}
-
-		public virtual string MessageDataDisplay
-		{
-			get
-			{
-				return "";
+                return dispRawMessage;
 			}
 		}
 
 	}
-	/*
+    /*
 
 	class ATCommand : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the ATCommand class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -166,7 +153,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class ATCommandQueue : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the ATCommandQueue class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -178,7 +165,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class ZigbeeTransmitRequest : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the ZigbeeTransmitRequest class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -201,7 +188,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class RemoteCommandRequest : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the RemoteCommandRequest class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -213,7 +200,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class CreateSourceRoute : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the CreateSourceRoute class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -225,7 +212,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class ATCommandResponse : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the ATCommandResponse class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -237,7 +224,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class ModemStatus : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the ModemStatus class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -248,7 +235,7 @@ namespace XbeeHandler.XbeeFrames
 	}
 	*/
 
-	class ZigbeeTransmitStatus : XbeeAPIFrame
+    class ZigbeeTransmitStatus : XbeeAPIFrame
 	{
 		public byte frameID;
 		public UInt16 destinationAddress16;
@@ -263,24 +250,24 @@ namespace XbeeHandler.XbeeFrames
 			transmitRetryCount = FrameData[3];
 			deliveryStatus = FrameData[4];
 			discoveryStatus = FrameData[5];
-		}
 
-		public override string FrameCommandDisplay
-		{
-			get
-			{
-				return "WARNING: unhandled swarm message received";
-			}
-		}
+            dispMessageType = "Xbee Transmit Status";
 
-		public override string FrameDataDisplay
-		{
-			get
-			{
-				return MJLib.HexToString(FrameData, 0, Length, true);
-			}
-		}
+            if(deliveryStatus == 0x00)
+            {
+                dispMessageData = "Success";
+            }
+            else if(deliveryStatus == 0x24)
+            {
+                dispMessageData = "Address Not Found";
+            }
+            else
+            {
+                dispMessageData = "Failure";
+            }
 
+            dispMessageData += " Retries:" + transmitRetryCount.ToString();
+		}
 	}
 
 
@@ -299,22 +286,15 @@ namespace XbeeHandler.XbeeFrames
 			receiveOptions = FrameData[10];
 			receivedData = new byte[FrameData.Length - 11];
 			Array.Copy(FrameData, 11, receivedData, 0, FrameData.Length - 11);
-		}
 
-		public override string SourceDisplay
-		{
-			get
-			{
-				//MANSEL: need to add UInt64 -> byte array
-				//return XbeeHandler.DESTINATION.ToString(sourceAddress64) + " (" + MJLib.HexToString(source64, 0, 8, true) + " , " + MJLib.HexToString(source16, 0, 2, true) + ")";
-
-				return XbeeAPI.DESTINATION.ToString(sourceAddress64) + " (" + sourceAddress64.ToString() + ")";
-			}
+            //dispSource = XbeeAPI.DESTINATION.ToString(sourceAddress64) + " (" + sourceAddress64.ToString() + ")";
+            dispSource = XbeeAPI.DESTINATION.ToString(sourceAddress64);
+            
 		}
 	}
 
 
-	/*
+    /*
 	class ZigbeeExplicitRXIndicator : XbeeAPIFrame
 	{
 		public override string FrameCommandDisplay
@@ -350,7 +330,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class NodeIdentificationIndicator : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the NodeIdentificationIndicator class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -362,7 +342,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class RemoteCommandResponse : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the RemoteCommandResponse class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -374,7 +354,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class ExtendedModemStatus : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the ExtendedModemStatus class
 		public override string FrameCommandDisplay
 		{
 			get
@@ -397,7 +377,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class RouteRecordIndicator : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the RouteRecordIndicator class
 
 		public override string FrameCommandDisplay
 		{
@@ -410,7 +390,7 @@ namespace XbeeHandler.XbeeFrames
 
 	class ManyToOneRouteRequestIndicator : XbeeAPIFrame
 	{
-		//MANSEL: add this class
+		//MANSEL: add the ManyToOneRouteRequestIndicator class
 
 		public override string FrameCommandDisplay
 		{

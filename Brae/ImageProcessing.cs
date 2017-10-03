@@ -271,7 +271,9 @@ namespace SwarmRoboticsGUI
                 // DEBUG: Robot counter
                 RobotCount++;
 
+                // Get the robot reference as a RobotItem
                 RobotItem robot = RobotList[index];
+                // Get the robot reference as an object that implements IObstacle
                 IObstacle obstacle = RobotList[index];
 
                 obstacle.IsTracked = true;
@@ -289,16 +291,15 @@ namespace SwarmRoboticsGUI
                 {
                     // BRAE: Calculate robot width dynamically
                     // Get the robot width using the arena scale factor
-                    //RobotList[index].Width += (int)(GetRobotWidth(Hexagon) * Arena.ScaleFactor);
-                    // Take the average of the new and previous width value
-                    //RobotList[index].Width /= 2;
+                    //var radius = GetRobotRadius(Hexagon);
+                    //RobotList[index].Width = (int)(2 * radius * Arena.ScaleFactor);
                     // Calulate height using sqrt(3)*radius
-                    //RobotList[index].Height = (int)(RobotList[index].Width / 2 * Math.Sqrt(3));
+                    //RobotList[index].Height = (int)(radius * Math.Sqrt(3));
                     obstacle.IsVisible = true;
                     obstacle.LastVisible = DateTime.Now;
                     // Store the robots real-world location
                     obstacle.Location = new System.Windows.Point((COM.X - Arena.Origin.X) * Arena.ScaleFactor,
-                        (COM.Y - Arena.Origin.Y) * Arena.ScaleFactor);
+                                                                 (COM.Y - Arena.Origin.Y) * Arena.ScaleFactor);
                 }
 
                 // Get the robots facing
@@ -322,7 +323,7 @@ namespace SwarmRoboticsGUI
             var Input = (Frame as UMat).Clone();
             var ArenaContour = new VectorOfPoint();
 
-            double factor = 0;
+            //double factor = 0;
             Point Origin = new Point();
             //const double REAL_DISTANCE = 1664.882954;
             //const double REAL_DISTANCE = 297;
@@ -360,45 +361,42 @@ namespace SwarmRoboticsGUI
             // Filter out small and large contours
             FilterContourArea(Contours, ProcessedContours, 1000000, 1500000);
 
-
             // DEBUG: Report images - Arena filtered contours based on area
             //var ContourMat = new Mat(Input.Size, Input.Depth, Input.NumberOfChannels);
             //ContourMat.SetTo(new MCvScalar(0,0,0));
             //CvInvoke.DrawContours(ContourMat, ProcessedContours, -1, new MCvScalar(255, 255, 255), 3);
             //CvInvoke.Imwrite("Arena-FilteredContours.png", ContourMat);
 
-
-            // Loop through the filtered contours in the frame
+            // Loop through the filtered contours in the frame until the arena is found
             for (int i = 0; i < ProcessedContours.Size; i++)
             {
                 VectorOfPoint ProcessedContour = ProcessedContours[i];
                 // Get approximate polygonal shape of contour
                 CvInvoke.ApproxPolyDP(ProcessedContour, ProcessedContour, CvInvoke.ArcLength(ProcessedContour, true) * 0.08, true);
 
-                // If contour is not the right shape (square), check next shape
-                if (!IsShape(ProcessedContour, Shape.SQUARE)) continue;
-
-                factor = GetScaleFactor(Frame, ProcessedContour);
-
-                // DEBUG: Report images - Arena contour approximation
-                //ContourMat.SetTo(new MCvScalar(0,0,0));
-                //CvInvoke.DrawContours(ContourMat, ProcessedContours, i, new MCvScalar(255, 255, 255), 3);
-                //CvInvoke.Imwrite("Arena-ApproxContour.png", ContourMat);
-
-                ArenaContour.Push(ProcessedContour);
-                break;
+                // If contour is the right shape (square), 
+                if (IsShape(ProcessedContour, Shape.SQUARE))
+                {
+                    //factor = GetScaleFactor(Frame, ProcessedContour);    
+                    ArenaContour.Push(ProcessedContour);
+                    break;
+                }                 
             }
+
+            // DEBUG: Report images - Arena contour approximation
+            //ContourMat.SetTo(new MCvScalar(0,0,0));
+            //CvInvoke.DrawContours(ContourMat, ProcessedContours, i, new MCvScalar(255, 255, 255), 3);
+            //CvInvoke.Imwrite("Arena-ApproxContour.png", ContourMat);
+
             // Test square is 210x210mm with area 44100mm^2
             // this area = square area / factor^2
             // for desk2floor setup this should roughly be 140,000 area
-
             // Arena is 1177x1177mm with area 1,385,329mm^2
             // this area = square area / factor^2
-
             //var area = CvInvoke.ContourArea(ArenaContour);
 
-            // If the arena was identified and a distance factor was calculated, find the origin point
-            if (factor != 0)
+            // If the arena was identified
+            if (ArenaContour.Size != 0)
             {
                 // Find the origin by looking for the point that is top-left most in the frame
                 Origin = FindOrigin(Frame, ArenaContour);                
@@ -406,8 +404,8 @@ namespace SwarmRoboticsGUI
                 {
                     // Bounds of arena contour used as reference frame for further pixel locations
                     var Bounds = CvInvoke.BoundingRectangle(ArenaContour);
-                    
-                    Arena.ScaleFactor = factor;
+                    // Get the pixel to real-world scale factor
+                    Arena.ScaleFactor = GetScaleFactor(Frame, ArenaContour); ;
                     // Store origin point relative to bounds
                     Arena.Origin = new Point(Origin.X - Bounds.X, Origin.Y - Bounds.Y);
                     // Store the arena contour
@@ -427,7 +425,6 @@ namespace SwarmRoboticsGUI
         private static void GetCountours(IInputArray Frame, IOutputArray Contours, int BlurSize, RetrType Mode, ChainApproxMethod Approx)
         {
             //bool HasCuda = CudaInvoke.HasCuda;
-            // BRAE: Don't use Cuda here
             bool HasCuda = false;
 
             if (HasCuda)
@@ -460,8 +457,6 @@ namespace SwarmRoboticsGUI
 
                 CvInvoke.CvtColor(Frame, Input, ColorConversion.Bgr2Hsv);
                 CvInvoke.ExtractChannel(Input, Input, 2);
-
-
 
                 // Noise removal
                 if (BlurSize > 0 && BlurSize % 2 != 0)
@@ -503,6 +498,9 @@ namespace SwarmRoboticsGUI
         }
         private static int GetHexagons(IInputArray Contours, IOutputArray Hexagons)
         {
+            // BRAE: Make GetHexagons work with any shape
+            // TODO: Make GetHexagons work with any shape
+
             var Input = Contours as VectorOfVectorOfPoint;
             var Output = Hexagons as VectorOfVectorOfPoint;
             for (int i = 0; i < Input.Size; i++)
@@ -571,56 +569,46 @@ namespace SwarmRoboticsGUI
                 case KnownColor.Orange:
                     HueRange.Start = 4;
                     HueRange.End = 12;
-                    //HueRange.Start = 10;
-                    //HueRange.End = 19;
                     break;
                 case KnownColor.Yellow:
                     HueRange.Start = 17;
                     HueRange.End = 32;
-                    //HueRange.Start = 25;
-                    //HueRange.End = 30;
                     break;
                 case KnownColor.Green:
                     HueRange.Start = 40;
                     HueRange.End = 87;
-                    //HueRange.Start = 31;
-                    //HueRange.End = 80;
                     break;
                 case KnownColor.LightBlue:
                     HueRange.Start = 99;
                     HueRange.End = 105;
-                    //HueRange.Start = 98;
-                    //HueRange.End = 110;
                     break;
                 case KnownColor.DarkBlue:
                     HueRange.Start = 107;
                     HueRange.End = 116;
-                    //HueRange.Start = 110;
-                    //HueRange.End = 160;
                     break;
                 case KnownColor.Red:
                     HueRange.Start = 172;
                     HueRange.End = 179;
-                    //HueRange.Start = 160;
-                    //HueRange.End = 180;
                     break;
                 default:
                     HueRange.Start = 0;
                     HueRange.End = 0;
                     break;
             }
+            // Try using ideal hue values
             //LowerH = TargetColour.GetHue() * 255 / 360 - 2;
             //UpperH = TargetColour.GetHue() * 255 / 360 + 2;
             return HueRange;
         }
         private static bool HasHueRange(IInputArray Frame, Range HueRange)
         {
+            const int ColourFraction = 20;      // 1/20=5% of the image needs to be within HueRange
             int Count = 0;
             //Range SaturationRange = new Range(25, 230);
             //Range ValueRange = new Range(60, 195);
             int Width = Frame.GetInputArray().GetSize().Width;
             int Height = Frame.GetInputArray().GetSize().Height;
-            int ColourCount = Width * Height / 20;
+            int ColourCount = Width * Height / ColourFraction;
 
             var HOut = new Mat();
 
@@ -802,13 +790,15 @@ namespace SwarmRoboticsGUI
         }
         private static double GetScaleFactor(IInputArray Frame, IInputArray Contour)
         {
-            var contour = Contour as VectorOfPoint;
+            // BRAE: Make GetScaleFactor work for any shape
+            // TODO: Make GetScaleFactor work for any shape
 
+            var contour = Contour as VectorOfPoint;
             int originIndex = -1;
             int oppositeIndex = -1;
             double pixelDistance = -1;
-
             double factor = 0;
+
             const double REAL_DISTANCE = 1664.882954;
             //const double REAL_DISTANCE = 840;
             //const double REAL_DISTANCE = 297;
@@ -843,17 +833,17 @@ namespace SwarmRoboticsGUI
 
             return factor;
         }
-        private static int GetRobotWidth(IInputArray Hexagon)
+        private static int GetRobotRadius(IInputArray Hexagon)
         {
             var hexagon = Hexagon as VectorOfPoint;
-
+            // Lines through centre of the robot
             LineSegment2D d1 = new LineSegment2D(hexagon[0], hexagon[3]);
             LineSegment2D d2 = new LineSegment2D(hexagon[1], hexagon[4]);
             LineSegment2D d3 = new LineSegment2D(hexagon[2], hexagon[5]);
+            // Average to get radius of arena
+            double radius = (d1.Length + d2.Length + d3.Length) / 3;
 
-            double width = (d1.Length + d2.Length + d3.Length) / 3;
-
-            return (int)width;
+            return (int)radius;
         }
         #endregion
     }

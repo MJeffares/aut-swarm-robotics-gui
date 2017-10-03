@@ -42,8 +42,6 @@ namespace SwarmRoboticsGUI
         RandomMovement = 11
     };
 
-
-
     public class Item: INotifyPropertyChanged
     {
         #region Properties
@@ -86,7 +84,7 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-        prvate object _Data {get;set;}
+        private object _Data {get;set;}
         public object Data
         {
             get { return _Data; }
@@ -191,7 +189,6 @@ namespace SwarmRoboticsGUI
         }
     }
 
-
     public interface IObstacle
     {
         System.Windows.Point Location { get; set; }
@@ -212,9 +209,6 @@ namespace SwarmRoboticsGUI
         UInt16 Address16 { get; set; }
         bool IsCommunicating { get; set; }
     }
-
-
-
 
     public class RobotItem : Item, INotifyPropertyChanged, IObstacle, ICommunicates
     {
@@ -772,6 +766,20 @@ namespace SwarmRoboticsGUI
             }
         }
 
+        private byte _DockingLights { get; set; }
+        public byte DockingLights
+        {
+            get { return _DockingLights; }
+            set
+            {
+                if (_DockingLights != value)
+                {
+                    _DockingLights = value;
+                    NotifyPropertyChanged("DockingLights");
+                }
+            }
+        }
+
         public ChargingDockItem(String Name, UInt64 MAC_Address, string Colour) : base(Name)
         {
             this.Name = Name;
@@ -791,6 +799,7 @@ namespace SwarmRoboticsGUI
             obstacle.IsVisible = true;
             double X = (600 - obstacle.Width/2);
             double Y = (600 - obstacle.Height/2);
+            DockingLights = 0;
             //double X = (double)1177 / 2;
             //double Y = (double)1177 / 2;
             obstacle.Location = new System.Windows.Point(X, Y);

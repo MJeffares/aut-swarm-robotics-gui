@@ -254,6 +254,15 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
+                        <DataGridTemplateColumn Header="Source Address" Width="SizeToHeader" 
+                                                IsReadOnly="True" SortMemberPath="SourceDisplay">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding SourceDisplay}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        
                         <DataGridTemplateColumn Header="Message Type" Width="SizeToHeader" 
                                                 IsReadOnly="True" SortMemberPath="MessageTypeDisplay">
                             <DataGridTemplateColumn.CellTemplate>
@@ -272,6 +281,7 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
+                        <!--
                         <DataGridTemplateColumn Header="Xbee Frame Length" Width="SizeToHeader" 
                                                 IsReadOnly="True" SortMemberPath="FrameLengthDisplay">
                             <DataGridTemplateColumn.CellTemplate>
@@ -289,16 +299,8 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-
-                        <DataGridTemplateColumn Header="Source Address" Width="SizeToHeader" 
-                                                IsReadOnly="True" SortMemberPath="SourceDisplay">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding SourceDisplay}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-
+                        -->
+                        
                         <DataGridTemplateColumn Header="Raw Data" Width="SizeToHeader" 
                                                 IsReadOnly="True" SortMemberPath="RawMessageDisplay">
                             <DataGridTemplateColumn.CellTemplate>
@@ -360,7 +362,7 @@
                                            FontWeight="Bold" 
                                            HorizontalAlignment="Center"/>
                                     <Grid Background="{StaticResource WindowForegroundBrush}">
-                                        <CheckBox x:Name="robotTaskObstacleAvoidance"
+                                        <Button x:Name="robotTaskObstacleAvoidance"
                                               Content="Obstacle Avoidance"
                                               Height="25"
                                               HorizontalAlignment="Center"  
@@ -412,82 +414,43 @@
                                                 Click="robotTaskRotateToHeading_Click"
                                                 Content="Turn to Facing"/>
                                         <Separator Padding="0" Margin="0"/>
-                                        <local:IntegerUpDown Text="Facing (Degrees)" 
-                                                             Maximum="100" 
-                                                             Minimum="0" 
+                                        <local:IntegerUpDown x:Name="UDrobotTaskRotateToHeading"
+                                                             Text="Facing (Degrees)" 
+                                                             Maximum="180" 
+                                                             Minimum="-180" 
                                                              Height="30"
+                                                             Delay="300"
+                                                             Interval="8"
                                                              HorizontalAlignment="Stretch"/>
-                                        <!--Old RotateToHeading-->
-                                        <!--<StackPanel Orientation="Horizontal" 
-                                                    HorizontalAlignment="Center" 
-                                                    Width="150">
-                                            <Label Content="Facing: " 
-                                                   Background="White"
-                                                   Foreground="{StaticResource FontDarkBrush}"
-                                                   VerticalAlignment="Stretch"/>
-                                            <TextBox x:Name="tbRotateToHeading"  
-                                                     Text="000" 
-                                                     Width="70"
-                                                     BorderThickness="0"
-                                                     VerticalContentAlignment="Center"
-                                                     TextAlignment="Center" 
-                                                     PreviewTextInput="tbRotateToHeading_PreviewTextInput" />
-                                            <StackPanel Orientation="Vertical" 
-                                                        Width="30">
-                                                <Button x:Name="btnRotateToHeadingUp" 
-                                                        Content="˄" 
-                                                        Height="12.5" 
-                                                        HorizontalContentAlignment="Center" 
-                                                        Click="btnRotateToHeadingUp_Click" />
-
-                                                <Button x:Name="btnRotateToHeadingDown" 
-                                                        Content="˅" 
-                                                        Height="12.5" 
-                                                        HorizontalContentAlignment="Center" 
-                                                        Click="btnRotateToHeadingDown_Click" />
-                                            </StackPanel>
-                                        </StackPanel>-->
                                     </StackPanel>
                                     <Separator Padding="0" Margin="0"/>
                                     <StackPanel Orientation="Vertical">
                                         <Button x:Name="robotTaskMoveToPosition"
                                                 Height="25"
                                                 HorizontalAlignment="Stretch" 
+                                                Click="robotTaskMoveToPosition_Click"
                                                 Content="Move to Position"/>
                                         <Separator Padding="0" Margin="0"/>
-                                        <local:IntegerUpDown Text="X (mm)" 
-                                                             Maximum="100" 
+                                        <local:IntegerUpDown x:Name="UBrobotTaskMoveToPositionX"
+                                                             Text="X (mm)" 
+                                                             Maximum="1100" 
                                                              Minimum="0" 
                                                              Height="30"
+                                                             Delay="300"
+                                                             Interval="1"
                                                              HorizontalAlignment="Stretch"/>
                                         <Separator Padding="0" Margin="0"/>
-                                        <local:IntegerUpDown Text="Y (mm)"
-                                                             Maximum="100" 
+                                        <local:IntegerUpDown x:Name="UBrobotTaskMoveToPositionY"
+                                                             Text="Y (mm)"
+                                                             Maximum="1100" 
                                                              Minimum="0" 
                                                              Height="30"
+                                                             Delay="300"
+                                                             Interval="5"
                                                              HorizontalAlignment="Stretch"/>
-                                        <!--Old MoveToPosition-->
-                                        <!--<StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                                <Label Content="X: " Height="20" Padding="0,-5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                                <TextBox x:Name="tbMoveToPositionX"  Width="35" Height="20" Text="0" TextAlignment="Center"/>
-                                                <StackPanel Orientation="Vertical">
-                                                    <Button x:Name="btnMoveToPositionXUp" Content="˄" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
-                                                    <Button x:Name="btnMoveToPositionXDown" Content="˅" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
-                                                </StackPanel>
-                                                <Label Content="mm" Height="20" Padding="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                            </StackPanel>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Label Content="Y: " Height="20" Padding="0,-5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                                <TextBox x:Name="tbMoveToPositionY"  Width="35" Height="20" Text="0" TextAlignment="Center"/>
-                                                <StackPanel Orientation="Vertical">
-                                                    <Button x:Name="btnMoveToPositionYUp" Content="˄" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
-                                                    <Button x:Name="btnMoveToPositionYDown" Content="˅" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
-                                                </StackPanel>
-                                                <Label Content="mm" Height="20" Padding="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                            </StackPanel>
-                                        </StackPanel>-->
                                     </StackPanel>
+                                    
+                                    <!--
                                     <Separator Padding="0" Margin="0"/>
                                     <StackPanel Orientation="Vertical">
                                         <Button x:Name="robotTaskMoveToPositionAtHeading"
@@ -511,37 +474,9 @@
                                                              Maximum="100" 
                                                              Minimum="0" 
                                                              Height="30"
-                                                             HorizontalAlignment="Stretch"/>
-                                        <!--Old MoveToPositionAtHeadingHDGUp-->
-                                        <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5">
-                                            <Label Content="FACE: " Height="20" Padding="0,-5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                            <TextBox x:Name="tbMoveToPositionAtHeadingHDG"  Width="35" Height="20" Text="000" TextAlignment="Center"/>
-                                            <StackPanel Orientation="Vertical">
-                                                <Button x:Name="btnMoveToPositionAtHeadingHDGUp" Content="˄" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
-                                                <Button x:Name="btnHDGDown" Content="˅" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
-                                            </StackPanel>
-                                        </StackPanel>
-                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                                <Label Content="X: " Height="20" Padding="0,-5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                                <TextBox x:Name="tbMoveToPositionAtHeadingX"  Width="35" Height="20" Text="0" TextAlignment="Center"/>
-                                                <StackPanel Orientation="Vertical">
-                                                    <Button x:Name="btnMoveToPositionAtHeadingXUp" Content="˄" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
-                                                    <Button x:Name="btnMoveToPositionAtHeadingXDown" Content="˅" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
-                                                </StackPanel>
-                                                <Label  Content="mm" Height="20" Padding="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                            </StackPanel>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Label Content="Y: " Height="20" Padding="0,-5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                                <TextBox x:Name="tbMoveToPositionAtHeadingY"  Width="35" Height="20" Text="0" TextAlignment="Center"/>
-                                                <StackPanel Orientation="Vertical">
-                                                    <Button x:Name="btnMoveToPositionAtHeadingYUp" Content="˄" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
-                                                    <Button x:Name="btnMoveToPositionAtHeadingYDown" Content="˅" Width="20" Height="10" Padding="0,-5,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
-                                                </StackPanel>
-                                                <Label Content="mm" Height="20" Padding="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                            </StackPanel>
-                                        </StackPanel>-->
+                                                             HorizontalAlignment="Stretch"/>                                        
                                     </StackPanel>
+                                    -->
                                 </StackPanel>
                             </Border>
 
@@ -572,7 +507,7 @@
 
                                     <Button x:Name="btManualModeCW"     Content="CW"     Height="20" Width="40" Canvas.Left="10" Canvas.Top="173" IsEnabled="{Binding IsChecked, ElementName=checkboxManualModeEnable}" MouseEnter="ManualModeRotateMouseEnter" MouseLeave="ManualModeMouseLeave"/>
                                     <Button x:Name="btManualModeCCW"    Content="CCW"    Height="20" Width="40" Canvas.Left="55" Canvas.Top="173" IsEnabled="{Binding IsChecked, ElementName=checkboxManualModeEnable}" MouseEnter="ManualModeRotateMouseEnter" MouseLeave="ManualModeMouseLeave"/>
-                                    <TextBox x:Name="tbManualModeSpeed" Width="35" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" PreviewTextInput="tbManualModeSpeed_PreviewTextInput" Canvas.Left="155" Text="50" Canvas.Top="174"/>
+                                    <TextBox x:Name="tbManualModeSpeed" Width="35" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"  Canvas.Left="155" Text="50" Canvas.Top="174" TextChanged="tbManualModeSpeed_TextChanged"/>
                                     <Label Content="Speed" Canvas.Left="112" Canvas.Top="170"/>
                                 </Canvas>
                             </Border>
@@ -629,15 +564,16 @@
                             <Border BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Padding="2" Width="130" Height="150">
                                 <StackPanel Orientation="Vertical" Margin="0">
                                     <Label FontWeight="Bold" HorizontalAlignment="Center" >Docking Lights</Label>
-                                    <CheckBox Margin="20,0,0,0">Front</CheckBox>
-                                    <CheckBox Margin="20,0,0,0">Front Right</CheckBox>
-                                    <CheckBox Margin="20,0,0,0">Rear Right</CheckBox>
-                                    <CheckBox Margin="20,0,0,0">Rear</CheckBox>
-                                    <CheckBox Margin="20,0,0,0">Rear Left</CheckBox>
-                                    <CheckBox Margin="20,0,0,0">Front Left</CheckBox>
+                                    <CheckBox Margin="20,0,0,0" Tag="0">Front</CheckBox>
+                                    <CheckBox Margin="20,0,0,0" Tag="1">Front Right</CheckBox>
+                                    <CheckBox Margin="20,0,0,0" Tag="2">Rear Right</CheckBox>
+                                    <CheckBox Margin="20,0,0,0" Tag="3">Rear</CheckBox>
+                                    <CheckBox Margin="20,0,0,0" Tag="4">Rear Left</CheckBox>
+                                    <CheckBox Margin="20,0,0,0" Tag="5">Front Left</CheckBox>
                                 </StackPanel>
                             </Border>
 
+                            <!--
                             <Border BorderThickness="2"  HorizontalAlignment="Left" Margin="5" Padding="2" Width="180" Height="150">
                                 <StackPanel Orientation="Vertical" Margin="0">
                                     <Label FontWeight="Bold" HorizontalAlignment="Center" >Docking Pad Power Enable</Label>
@@ -649,6 +585,7 @@
                                     <CheckBox Margin="50,0,0,0">Front Left</CheckBox>
                                 </StackPanel>
                             </Border>
+                            -->
 
 
                         </StackPanel>

@@ -197,8 +197,8 @@ static class MJLib
 	}
 
 
-	//MANSEL: document this
-	public static byte[] StringToByteArrayFastest(string hex)
+    //MANSEL: document StringToByteArrayFastest method
+    public static byte[] StringToByteArrayFastest(string hex)
     {
 		if (hex.Length % 2 == 1)
            throw new Exception("The binary key cannot have an odd number of digits");
@@ -224,8 +224,8 @@ static class MJLib
         //return val - (val < 58 ? 48 : (val < 97 ? 55 : 87));
     }
 
-	//MANSEL: document this
-	public class AutoClosingMessageBox
+    //MANSEL: document AutoClosingMessageBox class
+    public class AutoClosingMessageBox
 	{
 		System.Threading.Timer _timeoutTimer;
 		string _caption;

@@ -46,6 +46,7 @@ namespace SwarmRoboticsGUI
         public List<IObstacle> Obstacles { get; set; }
         public List<Item> ItemList { get; set; }
         public Arena RobotArena { get; set; }
+        public XbeeHandler.XbeeAPI Xbee { get; set; }
 
         private Camera camera1;
 
@@ -66,7 +67,7 @@ namespace SwarmRoboticsGUI
             InitializeTimer();
 
             RobotArena = new Arena();         
-            // TEMP: reference mainWindow camera
+            // TEMP: reference mainWindow camera until setup is moved to overlay
             camera1 = mainWindow.camera1;
             // Create event driven by new frames from the camera
             camera1.Process += new EventHandler(DrawOverlayFrame);
@@ -75,6 +76,8 @@ namespace SwarmRoboticsGUI
             ItemList = mainWindow.ItemList;
             Obstacles = mainWindow.ItemList.Where(R => R is IObstacle).Cast<IObstacle>().ToList();
             RobotList = mainWindow.ItemList.Where(R => R is RobotItem).Cast<RobotItem>().ToList();
+
+            Xbee = mainWindow.xbee;
         }
 
         #region Public Methods
@@ -89,15 +92,14 @@ namespace SwarmRoboticsGUI
         private void Interface_Tick(object sender, ElapsedEventArgs e)
         {
             // Update the display with the interface when using the cutouts
-            switch (Display1.Source)
+            switch (display1.Source)
             {
                 case SourceType.NONE:
                     break;
                 case SourceType.CAMERA:
                     LowerH = Properties.Settings.Default.CV_Filter_HueLower;
                     UpperH = Properties.Settings.Default.CV_Filter_HueUpper;
-                    if (camera1 != null && camera1.Status == StatusType.PLAYING)
-                        camera1.SetWhiteBalance(Properties.Settings.Default.CV_WhiteBalance);
+                    
                     break;
                 case SourceType.CUTOUTS:
                     break;
@@ -112,7 +114,7 @@ namespace SwarmRoboticsGUI
         {
             var Frame = sender as UMat;
 
-            switch (Display1.Source)
+            switch (display1.Source)
             {
                 case SourceType.NONE:
                     break;
@@ -146,6 +148,9 @@ namespace SwarmRoboticsGUI
                         counter++;
                         if (counter > 30)
                         {
+                            if (camera1 != null)
+                                camera1.SetWhiteBalance(Properties.Settings.Default.CV_WhiteBalance);
+
                             ImageProcessing.GetArena(Frame, RobotArena);
 
                             counter = 0;
@@ -216,20 +221,38 @@ namespace SwarmRoboticsGUI
 
         private void OverlaySelect_Click(object sender, RoutedEventArgs e)
         {
-            Display1.Visibility = Visibility.Visible;
+            display1.Visibility = Visibility.Visible;
             CameraDisplay1.Visibility = Visibility.Collapsed;
         }
 
         private void OverlayCameraSelect_Click(object sender, RoutedEventArgs e)
         {
-            Display1.Visibility = Visibility.Visible;
+            display1.Visibility = Visibility.Visible;
             CameraDisplay1.Visibility = Visibility.Visible;
         }
 
         private void CameraSelect_Click(object sender, RoutedEventArgs e)
         {
-            Display1.Visibility = Visibility.Collapsed;
+            display1.Visibility = Visibility.Collapsed;
             CameraDisplay1.Visibility = Visibility.Visible;
+        }
+
+        private void Display1_TargetChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            var pos = ((System.Windows.Point)e.NewValue);
+
+            if (pos != null && display1.SelectedItem != null)
+            {
+                byte[] data;
+                data = new byte[5];
+                data[0] = ROBOT_CONTROL_MESSAGE.MoveToPosition;
+                data[1] = (byte)((int)pos.X >> 8);
+                data[2] = (byte)((int)pos.X);
+                data[3] = (byte)((int)pos.Y >> 8);
+                data[4] = (byte)((int)pos.Y);
+
+                Xbee.SendTransmitRequest(((ICommunicates)display1.SelectedItem).Address64, data);
+            }
         }
     }
 }

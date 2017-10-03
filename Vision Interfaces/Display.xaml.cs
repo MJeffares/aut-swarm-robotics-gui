@@ -66,6 +66,47 @@ namespace SwarmRoboticsGUI
 
         private System.Windows.Threading.DispatcherTimer TimeoutTimer = new System.Windows.Threading.DispatcherTimer();
 
+
+        public Point Target
+        {
+            get { return (Point)GetValue(TargetProperty); }
+            set { SetCurrentValue(TargetProperty, value); }
+        }
+        public readonly static DependencyProperty TargetProperty = DependencyProperty.Register(
+            "Target", typeof(Point), typeof(Display), new UIPropertyMetadata(new Point(), (o, e) =>
+            {
+                Display disp = (Display)o;
+                disp.RaiseTargetChangedEvent(e);
+            }));
+
+        public event EventHandler<DependencyPropertyChangedEventArgs> TargetChanged;
+        private void RaiseTargetChangedEvent(DependencyPropertyChangedEventArgs e)
+        {
+            if (TargetChanged != null)
+                TargetChanged(this, e);
+        }
+
+
+
+        public static readonly DependencyProperty SelectedItemProperty =
+            DependencyProperty.Register("SelectedItem",
+            typeof(IObstacle),
+            typeof(Display),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+        public IObstacle SelectedItem
+        {
+            get { return (IObstacle)GetValue(SelectedItemProperty); }
+            set { SetValue(SelectedItemProperty, value); }
+        }
+
+        public event EventHandler SelectedItemChanged;
+        protected void SelectedItem_Changed(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            //bubble the event up to the parent
+            if (this.SelectedItemChanged != null)
+                this.SelectedItemChanged(this, e);
+        }
+
         public Display()
         {
             InitializeComponent();
@@ -113,8 +154,17 @@ namespace SwarmRoboticsGUI
                     }
                     Robot.IsSelected = true;
                     Robot.IsExpanded = true;
+
+                    SelectedItem = Robot;
                 }
             }
+            
+        }
+
+        private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Target = e.GetPosition(sender as Canvas);
+            
         }
     }
 }

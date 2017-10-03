@@ -226,6 +226,9 @@ namespace SwarmRoboticsGUI
 
 		public static class MESSAGE_TYPES
 		{
+            //Debugging Messages 0x00 -> 0x0F
+            public const byte DEBUG_STRING = 0x00;
+
             //Status Messages 0xA0 -> 0xAF
             public const byte ROBOT_POSITION = 0xA0;
             public const byte ROBOT_STATUS = 0xA1;
@@ -258,9 +261,11 @@ namespace SwarmRoboticsGUI
 			public const byte SYSTEM_TEST_TWI_EXTERNAL = 0xEC;
 			public const byte SYSTEM_TEST_CAMERA = 0xED;
 
-            public const byte TOWER_LIGHT_SENSORS = 0xF0;
-            public const byte TOWER_LEDS = 0xF1;
-            public const byte TOWER_DOCK_ENABLE = 0xF2;
+            public const byte CHARGING_STATION_LIGHT_SENSORS = 0xF0;
+            public const byte CHARGING_STATION_LEDS = 0xF1;
+            public const byte CHARGING_STATION_DOCK_ENABLE = 0xF2;
+            public const byte CHARGING_STATION_ROBOT_STATUS_REPORT = 0xF3;
+            
 		}
 
 		// constructor
@@ -289,7 +294,17 @@ namespace SwarmRoboticsGUI
 				}
 			}
             
-            if(message.messageID >= 0xA0 && message.messageID <= 0xAF)
+
+            if(message.messageID >= 0x00 && message.messageID <= 0x0F)
+            {
+                switch (message.messageID)
+                {
+                    case MESSAGE_TYPES.DEBUG_STRING:
+                        //MANSEL: REMOVE THIS
+                        break;
+                }
+            }
+            else if(message.messageID >= 0xA0 && message.messageID <= 0xAF)
             {
                 switch(message.messageID)
                 {
@@ -348,16 +363,21 @@ namespace SwarmRoboticsGUI
             {
                 switch(message.messageID)
                 {
-                    case MESSAGE_TYPES.TOWER_LIGHT_SENSORS:
-                            DisplayTowerLightData(message as TowerDockingLightSensorData);
-                            break;
+                    case MESSAGE_TYPES.CHARGING_STATION_LIGHT_SENSORS:
+                        DisplayTowerLightData(message as TowerDockingLightSensorData);
+                        break;
 
-                    case MESSAGE_TYPES.TOWER_LEDS:
+                    case MESSAGE_TYPES.CHARGING_STATION_LEDS:
+                        
+                        break;
+
+                    case MESSAGE_TYPES.CHARGING_STATION_DOCK_ENABLE:
 
                         break;
 
-                    case MESSAGE_TYPES.TOWER_DOCK_ENABLE:
-
+                    case MESSAGE_TYPES.CHARGING_STATION_ROBOT_STATUS_REPORT:
+                        ChargingDockItem dock = (ChargingDockItem)window.ItemList.First(D => D is ChargingDockItem);
+                        dock.DockingLights = message.messageData[2];
                         break;
 
                 }
@@ -526,6 +546,10 @@ namespace SwarmRoboticsGUI
 
 			switch(swarmMessage.messageID)
 			{
+                case MESSAGE_TYPES.DEBUG_STRING:
+                    swarmMessage = new DebugString(swarmMessage.RawMessage);
+                    break;
+
                 case MESSAGE_TYPES.ROBOT_STATUS:
                     swarmMessage = new RobotStatus(swarmMessage.RawMessage);
                     break;
@@ -557,7 +581,7 @@ namespace SwarmRoboticsGUI
 
                     //MANSEL: Common issue with new receive
 
-                case MESSAGE_TYPES.TOWER_LIGHT_SENSORS:
+                case MESSAGE_TYPES.CHARGING_STATION_LIGHT_SENSORS:
                     swarmMessage = new TowerDockingLightSensorData(swarmMessage.RawMessage);
                     break;
 

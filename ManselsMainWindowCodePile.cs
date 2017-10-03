@@ -16,14 +16,34 @@ using XbeeHandler.XbeeFrames;
 
 namespace SwarmRoboticsGUI
 {
+    public static class ROBOT_CONTROL_MESSAGE
+    {
+        public const byte Stop = 0xD0;
+        public const byte MoveDirection = 0xD1;
+        public const byte RotateClockWise = 0xD2;
+        public const byte RotateCounterClockWise = 0xD3;
+        public const byte MoveRandomly = 0xD4;
+        public const byte ReleaseDock = 0xD6;
+        public const byte Dock = 0xD7;
+        public const byte StopObstacleAvoidance = 0xD8;
+        public const byte StartObstacleAvoidance = 0xD9;
+        public const byte FollowLight = 0xDA;
+        public const byte FollowLine = 0xDB;
+        public const byte RotateToHeading = 0xDC;
+        public const byte MoveToPosition = 0xDD;
+        public const byte MoveAtHeading = 0xDE;
+    }
+
     public partial class MainWindow : Window
     {
+
         #region Tower Control
+
         public List<ToggleButton> dockLightControls;
+
+        //Constructor
         public void TowerControlSetup()
         {
-
-
             dockLightControls = new List<ToggleButton>()
             {
                  btnDockLightA, btnDockLightB, btnDockLightC, btnDockLightD, btnDockLightE, btnDockLightF
@@ -35,13 +55,15 @@ namespace SwarmRoboticsGUI
                 toggleButton.Click += new RoutedEventHandler(btnDockLight_Click);
             }
         }
+
+        //Button handlers
         private void btnDockLight_Click(object sender, RoutedEventArgs e)
         {
             var senderToggleButton = sender as ToggleButton;
             byte[] data;
 
             data = new byte[3];
-            data[0] = ProtocolClass.MESSAGE_TYPES.TOWER_LIGHT_SENSORS;
+            data[0] = ProtocolClass.MESSAGE_TYPES.CHARGING_STATION_LIGHT_SENSORS;
             byte[] lightsensor = MJLib.StringToByteArrayFastest(senderToggleButton.Tag.ToString());
 
             if (senderToggleButton.IsChecked == true)
@@ -59,6 +81,34 @@ namespace SwarmRoboticsGUI
             ChargingDockItem Dock = (ChargingDockItem)ItemList.First(D => D is ChargingDockItem);
             xbee.SendTransmitRequest(((ICommunicates)Dock).Address64, data);
         }
+
+        private void TowerDockingLights_Update(object sender, RoutedEventArgs e)
+        {
+            var senderCheckBox = sender as CheckBox;
+
+            byte[] led = MJLib.StringToByteArrayFastest(senderCheckBox.Tag.ToString());
+
+            ChargingDockItem Dock = (ChargingDockItem)ItemList.First(D => D is ChargingDockItem);
+
+            if(senderCheckBox.IsChecked == true)
+            {
+                Dock.DockingLights &= (byte)~(byte)(1 << led[0]);
+            }
+            else
+            {
+                Dock.DockingLights |= (byte)(1 << led[0]);
+            }
+
+            byte[] data;
+            data = new byte[3];
+            data[0] = ProtocolClass.MESSAGE_TYPES.CHARGING_STATION_LEDS;
+            data[1] = 0x01;
+            data[2] = Dock.DockingLights;
+
+            xbee.SendTransmitRequest(((ICommunicates)Dock).Address64, data);            
+        }
+
+
         #endregion
 
         #region System Test
@@ -68,7 +118,7 @@ namespace SwarmRoboticsGUI
         int currentTestItem = 0;
         bool doublecommandlockout = false;
         public Dictionary<string, byte> twiMuxAddresses;
-        public void setupSystemTest()
+        public void SetupSystemTest()
         {
             EstablishingCommunicationsWindow = new ProgressWindow("Establishing Communications", "Please wait while communications are tested.");
 
@@ -343,23 +393,23 @@ namespace SwarmRoboticsGUI
             public static byte[] WEST = { 0x01, 0x0E };
             public static byte[] NORTHWEST = { 0x01, 0x2D };
         }
-        private static class ROBOT_CONTROL_MESSAGE
-        {
-            public const byte Stop = 0xD0;
-            public const byte MoveDirection = 0xD1;
-            public const byte RotateClockWise = 0xD2;
-            public const byte RotateCounterClockWise = 0xD3;
-            public const byte MoveRandomly = 0xD4;
-            public const byte ReleaseDock = 0xD6;
-            public const byte Dock = 0xD7;
-            public const byte StopObstacleAvoidance = 0xD8;
-            public const byte StartObstacleAvoidance = 0xD9;
-            public const byte FollowLight = 0xDA;
-            public const byte FollowLine = 0xDB;
-            public const byte RotateToHeading = 0xDC;
-            public const byte MoveToPosition = 0xDD;
-            public const byte MoveAtHeading = 0xDE;
-        }
+        //private static class ROBOT_CONTROL_MESSAGE
+        //{
+        //    public const byte Stop = 0xD0;
+        //    public const byte MoveDirection = 0xD1;
+        //    public const byte RotateClockWise = 0xD2;
+        //    public const byte RotateCounterClockWise = 0xD3;
+        //    public const byte MoveRandomly = 0xD4;
+        //    public const byte ReleaseDock = 0xD6;
+        //    public const byte Dock = 0xD7;
+        //    public const byte StopObstacleAvoidance = 0xD8;
+        //    public const byte StartObstacleAvoidance = 0xD9;
+        //    public const byte FollowLight = 0xDA;
+        //    public const byte FollowLine = 0xDB;
+        //    public const byte RotateToHeading = 0xDC;
+        //    public const byte MoveToPosition = 0xDD;
+        //    public const byte MoveAtHeading = 0xDE;
+        //}
         private void ManualModeDirectionMouseEnter(object sender, MouseEventArgs e)
         {
             Button control = sender as Button;
@@ -426,6 +476,26 @@ namespace SwarmRoboticsGUI
             data[1] = (byte)Convert.ToInt16(tbManualModeSpeed.Text);
             xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
         }
+
+        private void tbManualModeSpeed_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            int num;
+
+            if (int.TryParse(((TextBox)sender).Text, out num))
+            {
+                if (num >= 0)
+                {
+                    if (num > 100)
+                    {
+                        num = 100;
+                    }
+                    ((TextBox)sender).Text = num.ToString();
+                }
+            }
+        }
+
+
+        /*
         private void tbManualModeSpeed_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             int num;
@@ -443,21 +513,16 @@ namespace SwarmRoboticsGUI
                 e.Handled = true;
             }
         }
+         * */
         private void robotTaskObstacleAvoidance_Click(object sender, RoutedEventArgs e)
         {
-            CheckBox checkboxsender = sender as CheckBox;
+            Button checkboxsender = sender as Button;
 
             byte[] data;
             data = new byte[1];
 
-            if (checkboxsender.IsChecked == true)
-            {
-                data[0] = ROBOT_CONTROL_MESSAGE.StartObstacleAvoidance;
-            }
-            else
-            {
-                data[0] = ROBOT_CONTROL_MESSAGE.StopObstacleAvoidance;
-            }
+            data[0] = ROBOT_CONTROL_MESSAGE.StartObstacleAvoidance;
+
             xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
         }
         private void robotTaskStopMoving_Click(object sender, RoutedEventArgs e)
@@ -510,7 +575,26 @@ namespace SwarmRoboticsGUI
         }
         private void robotTaskRotateToHeading_Click(object sender, RoutedEventArgs e)
         {
+            byte[] data;
+            data = new byte[3];
+            data[0] = ROBOT_CONTROL_MESSAGE.RotateToHeading;
+            data[1] = (byte)(UDrobotTaskRotateToHeading.Value >> 8);
+            data[2] = (byte)(UDrobotTaskRotateToHeading.Value);
 
+            xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
+        }
+
+        private void robotTaskMoveToPosition_Click(object sender, RoutedEventArgs e)
+        {
+            byte[] data;
+            data = new byte[5];
+            data[0] = ROBOT_CONTROL_MESSAGE.MoveToPosition;
+            data[1] = (byte)(UBrobotTaskMoveToPositionX.Value >> 8);
+            data[2] = (byte)(UBrobotTaskMoveToPositionX.Value);
+            data[3] = (byte)(UBrobotTaskMoveToPositionY.Value >> 8);
+            data[4] = (byte)(UBrobotTaskMoveToPositionY.Value);
+
+            xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
         }
 
         //private void tbRotateToHeading_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -962,6 +1046,7 @@ namespace SwarmRoboticsGUI
             if (ports != null)
             {
                 portList.Items.Clear();
+
                 foreach (string port in ports)
                 {
                     MenuItem item = new MenuItem { Header = port };
@@ -975,17 +1060,22 @@ namespace SwarmRoboticsGUI
                         item.IsChecked = true;
                         connectButton.IsEnabled = true;
                     }
+
+					if(serial.IsConnected)
+					{
+						item.IsEnabled = false;
+					}
                 }
 
-                if (ports.Length == 0)
-                {
-                    MenuItem nonefound = new MenuItem { Header = "No Com Ports Found" };
-                    portList.Items.Add(nonefound);
-                    nonefound.IsEnabled = false;
-                    connectButton.IsEnabled = false;
-                }
-            }
-        }
+				if (ports.Length == 0)
+				{
+					MenuItem nonefound = new MenuItem { Header = "No Com Ports Found" };
+					portList.Items.Add(nonefound);
+					nonefound.IsEnabled = false;
+					connectButton.IsEnabled = false;
+				}
+			}
+		}
 
         public void menuPopulateSerialPorts(object sender, MouseEventArgs e)
         {
@@ -1014,7 +1104,31 @@ namespace SwarmRoboticsGUI
             else
             {
                 serial.Disconnect();
-                connectButton.Header = "Connect";
+
+				////creates a list with all settings in it
+				MenuItem[] ports = portList.Items.OfType<MenuItem>().ToArray();
+				MenuItem[] bauds = baudList.Items.OfType<MenuItem>().ToArray();
+				MenuItem[] paritys = parityList.Items.OfType<MenuItem>().ToArray();
+				MenuItem[] datas = dataBitsList.Items.OfType<MenuItem>().ToArray();
+				MenuItem[] stops = stopBitsList.Items.OfType<MenuItem>().ToArray();
+				MenuItem[] handshakes = handshakingList.Items.OfType<MenuItem>().ToArray();
+
+				List<MenuItem> itemList = new List<MenuItem>(ports.Concat<MenuItem>(ports));
+				itemList.AddRange(bauds);
+				itemList.AddRange(paritys);
+				itemList.AddRange(datas);
+				itemList.AddRange(stops);
+				itemList.AddRange(handshakes);
+
+				MenuItem[] finalArray = itemList.ToArray();
+
+				//re-enables all settings
+				foreach (var item in finalArray)
+				{
+					item.IsEnabled = true;
+				}
+
+				connectButton.Header = "Connect";
             }
             connectButton.IsChecked = false;
 
