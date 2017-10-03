@@ -304,7 +304,7 @@ namespace SwarmRoboticsGUI
 
                 // Get the robots facing
                 var RobotFrameLocation = new Point((int)COM.X - RobotFrameOffset.X, (int)COM.Y - RobotFrameOffset.Y);
-                double Facing = FindFacing(RobotFrame, RobotFrameLocation);
+                double Facing = GetRobotFacing(RobotFrame, RobotFrameLocation);
                 if (Facing == 0) continue;
 
                 if (obstacle.PixelLocation.X > 0 && obstacle.PixelLocation.Y > 0)
@@ -399,7 +399,7 @@ namespace SwarmRoboticsGUI
             if (ArenaContour.Size != 0)
             {
                 // Find the origin by looking for the point that is top-left most in the frame
-                Origin = FindOrigin(Frame, ArenaContour);                
+                Origin = GetOrigin(Frame, ArenaContour);                
                 if (!Origin.IsEmpty)
                 {
                     // Bounds of arena contour used as reference frame for further pixel locations
@@ -486,16 +486,7 @@ namespace SwarmRoboticsGUI
                 }
             }
         }
-        private static Point GetRobotFrame(IInputArray Frame, IInputArray Contour, IOutputArray RobotFrame)
-        {
-            var Input = Frame as UMat;
-            var Bounds = CvInvoke.BoundingRectangle(Contour);
-            Input = new UMat(Input, Bounds);
-            Input.CopyTo(RobotFrame);
-            RobotFrame.GetOutputArray().GetUMat().CopyTo(RobotFrame);
-
-            return Bounds.Location;
-        }
+        
         private static int GetHexagons(IInputArray Contours, IOutputArray Hexagons)
         {
             // BRAE: Make GetHexagons work with any shape
@@ -631,141 +622,8 @@ namespace SwarmRoboticsGUI
                 return true;
             }
             return false;
-        }
-        private static double FindFacing(IInputArray Frame, Point Centre)
-        {
-            var Input = Frame as UMat;
-            var Contours = new VectorOfVectorOfPoint();
-            var ProcessedContours = new VectorOfVectorOfPoint();
-            double MaxArea = Input.Cols * Input.Rows;
-            double MinArea = MaxArea * 0.005;
-
-            GetCountours(Input, Contours, 0, RetrType.List, ChainApproxMethod.ChainApproxSimple);
-            FilterContourArea(Contours, ProcessedContours, MinArea, MaxArea);
-
-            MCvPoint2D64f TriangleCOM = new MCvPoint2D64f();
-
-            for (int i = 0; i < ProcessedContours.Size; i++)
-            {
-                var ProcessedContour = ProcessedContours[i];
-                // Get approximate polygonal shape of contour
-                CvInvoke.ApproxPolyDP(ProcessedContour, ProcessedContour, CvInvoke.ArcLength(ProcessedContour, true) * 0.075, true);
-                // Check if contour is the right shape (triangle)
-                if (IsShape(ProcessedContour, Shape.TRIANGLE))
-                {
-                    TriangleCOM = CvInvoke.Moments(ProcessedContour).GravityCenter;
-                    // Get robot facing using Atan function
-                    double dy = TriangleCOM.Y - Centre.Y;
-                    double dx = TriangleCOM.X - Centre.X;
-                    double Facing = Math.Atan2(dy, dx);
-                    return Facing;
-                }
-            }
-            return 0;
-        }
-        private static int IdentifyRobot(IInputArray Frame, IInputArray Contour)
-        {
-            bool IsOrange = false, IsYellow = false, IsGreen = false;
-            bool IsDarkBlue = false, IsLightBlue = false, IsRed = false;
-            int RobotID = -1;
-            var hexagon = Contour as VectorOfPoint;
-            var Image = Frame.GetInputArray();
-
-            // DEBUG: Report Images - Robot input frame
-            //CvInvoke.Imwrite("Robot-Frame.png", Frame);
-
-            var Mask = new Mat(Image.GetSize(), Image.GetDepth(), Image.GetChannels());
-            Mask.SetTo(new MCvScalar(0, 0, 0));
-            CvInvoke.DrawContours(Mask, new VectorOfVectorOfPoint(hexagon), -1, new MCvScalar(255, 255, 255), -1);
-
-            // DEBUG: Report Images - Robot mask without erode
-            //CvInvoke.Imwrite("Robot-MaskNoErode.png", Mask);
-            // DEBUG: Report Images - Robot image masked with mask that has no erode passes
-            //var MaskedNoErode = new Mat();
-            //Image.CopyTo(MaskedNoErode, Mask);
-            //CvInvoke.Imwrite("Robot-FrameMaskedNoErode.png", MaskedNoErode);
-
-            // Apply three passes of erode to remove edges where the colour of the robot has bled
-            CvInvoke.Erode(Mask, Mask, null, new Point(-1, -1), 3, BorderType.Constant, new MCvScalar(0));
-
-            // DEBUG: Report Images - Robot mask with erode
-            //CvInvoke.Imwrite("Robot-MaskEroded.png", Mask);
-            // DEBUG: Report Images - Robot image masked with mask that has erode passes
-            //var MaskedEroded = new Mat();
-            //Image.CopyTo(MaskedEroded, Mask);
-            //CvInvoke.Imwrite("Robot-FrameMaskedEroded.png", MaskedEroded);
-
-            var Masked = new Mat();
-            Image.CopyTo(Masked, Mask);
-
-            var SOut = new Mat();
-            var VOut = new Mat();
-            //
-            CvInvoke.CvtColor(Masked, Masked, ColorConversion.Bgr2Hsv);
-
-            // DEBUG: Report Images
-            //CvInvoke.Imwrite("MaskedHSV.png", Masked);
-
-            CvInvoke.ExtractChannel(Masked, SOut, 1);
-            CvInvoke.ExtractChannel(Masked, VOut, 2);
-            CvInvoke.Threshold(SOut, SOut, SaturationRange.Start, SaturationRange.End, ThresholdType.Binary);        
-            CvInvoke.Threshold(VOut, VOut, ValueRange.Start, ValueRange.End, ThresholdType.Binary);
-            //CvInvoke.AdaptiveThreshold(SOut, SOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
-            //CvInvoke.AdaptiveThreshold(VOut, VOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
-
-            // DEBUG: Report Images
-            //CvInvoke.Imwrite("SOut.png", SOut);
-            //CvInvoke.Imwrite("VOut.png", VOut);  
-
-            CvInvoke.BitwiseAnd(SOut, VOut, SOut);
-
-            var Result = new Mat();
-            Masked.CopyTo(Result, SOut);
-
-            // DEBUG: Report Images - Robot masked with saturation and value is HSV colourspace
-            CvInvoke.Imwrite("Robot-FrameHSVColourMasked.png", Result);
-
-            // DEBUG: Report Images - Robot masked with saturation and value is RGB colourspace
-            var ResultBGR = new Mat();
-            CvInvoke.CvtColor(Result, ResultBGR, ColorConversion.Hsv2Bgr);
-            CvInvoke.Imwrite("Robot-FrameRGBColourMasked.png", ResultBGR);
-
-            // Look for colours on the robot
-            IsOrange = HasHueRange(Result, GetHueRange(KnownColor.Orange));
-            IsYellow = HasHueRange(Result, GetHueRange(KnownColor.Yellow));
-            IsGreen = HasHueRange(Result, GetHueRange(KnownColor.Green));
-            IsLightBlue = HasHueRange(Result, GetHueRange(KnownColor.LightBlue));
-            IsDarkBlue = HasHueRange(Result, GetHueRange(KnownColor.DarkBlue));
-            IsRed = HasHueRange(Result, GetHueRange(KnownColor.Red));
-
-            // LIGHTBLUE GREEN RED
-            if (!IsOrange && !IsYellow && IsGreen && IsLightBlue && !IsDarkBlue && IsRed) RobotID = 0;       // RED
-            //if (IsGreen && IsLightBlue && IsRed) RobotID = 0;       // RED
-            // ORANGE LIGHTBLUE RED
-            else if (IsOrange && !IsYellow && !IsGreen && IsLightBlue && !IsDarkBlue && IsRed) RobotID = 1;  // YELLOW
-            //else if (IsOrange && IsLightBlue && IsRed) RobotID = 1;  // YELLOW
-            // ORANGE GREEN RED
-            else if (IsOrange && !IsYellow && IsGreen && !IsLightBlue && !IsDarkBlue && IsRed) RobotID = 2;  // PURPLE
-            //else if (IsOrange && IsGreen && IsRed) RobotID = 2;  // PURPLE
-            // GREEN YELLOW DARKBLUE
-            else if (!IsOrange && IsYellow && IsGreen && !IsLightBlue && IsDarkBlue && !IsRed) RobotID = 3;  // LIGHTBLUE
-            //else if (IsYellow && IsGreen && IsDarkBlue) RobotID = 3;  // LIGHTBLUE
-            // LIGHTBLUE GREEN DARKBLUE
-            else if (!IsOrange && !IsYellow && IsGreen && IsLightBlue && IsDarkBlue && !IsRed) RobotID = 4;  // DARKBLUE
-            //else if (IsGreen && IsLightBlue && IsDarkBlue) RobotID = 4;  // DARKBLUE
-            // ORANGE YELLOW GREEN
-            else if (IsOrange && IsYellow && IsGreen && !IsLightBlue && !IsDarkBlue && !IsRed) RobotID = 5;  // BROWN
-            //else if (IsOrange && IsYellow && IsGreen) RobotID = 5;  // BROWN
-            // LIGHTBLUE YELLOW ORANGE
-            else if (IsOrange && IsYellow && !IsGreen && IsLightBlue && !IsDarkBlue && !IsRed) RobotID = 6;  // PINK
-            //else if (IsOrange && IsYellow && IsLightBlue) RobotID = 6;  // PINK
-            // ORANGE YELLOW RED
-            else if (IsOrange && IsYellow && !IsGreen && !IsLightBlue && !IsDarkBlue && IsRed) RobotID = 7;  // ORANGE
-            //else if (IsOrange && IsYellow && IsRed) RobotID = 7;  // ORANGE
-
-            return RobotID;
-        }    
-        private static Point FindOrigin(IInputArray Frame, IInputArray Contour)
+        } 
+        private static Point GetOrigin(IInputArray Frame, IInputArray Contour)
         {
             var contour = Contour as VectorOfPoint;
 
@@ -833,6 +691,109 @@ namespace SwarmRoboticsGUI
 
             return factor;
         }
+
+        private static int IdentifyRobot(IInputArray Frame, IInputArray Contour)
+        {
+            bool IsOrange = false, IsYellow = false, IsGreen = false;
+            bool IsDarkBlue = false, IsLightBlue = false, IsRed = false;
+            int RobotID = -1;
+            var hexagon = Contour as VectorOfPoint;
+            var Image = Frame.GetInputArray();
+
+            // DEBUG: Report Images - Robot input frame
+            //CvInvoke.Imwrite("Robot-Frame.png", Frame);
+
+            var Mask = new Mat(Image.GetSize(), Image.GetDepth(), Image.GetChannels());
+            Mask.SetTo(new MCvScalar(0, 0, 0));
+            CvInvoke.DrawContours(Mask, new VectorOfVectorOfPoint(hexagon), -1, new MCvScalar(255, 255, 255), -1);
+
+            // DEBUG: Report Images - Robot mask without erode
+            //CvInvoke.Imwrite("Robot-MaskNoErode.png", Mask);
+            // DEBUG: Report Images - Robot image masked with mask that has no erode passes
+            //var MaskedNoErode = new Mat();
+            //Image.CopyTo(MaskedNoErode, Mask);
+            //CvInvoke.Imwrite("Robot-FrameMaskedNoErode.png", MaskedNoErode);
+
+            // Apply three passes of erode to remove edges where the colour of the robot has bled
+            CvInvoke.Erode(Mask, Mask, null, new Point(-1, -1), 3, BorderType.Constant, new MCvScalar(0));
+
+            // DEBUG: Report Images - Robot mask with erode
+            //CvInvoke.Imwrite("Robot-MaskEroded.png", Mask);
+            // DEBUG: Report Images - Robot image masked with mask that has erode passes
+            //var MaskedEroded = new Mat();
+            //Image.CopyTo(MaskedEroded, Mask);
+            //CvInvoke.Imwrite("Robot-FrameMaskedEroded.png", MaskedEroded);
+
+            var Masked = new Mat();
+            Image.CopyTo(Masked, Mask);
+
+            var SOut = new Mat();
+            var VOut = new Mat();
+            //
+            CvInvoke.CvtColor(Masked, Masked, ColorConversion.Bgr2Hsv);
+
+            // DEBUG: Report Images
+            //CvInvoke.Imwrite("MaskedHSV.png", Masked);
+
+            CvInvoke.ExtractChannel(Masked, SOut, 1);
+            CvInvoke.ExtractChannel(Masked, VOut, 2);
+            CvInvoke.Threshold(SOut, SOut, SaturationRange.Start, SaturationRange.End, ThresholdType.Binary);
+            CvInvoke.Threshold(VOut, VOut, ValueRange.Start, ValueRange.End, ThresholdType.Binary);
+            //CvInvoke.AdaptiveThreshold(SOut, SOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
+            //CvInvoke.AdaptiveThreshold(VOut, VOut, 254, AdaptiveThresholdType.MeanC, ThresholdType.Binary, 21, 0);
+
+            // DEBUG: Report Images
+            //CvInvoke.Imwrite("SOut.png", SOut);
+            //CvInvoke.Imwrite("VOut.png", VOut);  
+
+            CvInvoke.BitwiseAnd(SOut, VOut, SOut);
+
+            var Result = new Mat();
+            Masked.CopyTo(Result, SOut);
+
+            // DEBUG: Report Images - Robot masked with saturation and value is HSV colourspace
+            CvInvoke.Imwrite("Robot-FrameHSVColourMasked.png", Result);
+
+            // DEBUG: Report Images - Robot masked with saturation and value is RGB colourspace
+            var ResultBGR = new Mat();
+            CvInvoke.CvtColor(Result, ResultBGR, ColorConversion.Hsv2Bgr);
+            CvInvoke.Imwrite("Robot-FrameRGBColourMasked.png", ResultBGR);
+
+            // Look for colours on the robot
+            IsOrange = HasHueRange(Result, GetHueRange(KnownColor.Orange));
+            IsYellow = HasHueRange(Result, GetHueRange(KnownColor.Yellow));
+            IsGreen = HasHueRange(Result, GetHueRange(KnownColor.Green));
+            IsLightBlue = HasHueRange(Result, GetHueRange(KnownColor.LightBlue));
+            IsDarkBlue = HasHueRange(Result, GetHueRange(KnownColor.DarkBlue));
+            IsRed = HasHueRange(Result, GetHueRange(KnownColor.Red));
+
+            // LIGHTBLUE GREEN RED
+            if (!IsOrange && !IsYellow && IsGreen && IsLightBlue && !IsDarkBlue && IsRed) RobotID = 0;       // RED
+            //if (IsGreen && IsLightBlue && IsRed) RobotID = 0;       // RED
+            // ORANGE LIGHTBLUE RED
+            else if (IsOrange && !IsYellow && !IsGreen && IsLightBlue && !IsDarkBlue && IsRed) RobotID = 1;  // YELLOW
+            //else if (IsOrange && IsLightBlue && IsRed) RobotID = 1;  // YELLOW
+            // ORANGE GREEN RED
+            else if (IsOrange && !IsYellow && IsGreen && !IsLightBlue && !IsDarkBlue && IsRed) RobotID = 2;  // PURPLE
+            //else if (IsOrange && IsGreen && IsRed) RobotID = 2;  // PURPLE
+            // GREEN YELLOW DARKBLUE
+            else if (!IsOrange && IsYellow && IsGreen && !IsLightBlue && IsDarkBlue && !IsRed) RobotID = 3;  // LIGHTBLUE
+            //else if (IsYellow && IsGreen && IsDarkBlue) RobotID = 3;  // LIGHTBLUE
+            // LIGHTBLUE GREEN DARKBLUE
+            else if (!IsOrange && !IsYellow && IsGreen && IsLightBlue && IsDarkBlue && !IsRed) RobotID = 4;  // DARKBLUE
+            //else if (IsGreen && IsLightBlue && IsDarkBlue) RobotID = 4;  // DARKBLUE
+            // ORANGE YELLOW GREEN
+            else if (IsOrange && IsYellow && IsGreen && !IsLightBlue && !IsDarkBlue && !IsRed) RobotID = 5;  // BROWN
+            //else if (IsOrange && IsYellow && IsGreen) RobotID = 5;  // BROWN
+            // LIGHTBLUE YELLOW ORANGE
+            else if (IsOrange && IsYellow && !IsGreen && IsLightBlue && !IsDarkBlue && !IsRed) RobotID = 6;  // PINK
+            //else if (IsOrange && IsYellow && IsLightBlue) RobotID = 6;  // PINK
+            // ORANGE YELLOW RED
+            else if (IsOrange && IsYellow && !IsGreen && !IsLightBlue && !IsDarkBlue && IsRed) RobotID = 7;  // ORANGE
+            //else if (IsOrange && IsYellow && IsRed) RobotID = 7;  // ORANGE
+
+            return RobotID;
+        }
         private static int GetRobotRadius(IInputArray Hexagon)
         {
             var hexagon = Hexagon as VectorOfPoint;
@@ -844,6 +805,47 @@ namespace SwarmRoboticsGUI
             double radius = (d1.Length + d2.Length + d3.Length) / 3;
 
             return (int)radius;
+        }
+        private static Point GetRobotFrame(IInputArray Frame, IInputArray Contour, IOutputArray RobotFrame)
+        {
+            var Input = Frame as UMat;
+            var Bounds = CvInvoke.BoundingRectangle(Contour);
+            Input = new UMat(Input, Bounds);
+            Input.CopyTo(RobotFrame);
+            RobotFrame.GetOutputArray().GetUMat().CopyTo(RobotFrame);
+
+            return Bounds.Location;
+        }
+        private static double GetRobotFacing(IInputArray Frame, Point Centre)
+        {
+            var Input = Frame as UMat;
+            var Contours = new VectorOfVectorOfPoint();
+            var ProcessedContours = new VectorOfVectorOfPoint();
+            double MaxArea = Input.Cols * Input.Rows;
+            double MinArea = MaxArea * 0.005;
+
+            GetCountours(Input, Contours, 0, RetrType.List, ChainApproxMethod.ChainApproxSimple);
+            FilterContourArea(Contours, ProcessedContours, MinArea, MaxArea);
+
+            MCvPoint2D64f TriangleCOM = new MCvPoint2D64f();
+
+            for (int i = 0; i < ProcessedContours.Size; i++)
+            {
+                var ProcessedContour = ProcessedContours[i];
+                // Get approximate polygonal shape of contour
+                CvInvoke.ApproxPolyDP(ProcessedContour, ProcessedContour, CvInvoke.ArcLength(ProcessedContour, true) * 0.075, true);
+                // Check if contour is the right shape (triangle)
+                if (IsShape(ProcessedContour, Shape.TRIANGLE))
+                {
+                    TriangleCOM = CvInvoke.Moments(ProcessedContour).GravityCenter;
+                    // Get robot facing using Atan function
+                    double dy = TriangleCOM.Y - Centre.Y;
+                    double dx = TriangleCOM.X - Centre.X;
+                    double Facing = Math.Atan2(dy, dx);
+                    return Facing;
+                }
+            }
+            return 0;
         }
         #endregion
     }
