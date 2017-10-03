@@ -389,7 +389,7 @@ namespace SwarmRoboticsGUI
                     case MESSAGE_TYPES.CHARGING_STATION_ROBOT_STATUS_REPORT:
 
 						byte[] datatodock;
-						UInt64 destination = message.sourceAddress64;
+						UInt64 destination = (message as TowerRobotReport).robotrequested;
 						RobotItem robot = (RobotItem)window.ItemList.Find(R => (R is RobotItem) && ((R as ICommunicates).Address64 == message.sourceAddress64));
 						ChargingDockItem chargingstation = (ChargingDockItem)window.ItemList.First(D => D is ChargingDockItem);
 
