@@ -105,7 +105,7 @@ namespace SwarmRoboticsGUI
 				datatorobot[0] = ProtocolClass.MESSAGE_TYPES.CHARGING_STATION_ROBOT_STATUS_REPORT;
 				datatorobot[1] = 0x00; //read
 
-                UInt64 destination = ((ICommunicates)R).Address64;
+                UInt64 destination = comms.Address64;
 
 				datatorobot[2] = BitConverter.GetBytes(destination)[7];
 				datatorobot[3] = BitConverter.GetBytes(destination)[6];
