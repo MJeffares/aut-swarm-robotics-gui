@@ -628,12 +628,8 @@ namespace SwarmRoboticsGUI
                     swarmMessage = new TowerDockingLightSensorData(swarmMessage.RawMessage);
                     break;
 
-				case MESSAGE_TYPES.CHARGING_STATION_ROBOT_STATUS_REPORT:
-					swarmMessage = new TowerRobotReport(swarmMessage.RawMessage);
-					break;
-
 				default:
-					MessageBox.Show("Mansels common error add a new message to ParseSwarmProtocolMessage ");
+
 					break;
 			}
 			return swarmMessage;

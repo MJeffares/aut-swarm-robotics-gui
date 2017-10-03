@@ -368,7 +368,8 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
         //public byte[] sensorData = new byte[2];
         public byte sensorData;
 
-        public TowerDockingLightSensorData(byte[] frame) : base(frame)
+        public TowerDockingLightSensorData(byte[] frame)
+            : base(frame)
         {
             sensor = testMessage[0];
             sensorData = testMessage[1];
@@ -383,13 +384,4 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
             }
         }
     }
-
-	public class TowerRobotReport : SwarmProtocolMessage
-	{
-		public TowerRobotReport(byte[] frame) : base(frame)
-		{
-
-		}
-	}
-
 }
