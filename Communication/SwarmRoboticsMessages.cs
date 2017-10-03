@@ -386,9 +386,11 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 
 	public class TowerRobotReport : SwarmProtocolMessage
 	{
+		public UInt64 robotrequested;
+
 		public TowerRobotReport(byte[] frame) : base(frame)
 		{
-
+			robotrequested = MJLib.ByteArrayToUInt64(messageData, 2);
 		}
 	}
 
