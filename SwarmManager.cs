@@ -54,7 +54,7 @@ namespace SwarmRoboticsGUI
 
             PositioningTimer = new DispatcherTimer();
             PositioningTimer.Tick += PositioningTimer_Tick;
-            PositioningTimer.Interval = new System.TimeSpan(0, 0, 5);
+            PositioningTimer.Interval = new System.TimeSpan(0, 0, 1);
             PositioningTimer.Start();
 
             // RegisteredRobots = mainWindow.RobotList.Where(R => R is RobotItem && (R as RobotItem).IsTracked).Cast<RobotItem>().ToList<RobotItem>();
