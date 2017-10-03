@@ -57,13 +57,13 @@ namespace SwarmRoboticsGUI
             PositioningTimer.Interval = new System.TimeSpan(0, 0, 5);
             PositioningTimer.Start();
 
-           // RegisteredRobots = mainWindow.RobotList.Where(R => R is RobotItem && (R as RobotItem).IsTracked).Cast<RobotItem>().ToList<RobotItem>();
-            //RobotList = mainWindow.ItemList.Where(R => R is RobotItem).Cast<RobotItem>().ToList<RobotItem>();
-            //RegisteredRobots = RobotList.Where(R => (R as IObstacle).IsTracked).ToList<RobotItem>();
+            // RegisteredRobots = mainWindow.RobotList.Where(R => R is RobotItem && (R as RobotItem).IsTracked).Cast<RobotItem>().ToList<RobotItem>();
+            RobotList = mainWindow.ItemList.Where(R => R is RobotItem).Cast<RobotItem>().ToList<RobotItem>();
+            RegisteredRobots = RobotList.Where(R => (R as IObstacle).IsTracked).ToList<RobotItem>();
 
             dock = (ChargingDockItem)mainWindow.ItemList.First(D => D is ChargingDockItem);
             //MANSEL: Test this line
-            RegisteredRobots = mainWindow.ItemList.Where(R => (R is RobotItem) && ((R as IObstacle).IsTracked)).Cast<RobotItem>().ToList<RobotItem>();
+            //RegisteredRobots = mainWindow.ItemList.Where(R => (R is RobotItem) && ((R as IObstacle).IsTracked)).Cast<RobotItem>().ToList<RobotItem>();
         }
 
 
