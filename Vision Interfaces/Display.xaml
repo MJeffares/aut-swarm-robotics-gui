@@ -87,7 +87,7 @@
                     <ItemsControl.ItemContainerStyle>
                         <Style TargetType="ContentPresenter">
                             <Setter Property="Canvas.Left" Value="{Binding Path=(local:IObstacle.Location).X}"/>
-                            <Setter Property="Canvas.Margin" Value="-20,-40,0,0"/>
+                            <Setter Property="Canvas.Margin" Value="-50,-43,0,0"/>
                             <Setter Property="Canvas.Top" Value="{Binding Path=(local:IObstacle.Location).Y}"/>
                             <Setter Property="Canvas.Visibility" Value="{Binding Path=(local:IObstacle.IsVisible), Converter={StaticResource BoolToVis}}"/>
                         </Style>
