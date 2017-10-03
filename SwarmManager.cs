@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Threading;
 using XbeeHandler;
+using System.Threading.Tasks;
 //using SwarmRoboticsGUI;
 
 
@@ -37,6 +38,7 @@ namespace SwarmRoboticsGUI
     {
         private DispatcherTimer CheckupTimer;
         private DispatcherTimer PositioningTimer;
+        private ChargingDockItem dock;
         private List<RobotItem> RobotList;
         private List<RobotItem> RegisteredRobots;
         private XbeeAPI xbee { get; set; }
@@ -52,13 +54,14 @@ namespace SwarmRoboticsGUI
 
             PositioningTimer = new DispatcherTimer();
             PositioningTimer.Tick += PositioningTimer_Tick;
-            PositioningTimer.Interval = new System.TimeSpan(0, 0, 5);
+            PositioningTimer.Interval = new System.TimeSpan(0, 0, 1);
             PositioningTimer.Start();
 
-           // RegisteredRobots = mainWindow.RobotList.Where(R => R is RobotItem && (R as RobotItem).IsTracked).Cast<RobotItem>().ToList<RobotItem>();
+            // RegisteredRobots = mainWindow.RobotList.Where(R => R is RobotItem && (R as RobotItem).IsTracked).Cast<RobotItem>().ToList<RobotItem>();
             RobotList = mainWindow.ItemList.Where(R => R is RobotItem).Cast<RobotItem>().ToList<RobotItem>();
             RegisteredRobots = RobotList.Where(R => (R as IObstacle).IsTracked).ToList<RobotItem>();
 
+            dock = (ChargingDockItem)mainWindow.ItemList.First(D => D is ChargingDockItem);
             //MANSEL: Test this line
             //RegisteredRobots = mainWindow.ItemList.Where(R => (R is RobotItem) && ((R as IObstacle).IsTracked)).Cast<RobotItem>().ToList<RobotItem>();
         }
@@ -74,36 +77,62 @@ namespace SwarmRoboticsGUI
 
         private void PositioningTimer_Tick(object sender, EventArgs arg)
         {
+            byte[] data;
+			byte[] datatorobot;
             RegisteredRobots = RobotList.Where(R => (R as IObstacle).IsTracked).ToList<RobotItem>();
 
             foreach (RobotItem R in RegisteredRobots)
             {
                 ICommunicates comms = R as ICommunicates;
                 IObstacle obstacle = R as IObstacle;
-                byte[] data;
-                UInt16 num;
+
+                UInt16 positionX = (UInt16)obstacle.Location.X;
+                UInt16 positionY = (UInt16)obstacle.Location.Y;
+                UInt16 facing = (UInt16)R.FacingDeg;
+
                 data = new byte[7];
-
                 data[0] = 0xA0;
-
-                num = (UInt16)obstacle.Location.X;
-
-                data[1] = (byte)(num >> 0x8);
-                data[2] = (byte)(num);
-
-                num = (UInt16)obstacle.Location.Y;
-
-                data[3] = (byte)(num >> 0x8);
-                data[4] = (byte)(num);
-
-
-                num = (UInt16)R.FacingDeg;
-
-                data[5] = (byte)(num >> 0x8);
-                data[6] = (byte)(num);
+                data[1] = (byte)(positionX >> 0x8);
+                data[2] = (byte)(positionX);
+                data[3] = (byte)(positionY >> 0x8);
+                data[4] = (byte)(positionY);
+                data[5] = (byte)(facing>> 0x8);
+                data[6] = (byte)(facing);
 
                 xbee.SendTransmitRequest(comms.Address64, data);
-            }
+
+				/*
+				datatorobot = new byte[20];
+				datatorobot[0] = ProtocolClass.MESSAGE_TYPES.CHARGING_STATION_ROBOT_STATUS_REPORT;
+				datatorobot[1] = 0x00; //read
+
+                UInt64 destination = comms.Address64;
+
+				datatorobot[2] = BitConverter.GetBytes(destination)[7];
+				datatorobot[3] = BitConverter.GetBytes(destination)[6];
+				datatorobot[4] = BitConverter.GetBytes(destination)[5];
+				datatorobot[5] = BitConverter.GetBytes(destination)[4];
+				datatorobot[6] = BitConverter.GetBytes(destination)[3];
+				datatorobot[7] = BitConverter.GetBytes(destination)[2];
+				datatorobot[8] = BitConverter.GetBytes(destination)[1];
+				datatorobot[9] = BitConverter.GetBytes(destination)[0];
+
+				datatorobot[10] =  (byte)EnumUtils<TaskType>.FromDescription(R.Task);
+
+				datatorobot[11] = (byte)(R.Battery >> 0x8);
+				datatorobot[12] = (byte)(R.Battery);
+
+				datatorobot[13] = (byte)(positionX >> 0x8);
+				datatorobot[14] = (byte)(positionX);
+				datatorobot[15] = (byte)(positionY >> 0x8);
+				datatorobot[16] = (byte)(positionY);
+				datatorobot[17] = (byte)(facing >> 0x8);
+				datatorobot[18] = (byte)(facing);
+
+
+                xbee.SendTransmitRequest(((ICommunicates)dock).Address64, datatorobot);
+				*/
+            }            
         }
     }
 }

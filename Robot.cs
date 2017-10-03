@@ -164,17 +164,29 @@ namespace SwarmRoboticsGUI
                 {
                     if (Child.Name == PropertyName)
                     {
-                        var ThisType = typeof(IObstacle).GetProperty(PropertyName);
-                        if (ThisType != null)
+                        var ThisProperty = typeof(IObstacle).GetProperty(PropertyName);
+                        if (ThisProperty != null)
                         {
-                            var Value = ThisType.GetValue(this, null);
-                            Child.Text = Value.ToString();
+                            var Value = ThisProperty.GetValue(this, null);
+                            var type = Value.GetType();
+                            if (type == typeof(System.Windows.Point))
+                            {
+                                var point = (System.Windows.Point)Value;
+                                Child.Text = string.Format("{0,-10:N0} {1,10:N0}", point.X, point.Y);
+                            }
+                            else
+                                Child.Text = string.Format("{0,-10:N0}", Value);
                         }
                         else
                         {
-                            ThisType = GetType().GetProperty(PropertyName);
-                            var Value = ThisType.GetValue(this, null);
-                            Child.Text = Value.ToString();
+                            ThisProperty = GetType().GetProperty(PropertyName);
+                            var Value = ThisProperty.GetValue(this, null);
+                            if (PropertyName == "Battery")
+                                Child.Text = string.Format("{0,-3:N0} mV", Value);
+                            else if (PropertyName == "FacingDeg")
+                                Child.Text = string.Format("{0,-4:N1} °", Value);
+                            else
+                                Child.Text = string.Format("{0,-10:N0}", Value);
                         }
                     }
                 }
@@ -766,6 +778,20 @@ namespace SwarmRoboticsGUI
             }
         }
 
+        private byte _DockingLights { get; set; }
+        public byte DockingLights
+        {
+            get { return _DockingLights; }
+            set
+            {
+                if (_DockingLights != value)
+                {
+                    _DockingLights = value;
+                    NotifyPropertyChanged("DockingLights");
+                }
+            }
+        }
+
         public ChargingDockItem(String Name, UInt64 MAC_Address, string Colour) : base(Name)
         {
             this.Name = Name;
@@ -785,6 +811,7 @@ namespace SwarmRoboticsGUI
             obstacle.IsVisible = true;
             double X = (600 - obstacle.Width/2);
             double Y = (600 - obstacle.Height/2);
+            DockingLights = 0;
             //double X = (double)1177 / 2;
             //double Y = (double)1177 / 2;
             obstacle.Location = new System.Windows.Point(X, Y);

@@ -24,7 +24,8 @@ namespace SwarmRoboticsGUI
  //           public static byte[] NORTHWEST = { 0x01, 0x2D };
  //       }
 
- //       private static class ROBOT_CONTROL_MESSAGE
+ //       private static class 
+
  //       {
  //           public const byte Stop = 0xD0;
  //           public const byte MoveDirection = 0xD1;

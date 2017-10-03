@@ -65,6 +65,9 @@ namespace XbeeHandler
         private int length;
         private bool escape;
         private List<byte> frameAsList;
+        private byte frameID;
+        private List<List<byte>> outgoingFrames;
+
 		//private MainWindow window { get; set; }
         private SerialUARTCommunication serial { get; set; }
 
@@ -79,6 +82,13 @@ namespace XbeeHandler
 		public XbeeAPI(MainWindow main)
 		{
 			serial = main.serial;
+            frameID = 0;
+            outgoingFrames = new List<List<byte>>(256);
+
+            for(int i=0; i < 256; i++)
+            {
+                outgoingFrames.Add(null);
+            }
 		}
 
 		#region Child classes
@@ -431,6 +441,11 @@ namespace XbeeHandler
 				messageList.AddLast(checksum);
 			}
 
+
+            
+
+            outgoingFrames.Insert(frameID, messageList.ToList<byte>());
+            outgoingFrames.RemoveAt(frameID + 1);
 			return messageList.ToArray<byte>();
 		}
 
@@ -478,10 +493,17 @@ namespace XbeeHandler
 
 		public void SendTransmitRequest(UInt64 destination, byte[] data)
 		{
+            
 			byte[] frame_data = new byte[data.Length + 14];
 
 			frame_data[0] = API_FRAME_TYPES.ZIGBEE_TRANSMIT_REQUEST;
-			frame_data[1] = 200;
+			frame_data[1] = frameID;
+
+            frameID++;
+            if(frameID == 255)
+            {
+                frameID = 0;
+            }
 
 			//byte[] destination_address_64 = BitConverter.GetBytes(destination);
             byte[] destination_address_64 = new byte[8];

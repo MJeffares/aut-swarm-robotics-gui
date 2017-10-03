@@ -185,9 +185,14 @@ namespace SwarmRoboticsGUI
                 rxMessageBuffer.Add(frame);
 
                 var T = Task<XbeeAPIFrame>.Factory.StartNew(() => ReadFrame(frame));
-                var message = T.Result;
-                if (message != null)
-                    Application.Current.Dispatcher.Invoke(() => rxXbeeMessageBuffer.Add(message));
+
+
+				var message = T.Result;
+				if (message != null)
+				{
+					Application.Current.Dispatcher.Invoke(() => rxXbeeMessageBuffer.Add(message));
+				}
+
             }
 		}
 
@@ -261,9 +266,10 @@ namespace SwarmRoboticsGUI
 			public const byte SYSTEM_TEST_TWI_EXTERNAL = 0xEC;
 			public const byte SYSTEM_TEST_CAMERA = 0xED;
 
-            public const byte TOWER_LIGHT_SENSORS = 0xF0;
-            public const byte TOWER_LEDS = 0xF1;
-            public const byte TOWER_DOCK_ENABLE = 0xF2;
+            public const byte CHARGING_STATION_LIGHT_SENSORS = 0xF0;
+            public const byte CHARGING_STATION_LEDS = 0xF1;
+            public const byte CHARGING_STATION_DOCK_ENABLE = 0xF2;
+            public const byte CHARGING_STATION_ROBOT_STATUS_REPORT = 0xF3;
             
 		}
 
@@ -362,17 +368,55 @@ namespace SwarmRoboticsGUI
             {
                 switch(message.messageID)
                 {
-                    case MESSAGE_TYPES.TOWER_LIGHT_SENSORS:
-                            DisplayTowerLightData(message as TowerDockingLightSensorData);
-                            break;
+                    case MESSAGE_TYPES.CHARGING_STATION_LIGHT_SENSORS:
+                        DisplayTowerLightData(message as TowerDockingLightSensorData);
+                        break;
 
-                    case MESSAGE_TYPES.TOWER_LEDS:
+                    case MESSAGE_TYPES.CHARGING_STATION_LEDS:
+						ChargingDockItem dock = (ChargingDockItem)window.ItemList.First(D => D is ChargingDockItem);
+						dock.DockingLights = message.messageData[2];
+						break;
+
+                    case MESSAGE_TYPES.CHARGING_STATION_DOCK_ENABLE:
 
                         break;
 
-                    case MESSAGE_TYPES.TOWER_DOCK_ENABLE:
+                    case MESSAGE_TYPES.CHARGING_STATION_ROBOT_STATUS_REPORT:
 
-                        break;
+						byte[] datatodock;
+						UInt64 destination = (message as TowerRobotReport).robotrequested;
+						RobotItem robot = (RobotItem)window.ItemList.Find(R => (R is RobotItem) && ((R as ICommunicates).Address64 == message.sourceAddress64));
+						ChargingDockItem chargingstation = (ChargingDockItem)window.ItemList.First(D => D is ChargingDockItem);
+
+
+						datatodock = new byte[20];
+						datatodock[0] = ProtocolClass.MESSAGE_TYPES.CHARGING_STATION_ROBOT_STATUS_REPORT;
+						datatodock[1] = 0x00; //read			
+
+						datatodock[2] = BitConverter.GetBytes(destination)[7];
+						datatodock[3] = BitConverter.GetBytes(destination)[6];
+						datatodock[4] = BitConverter.GetBytes(destination)[5];
+						datatodock[5] = BitConverter.GetBytes(destination)[4];
+						datatodock[6] = BitConverter.GetBytes(destination)[3];
+						datatodock[7] = BitConverter.GetBytes(destination)[2];
+						datatodock[8] = BitConverter.GetBytes(destination)[1];
+						datatodock[9] = BitConverter.GetBytes(destination)[0];
+
+						datatodock[10] = (byte)EnumUtils<TaskType>.FromDescription(robot.Task);
+
+						datatodock[11] = (byte)(robot.Battery >> 0x8);
+						datatodock[12] = (byte)(robot.Battery);
+
+						datatodock[13] = (byte)((int)(robot as IObstacle).Location.X >> 0x8);
+						datatodock[14] = (byte)((int)(robot as IObstacle).Location.X);
+						datatodock[15] = (byte)((int)(robot as IObstacle).Location.Y >> 0x8);
+						datatodock[16] = (byte)((int)(robot as IObstacle).Location.Y);
+						datatodock[17] = (byte)((int)robot.Facing >> 0x8);
+						datatodock[18] = (byte)((int)robot.Facing);
+
+
+						window.xbee.SendTransmitRequest(((ICommunicates)chargingstation).Address64, datatodock);
+						break;
 
                 }
             }
@@ -573,14 +617,19 @@ namespace SwarmRoboticsGUI
                     swarmMessage = new TWIMuxTestData(swarmMessage.RawMessage);
                     break;
 
-                    //MANSEL: Common issue with new receive
 
-                case MESSAGE_TYPES.TOWER_LIGHT_SENSORS:
+                case MESSAGE_TYPES.CHARGING_STATION_LIGHT_SENSORS:
                     swarmMessage = new TowerDockingLightSensorData(swarmMessage.RawMessage);
                     break;
 
-				default:
+				case MESSAGE_TYPES.CHARGING_STATION_ROBOT_STATUS_REPORT:
+					swarmMessage = new TowerRobotReport(swarmMessage.RawMessage);
+					break;
 
+				//MANSEL: Common issue with new receive
+
+				default:
+					MessageBox.Show("Error with unhandled type in communicationmanger.cs ParseSwarmProtocolMessage")
 					break;
 			}
 			return swarmMessage;
