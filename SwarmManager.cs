@@ -75,7 +75,7 @@ namespace SwarmRoboticsGUI
 
         }
 
-        private async void PositioningTimer_Tick(object sender, EventArgs arg)
+        private void PositioningTimer_Tick(object sender, EventArgs arg)
         {
             byte[] data;
 			byte[] datatorobot;
@@ -101,8 +101,7 @@ namespace SwarmRoboticsGUI
 
                 xbee.SendTransmitRequest(comms.Address64, data);
 
-				await Task.Delay(50);
-
+				/*
 				datatorobot = new byte[20];
 				datatorobot[0] = ProtocolClass.MESSAGE_TYPES.CHARGING_STATION_ROBOT_STATUS_REPORT;
 				datatorobot[1] = 0x00; //read
@@ -132,6 +131,7 @@ namespace SwarmRoboticsGUI
 
 
                 xbee.SendTransmitRequest(((ICommunicates)dock).Address64, datatorobot);
+				*/
             }            
         }
     }
