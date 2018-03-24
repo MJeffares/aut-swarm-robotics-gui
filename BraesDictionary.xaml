@@ -15,7 +15,7 @@
         </VisualBrush.Visual>
     </VisualBrush>
 
-
+    <!--
 
     <SolidColorBrush x:Key="DataGridColumnHeader.Static.Background" Color="#666"/>
     <SolidColorBrush x:Key="DataGridColumnHeader.Static.Border" Color="#444"/>
@@ -112,6 +112,8 @@
         </Setter>
     </Style>
 
+    -->
+    
     <Style x:Key="FocusVisual">
         <Setter Property="Control.Template">
             <Setter.Value>

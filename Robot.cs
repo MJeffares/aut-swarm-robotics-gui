@@ -585,238 +585,238 @@ namespace SwarmRoboticsGUI
         }
     }
 
-    public class ChargingDockItem : Item, INotifyPropertyChanged, IObstacle, ICommunicates
-    {
-        #region Communication Properties
-        private ulong _Address64 { get; set; }
-        ulong ICommunicates.Address64
-        {
-            get { return _Address64; }
-            set
-            {
-                if (_Address64 != value)
-                {
-                    _Address64 = value;
-                    NotifyPropertyChanged("Address64");
-                }
-            }
-        }
-        private ushort _Address16 { get; set; }
-        ushort ICommunicates.Address16
-        {
-            get { return _Address16; }
-            set
-            {
-                if (_Address16 != value)
-                {
-                    _Address16 = value;
-                    NotifyPropertyChanged("Address16");
-                }
-            }
-        }
-        private bool _IsCommunicating { get; set; }
-        bool ICommunicates.IsCommunicating
-        {
-            get { return _IsCommunicating; }
-            set
-            {
-                if (_IsCommunicating != value)
-                {
-                    _IsCommunicating = value;
-                    NotifyPropertyChanged("IsCommunicating");
-                }
-            }
-        }
-        #endregion
+	public class ChargingDockItem : Item, INotifyPropertyChanged, IObstacle, ICommunicates
+	{
+		#region Communication Properties
+		private ulong _Address64 { get; set; }
+		ulong ICommunicates.Address64
+		{
+			get { return _Address64; }
+			set
+			{
+				if (_Address64 != value)
+				{
+					_Address64 = value;
+					NotifyPropertyChanged("Address64");
+				}
+			}
+		}
+		private ushort _Address16 { get; set; }
+		ushort ICommunicates.Address16
+		{
+			get { return _Address16; }
+			set
+			{
+				if (_Address16 != value)
+				{
+					_Address16 = value;
+					NotifyPropertyChanged("Address16");
+				}
+			}
+		}
+		private bool _IsCommunicating { get; set; }
+		bool ICommunicates.IsCommunicating
+		{
+			get { return _IsCommunicating; }
+			set
+			{
+				if (_IsCommunicating != value)
+				{
+					_IsCommunicating = value;
+					NotifyPropertyChanged("IsCommunicating");
+				}
+			}
+		}
+		#endregion
 
-        #region Obstacle Properties
-        private System.Windows.Point _Location { get; set; }
-        System.Windows.Point IObstacle.Location
-        {
-            get { return _Location; }
-            set
-            {
-                if (_Location != value)
-                {
-                    _Location = value;
-                    NotifyPropertyChanged("Location");
-                }
-            }
-        }
-        private System.Drawing.Point _PixelLocation { get; set; }
-        System.Drawing.Point IObstacle.PixelLocation
-        {
-            get { return _PixelLocation; }
-            set
-            {
-                if (_PixelLocation != value)
-                {
-                    _PixelLocation = value;
-                    NotifyPropertyChanged("PixelLocation");
-                }
-            }
-        }
-        private System.Drawing.Point[] _Contour { get; set; }
-        System.Drawing.Point[] IObstacle.Contour
-        {
-            get { return _Contour; }
-            set
-            {
-                if (_Contour != value)
-                {
-                    _Contour = value;
-                    NotifyPropertyChanged("Contour");
-                }
-            }
-        }
-        private DateTime _LastVisible { get; set; }
-        DateTime IObstacle.LastVisible
-        {
-            get { return DateTime.Now; }
-            set
-            {
-                if (_LastVisible != value)
-                {
-                    _LastVisible = value;
-                    NotifyPropertyChanged("LastVisible");
-                }
-            }
-        }
-        private bool _IsVisible { get; set; }
-        bool IObstacle.IsVisible
-        {
-            get { return _IsVisible; }
-            set
-            {
-                if (_IsVisible != value)
-                {
-                    _IsVisible = value;
-                    NotifyPropertyChanged("IsVisible");
-                }
-            }
-        }
-        private bool _IsTracked { get; set; }
-        bool IObstacle.IsTracked
-        {
-            get { return _IsTracked; }
-            set
-            {
-                if (_IsTracked != value)
-                {
-                    _IsTracked = value;
-                    NotifyPropertyChanged("IsTracked");
-                }
-            }
-        }
-        private int _Radius { get; set; }
-        int IObstacle.Radius
-        {
-            get { return _Radius; }
-            set
-            {
-                if (_Radius != value)
-                {
-                    _Radius = value;
-                    NotifyPropertyChanged("Radius");
-                }
-            }
-        }
-        private int _Height { get; set; }
-        int IObstacle.Height
-        {
-            get { return _Height; }
-            set
-            {
-                if (_Height != value)
-                {
-                    _Height = value;
-                    NotifyPropertyChanged("Height");
-                }
-            }
-        }
-        private int _Width { get; set; }
-        int IObstacle.Width
-        {
-            get { return _Width; }
-            set
-            {
-                if (_Width != value)
-                {
-                    _Width = value;
-                    NotifyPropertyChanged("Width");
-                }
-            }
-        }
-        #endregion
+		#region Obstacle Properties
+		private System.Windows.Point _Location { get; set; }
+		System.Windows.Point IObstacle.Location
+		{
+			get { return _Location; }
+			set
+			{
+				if (_Location != value)
+				{
+					_Location = value;
+					NotifyPropertyChanged("Location");
+				}
+			}
+		}
+		private System.Drawing.Point _PixelLocation { get; set; }
+		System.Drawing.Point IObstacle.PixelLocation
+		{
+			get { return _PixelLocation; }
+			set
+			{
+				if (_PixelLocation != value)
+				{
+					_PixelLocation = value;
+					NotifyPropertyChanged("PixelLocation");
+				}
+			}
+		}
+		private System.Drawing.Point[] _Contour { get; set; }
+		System.Drawing.Point[] IObstacle.Contour
+		{
+			get { return _Contour; }
+			set
+			{
+				if (_Contour != value)
+				{
+					_Contour = value;
+					NotifyPropertyChanged("Contour");
+				}
+			}
+		}
+		private DateTime _LastVisible { get; set; }
+		DateTime IObstacle.LastVisible
+		{
+			get { return DateTime.Now; }
+			set
+			{
+				if (_LastVisible != value)
+				{
+					_LastVisible = value;
+					NotifyPropertyChanged("LastVisible");
+				}
+			}
+		}
+		private bool _IsVisible { get; set; }
+		bool IObstacle.IsVisible
+		{
+			get { return _IsVisible; }
+			set
+			{
+				if (_IsVisible != value)
+				{
+					_IsVisible = value;
+					NotifyPropertyChanged("IsVisible");
+				}
+			}
+		}
+		private bool _IsTracked { get; set; }
+		bool IObstacle.IsTracked
+		{
+			get { return _IsTracked; }
+			set
+			{
+				if (_IsTracked != value)
+				{
+					_IsTracked = value;
+					NotifyPropertyChanged("IsTracked");
+				}
+			}
+		}
+		private int _Radius { get; set; }
+		int IObstacle.Radius
+		{
+			get { return _Radius; }
+			set
+			{
+				if (_Radius != value)
+				{
+					_Radius = value;
+					NotifyPropertyChanged("Radius");
+				}
+			}
+		}
+		private int _Height { get; set; }
+		int IObstacle.Height
+		{
+			get { return _Height; }
+			set
+			{
+				if (_Height != value)
+				{
+					_Height = value;
+					NotifyPropertyChanged("Height");
+				}
+			}
+		}
+		private int _Width { get; set; }
+		int IObstacle.Width
+		{
+			get { return _Width; }
+			set
+			{
+				if (_Width != value)
+				{
+					_Width = value;
+					NotifyPropertyChanged("Width");
+				}
+			}
+		}
+		#endregion
 
-        private double _FacingDeg { get; set; }
-        public double FacingDeg
-        {
-            get { return _FacingDeg; }
-            set
-            {
-                if (_FacingDeg != value)
-                {
-                    _FacingDeg = value;
-                    NotifyPropertyChanged("FacingDeg");
-                }
-            }
-        }
-        private String _Colour { get; set; }
-        public String Colour
-        {
-            get { return _Colour; }
-            set
-            {
-                if (_Colour != value)
-                {
-                    _Colour = value;
-                    NotifyPropertyChanged("Colour");
-                }
-            }
-        }
+		private double _FacingDeg { get; set; }
+		public double FacingDeg
+		{
+			get { return _FacingDeg; }
+			set
+			{
+				if (_FacingDeg != value)
+				{
+					_FacingDeg = value;
+					NotifyPropertyChanged("FacingDeg");
+				}
+			}
+		}
+		private String _Colour { get; set; }
+		public String Colour
+		{
+			get { return _Colour; }
+			set
+			{
+				if (_Colour != value)
+				{
+					_Colour = value;
+					NotifyPropertyChanged("Colour");
+				}
+			}
+		}
 
-        private byte _DockingLights { get; set; }
-        public byte DockingLights
-        {
-            get { return _DockingLights; }
-            set
-            {
-                if (_DockingLights != value)
-                {
-                    _DockingLights = value;
-                    NotifyPropertyChanged("DockingLights");
-                }
-            }
-        }
+		private byte _DockingLights { get; set; }
+		public byte DockingLights
+		{
+			get { return _DockingLights; }
+			set
+			{
+				if (_DockingLights != value)
+				{
+					_DockingLights = value;
+					NotifyPropertyChanged("DockingLights");
+				}
+			}
+		}
 
-        public ChargingDockItem(String Name, UInt64 MAC_Address, string Colour) : base(Name)
-        {
-            this.Name = Name;
-            this.Group = "Charging Stations";
-            this.Colour = "Green";
-            this.FacingDeg = 30;
+		public ChargingDockItem(String Name, UInt64 MAC_Address, string Colour) : base(Name)
+		{
+			this.Name = Name;
+			this.Group = "Charging Stations";
+			this.Colour = "Green";
+			this.FacingDeg = 30;
 
-            ICommunicates comms = this;
-            comms.Address16 = 0xFFFE;
-            comms.Address64 = MAC_Address;
+			ICommunicates comms = this;
+			comms.Address16 = 0xFFFE;
+			comms.Address64 = MAC_Address;
 
-            IObstacle obstacle = this;
-            // TEMP: Size of the displayed charging dock is fixed
-            obstacle.Radius = 70;
-            obstacle.Width = 2 * obstacle.Radius;
-            obstacle.Height = (int)(Math.Sqrt(3) * obstacle.Radius);
-            obstacle.IsVisible = true;
-            double X = (600 - obstacle.Width/2);
-            double Y = (600 - obstacle.Height/2);
-            DockingLights = 0;
-            //double X = (double)1177 / 2;
-            //double Y = (double)1177 / 2;
-            obstacle.Location = new System.Windows.Point(X, Y);
-        }
-    }
+			IObstacle obstacle = this;
+			// TEMP: Size of the displayed charging dock is fixed
+			obstacle.Radius = 70;
+			obstacle.Width = 2 * obstacle.Radius;
+			obstacle.Height = (int)(Math.Sqrt(3) * obstacle.Radius);
+			obstacle.IsVisible = true;
+			double X = (600 - obstacle.Width / 2);
+			double Y = (600 - obstacle.Height / 2);
+			DockingLights = 0;
+			//double X = (double)1177 / 2;
+			//double Y = (double)1177 / 2;
+			obstacle.Location = new System.Windows.Point(X, Y);
+		}
+	}
 
-    public class CommunicationItem : Item, INotifyPropertyChanged, ICommunicates
+	public class CommunicationItem : Item, INotifyPropertyChanged, ICommunicates
     {
         #region Communication Properties
         private ulong _Address64 { get; set; }
