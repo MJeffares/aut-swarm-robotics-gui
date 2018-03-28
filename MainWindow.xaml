@@ -897,6 +897,20 @@
 
                     </TabItem>
 
+                    <TabItem Header="Camera" IsEnabled="False" >
+                        <StackPanel Margin = "5">
+
+                            <WrapPanel Margin="0,2">
+                                <Button x:Name="btnCameraTest" Content="Camera Test" Margin="5,5,0,5" Click="btnCameraTest_Click" />
+                                <Button x:Name="btn1" Content = "Placeholder" Margin="5,5,0,5" />
+                                <Button x:Name="btn2" Content = "Placeholder" Margin="5,5,0,5" />
+                            </WrapPanel>
+
+                            <Image x:Name="testImage" />
+
+                        </StackPanel>
+                    </TabItem>
+
                 </TabControl>
             </DockPanel>
 

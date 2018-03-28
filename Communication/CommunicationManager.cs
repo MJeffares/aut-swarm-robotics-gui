@@ -264,9 +264,10 @@ namespace SwarmRoboticsGUI
 			public const byte SYSTEM_TEST_FAST_CHARGE_CHIP = 0xEA;
 			public const byte SYSTEM_TEST_TWI_MUX = 0xEB;
 			public const byte SYSTEM_TEST_TWI_EXTERNAL = 0xEC;
-			public const byte SYSTEM_TEST_CAMERA = 0xED;
+			public const byte SYSTEM_TEST_CAMERA_FRAME_REQUEST = 0xED;
+			public const byte SYSTEM_TEST_CAMERA_FRAME_INFORMATION = 0xEE;
 
-            public const byte CHARGING_STATION_LIGHT_SENSORS = 0xF0;
+			public const byte CHARGING_STATION_LIGHT_SENSORS = 0xF0;
             public const byte CHARGING_STATION_LEDS = 0xF1;
             public const byte CHARGING_STATION_DOCK_ENABLE = 0xF2;
             public const byte CHARGING_STATION_ROBOT_STATUS_REPORT = 0xF3;
@@ -358,9 +359,13 @@ namespace SwarmRoboticsGUI
                            
                         break;
 
-                    case MESSAGE_TYPES.SYSTEM_TEST_CAMERA:
+					case MESSAGE_TYPES.SYSTEM_TEST_CAMERA_FRAME_INFORMATION:
                         
                         break;
+
+					case MESSAGE_TYPES.SYSTEM_TEST_CAMERA_FRAME_REQUEST:
+
+						break;
                     
                 }
             }
@@ -584,6 +589,14 @@ namespace SwarmRoboticsGUI
 
 			switch(swarmMessage.messageID)
 			{
+				case MESSAGE_TYPES.SYSTEM_TEST_CAMERA_FRAME_REQUEST:
+					swarmMessage = new CameraTestRequest(swarmMessage.RawMessage);
+					break;
+
+				case MESSAGE_TYPES.SYSTEM_TEST_CAMERA_FRAME_INFORMATION:
+					swarmMessage = new CameraTestData(swarmMessage.RawMessage);
+					break;
+
                 case MESSAGE_TYPES.DEBUG_STRING:
                     swarmMessage = new DebugString(swarmMessage.RawMessage);
                     break;
@@ -921,7 +934,10 @@ namespace SwarmRoboticsGUI
 				case MESSAGE_TYPES.SYSTEM_TEST_TWI_EXTERNAL:
 					return "NOT YET COMPLETED";
 
-				case MESSAGE_TYPES.SYSTEM_TEST_CAMERA:
+				case MESSAGE_TYPES.SYSTEM_TEST_CAMERA_FRAME_REQUEST:
+					return "NOT YET COMPLETED";
+
+				case MESSAGE_TYPES.SYSTEM_TEST_CAMERA_FRAME_INFORMATION:
 					return "NOT YET COMPLETED";
 
 				default:

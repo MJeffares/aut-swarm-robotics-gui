@@ -10,6 +10,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using WPFCustomMessageBox;
 using XbeeHandler;
 using XbeeHandler.XbeeFrames;
@@ -36,10 +37,36 @@ namespace SwarmRoboticsGUI
 
     public partial class MainWindow : Window
     {
+		#region Robot Camera
 
-        #region Tower Control
+		public void TestImage()
+		{
+			double dpi = 96;
+			int width = 320;
+			int height = 240;
+			UInt16[] pixelData = new UInt16[width * height];
+			
 
-        public List<ToggleButton> dockLightControls;
+			for (int y = 0; y < height; ++y)
+			{
+				int yIndex = y * width;
+				for (int x = 0; x < width; ++x)
+				{
+					//pixelData[x + yIndex] = (UInt16)(x + y);
+					pixelData[x + yIndex] = (UInt16)(0);
+				}
+			}
+
+			BitmapSource bmpSource = BitmapSource.Create(width, height, dpi, dpi, PixelFormats.Bgr555, null, pixelData, width*2);
+
+			testImage.Source = bmpSource;
+		}
+
+		#endregion
+
+		#region Tower Control
+
+		public List<ToggleButton> dockLightControls;
 
         //Constructor
         public void TowerControlSetup()
@@ -255,6 +282,7 @@ namespace SwarmRoboticsGUI
             public const byte DATA = 0x00;
             public const byte SINGLE_SAMPLE = 0x01;
             public const byte START_STREAMING = 0x02;
+			public const byte IMAGE = 0x03;
             public const byte STOP_STREAMING = 0xFF;
         }
         public static class SYSTEM_TEST_MESSAGE

@@ -152,7 +152,10 @@ namespace SwarmRoboticsGUI
             TowerControlSetup();
             //
             InitializeInterfaceTimer();
-        }
+
+			TestImage();
+
+		}
 
         #region Private Methods
         private void InitializeInterfaceTimer()
@@ -707,8 +710,27 @@ namespace SwarmRoboticsGUI
             //camera1.CloseCapture();
         }
 
-       
+		private void btnCameraTest_Click(object sender, RoutedEventArgs e)
+		{
+			byte[] data;
+			data = new byte[10];
+			data[0] = SYSTEM_TEST_MESSAGE.CAMERA;
+			data[1] = REQUEST.IMAGE;
+			data[2] = 0x00;		//start pixel
+			data[3] = 0x00;     //start pixel
+			data[4] = 0x00;     //start pixel
+			data[5] = 0x00;     //start pixel
+			data[6] = 0x00;     //end pixel
+			data[7] = 0x00;     //end pixel
+			data[8] = 0x00;     //end pixel
+			data[9] = 0x14;     //end pixel
 
-        
-    }
+			xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
+
+			//CommunicationManager.WaitForMessage tada = new CommunicationManager.WaitForMessage(0xE1, 15000, MyHandler);
+
+			//EstablishingCommunicationsWindow = new ProgressWindow("Establishing Communications", "Please wait while communications are tested.");
+			//EstablishingCommunicationsWindow.ShowDialog();
+		}
+	}
 }

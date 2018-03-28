@@ -307,6 +307,28 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		}
 	}
 
+	public class CameraTestData : SwarmProtocolMessage
+	{
+		public UInt32 pixel_index;
+		public UInt16[] pixel_data;
+
+		public CameraTestData(byte[] frame) : base(frame)
+		{
+			pixel_index = (UInt32)(messageData[0] << 24 | messageData[1] << 16 | messageData[2] << 8 | messageData[3]);
+			pixel_data = new UInt16[messageData.Length - 4];
+			Array.Copy(messageData, 4, pixel_data, 0, messageData.Length - 4);
+			dispMessageType = "Camera Image Data";
+		}
+	}
+
+	public class CameraTestRequest : SwarmProtocolMessage
+	{
+		public CameraTestRequest(byte[] frame) : base(frame)
+		{
+			dispMessageType = "Camera Image Data";
+		}
+	}
+
     public class TowerDockingLightSensorData : SystemTestMessage
     {
         public static class Sensors
