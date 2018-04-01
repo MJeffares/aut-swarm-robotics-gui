@@ -39,12 +39,16 @@ namespace SwarmRoboticsGUI
     {
 		#region Robot Camera
 
+		public UInt16[] pixelData;
+		public BitmapSource mybmpSource;
+
+
 		public void TestImage()
 		{
 			double dpi = 96;
 			int width = 320;
 			int height = 240;
-			UInt16[] pixelData = new UInt16[width * height];
+			pixelData = new UInt16[width * height];
 			
 
 			for (int y = 0; y < height; ++y)
@@ -53,14 +57,66 @@ namespace SwarmRoboticsGUI
 				for (int x = 0; x < width; ++x)
 				{
 					//pixelData[x + yIndex] = (UInt16)(x + y);
-					pixelData[x + yIndex] = (UInt16)(0);
+					pixelData[x + yIndex] = (UInt16)(255);
 				}
 			}
 
-			BitmapSource bmpSource = BitmapSource.Create(width, height, dpi, dpi, PixelFormats.Bgr555, null, pixelData, width*2);
+			mybmpSource = BitmapSource.Create(width, height, dpi, dpi, PixelFormats.Bgr555, null, pixelData, width*2);
 
-			testImage.Source = bmpSource;
+			testImage.Source = mybmpSource;
 		}
+
+		public void updatePixelData(UInt32 index, UInt16[] data)
+		{
+			Array.Copy(data, 0, pixelData, index, data.Length);
+			double dpi = 96;
+			int width = 320;
+			int height = 240;
+			BitmapSource bmpSource = BitmapSource.Create(width, height, dpi, dpi, PixelFormats.Bgr555, null, pixelData, width * 2);
+			bmpSource.Freeze();
+			
+
+			//testImage.Source = bmpSource;
+			UpdateImageSource(testImage, bmpSource);
+		}
+
+		
+		public delegate void UpdateImageSourceCallback(Image img, BitmapSource source);
+		public void UpdateImageSource(Image img, BitmapSource source)
+		{
+			//control.Text = TextAlignment;
+			//lvCommunicatedMessages.Dispatcher.Invoke(new RefreshListViewCallback(this.Refresh));
+			//control.Dispatcher.Invoke(new UpdateTextBoxCallback(this.UpdateText),new object { control, text } );
+
+			img.Dispatcher.Invoke(new UpdateImageSourceCallback(this.UpdateSource), new object[] { img, source });
+		}
+		private void UpdateSource(Image img, BitmapSource source)
+		{
+			img.Source = source;
+		}
+		
+
+
+
+
+		/*
+		public delegate void UpdateTextBoxCallback(TextBox control, string text);
+		public void UpdateTextBox(TextBox control, string text)
+		{
+			//control.Text = TextAlignment;
+			//lvCommunicatedMessages.Dispatcher.Invoke(new RefreshListViewCallback(this.Refresh));
+			//control.Dispatcher.Invoke(new UpdateTextBoxCallback(this.UpdateText),new object { control, text } );
+
+			control.Dispatcher.Invoke(new UpdateTextBoxCallback(this.UpdateText), new object[] { control, text });
+		}
+		private void UpdateText(TextBox control, string text)
+		{
+			control.Text = text;
+		}
+		*/
+
+
+
 
 		#endregion
 

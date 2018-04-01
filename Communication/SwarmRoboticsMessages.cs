@@ -310,14 +310,34 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 	public class CameraTestData : SwarmProtocolMessage
 	{
 		public UInt32 pixel_index;
-		public UInt16[] pixel_data;
+		public UInt16[] rgb_pixel_data;
+		public UInt16[] bgr_pixel_data;
+		public uint request_type;
+
+		public UInt16 red_mask = 0b0111110000000000;
+		public UInt16 green_mask = 0b0000001111100000;
+		public UInt16 blue_mask = 0b0000000000011111;
+
 
 		public CameraTestData(byte[] frame) : base(frame)
 		{
-			pixel_index = (UInt32)(messageData[0] << 24 | messageData[1] << 16 | messageData[2] << 8 | messageData[3]);
-			pixel_data = new UInt16[messageData.Length - 4];
-			Array.Copy(messageData, 4, pixel_data, 0, messageData.Length - 4);
+			request_type = messageData[0];
+			pixel_index = (UInt32)(messageData[1] << 24 | messageData[2] << 16 | messageData[3] << 8 | messageData[4]);
+			rgb_pixel_data = new UInt16[(messageData.Length - 5) / 2];
+			bgr_pixel_data = new UInt16[(messageData.Length - 5) / 2];
+
+			for (int i = 5, j = 0; i < messageData.Length; i+=2, j++)
+			{
+				rgb_pixel_data[j] = BitConverter.ToUInt16(messageData, i);
+			}
+
+			//Array.Copy(messageData, 5, pixel_data, 0, messageData.Length - 5);
 			dispMessageType = "Camera Image Data";
+
+			for(int i = 0; i < rgb_pixel_data.Length; i++)
+			{
+				bgr_pixel_data[i] = (UInt16) (((rgb_pixel_data[1] & red_mask) >> 10) | (rgb_pixel_data[1] & green_mask) | ((rgb_pixel_data[1] & blue_mask) << 10));
+			}
 		}
 	}
 

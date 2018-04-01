@@ -360,7 +360,7 @@ namespace SwarmRoboticsGUI
                         break;
 
 					case MESSAGE_TYPES.SYSTEM_TEST_CAMERA_FRAME_INFORMATION:
-                        
+						updatePixelDataWrapper(message as CameraTestData);
                         break;
 
 					case MESSAGE_TYPES.SYSTEM_TEST_CAMERA_FRAME_REQUEST:
@@ -576,6 +576,13 @@ namespace SwarmRoboticsGUI
 
 			window.UpdateTextBox(window.tbSysTestTWIRead, window.twiMuxAddresses.FirstOrDefault(x => x.Value == message.address).Key);
         }
+
+
+		public void updatePixelDataWrapper(CameraTestData message)
+		{
+			window.updatePixelData(message.pixel_index, message.bgr_pixel_data);
+		}
+
 
 
 
