@@ -46,7 +46,7 @@ namespace SwarmRoboticsGUI
 		public void TestImage()
 		{
 			double dpi = 96;
-			int width = 320;
+			int width = 310;
 			int height = 240;
 			pixelData = new UInt16[width * height];
 			
@@ -57,11 +57,11 @@ namespace SwarmRoboticsGUI
 				for (int x = 0; x < width; ++x)
 				{
 					//pixelData[x + yIndex] = (UInt16)(x + y);
-					pixelData[x + yIndex] = (UInt16)(255);
+					pixelData[x + yIndex] = (UInt16)(65000);
 				}
 			}
 
-			mybmpSource = BitmapSource.Create(width, height, dpi, dpi, PixelFormats.Bgr555, null, pixelData, width*2);
+			mybmpSource = BitmapSource.Create(width, height, dpi, dpi, PixelFormats.Bgr565, null, pixelData, width*2);
 
 			testImage.Source = mybmpSource;
 		}
@@ -70,9 +70,9 @@ namespace SwarmRoboticsGUI
 		{
 			Array.Copy(data, 0, pixelData, index, data.Length);
 			double dpi = 96;
-			int width = 320;
+			int width = 310;
 			int height = 240;
-			BitmapSource bmpSource = BitmapSource.Create(width, height, dpi, dpi, PixelFormats.Bgr555, null, pixelData, width * 2);
+			BitmapSource bmpSource = BitmapSource.Create(width, height, dpi, dpi, PixelFormats.Bgr565, null, pixelData, width * 2);
 			bmpSource.Freeze();
 			
 
