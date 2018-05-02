@@ -57,7 +57,7 @@ namespace SwarmRoboticsGUI
 				for (int x = 0; x < width; ++x)
 				{
 					//pixelData[x + yIndex] = (UInt16)(x + y);
-					pixelData[x + yIndex] = (UInt16)(65000);
+					pixelData[x + yIndex] = (UInt16)(0xfb96); //hot pink
 				}
 			}
 

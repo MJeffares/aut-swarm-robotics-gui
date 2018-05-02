@@ -350,7 +350,7 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 
 			for(int i = 0; i < rgb_pixel_data.Length; i++)
 			{
-				bgr_pixel_data[i] = (UInt16) (((rgb_pixel_data[i] & red_mask) >> 10) | (rgb_pixel_data[i] & green_mask) | ((rgb_pixel_data[i] & blue_mask) << 10));
+				bgr_pixel_data[i] = (UInt16) (((rgb_pixel_data[i] & red_mask) >> 11) | (rgb_pixel_data[i] & green_mask) | ((rgb_pixel_data[i] & blue_mask) << 11));
 			}
 		}
 	}
