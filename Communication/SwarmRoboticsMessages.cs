@@ -314,17 +314,10 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 		public UInt16[] bgr_pixel_data;
 		public uint request_type;
 
-
+		//RGB 565 HEX masks
         public UInt16 red_mask = 0xF800;
         public UInt16 green_mask = 0x07E0;
         public UInt16 blue_mask = 0x001F;
-        //public UInt16 red_mask = 0x7C00;
-        //public UInt16 green_mask = 0x03E0;
-        //public UInt16 blue_mask = 0x001F;
-
-        //public UInt16 red_mask = 0b1111100000000000;
-        //public UInt16 green_mask = 0b0000011111100000;
-        //public UInt16 blue_mask = 0b0000000000011111;
 
 
         public CameraTestData(byte[] frame) : base(frame)
@@ -348,9 +341,15 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
             //Array.Copy(messageData, 5, pixel_data, 0, messageData.Length - 5);
             dispMessageType = "Camera Image Data";
 
-			for(int i = 0; i < rgb_pixel_data.Length; i++)
+			
+
+			for (int i = 0; i < rgb_pixel_data.Length; i++)
 			{
-				bgr_pixel_data[i] = (UInt16) (((rgb_pixel_data[i] & red_mask) >> 11) | (rgb_pixel_data[i] & green_mask) | ((rgb_pixel_data[i] & blue_mask) << 11));
+				UInt16 red_pixel = (UInt16)((rgb_pixel_data[i] & red_mask) >> 11);
+				UInt16 green_pixel = (UInt16)((rgb_pixel_data[i] & green_mask) >> 5);
+				UInt16 blue_pixel = (UInt16)(rgb_pixel_data[i] & blue_mask);
+
+				bgr_pixel_data[i] = (UInt16)((blue_pixel << 11) | (green_pixel << 5) | red_pixel);
 			}
 		}
 	}
