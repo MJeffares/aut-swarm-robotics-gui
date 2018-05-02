@@ -903,7 +903,7 @@
                             <WrapPanel Margin="0,2">
                                 <Button x:Name="btnCameraTest" Content="Camera Test" Margin="5,5,0,5" Click="btnCameraTest_Click" />
                                 <Button x:Name="btnCameraTestClearFrame" Content = "Reset Frame" Margin="5,5,0,5" Click="btnCameraTestClearFrame_Click"/>
-                                <Button x:Name="btn2" Content = "Placeholder" Margin="5,5,0,5" />
+                                <Button x:Name="btnCameraTestSaveImage" Content = "Save Image" Margin="5,5,0,5" Click="btnCameraTestSaveImage_Click"/>
                             </WrapPanel>
 
                             <Image x:Name="testImage" />

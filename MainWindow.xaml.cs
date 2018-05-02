@@ -739,5 +739,21 @@ namespace SwarmRoboticsGUI
 		{
 			TestImage();
 		}
+
+		private void btnCameraTestSaveImage_Click(object sender, RoutedEventArgs e)
+		{
+			SaveFileDialog saveRobotImageDialog = new SaveFileDialog();
+			saveRobotImageDialog.Filter = "Image files (*.png;*.jpeg)|*.png;*.jpeg|All files (*.*)|*.*";
+			saveRobotImageDialog.FileName = "RobotImage.png";
+			if (saveRobotImageDialog.ShowDialog() == true)
+			{
+				using (var fileStream = new FileStream(saveRobotImageDialog.FileName, FileMode.Create))
+				{
+					BitmapEncoder encoder = new PngBitmapEncoder();
+					encoder.Frames.Add(BitmapFrame.Create(mybmpSource));
+					encoder.Save(fileStream);
+				}
+			}
+		}
 	}
 }
