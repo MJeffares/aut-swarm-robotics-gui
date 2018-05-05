@@ -199,7 +199,7 @@ namespace SwarmRoboticsGUI
 
 
                 // Filter out small and large contours
-                FilterContourArea(Contours, FilteredContours, 1000, 5000);
+                FilterContourArea(Contours, FilteredContours, 500, 10000);
 
                 // DEBUG: Report images - Arena cropped with internal contours filtered by area
                 //var ContourMat = new Mat(Input.Size, Input.Depth, Input.NumberOfChannels);
@@ -359,7 +359,7 @@ namespace SwarmRoboticsGUI
             //CvInvoke.Imwrite("Arena-AllContours.png", ContourMat);
 
             // Filter out small and large contours
-            FilterContourArea(Contours, ProcessedContours, 1000000, 1500000);
+            FilterContourArea(Contours, ProcessedContours, 100000, 15000000);
 
             // DEBUG: Report images - Arena filtered contours based on area
             //var ContourMat = new Mat(Input.Size, Input.Depth, Input.NumberOfChannels);
