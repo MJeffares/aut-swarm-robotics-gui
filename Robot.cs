@@ -39,8 +39,18 @@ namespace SwarmRoboticsGUI
         [Description("Light Following")]
         LightFollow = 10,
         [Description("Moving Random")]
-        RandomMovement = 11
-    };
+        RandomMovement = 11,
+		[Description("Moving To a Specified Position")]
+		MoveToPosition = 12,
+		[Description("Rotating To a Heading")]
+		RotateToHeading = 13,
+		[Description("Delaying Start")]
+		StartDelay = 14,
+		[Description("Calibrating IMU")]
+		IMUCal = 15,
+		[Description("Docking Old")]
+		DockingOld = 16
+	};
 
     public class Item: INotifyPropertyChanged
     {
