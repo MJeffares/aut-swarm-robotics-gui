@@ -343,20 +343,24 @@ namespace SwarmRoboticsGUI
         }
         public static class SYSTEM_TEST_MESSAGE
         {
-            public const byte MODE = 0xE0;
+            public const byte MODE = 0xE0;				//???
             public const byte COMMUNICATION = 0xE1;
-            public const byte PROXIMITY = 0xE4;
+			//0xE2  reserved
+			//0xE3  reserved
+			public const byte PROXIMITY = 0xE4;
             public const byte LIGHT = 0xE5;
             public const byte MOTORS = 0xE6;
             public const byte MOUSE = 0xE7;
             public const byte IMU = 0xE8;
             public const byte LINE_FOLLOWERS = 0xE9;
-            public const byte FAST_CHARGE = 0xEA;
-            public const byte TWI_MUX = 0xEB;
-            public const byte TWI_EXT = 0xEC;
-            public const byte CAMERA = 0xED;
-        }
-        private void updateSystemsTest(string test, byte request)
+			//0xEA  reserved
+			public const byte TWI_MUX = 0xEB;
+			//0xEC  reserved
+			public const byte CAMERA = 0xED;
+			//0xEE  reserved
+			//0xEF  reserved
+		}
+		private void updateSystemsTest(string test, byte request)
         {
             string[] tokens = test.Split(',');
             byte[] data;
@@ -382,7 +386,7 @@ namespace SwarmRoboticsGUI
 
                     xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
                     break;
-
+				
                 case "Mouse":
                     data = new byte[2];
                     data[0] = 0xE7;
@@ -426,30 +430,42 @@ namespace SwarmRoboticsGUI
 
             byte[] motor = MJLib.StringToByteArrayFastest(slider.Tag.ToString());
 
-            byte[] data = new byte[3];
+            byte[] data = new byte[4];
             data[0] = 0xE6;
-            data[1] = motor[0];
-            data[2] += (byte)Math.Abs(slider.Value);
+			data[1] = 0x00;
+            data[2] = motor[0];
+			data[3] = 0x00;
 
-            xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
+			xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
         }
         private void slMotor_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+			
             Slider slider = sender as Slider;
             byte[] motor = MJLib.StringToByteArrayFastest(slider.Tag.ToString());
 
-            byte[] data = new byte[3];
+            byte[] data = new byte[4];
             data[0] = 0xE6;
-            data[1] = motor[0];
+			data[1] = 0x02;
+            data[2] = motor[0];
 
-            if (slider.Value > 0)
+            if (slider.Value > 2)
             {
-                data[2] = 0x80;
-            }
-
-            data[2] += (byte)Math.Abs(slider.Value);
-
+                data[3] = 0x80;
+				data[3] += (byte)Math.Abs(slider.Value);
+			}
+			else if (slider.Value < -2)
+			{
+				data[3] += (byte)Math.Abs(slider.Value);
+			}
+			else
+			{
+				data[1] = 0x00;
+				data[3] = 0x00;
+			}
+			
             xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
+			
         }
         private void btnSysTestTWISet_Click(object sender, RoutedEventArgs e)
         {

@@ -335,18 +335,22 @@ namespace SwarmRoboticsGUI
                         DisplayLightSensorData(message as LightSensorTestData);
                         break;
 
-                    case MESSAGE_TYPES.SYSTEM_TEST_LINE_FOLLOWERS:
+					case MESSAGE_TYPES.SYSTEM_TEST_MOTORS:
+						//TODO:
+						//MANSEL: motors display
+						break;
+
+					case MESSAGE_TYPES.SYSTEM_TEST_MOUSE:
+						DisplayMouseSensorData(message as MouseSensorTestData);
+						break;
+
+					case MESSAGE_TYPES.SYSTEM_TEST_IMU:
+						DisplayIMUSensorData(message as IMUSensorTestData);
+						break;
+
+					case MESSAGE_TYPES.SYSTEM_TEST_LINE_FOLLOWERS:
                         DisplayLineSensorData(message as LineSensorTestData);
                         break;
-
-                    case MESSAGE_TYPES.SYSTEM_TEST_MOUSE:
-                        DisplayMouseSensorData(message as MouseSensorTestData);
-                        break;
-
-                    case MESSAGE_TYPES.SYSTEM_TEST_IMU:
-                        DisplayIMUSensorData(message as IMUSensorTestData);
-                        break;
-
 
                     case MESSAGE_TYPES.SYSTEM_TEST_TWI_MUX:
                         DisplayTWIMuxTestData(message as TWIMuxTestData);
@@ -489,9 +493,6 @@ namespace SwarmRoboticsGUI
             }
         }
 
-
-
-
 		public void DisplayProximityData(ProximitySensorTestData message)
 		{
 			switch(message.sensor)
@@ -577,16 +578,10 @@ namespace SwarmRoboticsGUI
 			window.UpdateTextBox(window.tbSysTestTWIRead, window.twiMuxAddresses.FirstOrDefault(x => x.Value == message.address).Key);
         }
 
-
 		public void updatePixelDataWrapper(CameraTestData message)
 		{
 			window.updatePixelData(message.pixel_index, message.bgr_pixel_data);
 		}
-
-
-
-
-
 
 
 
@@ -632,6 +627,9 @@ namespace SwarmRoboticsGUI
                     swarmMessage = new IMUSensorTestData(swarmMessage.RawMessage);
                     break;
 
+				case MESSAGE_TYPES.SYSTEM_TEST_MOTORS:
+					swarmMessage = new MotorTestData(swarmMessage.RawMessage);
+					break;
 
                 case MESSAGE_TYPES.SYSTEM_TEST_TWI_MUX:
                     swarmMessage = new TWIMuxTestData(swarmMessage.RawMessage);
