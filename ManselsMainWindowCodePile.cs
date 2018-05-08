@@ -432,7 +432,7 @@ namespace SwarmRoboticsGUI
 
             byte[] data = new byte[4];
             data[0] = 0xE6;
-			data[1] = 0x00;
+			data[1] = 0xFF;
             data[2] = motor[0];
 			data[3] = 0x00;
 
@@ -460,7 +460,7 @@ namespace SwarmRoboticsGUI
 			}
 			else
 			{
-				data[1] = 0x00;
+				data[1] = 0xFF;
 				data[3] = 0x00;
 			}
 			

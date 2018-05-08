@@ -498,27 +498,27 @@ namespace SwarmRoboticsGUI
 			switch(message.sensor)
 			{
 				case ProximitySensorTestData.Sensors.proximityA:
-					window.UpdateTextBox(window.tbSysTestProximityA, message.MessageDataDisplay);
+					window.UpdateTextBox(window.tbSysTestProximityA, message.sensorValue.ToString());
 					break;
 
 				case ProximitySensorTestData.Sensors.proximityB:
-					window.UpdateTextBox(window.tbSysTestProximityB, message.MessageDataDisplay);
+					window.UpdateTextBox(window.tbSysTestProximityB, message.sensorValue.ToString());
 					break;
 
 				case ProximitySensorTestData.Sensors.proximityC:
-					window.UpdateTextBox(window.tbSysTestProximityC, message.MessageDataDisplay);
+					window.UpdateTextBox(window.tbSysTestProximityC, message.sensorValue.ToString());
 					break;
 
 				case ProximitySensorTestData.Sensors.proximityD:
-					window.UpdateTextBox(window.tbSysTestProximityD, message.MessageDataDisplay);
+					window.UpdateTextBox(window.tbSysTestProximityD, message.sensorValue.ToString());
 					break;
 
 				case ProximitySensorTestData.Sensors.proximityE:
-					window.UpdateTextBox(window.tbSysTestProximityE, message.MessageDataDisplay);
+					window.UpdateTextBox(window.tbSysTestProximityE, message.sensorValue.ToString());
 					break;
 
 				case ProximitySensorTestData.Sensors.proximityF:
-					window.UpdateTextBox(window.tbSysTestProximityF, message.MessageDataDisplay);
+					window.UpdateTextBox(window.tbSysTestProximityF, message.sensorValue.ToString());
 					break;
 			}
 		}
@@ -528,11 +528,11 @@ namespace SwarmRoboticsGUI
             switch(message.sensor)
             {	
                 case LightSensorTestData.Sensors.leftHandSide:
-                    window.UpdateTextBox(window.tbSysTestLightSensorLHS, message.MessageDataDisplay);
+                    window.UpdateTextBox(window.tbSysTestLightSensorLHS, message.sensorValue.ToString());
                     break;
 
                 case LightSensorTestData.Sensors.rightHandSide:
-                    window.UpdateTextBox(window.tbSysTestLightSensorRHS, message.MessageDataDisplay);
+                    window.UpdateTextBox(window.tbSysTestLightSensorRHS, message.sensorValue.ToString());
                     break;
             }
         }
@@ -555,19 +555,19 @@ namespace SwarmRoboticsGUI
             switch(message.sensor)
             {
                 case LineSensorTestData.Sensors.farLeft:
-                    window.UpdateTextBox(window.tbSysTestLineFollowerFarLeft, message.MessageDataDisplay);
+                    window.UpdateTextBox(window.tbSysTestLineFollowerFarLeft, message.sensorValue.ToString());
                     break;
 
                 case LineSensorTestData.Sensors.centreLeft:
-                    window.UpdateTextBox(window.tbSysTestLineFollowerCentreLeft, message.MessageDataDisplay);
+                    window.UpdateTextBox(window.tbSysTestLineFollowerCentreLeft, message.sensorValue.ToString());
                     break;
 
                 case LineSensorTestData.Sensors.centreRight:
-                    window.UpdateTextBox(window.tbSysTestLineFollowerCentreRight, message.MessageDataDisplay);
+                    window.UpdateTextBox(window.tbSysTestLineFollowerCentreRight, message.sensorValue.ToString());
                     break;
 
                 case LineSensorTestData.Sensors.farRight:
-                    window.UpdateTextBox(window.tbSysTestLineFollowerFarRight, message.MessageDataDisplay);
+                    window.UpdateTextBox(window.tbSysTestLineFollowerFarRight, message.sensorValue.ToString());
                     break;
             }
         }
@@ -1252,5 +1252,3 @@ namespace SwarmRoboticsGUI
 	//	*/
 	//}
 }
-
-
