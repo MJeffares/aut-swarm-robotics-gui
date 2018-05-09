@@ -59,6 +59,8 @@
                 <MenuItem x:Name="menuRecordNew" Header="New Recording" IsEnabled="False" Click="menuRecordNew_Click" />
                 <MenuItem x:Name="menuRecordPause" Header="Pause Recording" IsCheckable="True" IsEnabled="False"/>
                 <MenuItem x:Name="menuRecordStop" Header="Stop Recording" IsEnabled="False" Click="menuRecordStop_Click" />
+                <MenuItem x:Name="saveDebugMessages" Header="Save Debug Messages" Click="saveDebugMessages_Click"/>
+
                 <Separator/>
                 <MenuItem x:Name="menuRecordingSettings" Header="Recording Settings" />
             </MenuItem>
@@ -179,12 +181,13 @@
                            HorizontalAlignment="Center" 
                            VerticalAlignment="Center"
                            TextAlignment="Center"/>
-                <WrapPanel Grid.Row="1">
+                <WrapPanel Grid.Column="0" Grid.Row="1" Background="DeepPink">
                     <!--<Button x:Name="receivedDataNewline" Content="/n" Margin="10" Click="receivedDataNewline_Click"/>-->
                     <!--<Button x:Name="receivedDataClear" Content="clear" Margin="5" Click="receivedDataClear_Click"/>-->
                     <!--<Button x:Name="receivedDataClear" Content="clear" Margin="5" Click="receivedDataClear_Click"/>-->
                     <!--<Button x:Name="receivedDataRemove" Content="Add" Margin="5" Click="receivedDataAdd_Click"/>
                     <Button x:Name="receivedDataAdd" Content="Remove" Margin="5" Click="receivedDataRemove_Click"/>-->
+                    
                 </WrapPanel>
 
                 <!--<ListView Name="lvCommunicatedMessages" Visibility="Collapsed" 

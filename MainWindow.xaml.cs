@@ -755,5 +755,28 @@ namespace SwarmRoboticsGUI
 				}
 			}
 		}
+
+		private void saveDebugMessages_Click(object sender, RoutedEventArgs e)
+		{
+			SaveFileDialog saveDebugMessages = new SaveFileDialog();
+			saveDebugMessages.Filter = "Comma Seperate Values(*.csv)|*.csv";
+			saveDebugMessages.FileName = "Debug Messages.csv";
+			if (saveDebugMessages.ShowDialog() == true)
+			{
+				File.WriteAllText(saveDebugMessages.FileName, SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationProtocolMessages.DebugString.csv.ToString());
+				//SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationProtocolMessages.DebugString.csv
+				/*
+				using (var fileStream = new FileStream(saveRobotImageDialog.FileName, FileMode.Create))
+				{
+					BitmapEncoder encoder = new PngBitmapEncoder();
+					encoder.Frames.Add(BitmapFrame.Create(mybmpSource));
+					encoder.Save(fileStream);
+				}
+				*/
+			}
+
+
+				
+		}
 	}
 }

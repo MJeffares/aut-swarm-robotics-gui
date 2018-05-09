@@ -26,8 +26,10 @@
 
 using System;
 using System.ComponentModel;
+using System.Linq;
 using XbeeHandler.XbeeFrames;
 using SwarmRoboticsGUI;
+using System.Text;
 
 namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationProtocolMessages
 {
@@ -78,16 +80,43 @@ namespace SwarmRoboticsCommunicationProtocolHandler.SwarmRoboticsCommunicationPr
 
     public class DebugString : SwarmProtocolMessage
     {
+
+		public uint type;
+		public int string_length;
         public string msg;
+		public float timestamp;
+		public float varFloat;
+
+		public static StringBuilder csv = new StringBuilder(); 
 
         public DebugString(byte[] frame) : base(frame)
         {
-            msg = System.Text.Encoding.ASCII.GetString(messageData);
-            dispMessageData = msg;
-
+			type = messageData[0];
+			string_length = messageData[1];
+            msg = System.Text.Encoding.ASCII.GetString(messageData.Skip(2).Take(string_length).ToArray());
             dispMessageType = "Debug String";
-            dispMessageData = msg;  
+			
+			switch(type)
+			{
+				//string only
+				case 0x00:
+					dispMessageData = msg;
+					break;
 
+				//float
+				case 0x01:
+					varFloat = BitConverter.ToSingle(messageData, string_length + 2);
+					
+					dispMessageData = msg + "," + varFloat.ToString();
+					break;
+
+				case 0x02:
+					timestamp = BitConverter.ToSingle(messageData, string_length + 2);
+					varFloat = BitConverter.ToSingle(messageData, string_length + 6);
+					dispMessageData = msg + "," + timestamp.ToString() + "," + varFloat.ToString();
+					break;
+			}
+			csv.AppendLine(dispMessageData);
         }
     }
 
