@@ -512,46 +512,49 @@ namespace SwarmRoboticsGUI
         //}
         private void ManualModeDirectionMouseEnter(object sender, MouseEventArgs e)
         {
-            Button control = sender as Button;
-            byte[] data = new byte[4];
-            data[0] = ROBOT_CONTROL_MESSAGE.MoveDirection;
-
-            switch (control.Name)
+            if (!e.Handled)
             {
-                case "btManualModeN":
-                    Array.Copy(DIRECTION.NORTH, 0, data, 1, 2);
-                    break;
+                Button control = sender as Button;
+                byte[] data = new byte[4];
+                data[0] = ROBOT_CONTROL_MESSAGE.MoveDirection;
 
-                case "btManualModeNE":
-                    Array.Copy(DIRECTION.NORTHEAST, 0, data, 1, 2);
-                    break;
+                switch (control.Name)
+                {
+                    case "btManualModeN":
+                        Array.Copy(DIRECTION.NORTH, 0, data, 1, 2);
+                        break;
 
-                case "btManualModeE":
-                    Array.Copy(DIRECTION.EAST, 0, data, 1, 2);
-                    break;
+                    case "btManualModeNE":
+                        Array.Copy(DIRECTION.NORTHEAST, 0, data, 1, 2);
+                        break;
 
-                case "btManualModeSE":
-                    Array.Copy(DIRECTION.SOUTHEAST, 0, data, 1, 2);
-                    break;
+                    case "btManualModeE":
+                        Array.Copy(DIRECTION.EAST, 0, data, 1, 2);
+                        break;
 
-                case "btManualModeS":
-                    Array.Copy(DIRECTION.SOUTH, 0, data, 1, 2);
-                    break;
+                    case "btManualModeSE":
+                        Array.Copy(DIRECTION.SOUTHEAST, 0, data, 1, 2);
+                        break;
 
-                case "btManualModeSW":
-                    Array.Copy(DIRECTION.SOUTHWEST, 0, data, 1, 2);
-                    break;
+                    case "btManualModeS":
+                        Array.Copy(DIRECTION.SOUTH, 0, data, 1, 2);
+                        break;
 
-                case "btManualModeW":
-                    Array.Copy(DIRECTION.WEST, 0, data, 1, 2);
-                    break;
+                    case "btManualModeSW":
+                        Array.Copy(DIRECTION.SOUTHWEST, 0, data, 1, 2);
+                        break;
 
-                case "btManualModeNW":
-                    Array.Copy(DIRECTION.NORTHWEST, 0, data, 1, 2);
-                    break;
+                    case "btManualModeW":
+                        Array.Copy(DIRECTION.WEST, 0, data, 1, 2);
+                        break;
+
+                    case "btManualModeNW":
+                        Array.Copy(DIRECTION.NORTHWEST, 0, data, 1, 2);
+                        break;
+                }
+                data[3] = (byte)Convert.ToInt16(tbManualModeSpeed.Text);
+                xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
             }
-            data[3] = (byte)Convert.ToInt16(tbManualModeSpeed.Text);
-            xbee.SendTransmitRequest(commManger.currentTargetRobot, data);
         }
         private void ManualModeMouseLeave(object sender, MouseEventArgs e)
         {
